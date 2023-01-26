@@ -44,7 +44,7 @@ coverage
 # no reason to bundle docs as they will not be seen via the extension, image
 # links are replaced by links to the repo
 docs
-!docs/images/**
+!docs/images/logo.png
 trace
 CONTRIBUTE.md
 pnpm-lock.yaml
