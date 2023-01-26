@@ -1,0 +1,624 @@
+{
+  "prefixes": {
+    "BasicDefinitionPrefix": "BasicDefinitionPrefix?",
+    "DefinitionPrefix": "BasicDefinitionPrefix PrefixMetadataMembers?",
+    "OccurrenceDefinitionPrefix": "BasicDefinitionPrefix Individual? PrefixMetadataMembers?",
+    "IndividualDefinitionPrefix": "BasicDefinitionPrefix Individual PrefixMetadataMembers?",
+    "ExtendedDefinitionPrefix": "BasicDefinitionPrefix PrefixMetadataMember",
+    "BasicUsagePrefix": "RefPrefix? Reference?",
+    "UsagePrefix": "BasicUsagePrefix PrefixMetadataMembers?",
+    "ExtendedUsagePrefix": "BasicUsagePrefix PrefixMetadataMembers",
+    "OccurrenceUsagePrefix": "BasicUsagePrefix Individual? Portion? PrefixMetadataMembers?",
+    "IndividualUsagePrefix": "BasicUsagePrefix Individual PrefixMetadataMembers?",
+    "PortionUsagePrefix": "BasicUsagePrefix Individual? Portion PrefixMetadataMembers?",
+    "RefPrefix": "RefPrefix?",
+    "VariantReferencePrefix": "FeatureChain",
+    "PrefixMetadata": "PrefixMetadataMembers?",
+    "MetadataBodyUsage": "'ref'? RedefinesToken? FeatureChain",
+    "None": "",
+    "ActionNodePrefix": "OccurrenceUsagePrefix ActionNodeUsageDeclaration?",
+    "ControlNodePrefix": "BasicUsagePrefix Individual? Portion?",
+    "ActionNodeUsageDeclaration": "ActionNodeUsageDeclaration?"
+  },
+  "sets": {
+    "None": [
+      {
+        "name": "Group_33",
+        "rules": [
+          "EmptyActionUsage"
+        ]
+      },
+      {
+        "name": "Group_24",
+        "rules": [
+          "TargetSuccession",
+          "GuardedTargetSuccession",
+          "DefaultTargetSuccession"
+        ]
+      },
+      {
+        "name": "Group_30",
+        "rules": [
+          "TransitionUsage",
+          "TriggerActionMember",
+          "GuardExpressionMember"
+        ]
+      },
+      {
+        "name": "Group_0",
+        "rules": [
+          "Comment",
+          "Documentation",
+          "TextualRepresentation",
+          "MetadataUsage"
+        ]
+      },
+      {
+        "name": "Group_20",
+        "rules": [
+          "EnumeratedValue",
+          "Group_0"
+        ]
+      },
+      {
+        "name": "Group_2",
+        "rules": [
+          "LibraryPackage",
+          "EnumerationDefinition",
+          "MetadataDefinition",
+          "Group_0"
+        ]
+      },
+      {
+        "name": "Group_15",
+        "rules": [
+          "ElementFilter",
+          "Alias",
+          "Import",
+          "Group_2"
+        ]
+      },
+      {
+        "name": "Group_19",
+        "rules": [
+          "EmptySuccession",
+          "Alias",
+          "Import",
+          "Group_2"
+        ]
+      },
+      {
+        "name": "Group_37",
+        "rules": [
+          "ElementFilter",
+          "Expose",
+          "ViewRenderingMember",
+          "Group_19"
+        ]
+      },
+      {
+        "name": "Group_28",
+        "rules": [
+          "InitialNodeMember",
+          "GuardedSuccession",
+          "Group_19",
+          "Group_24"
+        ]
+      },
+      {
+        "name": "Group_34",
+        "rules": [
+          "SubjectMember",
+          "RequirementConstraintMember",
+          "FramedConcernMember",
+          "RequirementVerificationMember",
+          "ActorMember",
+          "StakeholderMember",
+          "Group_19"
+        ]
+      },
+      {
+        "name": "Group_35",
+        "rules": [
+          "ReturnParameterMember",
+          "Group_28"
+        ]
+      },
+      {
+        "name": "Group_31",
+        "rules": [
+          "EntryActionMember",
+          "EntryTransitionMember",
+          "DoActionMember",
+          "ExitActionMember",
+          "Group_19",
+          "Group_30"
+        ]
+      },
+      {
+        "name": "Group_36",
+        "rules": [
+          "SubjectMember",
+          "ActorMember",
+          "ObjectiveMember",
+          "Group_35"
+        ]
+      }
+    ],
+    "PrefixMetadata": [
+      {
+        "name": "Group_1",
+        "rules": [
+          "Package",
+          "Dependency"
+        ]
+      }
+    ],
+    "DefinitionPrefix": [
+      {
+        "name": "Group_3",
+        "rules": [
+          "AttributeDefinition",
+          "PortDefinition"
+        ]
+      }
+    ],
+    "OccurrenceDefinitionPrefix": [
+      {
+        "name": "Group_4",
+        "rules": [
+          "OccurrenceDefinition",
+          "ItemDefinition",
+          "PartDefinition",
+          "ConnectionDefinition",
+          "FlowConnectionDefinition",
+          "InterfaceDefinition",
+          "AllocationDefinition",
+          "ActionDefinition",
+          "CalculationDefinition",
+          "StateDefinition",
+          "ConstraintDefinition",
+          "RequirementDefinition",
+          "ConcernDefinition",
+          "CaseDefinition",
+          "AnalysisCaseDefinition",
+          "VerificationCaseDefinition",
+          "UseCaseDefinition",
+          "ViewDefinition",
+          "ViewpointDefinition",
+          "RenderingDefinition"
+        ]
+      }
+    ],
+    "IndividualDefinitionPrefix": [
+      {
+        "name": "Group_5",
+        "rules": [
+          "IndividualDefinition"
+        ]
+      }
+    ],
+    "BasicDefinitionPrefix": [
+      {
+        "name": "Group_6",
+        "rules": [
+          "ExtendedDefinition"
+        ]
+      }
+    ],
+    "RefPrefix": [
+      {
+        "name": "Group_17",
+        "rules": [
+          "ReferenceUsage"
+        ]
+      },
+      {
+        "name": "Group_22",
+        "rules": [
+          "DefaultInterfaceEnd"
+        ]
+      },
+      {
+        "name": "Group_7",
+        "rules": [
+          "DefaultReferenceUsage",
+          "Group_17"
+        ]
+      },
+      {
+        "name": "Group_23",
+        "rules": [
+          "Group_22",
+          "Group_17"
+        ]
+      }
+    ],
+    "UsagePrefix": [
+      {
+        "name": "Group_18",
+        "rules": [
+          "AttributeUsage",
+          "BindingConnector",
+          "Succession"
+        ]
+      },
+      {
+        "name": "Group_21",
+        "rules": [
+          "AttributeUsage",
+          "EnumerationUsage",
+          "Succession"
+        ]
+      },
+      {
+        "name": "Group_8",
+        "rules": [
+          "BindingConnector",
+          "Group_21"
+        ]
+      }
+    ],
+    "BasicUsagePrefix": [
+      {
+        "name": "Group_9",
+        "rules": [
+          "ExtendedUsage"
+        ]
+      }
+    ],
+    "OccurrenceUsagePrefix": [
+      {
+        "name": "Group_26",
+        "rules": [
+          "SendNode",
+          "AcceptNode",
+          "AssignmentNode"
+        ]
+      },
+      {
+        "name": "Group_10",
+        "rules": [
+          "OccurrenceUsage",
+          "EventOccurrenceUsage",
+          "ItemUsage",
+          "PartUsage",
+          "ViewUsage",
+          "RenderingUsage",
+          "PortUsage",
+          "ConnectionUsage",
+          "InterfaceUsage",
+          "AllocationUsage",
+          "Message",
+          "FlowConnectionUsage",
+          "SuccessionFlowConnectionUsage"
+        ]
+      },
+      {
+        "name": "Group_13",
+        "rules": [
+          "ActionUsage",
+          "CalculationUsage",
+          "StateUsage",
+          "ConstraintUsage",
+          "RequirementUsage",
+          "ConcernUsage",
+          "CaseUsage",
+          "AnalysisCaseUsage",
+          "VerificationCaseUsage",
+          "UseCaseUsage",
+          "ViewpointUsage",
+          "PerformActionUsage",
+          "ExhibitStateUsage",
+          "IncludeUseCaseUsage",
+          "AssertConstraintUsage",
+          "SatisfyRequirementUsage"
+        ]
+      },
+      {
+        "name": "Group_14",
+        "rules": [
+          "Group_13",
+          "Group_10"
+        ]
+      },
+      {
+        "name": "Group_29",
+        "rules": [
+          "Group_14",
+          "Group_26"
+        ]
+      }
+    ],
+    "IndividualUsagePrefix": [
+      {
+        "name": "Group_11",
+        "rules": [
+          "IndividualUsage"
+        ]
+      }
+    ],
+    "PortionUsagePrefix": [
+      {
+        "name": "Group_12",
+        "rules": [
+          "PortionUsage"
+        ]
+      }
+    ],
+    "VariantReferencePrefix": [
+      {
+        "name": "Group_16",
+        "rules": [
+          "VariantReference"
+        ]
+      }
+    ],
+    "ControlNodePrefix": [
+      {
+        "name": "Group_25",
+        "rules": [
+          "MergeNode",
+          "DecisionNode",
+          "JoinNode",
+          "ForkNode"
+        ]
+      }
+    ],
+    "ActionNodePrefix": [
+      {
+        "name": "Group_27",
+        "rules": [
+          "IfNode",
+          "WhileLoopNode",
+          "ForLoopNode"
+        ]
+      }
+    ],
+    "ActionNodeUsageDeclaration": [
+      {
+        "name": "Group_32",
+        "rules": [
+          "PerformActionUsageDeclaration",
+          "AcceptNodeDeclaration",
+          "SendNodeDeclaration",
+          "AssignmentNodeDeclaration"
+        ]
+      }
+    ]
+  },
+  "groups": {
+    "AnnotatingElement": {
+      "None": "Group_0"
+    },
+    "DefinitionElement": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_2",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6"
+    },
+    "NonOccurrenceUsageElement": {
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "BasicUsagePrefix": "Group_9"
+    },
+    "StructureUsageElement": {
+      "OccurrenceUsagePrefix": "Group_10",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "BehaviorUsageElement": {
+      "OccurrenceUsagePrefix": "Group_13"
+    },
+    "OccurrenceUsageElement": {
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "UsageElement": {
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "BasicUsagePrefix": "Group_9",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "PackageMember": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_2",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "BasicUsagePrefix": "Group_9",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "PackageBodyElement": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_15",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "BasicUsagePrefix": "Group_9",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "VariantUsageElement": {
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_17",
+      "UsagePrefix": "Group_18",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "DefinitionBodyItem": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_19",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9"
+    },
+    "EnumerationElement": {
+      "None": "Group_20"
+    },
+    "InterfaceNonOccurrenceUsageElement": {
+      "RefPrefix": "Group_17",
+      "UsagePrefix": "Group_21"
+    },
+    "InterfaceOccurrenceUsageElement": {
+      "RefPrefix": "Group_22",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "InterfaceBodyItem": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_19",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_23",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12"
+    },
+    "ActionTargetSuccession": {
+      "None": "Group_24"
+    },
+    "ControlNode": {
+      "ControlNodePrefix": "Group_25"
+    },
+    "ActionNode": {
+      "OccurrenceUsagePrefix": "Group_26",
+      "ActionNodePrefix": "Group_27",
+      "ControlNodePrefix": "Group_25"
+    },
+    "ActionBodyItem": {
+      "None": "Group_28",
+      "PrefixMetadata": "Group_1",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_29",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9",
+      "ActionNodePrefix": "Group_27",
+      "ControlNodePrefix": "Group_25"
+    },
+    "TargetTransitionUsage": {
+      "None": "Group_30"
+    },
+    "StateBodyItem": {
+      "None": "Group_31",
+      "PrefixMetadata": "Group_1",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9"
+    },
+    "PerformedActionUsage": {
+      "ActionNodeUsageDeclaration": "Group_32"
+    },
+    "EffectBehaviorUsage": {
+      "None": "Group_33",
+      "ActionNodeUsageDeclaration": "Group_32"
+    },
+    "RequirementBodyItem": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_34",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9"
+    },
+    "CalculationBodyItem": {
+      "None": "Group_35",
+      "PrefixMetadata": "Group_1",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_29",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9",
+      "ActionNodePrefix": "Group_27",
+      "ControlNodePrefix": "Group_25"
+    },
+    "CaseBodyItem": {
+      "None": "Group_36",
+      "PrefixMetadata": "Group_1",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_29",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9",
+      "ActionNodePrefix": "Group_27",
+      "ControlNodePrefix": "Group_25"
+    },
+    "ViewBodyItem": {
+      "PrefixMetadata": "Group_1",
+      "None": "Group_37",
+      "DefinitionPrefix": "Group_3",
+      "OccurrenceDefinitionPrefix": "Group_4",
+      "IndividualDefinitionPrefix": "Group_5",
+      "BasicDefinitionPrefix": "Group_6",
+      "VariantReferencePrefix": "Group_16",
+      "RefPrefix": "Group_7",
+      "UsagePrefix": "Group_8",
+      "OccurrenceUsagePrefix": "Group_14",
+      "IndividualUsagePrefix": "Group_11",
+      "PortionUsagePrefix": "Group_12",
+      "BasicUsagePrefix": "Group_9"
+    }
+  }
+}

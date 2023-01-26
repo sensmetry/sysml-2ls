@@ -1,0 +1,47 @@
+{
+  "name": "kerml",
+  "scopeName": "source.kerml",
+  "fileTypes": [
+    ".kerml"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "name": "keyword.control.kerml",
+      "match": "\\b(about|abstract|alias|all|and|as|assoc|behavior|binding|bool|by|chains|class|classifier|comment|composite|conjugate|conjugates|conjugation|connector|datatype|default|derived|differences|disjoining|disjoint|doc|element|else|end|expr|false|feature|featured|featuring|filter|first|flow|for|from|function|hastype|if|implies|import|in|inout|interaction|intersects|inv|inverse|inverting|istype|language|library|member|meta|metaclass|metadata|multiplicity|namespace|nonunique|not|null|of|or|ordered|out|package|portion|predicate|private|protected|public|readonly|redefines|redefinition|references|relationship|rep|return|specialization|specializes|standard|step|struct|subclassifier|subset|subsets|subtype|succession|then|to|true|type|typed|typing|unions|xor)\\b"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.kerml",
+          "begin": "//\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.kerml"
+            }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.kerml"
+            }
+          }
+        },
+        {
+          "begin": "//",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.kerml"
+            }
+          },
+          "end": "(?=$)",
+          "name": "comment.line.kerml"
+        }
+      ]
+    }
+  }
+}

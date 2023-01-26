@@ -1,0 +1,46 @@
+/********************************************************************************
+ * Copyright (c) 2022-2023 Sensmetry UAB and others
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
+
+import { Mixin } from "ts-mixer";
+import { MetadataUsage } from "../../generated/ast";
+import { MetadataFeatureMeta } from "../KerML/metadata-feature";
+import { metamodelOf, ElementID } from "../metamodel";
+import { ItemUsageMeta } from "./item-usage";
+
+@metamodelOf(MetadataUsage, {
+    base: "Metadata::metadataItems",
+    annotatedElement: "Metaobjects::Metaobject::annotatedElement",
+    baseType: "Metaobjects::SemanticMetadata::baseType",
+})
+export class MetadataUsageMeta extends Mixin(MetadataFeatureMeta, ItemUsageMeta) {
+    constructor(node: MetadataUsage, id: ElementID) {
+        super(node, id);
+    }
+
+    override defaultSupertype(): string {
+        return "base";
+    }
+
+    override self(): MetadataUsage {
+        return super.self() as MetadataUsage;
+    }
+}
+
+declare module "../../generated/ast" {
+    interface MetadataUsage {
+        $meta: MetadataUsageMeta;
+    }
+}

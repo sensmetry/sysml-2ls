@@ -1,0 +1,16 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Kill used ports",
+            "type": "shell",
+            "command": "kill -9 $(lsof -i tcp:8008 | grep -i code | awk '{print $2}')",
+            "windows": {
+                // TODO:
+                "command": ""
+            },
+        }
+    ]
+}

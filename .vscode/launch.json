@@ -1,0 +1,132 @@
+// A launch configuration that launches the extension inside a new window
+// Use IntelliSense to learn about possible attributes.
+// Hover to view descriptions of existing attributes.
+// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+{
+    "version": "0.2.0",
+    "compounds": [
+        {
+            "name": "Run Extension and Attach a Debugger",
+            "configurations": [
+                "Run Extension and Break",
+                "Attach to Language Server"
+            ],
+            "stopAll": true,
+            "preLaunchTask": "Kill used ports",
+        }
+    ],
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "cmdArgs",
+            "description": "Script CLI arguments"
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Debug KerML AST",
+            "program": "${workspaceFolder}/bin/cli",
+            "args": [
+                "dump",
+                "${workspaceFolder}/test.kerml",
+                "-v",
+                "-l",
+                "none"
+            ],
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "Debug SysML AST",
+            "program": "${workspaceFolder}/bin/cli",
+            "args": [
+                "dump",
+                "${workspaceFolder}/test.sysml",
+                "-v",
+                "-l",
+                "none"
+            ],
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "tsx",
+            "type": "node",
+            "request": "launch",
+            "args": [
+                "${relativeFile}",
+                "${input:cmdArgs}"
+            ],
+            "runtimeArgs": [
+                "--loader",
+                "tsx"
+            ],
+            "cwd": "${workspaceRoot}",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Run Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "env": {
+                // same socket as attach port
+                "DEBUG_SOCKET": "8008"
+            }
+        },
+        {
+            // there doesn't seem to be a way to inherit configurations...
+            "name": "Run Extension and Break",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "env": {
+                "DEBUG_BREAK": "true",
+                // same socket as attach port
+                "DEBUG_SOCKET": "8008"
+            }
+        },
+        {
+            "name": "Attach to Language Server",
+            "type": "node",
+            "port": 8008,
+            "request": "attach",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "${workspaceFolder}/node_modules/langium"
+            ]
+        },
+        {
+            "name": "Jest",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "pnpm",
+            "args": [
+                "test"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "sourceMaps": true,
+        },
+    ],
+    "debug.javascript.terminalOptions": {
+        "skipFiles": [
+            "<node_internals>/**"
+        ]
+    }
+}

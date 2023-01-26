@@ -1,0 +1,31 @@
+{
+    "jest.autoRun": {
+        "watch": false,
+        "onSave": "test-file"
+    },
+    "cSpell.words": [
+        "Langium"
+    ],
+    "VSCodeCounter.exclude": [
+        "**/.gitignore",
+        "**/.vscode/**",
+        "**/node_modules/**",
+        "**/out/**",
+        "**/generated/**",
+        "SysML-v2-Release/**",
+        "package-lock.json"
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "eslint.validate": [
+        "typescript"
+    ],
+    "[typescript]": {
+        "editor.formatOnSave": true
+    },
+    "[langium]": {
+        "editor.formatOnSave": true
+    },
+    "debug.onTaskErrors": "debugAnyway",
+}

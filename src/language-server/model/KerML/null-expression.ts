@@ -1,0 +1,46 @@
+/********************************************************************************
+ * Copyright (c) 2022-2023 Sensmetry UAB and others
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
+
+import { NullExpression, Type } from "../../generated/ast";
+import { metamodelOf, ElementID } from "../metamodel";
+import { InlineExpressionMeta } from "./inline-expression";
+
+export const ImplicitNullExpressions = {
+    base: "Performances::nullEvaluations",
+};
+
+// TODO: implement implicit kind selection
+
+@metamodelOf(NullExpression, ImplicitNullExpressions)
+export class NullExpressionMeta extends InlineExpressionMeta {
+    constructor(node: NullExpression, id: ElementID) {
+        super(node, id);
+    }
+
+    override self(): NullExpression {
+        return super.deref() as NullExpression;
+    }
+
+    override returnType(): string | Type | undefined {
+        return undefined;
+    }
+}
+
+declare module "../../generated/ast" {
+    interface NullExpression {
+        $meta: NullExpressionMeta;
+    }
+}
