@@ -1,6 +1,6 @@
 ## Checklist before submitting a bug report
 
-- [ ] I have reviewed `CONTRIBUTE.md` document
+- [ ] I have reviewed `CONTRIBUTING.md` document
 - [ ] I have done a quick search on the issue tracker to check if the bug report is not redundant
 
 ## Context
