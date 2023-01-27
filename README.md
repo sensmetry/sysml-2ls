@@ -3,7 +3,7 @@
 
 Provides language support for systems modeling in SysML v2 in VS Code.
 
-SysML2 Tools is a language server for SysML v2 and KerML specifications.
+SysML2 Tools is a language server for SysML v2 and KerML [2022-10 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2022-10) specifications.
 
 This extension provides:
 
@@ -20,7 +20,7 @@ This extension provides:
 
 SysML2 Tools is built and maintained by [Sensmetry](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission & safety critical systems.
 
-The initial version has been created as an R&D effort, and contributions are highly encouraged. To provide your contributions please see the [CONTRIBUTE.md](/CONTRIBUTE.md) document.
+The initial version has been created as an R&D effort, and contributions are highly encouraged. To provide your contributions please see the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
 ## Quick start
 
@@ -84,7 +84,7 @@ To package the extension for VS Code run:
 
 ## Contributing
 
-See [CONTRIBUTE.md](/CONTRIBUTE.md).
+See [CONTRIBUTING.md](/CONTRIBUTING.md).
 
 ## Disclaimer
 

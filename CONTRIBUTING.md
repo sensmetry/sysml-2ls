@@ -5,10 +5,7 @@ We are happy for you taking the time to contribute! We appreciate your help with
 - [Main project repo](https://gitlab.com/sensmetry/public/sysml-2ls) is hosted on Gitlab, but we have a [mirrored repo](https://github.com/sensmetry/sysml-2ls) hosted on GitHub
 - Developer instructions are available in the [README.md](README.md#developer-instructions)
 - Project's main issue tracker is [here](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues) and this is the prefered place to post issues. Alternatively, you may post issues to the issue tracker of the [mirror repo](https://github.com/sensmetry/sysml-2ls/issues) on GitHub.
-- To contact the maintainers of the project, feel free to send an email to (while making sure to CC all of the bellow):
-  - Tilo Wiklund tilo.wiklund@sensmetry.com
-  - Antanas Kalkauskas antanas.kalkauskas@sensmetry.com
-  - Daumantas Kavolis daumantas.kavolis@sensmetry.com
+- To contact the maintainers of the project, feel free to send an email to opensource@sensmetry.com
 
 ## Environment details
 
