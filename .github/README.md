@@ -1,6 +1,8 @@
 
 # SysML2 Tools
 
+**NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
+
 Provides language support for systems modeling in SysML v2 in VS Code.
 
 SysML2 Tools is a language server for SysML v2 and KerML specifications.
