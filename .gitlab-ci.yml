@@ -45,7 +45,7 @@ package-job:
   stage: package
   environment: production
   variables:
-    EXTENSION_NAME: sensmetry.sysml-v2-${CI_COMMIT_SHA}
+    EXTENSION_NAME: sensmetry.sysml-2ls-${CI_COMMIT_SHA}
   script:
     - pnpm run vscode:package -o "$EXTENSION_NAME.vsix"
   artifacts:
