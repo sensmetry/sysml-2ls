@@ -1,8 +1,8 @@
 ## Checklist before submitting a merge request
 
-- [ ] I reviewed `CONTRIBUTE.md` document
-- [ ] All commits have been signed-off for the Developer Certificate of Origin. See [here](../../CONTRIBUTE.md#developer-certificate-of-origin).
-- [ ] I added my contribution to `CHANGELOG.md`
+- [ ] I have reviewed `CONTRIBUTE.md` document
+- [ ] All commits have been signed-off for the Developer Certificate of Origin. See [here](/CONTRIBUTE.md#developer-certificate-of-origin).
+- [ ] I have added my contribution to `CHANGELOG.md`
 
 ## Description of contribution
 
