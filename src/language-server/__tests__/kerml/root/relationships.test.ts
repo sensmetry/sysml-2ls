@@ -18,24 +18,24 @@ import { qualifiedTypeReference } from "../../../../testing";
 
 test("relationships are parseable", async () => {
     return expect(`
-    element <'1'> A;
-    element <'2'> B;
-    element <'3'> C;
-    element <'4'> D;
-    relationship <'5'> R from '1', D to B, C;
+    type <'1'> A;
+    type <'2'> B;
+    type <'3'> C;
+    type <'4'> D;
+    dependency <'5'> R from '1', D to B, C;
     `).toParseKerML({
         elements: [
-            { name: "A", shortName: "'1'" },
-            { name: "B", shortName: "'2'" },
-            { name: "C", shortName: "'3'" },
-            { name: "D", shortName: "'4'" },
+            { declaredName: "A", declaredShortName: "'1'" },
+            { declaredName: "B", declaredShortName: "'2'" },
+            { declaredName: "C", declaredShortName: "'3'" },
+            { declaredName: "D", declaredShortName: "'4'" },
         ],
         relationships: [
             {
-                name: "R",
-                shortName: "'5'",
-                source: [qualifiedTypeReference("A"), qualifiedTypeReference("D")],
-                target: [qualifiedTypeReference("B"), qualifiedTypeReference("C")],
+                declaredName: "R",
+                declaredShortName: "'5'",
+                client: [qualifiedTypeReference("A"), qualifiedTypeReference("D")],
+                supplier: [qualifiedTypeReference("B"), qualifiedTypeReference("C")],
             },
         ],
     });

@@ -15,7 +15,9 @@
  ********************************************************************************/
 
 import { MaybePromise } from "langium";
+import path from "path";
 import { ExecuteCommandRequest, ProtocolConnection } from "vscode-languageserver-protocol";
+import { cacheDir } from "../common/download";
 import {
     FindStdlibRequest,
     RegisterTextEditorCommandsRequest,
@@ -42,14 +44,23 @@ const HEARTBEAT_PERIOD = 1000; // ms
  */
 export abstract class SysMLClientExtender {
     /**
-     * Extend language {@link client} with SysML specific handlers
+     * Client config
+     */
+    config: ClientConfig = {
+        stdlibUrl: this.stdlibRepoZipUrl,
+    };
+
+    /**
+     * Extend language {@link client} with SysML specific handlers. Should be
+     * called before starting the language client.
      * @param client language client to extend
      * @returns same client
      */
-    extend<T extends GenericLanguageClient>(client: T): T {
+    async extend<T extends GenericLanguageClient>(client: T): Promise<T> {
         this.installTextEditorCommandsHandler(client);
         this.installStdlibFinder(client);
 
+        await this.initializeClient();
         return client;
     }
 
@@ -109,13 +120,67 @@ export abstract class SysMLClientExtender {
      */
     protected get stdlibRepoZipUrl(): string {
         //  TODO: download only a folder somehow (~35 times less data used)
-        return `https://github.com/Systems-Modeling/SysML-v2-Release/archive/refs/tags/${this.stdlibTag}.zip`;
+        return "https://github.com/Systems-Modeling/SysML-v2-Release/archive/refs/tags/2022-12.zip";
     }
 
     /**
-     * Tag of compatible SysML v2 Release repo
+     * Path to where the standard library may be cached
      */
-    protected get stdlibTag(): string {
-        return "2022-10";
+    protected get stdlibDir(): string {
+        return path.join(cacheDir(), "sysml.library");
     }
+
+    /**
+     * Path to persistent config
+     */
+    protected get configPath(): string {
+        return path.join(cacheDir(), ".config");
+    }
+
+    /**
+     * Perform client initialization
+     */
+    private async initializeClient(): Promise<void> {
+        let config = await this.loadConfig();
+
+        if (config?.stdlibUrl !== this.stdlibRepoZipUrl) {
+            await this.maybeUpdateDownloadedStdlib();
+        }
+
+        if (!config) config = this.config;
+        else this.config = config;
+
+        await this.onInitialize();
+        await this.saveConfig(this.config);
+    }
+
+    /**
+     * Load stored persistent config
+     */
+    protected abstract loadConfig(): MaybePromise<ClientConfig | undefined>;
+
+    /**
+     * Save persistent config
+     * @param config
+     */
+    protected abstract saveConfig(config: ClientConfig): MaybePromise<void>;
+
+    /**
+     * Maybe update the previously downloaded standard library
+     */
+    protected abstract maybeUpdateDownloadedStdlib(): MaybePromise<void>;
+
+    /**
+     * Perform specific client initialization if needed
+     */
+    protected onInitialize(): MaybePromise<void> {
+        /* empty */
+    }
+}
+
+export interface ClientConfig {
+    /**
+     * Compatible standard library URL used the last time the client was run
+     */
+    stdlibUrl: string;
 }

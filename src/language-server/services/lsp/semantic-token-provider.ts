@@ -321,17 +321,17 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         // this is also a declaration
         mods.push(SysMLSemanticTokenModifiers.declaration);
 
-        if (node.name)
+        if (node.declaredName)
             acceptor({
                 node: node,
-                property: "name",
+                property: "declaredName",
                 type: type,
                 modifier: mods,
             });
-        if (node.shortName)
+        if (node.declaredShortName)
             acceptor({
                 node: node,
-                property: "shortName",
+                property: "declaredShortName",
                 type: type,
                 modifier: mods,
             });

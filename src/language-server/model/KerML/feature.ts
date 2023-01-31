@@ -93,7 +93,7 @@ export class FeatureMeta extends TypeMeta {
     }
 
     override initialize(node: Feature): void {
-        if (!node.name && node.redefines.length > 0) {
+        if (!node.declaredName && node.redefines.length > 0) {
             const newName = node.redefines[0].chain.at(-1)?.$refText;
             if (newName) this.setName(newName);
         }
@@ -218,9 +218,9 @@ export class FeatureMeta extends TypeMeta {
      * Feature that provides the name for this feature. Itself if it was named,
      * otherwise the naming feature of the first redefinition
      */
-    get namingFeature(): (Feature & { name: string }) | undefined {
+    get namingFeature(): (Feature & { declaredName: string }) | undefined {
         const feature = this.self();
-        if (feature.name) return feature as Feature & { name: string };
+        if (feature.declaredName) return feature as Feature & { declaredName: string };
         const redefinitions = this.specializations(SpecializationKind.Redefinition);
         if (redefinitions.length === 0) return undefined;
         // redefinitions are always features
@@ -246,7 +246,7 @@ export class FeatureMeta extends TypeMeta {
 
         if (kind !== SpecializationKind.Redefinition || this.name) return;
         const namingFeature = this.namingFeature;
-        if (namingFeature) this.setName(namingFeature.name);
+        if (namingFeature) this.setName(namingFeature.declaredName);
     }
 
     override specializationKind(): SpecializationKind {

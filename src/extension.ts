@@ -82,7 +82,8 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<La
     const client = new LanguageClient("sysml", "sysml", serverOptions, clientOptions);
 
     // Start the client. This will also launch the server
-    await new SysMLVSCodeClientExtender(context).extend(client).start();
+    await new SysMLVSCodeClientExtender(context).extend(client);
+    await client.start();
     // commands registered in execute command handler seem to be automatically
     // registered with VSCode
 

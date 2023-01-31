@@ -50,16 +50,16 @@ test("namespace members can be imported with qualified names", async () => {
         elements: [
             {
                 $type: Namespace,
-                name: "N1",
+                declaredName: "N1",
             },
             {
                 $type: Namespace,
-                name: "N2",
+                declaredName: "N2",
                 imports: anything(2),
                 features: [
                     {
                         $type: Feature,
-                        name: "B",
+                        declaredName: "B",
                         typedBy: [qualifiedTypeReference("N1::A")],
                     },
                 ],
@@ -80,20 +80,20 @@ test("wildcard imports all public members from a namespace", async () => {
         elements: [
             {
                 $type: Namespace,
-                name: "N1",
+                declaredName: "N1",
             },
             {
                 $type: Namespace,
-                name: "N3",
+                declaredName: "N3",
                 features: [
                     {
                         $type: Feature,
-                        name: "D",
+                        declaredName: "D",
                         typedBy: [qualifiedTypeReference("N1::A")],
                     },
                     {
                         $type: Feature,
-                        name: "E",
+                        declaredName: "E",
                         typedBy: [qualifiedTypeReference("N1::B")],
                     },
                 ],
@@ -126,19 +126,19 @@ test("double wildcard recursively imports all members from a namespace and its c
         elements: [
             {
                 $type: Namespace,
-                name: "N4",
+                declaredName: "N4",
             },
             {
                 $type: Namespace,
-                name: "N5",
+                declaredName: "N5",
             },
             {
                 $type: Namespace,
-                name: "N6",
+                declaredName: "N6",
                 features: [
                     {
                         $type: Feature,
-                        name: "D",
+                        declaredName: "D",
                         typedBy: [qualifiedTypeReference("N4::M::C")],
                     },
                 ],
@@ -165,7 +165,7 @@ test("visibility affects the visibility of imported members", async () => {
         features: [
             {
                 $type: Feature,
-                name: "A",
+                declaredName: "A",
                 typedBy: [qualifiedTypeReference("N1::A")],
             },
         ],
@@ -178,7 +178,7 @@ test("imported elements can be filtered", async () => {
         metaclass Approved;
     }
     namespace NA {
-        element A {
+        type A {
             @Annotations::Approved;
         }
     }
@@ -194,19 +194,19 @@ test("imported elements can be filtered", async () => {
         elements: [
             {
                 $type: Namespace,
-                name: "Annotations",
+                declaredName: "Annotations",
             },
             {
                 $type: Namespace,
-                name: "NA",
+                declaredName: "NA",
             },
             {
                 $type: Namespace,
-                name: "N8",
+                declaredName: "N8",
             },
             {
                 $type: Namespace,
-                name: "N9",
+                declaredName: "N9",
             },
         ],
     });

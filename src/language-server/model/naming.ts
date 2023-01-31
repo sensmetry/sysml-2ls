@@ -76,7 +76,7 @@ export function computeQualifiedName(meta: ElementMeta, parent: AstNode | undefi
 }
 
 export class Name {
-    protected _raw: string | undefined;
+    protected _declared: string | undefined;
     protected _name: string | undefined;
 
     constructor(name?: string) {
@@ -86,8 +86,8 @@ export class Name {
     /**
      * Name as was parsed/provided
      */
-    get raw(): string | undefined {
-        return this._raw;
+    get declared(): string | undefined {
+        return this._declared;
     }
 
     /**
@@ -101,7 +101,7 @@ export class Name {
      * Set new name
      */
     set(name: string | undefined): void {
-        this._raw = name;
+        this._declared = name;
         this._name = sanitizeName(name);
     }
 }

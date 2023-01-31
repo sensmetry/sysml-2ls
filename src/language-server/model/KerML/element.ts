@@ -96,8 +96,8 @@ export class ElementMeta extends VisibilityMeta {
     }
 
     override initialize(node: Element): void {
-        this._name.set(node.name);
-        this._shortName.set(node.shortName);
+        this._name.set(node.declaredName);
+        this._shortName.set(node.declaredShortName);
 
         // using raw names for easier disambiguation between
         this.qualifiedName = computeQualifiedName(this, node.$container);
@@ -190,7 +190,7 @@ export class ElementMeta extends VisibilityMeta {
      * Name as parsed
      */
     get rawName(): string | undefined {
-        return this._name.raw;
+        return this._name.declared;
     }
 
     /**
@@ -212,7 +212,7 @@ export class ElementMeta extends VisibilityMeta {
      * Short name as parsed
      */
     get rawShortName(): string | undefined {
-        return this._shortName.raw;
+        return this._shortName.declared;
     }
 
     /**

@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { AstNode, EMPTY_STREAM, isAstNode, Stream, TreeStream, TreeStreamImpl } from "langium";
+import { Position, Range } from "vscode-languageserver";
 import { Alias, Element, Feature, isAlias, isElement } from "../generated/ast";
 import { SpecializationKind } from "../model/enums";
 import { resolveAlias } from "../model/util";
@@ -267,3 +268,21 @@ export type AstContainer<
      */
     $containerIndex?: T[P] extends Array<unknown> ? number : never;
 };
+
+const EMPTY_POS: Position = { line: 0, character: 0 };
+
+/**
+ * Compare range start positions for use in sorting
+ * @param lhs first range to compare
+ * @param rhs second range to compare
+ * @returns value which can be used for sorting ranges in ascending order by
+ * their start positions, negate the returned value for descending sorting
+ */
+export function compareRanges(lhs?: Range, rhs?: Range): number {
+    const left = lhs?.start ?? EMPTY_POS;
+    const right = rhs?.start ?? EMPTY_POS;
+
+    const lineDiff = left.line - right.line;
+    if (lineDiff !== 0) return lineDiff;
+    return left.character - right.character;
+}

@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import fs from "fs";
+import fs from "fs-extra";
 import http from "http";
 import https from "https";
 import path from "path";
@@ -45,20 +45,38 @@ export function formatBytes(bytes: number, fractionDigits = 2): string {
 }
 
 /**
+ * @see {@link mkTmpdir}
  * @returns temporary directory that can be used for downloads
  */
 export function tmpdir(): string {
-    const dir = path.join(os.tmpdir(), "Sensmetry");
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    return path.join(os.tmpdir(), "Sensmetry");
+}
+
+/**
+ * @see {@link cacheDir}
+ * @returns directory that can be used to for persistent caching
+ */
+export function cacheDir(): string {
+    return path.join(os.homedir(), ".sysml-2ls");
+}
+
+/**
+ * @see {@link tmpdir}
+ * @returns a valid temporary directory that can be used for downloads
+ */
+export async function mkTmpdir(): Promise<string> {
+    const dir = tmpdir();
+    if (!(await fs.exists(dir))) await fs.mkdir(dir);
     return dir;
 }
 
 /**
- * @returns directory that can be used to for persistent caching
+ * @see {@link cacheDir}
+ * @returns a valid directory that can be used to for persistent caching
  */
-export function cacheDir(): string {
-    const dir = path.join(os.homedir(), ".sysml-2ls");
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+export async function mkCacheDir(): Promise<string> {
+    const dir = cacheDir();
+    if (!(await fs.exists(dir))) await fs.mkdir(dir);
     return dir;
 }
 

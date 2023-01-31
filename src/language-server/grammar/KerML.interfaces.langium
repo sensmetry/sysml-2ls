@@ -74,6 +74,7 @@ interface Element extends VisibilityElement {
     comments: Comment[];
     docs: Documentation[];
     metadata: MetadataFeature[];
+    prefixes: MetadataFeature[]
     reps: TextualRepresentation[];
     name?: string;
     shortName?: string;
@@ -274,6 +275,11 @@ interface Conjugation extends Specialization {
 }
 
 interface Redefinition extends Subsetting {
+}
+
+interface Dependency extends Relationship {
+    client: ElementReference[];
+    supplier: ElementReference[];
 }
 
 // References

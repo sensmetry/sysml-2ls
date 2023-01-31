@@ -14,20 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { SysMLClientExtender } from "./sysml-language-client";
+import { ClientConfig, SysMLClientExtender } from "./sysml-language-client";
 import * as vscode from "vscode";
 import { TextEditor } from "../common/protocol-extensions";
 import { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import fs from "fs-extra";
 import path from "path";
-import {
-    cacheDir,
-    downloadFile,
-    DownloadInfo,
-    formatBytes,
-    tmpdir,
-    unzipFile,
-} from "../common/download";
+import { downloadFile, DownloadInfo, formatBytes, mkTmpdir, unzipFile } from "../common/download";
+import CONFIG from "../../package.json";
+
+type Options = keyof typeof CONFIG.contributes.configuration.properties;
 
 /**
  * SysML language client for VS Code.
@@ -92,8 +88,12 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
             ? vscode.ConfigurationTarget.Global
             : vscode.ConfigurationTarget.Workspace;
         const config = vscode.workspace.getConfiguration();
-        await config.update("sysml.standardLibrary", false, target);
-        await config.update("sysml.defaultBuildOptions.ignoreMetamodelErrors", true, target);
+        await config.update(<Options>"sysml.standardLibrary", false, target);
+        await config.update(
+            <Options>"sysml.defaultBuildOptions.ignoreMetamodelErrors",
+            true,
+            target
+        );
     }
 
     /**
@@ -112,7 +112,9 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
         const dir = result[0].fsPath;
 
         if (!(await fs.exists(dir))) return;
-        await vscode.workspace.getConfiguration().update("sysml.standardLibraryPath", dir, true);
+        await vscode.workspace
+            .getConfiguration()
+            .update(<Options>"sysml.standardLibraryPath", dir, true);
         return dir;
     }
 
@@ -120,8 +122,8 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
      * Download the stdlib from web
      */
     protected async downloadStdlibDir(): Promise<string | undefined> {
-        const tempDir = tmpdir();
-        const zipFile = path.join(tempDir, `sysml-v2-release-${this.stdlibTag}.zip`);
+        const tempDir = await mkTmpdir();
+        const zipFile = path.join(tempDir, "sysml-v2-release.zip");
 
         const info = await SysMLVSCodeClientExtender.downloadUrl(
             this.stdlibRepoZipUrl,
@@ -132,13 +134,12 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
         if (!info) return;
 
         // store the extracted standard library in cache
-        const cache = cacheDir();
-        const libPath = path.join(cache, "sysml.library");
+        const libPath = this.stdlibDir;
 
         // delete old directory if it exists to avoid any stale files
         await fs.remove(libPath);
 
-        await unzipFile(zipFile, cache, (entry) => {
+        await unzipFile(zipFile, path.dirname(libPath), (entry) => {
             // only unzip the library documents
             const suffix = /sysml\.library.*\.(?:kerml|sysml)/.exec(entry.fileName);
             if (!suffix) return;
@@ -148,7 +149,11 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
         // and update the configuration
         await vscode.workspace
             .getConfiguration()
-            .update("sysml.standardLibraryPath", libPath, vscode.ConfigurationTarget.Global);
+            .update(
+                <Options>"sysml.standardLibraryPath",
+                libPath,
+                vscode.ConfigurationTarget.Global
+            );
         vscode.window.showInformationMessage(
             `The downloaded standard library can be found in ${libPath}`
         );
@@ -200,5 +205,45 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
         );
 
         return await downloadPromise;
+    }
+
+    protected async loadConfig(): Promise<ClientConfig | undefined> {
+        if (!(await fs.exists(this.configPath))) return;
+        const contents = await fs.readFile(this.configPath, "utf-8");
+        return JSON.parse(contents);
+    }
+
+    protected async saveConfig(config: ClientConfig): Promise<void> {
+        const contents = JSON.stringify(config, undefined, 2);
+        const out = this.configPath;
+        const dir = path.dirname(out);
+        if (!(await fs.exists(dir))) await fs.mkdir(dir, { recursive: true });
+
+        return fs.writeFile(this.configPath, contents, "utf-8");
+    }
+
+    protected async maybeUpdateDownloadedStdlib(): Promise<void> {
+        if (!(await fs.exists(this.stdlibDir))) {
+            // nothing downloaded so nothing to update
+            return;
+        }
+
+        const usedDir = await vscode.workspace
+            .getConfiguration()
+            .get(<Options>"sysml.standardLibraryPath");
+        if (usedDir !== this.stdlibDir) {
+            // not using the downloaded library, skip update
+            return;
+        }
+
+        const answer = await vscode.window.showInformationMessage(
+            "The compatible SysML v2 standard library has been updated, would you like to download it?",
+            "Yes",
+            "No"
+        );
+
+        if (answer === "Yes") {
+            await this.downloadStdlibDir();
+        }
     }
 }

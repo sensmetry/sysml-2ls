@@ -21,14 +21,14 @@ import { stream } from "langium";
 
 const N1 = `
 namespace N1 {
-    element A;
-    protected element A2;
-    private element A3;
+    type A;
+    protected type A2;
+    private type A3;
 
     namespace N2 {
-        element B;
-        protected element B2;
-        private element B3;
+        type B;
+        protected type B2;
+        private type B3;
     }
 }
 `;
@@ -37,28 +37,28 @@ const N4 = `
 namespace N4 {
     import N1::N2::B;
 
-    element C;
+    type C;
 }
 `;
 
 const N5 = `namespace N5 {
     import N1::N2::*;
 
-    element C;
+    type C;
 }
 `;
 
 const N6 = `namespace N6 {
     import N1::**;
 
-    element C;
+    type C;
 }
 `;
 
 const N7 = `namespace N7 {
     import N1::*::**;
 
-    element C;
+    type C;
 }
 `;
 

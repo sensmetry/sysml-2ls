@@ -53,6 +53,7 @@ import { SUPPORTED_TRIGGER_CHARACTERS } from "../completion-provider";
 import { SysMLExecuteCommandHandler } from "../execute-command-handler";
 import { SysMLSemanticTokenTypes, SysMLSemanticTokenModifiers } from "../semantic-token-provider";
 import {
+    ClientConfig,
     GenericLanguageClient,
     SysMLClientExtender,
 } from "../../../../language-client/sysml-language-client";
@@ -76,7 +77,7 @@ class TestStream extends Duplex {
 class TestClientExtender extends SysMLClientExtender {
     commands: string[] = [];
 
-    override extend<T extends GenericLanguageClient>(client: T): T {
+    override async extend<T extends GenericLanguageClient>(client: T): Promise<T> {
         super.extend(client);
         client.onRequest(ConfigurationRequest.type, (params) =>
             params.items.map((item) => {
@@ -102,6 +103,10 @@ class TestClientExtender extends SysMLClientExtender {
             skipWorkspaceInit: false,
         };
     });
+
+    loadConfig = jest.fn();
+    saveConfig = jest.fn();
+    maybeUpdateDownloadedStdlib = jest.fn();
 }
 
 interface Services {
@@ -116,7 +121,7 @@ interface Services {
 
 let _services: Services | undefined;
 
-function getLanguageServices(): Services {
+async function getLanguageServices(): Promise<Services> {
     if (_services) return _services;
 
     const up = new TestStream();
@@ -129,7 +134,7 @@ function getLanguageServices(): Services {
     );
     clientConnection.listen();
     const extender = new TestClientExtender();
-    extender.extend(clientConnection);
+    await extender.extend(clientConnection);
 
     // ignore registration request, consumes the requests so that there are no
     // errors reported on disposing the connection
@@ -242,7 +247,7 @@ describe("package.json exports custom contributions", () => {
     test("exported commands are all known", async () => {
         const exported = CONFIG.contributes.commands.map((v) => v.command);
         // don't initialize the client/server as there are other tests for that
-        const services = getLanguageServices();
+        const services = await getLanguageServices();
 
         const lsp = services.shared.lsp;
         expect(lsp.ExecuteCommandHandler).toBeDefined();
@@ -261,9 +266,10 @@ async function asyncWhile(predicate: () => boolean): Promise<void> {
 }
 
 describe("Language server registration tests", () => {
-    const services = getLanguageServices();
+    let services: Services;
 
     beforeAll(async () => {
+        services = await getLanguageServices();
         await initializeServices(services);
 
         // put test wait conditions here as initialized is only a notification
@@ -306,6 +312,29 @@ describe("Language server registration tests", () => {
 
     test("a request is sent if no standard library was found", async () => {
         expect(services.extender.selectStdlibPath).toHaveBeenCalledTimes(1);
+    });
+
+    test("client loads config on initialization", async () => {
+        expect(services.extender.loadConfig).toHaveBeenCalledTimes(1);
+    });
+
+    test("client saves config on initialization", async () => {
+        expect(services.extender.saveConfig).toHaveBeenCalledTimes(1);
+        expect(services.extender.saveConfig).toHaveBeenCalledWith(services.extender.config);
+    });
+
+    test("client asks to download a newer version of standard library if no config was loaded", async () => {
+        expect(services.extender.maybeUpdateDownloadedStdlib).toHaveBeenCalledTimes(1);
+    });
+
+    test("client asks to download a newer version of standard library if the urls don't match", async () => {
+        services.extender.maybeUpdateDownloadedStdlib.mockClear();
+        services.extender.maybeUpdateDownloadedStdlib.mockReturnValueOnce(<ClientConfig>{
+            stdlibUrl: services.extender["stdlibRepoZipUrl"] + "...",
+        });
+        await services.extender["initializeClient"]();
+
+        expect(services.extender.maybeUpdateDownloadedStdlib).toHaveBeenCalledTimes(1);
     });
 });
 

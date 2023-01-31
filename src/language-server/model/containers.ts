@@ -17,7 +17,6 @@
 import { stream } from "langium";
 import { Type, TypeReference, isFeature } from "../generated/ast";
 import { SpecializationKind } from "./enums";
-import { Position } from "vscode-languageserver";
 import { JSONConvertible } from "../utils/common";
 
 export type SpecializationType<T extends Type = Type> = {
@@ -84,8 +83,6 @@ export class Specializations
     }
 }
 
-const EMPTY_POS: Position = { line: 0, character: 0 };
-
 /**
  * @param node type to collect explicit specializations for
  * @returns type references used in explicit specialization in the order they
@@ -96,14 +93,5 @@ export function getExplicitSpecializations(node: Type): TypeReference[] {
     if (isFeature(node))
         refs = refs.concat(stream(node.typedBy, node.references, node.redefines, node.subsets));
 
-    // TODO: extract range comparison to a separate function and use it to sort
-    // $children in parser.ts
-    return refs.toArray().sort((l, r) => {
-        const lpos = l.$cstNode?.range.start ?? EMPTY_POS;
-        const rpos = r.$cstNode?.range.start ?? EMPTY_POS;
-
-        const lineDiff = lpos.line - rpos.line;
-        if (lineDiff !== 0) return lineDiff;
-        return lpos.character - rpos.character;
-    });
+    return refs.toArray().sort((l, r) => l.$childIndex - r.$childIndex);
 }

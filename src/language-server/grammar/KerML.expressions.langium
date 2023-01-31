@@ -53,9 +53,9 @@ NullExpression returns NullExpression:
     {NullExpression} ('null' | '(' ')');
 
 fragment ShortName:
-    '<' shortName=Name '>';
+    '<' declaredShortName=Name '>';
 fragment RegularName:
-    name=Name;
+    declaredName=Name;
 fragment Identification:
     ShortName RegularName? | RegularName;
 
@@ -170,16 +170,12 @@ FeatureChain returns FeatureReference:
     AnyReferenceChain;
 DummyFeatureReference returns TypeReference:
     QualifiedFeatureReference;
-DummyFeatureReference2 returns FeatureReference:
-    (prefix=ElementReference)? QualifiedFeatureReference;
 TypeReferenceOrFeatureChain returns TypeReference:
-    // Langium discards anything before if a new type is parsed later so save it
-    // into a member
-    TypeReference ({FeatureReference.prefix=current} ChainToken FeatureChain)?;
+    TypeReference | FeatureChain;
 DummyTypeOrFeatureReference returns TypeReference:
     TypeReferenceOrFeatureChain;
 ElementReferenceOrFeatureChain returns ElementReference:
-    ElementReference ({FeatureReference.prefix=current} ChainToken FeatureChain)?;
+    ElementReference | FeatureChain;
 MetaclassReference returns MetaclassReference:
     QualifiedReferenceChain;
 DummyMetaclassReference returns TypeReference:
