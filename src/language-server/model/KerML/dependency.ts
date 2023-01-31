@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Dependency } from "../../generated/ast";
-import { RelationshipMeta } from "../KerML/relationship";
+import { RelationshipMeta } from "./relationship";
 import { metamodelOf, ElementID } from "../metamodel";
 
 @metamodelOf(Dependency)

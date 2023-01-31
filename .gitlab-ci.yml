@@ -35,9 +35,9 @@ lint-job:
 validate-job:
   stage: test
   script:
-    - git clone -n --shallow-exclude=2022-09 https://github.com/Systems-Modeling/SysML-v2-Release.git
+    - git clone -n --shallow-exclude=2022-11 https://github.com/Systems-Modeling/SysML-v2-Release.git
     - cd SysML-v2-Release
-    - git checkout tags/2022-10
+    - git checkout tags/2022-12
     - cd ..
     - pnpm run run-validation
 

@@ -41,7 +41,6 @@ export * from "./constraint-usage";
 export * from "./control-node";
 export * from "./decision-node";
 export * from "./definition";
-export * from "./dependency";
 export * from "./enumeration-definition";
 export * from "./enumeration-usage";
 export * from "./event-occurrence-usage";

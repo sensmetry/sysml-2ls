@@ -10,8 +10,7 @@ import 'KerML.expressions'
 //! DO NOT USE UNIONS SINCE THEY CAN EASILY LEAD TO INFINITE RECURSION IN SUBTYPE COMPUTATION
 
 NonFeatureElement<visible> returns Element:
-    Element<visible>
-	| Namespace<visible>
+    Namespace<visible>
 	| Package<visible>
     | LibraryPackage<visible>
 	| Multiplicity<visible>
@@ -31,7 +30,7 @@ NonFeatureElement<visible> returns Element:
 ;
 
 RelationshipElement<visible> returns Relationship:
-    Relationship<visible>
+    Dependency<visible>
     | Specialization<visible>
 	| Conjugation<visible>
     | FeatureTyping<visible>
@@ -88,35 +87,16 @@ fragment ConjugatesToken returns string:
     '~' | 'conjugates';
 
 // Elements
-Element<visible> returns Element:
-    (<visible> Visibility)? PrefixMetadataMembers? 'element' Identification? ElementBody;
-fragment ElementBody:
-    ';' | '{'
-        (comments+=Comment
-        | docs+=Documentation
-        | reps+=TextualRepresentation
-        | metadata+=MetadataFeature
-        | relationships+=OwnedRelationship
-        )*
-    '}'
-;
+
+fragment ElementFrag:
+    PrefixMetadataMembers? Visibility? Identification? RelationshipBody;
+DummyElement returns Element:
+    ElementFrag;
 DummyVisibleElement returns VisibilityElement:
-    Element<true>;
-DummyElementInterface returns Element:
-    RelationshipBody;
+    DummyElement;
 
 // Relationships
-Relationship<visible> returns Relationship:
-    (<visible> Visibility)? PrefixMetadataMembers? 'relationship' Identification?
-    ( 'from' source+=ElementReference (',' source+=ElementReference)* )?
-    ( 'to' target+=ElementReference (',' target+=ElementReference)* )?
-    RelationshipBody;
-OwnedRelationship returns Relationship:
-    PrefixMetadataMembers?
-    'relationship' Identification?
-    ('to' target+=ElementReference (',' target+=ElementReference)*)?
-    RelationshipBody
-;
+
 fragment RelationshipBody:
     ';' | '{'
         (comments+=Comment
@@ -127,11 +107,22 @@ fragment RelationshipBody:
         | elements+=NonFeatureElement<false>
         | relationships+=RelationshipElement<false>
         )*
-     '}'
+    '}'
 ;
 
-DummyRelationship returns Element:
-    Relationship<true>;
+DummyRelationship returns Relationship:
+    ElementFrag source+=ElementReference target+=ElementReference;
+RelationshipHierarchy returns Element:
+    DummyRelationship;
+
+// Dependencies
+
+Dependency<visible> returns Dependency:
+    (<visible> Visibility?)? PrefixMetadataMembers? 'dependency' Identification? 'from'?
+    client+=ElementReference ( ',' client+=ElementReference )* 'to'
+    supplier+=ElementReference ( ',' supplier+=ElementReference )*
+    RelationshipBody
+;
 
 // Namespaces
 Namespace<visible> returns Namespace:
@@ -703,8 +694,6 @@ PrimaryExpression returns InlineExpression:
         | {InvocationExpression.args+=current} '->' type=TypeReference 
             ( args+=BodyExpression
             | args+=FunctionReferenceExpression
-            // https://gitlab.com/sensmetry/internal/tech/offering/product/sysml-v2-language-server/-/issues/20
-            // | ArgumentList
             | '(' (args+=Argument (',' args+=Argument)* | args+=NamedArgument (',' args+=NamedArgument)*)? ')'
             )
         | {CollectExpression.args+=current} '.' args+=BodyExpression // collect
@@ -748,3 +737,9 @@ InvocationExpressionTypings returns InvocationExpression:
 // Also, inference breaks for explicit interfaces so have to use a string operator...
 OperatorExpressionOperators returns OperatorExpression:
     operator=Name;
+
+// =========================================================================
+// Hierarchies
+
+DependencyHierarchy returns Relationship:
+    Dependency<true>;

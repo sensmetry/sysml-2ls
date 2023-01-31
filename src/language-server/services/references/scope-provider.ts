@@ -242,7 +242,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
                 // allowed to reference the declaring element but this fixes a
                 // linking error in
                 // SysML-v2-Release/sysml/src/examples/Individuals%20Examples/JohnIndividualExample.sysml
-                skip: property === "subsets" ? undefined : owner,
+                skip: property === "subsets" || property === "inverseOf" ? undefined : owner,
                 visited: redefinitions,
             },
             this.indexManager.getGlobalScope(document)

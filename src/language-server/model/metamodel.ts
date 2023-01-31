@@ -261,6 +261,5 @@ export class BasicMetamodel<T extends AstNode> implements Metamodel<T> {
 declare module "langium" {
     interface AstNode {
         $meta?: Metamodel;
-        readonly $children: AstNode[];
     }
 }

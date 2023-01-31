@@ -16,13 +16,14 @@
 
 import { Command } from "commander";
 import { spawn, execSync, ExecSyncOptions } from "child_process";
+import CONFIG from "../package.json";
 
 const GENERATE = "file:node_modules/langium-workspaces/packages/langium";
-const RUNTIME = "^1.0.1";
+const RUNTIME = CONFIG.dependencies.langium;
 
-const CHILD_OPTIONS = {
+const CHILD_OPTIONS: ExecSyncOptions = {
     stdio: [0, 1, 2],
-} satisfies ExecSyncOptions;
+};
 
 async function generate(watch = false): Promise<void> {
     const install = (pack: string): void => {
@@ -36,18 +37,17 @@ async function generate(watch = false): Promise<void> {
         install(RUNTIME);
     };
 
+    const args = [
+        "tsx",
+        "node_modules/langium-workspaces/packages/langium-cli/bin/langium.js",
+        "generate",
+    ];
+
+    if (watch) args.push("--watch");
+
     return new Promise((resolve, reject) => {
         install(GENERATE);
-        const child = spawn(
-            "pnpm",
-            [
-                "tsx",
-                "node_modules/langium-workspaces/packages/langium-cli/bin/langium.js",
-                "--",
-                watch ? "watch" : "generate",
-            ],
-            CHILD_OPTIONS
-        );
+        const child = spawn("pnpm", args, CHILD_OPTIONS);
 
         child.on("spawn", () => {
             revert();

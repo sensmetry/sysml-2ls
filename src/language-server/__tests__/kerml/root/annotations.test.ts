@@ -15,19 +15,19 @@
  ********************************************************************************/
 
 /* eslint-disable quotes */
+import { Type } from "../../../generated/ast";
 import { prettyAnnotationBody } from "../../../model";
-import { Element } from "../../../generated/ast";
 
 describe("elements are parseable with annotations", () => {
     // TODO: strip surrounding /* */ from annotations, it would be nice to display comments on hover
     test("with single line comment", async () => {
-        return expect("element { comment /* this is a comment */ }").toParseKerML({
+        return expect("type { comment /* this is a comment */ }").toParseKerML({
             elements: [{ comments: [{ body: "/* this is a comment */" }] }],
         });
     });
 
     test("with single line comment without a keyword", async () => {
-        return expect("element { /* this is a comment */ }").toParseKerML({
+        return expect("type { /* this is a comment */ }").toParseKerML({
             elements: [{ comments: [{ body: "/* this is a comment */" }] }],
         });
     });
@@ -35,7 +35,7 @@ describe("elements are parseable with annotations", () => {
     // TODO: strip leading whitespace and optionally * in multiline annotation bodies
     test("with multi line comment", async () => {
         return expect(`
-element {
+type {
     comment /* this is
              * a comment
              */ }`).toParseKerML({
@@ -54,12 +54,12 @@ element {
     });
 
     test("with a named single line comment", async () => {
-        return expect("element { comment Comment /* this is a comment */ }").toParseKerML({
+        return expect("type { comment Comment /* this is a comment */ }").toParseKerML({
             elements: [
                 {
                     comments: [
                         {
-                            name: "Comment",
+                            declaredName: "Comment",
                             body: "/* this is a comment */",
                         },
                     ],
@@ -69,13 +69,13 @@ element {
     });
 
     test("with named documentation", async () => {
-        return expect("element { doc Doc /* this is a doc */ }").toParseKerML({
-            elements: [{ docs: [{ name: "Doc", body: "/* this is a doc */" }] }],
+        return expect("type { doc Doc /* this is a doc */ }").toParseKerML({
+            elements: [{ docs: [{ declaredName: "Doc", body: "/* this is a doc */" }] }],
         });
     });
 
     test("with unnamed documentation", async () => {
-        return expect("element { doc /* this is a doc */ }").toParseKerML({
+        return expect("type { doc /* this is a doc */ }").toParseKerML({
             elements: [{ docs: [{ body: "/* this is a doc */" }] }],
         });
     });
@@ -86,7 +86,7 @@ element {
             return expect('rep inOCL language "OCL" /* self.x > 0.0 */').toParseKerML({
                 reps: [
                     {
-                        name: "inOCL",
+                        declaredName: "inOCL",
                         language: '"OCL"',
                         body: "/* self.x > 0.0 */",
                         $meta: { language: "OCL" },
@@ -108,7 +108,7 @@ element {
         });
 
         test("without keyword", async () => {
-            return expect(`element B { 
+            return expect(`type B { 
                 language "HTML" 
                     /* <a href="https://plm.elsewhere.com/part?id="1234"/> */
             }`).toParseKerML({
@@ -129,13 +129,13 @@ element {
 });
 
 test("Multiple comments are parsed", async () => {
-    expect(`element {
+    expect(`type {
         /* comment 1 */   
         /* comment 2 */   
     }`).toParseKerML({
         elements: [
             {
-                $type: Element,
+                $type: Type,
                 comments: [{ body: "/* comment 1 */" }, { body: "/* comment 2 */" }],
             },
         ],

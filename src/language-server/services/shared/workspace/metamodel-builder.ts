@@ -97,8 +97,8 @@ const MetaclassPackages = [
     "KerML::Root::",
     "KerML::Core::",
     "KerML::Kernel::",
-    // "SysML::Systems::",
-    "SysML::",
+    "SysML::Systems::",
+    // "SysML::",
 ] as const;
 const MetaclassOverrides: { readonly [K in keyof SysMlAstType]?: string } = {
     ConnectorEnd: Feature,

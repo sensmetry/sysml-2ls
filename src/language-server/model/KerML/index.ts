@@ -29,6 +29,7 @@ export * from "./comment";
 export * from "./connector-end";
 export * from "./connector";
 export * from "./data-type";
+export * from "./dependency";
 export * from "./documentation";
 export * from "./element-reference";
 export * from "./element";

@@ -130,6 +130,8 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
                 out[mandatoryProperty.name] = false;
             }
         }
+
+        if (out["$childIndex"] === undefined) out["$childIndex"] = 0;
     }
 
     /**
@@ -184,7 +186,10 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
 
         // if this was called during parsing, it may be possible that $children
         // has not been created yet
-        if (parent.$children) parent.$children.push(child);
+        if (parent.$children) {
+            parent.$children.push(child);
+            (child as Mutable<AstNode>).$childIndex = parent.$children.length - 1;
+        }
         return child;
     }
 }

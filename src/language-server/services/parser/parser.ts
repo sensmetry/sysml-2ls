@@ -34,6 +34,7 @@ import {
 import { typeIndex, TypeMap } from "../../model/types";
 import { SysMLDefaultServices } from "../services";
 import { cstNodeRuleName } from "../../utils/common";
+import { compareRanges } from "../../utils/ast-util";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -132,6 +133,8 @@ interface MutableLangiumParser extends Mutable<LangiumParser> {
 function collectChildren(node: AstNode): void {
     node.$children.length = 0;
     node.$children.push(...streamContents(node).toArray());
+    node.$children.sort((a, b) => compareRanges(a.$cstNode?.range, b.$cstNode?.range));
+    node.$children.forEach((child, index) => ((child as Mutable<AstNode>).$childIndex = index));
 }
 
 export class SysMLParser extends LangiumParser {
@@ -176,5 +179,19 @@ export function prepareSysMLParser(services: SysMLDefaultServices): SysMLParser 
 declare module "../../generated/ast" {
     interface ElementReference {
         text?: string;
+    }
+}
+
+declare module "langium" {
+    interface AstNode {
+        /**
+         * Direct children of this AST node
+         */
+        readonly $children: AstNode[];
+
+        /**
+         * Index of this AST node in parent {@link $children} container
+         */
+        readonly $childIndex: number;
     }
 }

@@ -14,9 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Type } from "langium/lib/grammar/generated/ast";
 import { qualifiedTypeReference } from "../../../../testing";
-import { Relationship, Class, DataType, Package, Feature } from "../../../generated/ast";
-import { Element } from "../../../generated/ast";
+import { Class, DataType, Package, Feature } from "../../../generated/ast";
 
 test("namespaces are parseable", async () => {
     return expect(`namespace <'1.1'> N1; // This is an empty namespace.
@@ -28,13 +28,13 @@ test("namespaces are parseable", async () => {
     namespace N3; // This is a nested namespace.
     }`).toParseKerML({
         elements: [
-            { name: "N1", shortName: "'1.1'" },
+            { declaredName: "N1", declaredShortName: "'1.1'" },
             {
-                name: "N2",
-                shortName: "'1.2'",
+                declaredName: "N2",
+                declaredShortName: "'1.2'",
                 docs: [{ body: "/* This is an example of a namespace body. */" }],
-                elements: [{ name: "C" }, { name: "D" }, { name: "N3" }],
-                features: [{ name: "f", typedBy: [qualifiedTypeReference("N2::C")] }],
+                elements: [{ declaredName: "C" }, { declaredName: "D" }, { declaredName: "N3" }],
+                features: [{ declaredName: "f", typedBy: [qualifiedTypeReference("N2::C")] }],
             },
         ],
     });
@@ -48,14 +48,14 @@ test("namespace elements can have visibility", async () => {
     }`).toParseKerML({
         elements: [
             {
-                name: "N",
+                declaredName: "N",
                 elements: [
-                    { name: "C", visibility: "public" },
-                    { name: "D", visibility: "private" },
+                    { declaredName: "C", visibility: "public" },
+                    { declaredName: "D", visibility: "private" },
                 ],
                 features: [
                     {
-                        name: "f",
+                        declaredName: "f",
                         visibility: "protected",
                         typedBy: [qualifiedTypeReference("N::C")],
                     },
@@ -76,16 +76,20 @@ test("aliases are parseable", async () => {
     }`).toParseKerML({
         elements: [
             {
-                name: "N1",
-                elements: [{ name: "A" }, { name: "B" }],
+                declaredName: "N1",
+                elements: [{ declaredName: "A" }, { declaredName: "B" }],
                 aliases: [
                     {
-                        name: "CCC",
-                        shortName: "C",
+                        declaredName: "CCC",
+                        declaredShortName: "C",
                         for: qualifiedTypeReference("N1::B"),
                         docs: [{ body: "/* alias doc */" }],
                     },
-                    { name: "D", for: qualifiedTypeReference("N1::B"), visibility: "private" },
+                    {
+                        declaredName: "D",
+                        for: qualifiedTypeReference("N1::B"),
+                        visibility: "private",
+                    },
                 ],
             },
         ],
@@ -105,18 +109,18 @@ test("namespaces can have comments", async () => {
     }`).toParseKerML({
         elements: [
             {
-                name: "N9",
-                elements: [{ name: "A" }],
+                declaredName: "N9",
+                elements: [{ declaredName: "A" }],
                 comments: [
                     {
-                        name: "Comment1",
+                        declaredName: "Comment1",
                         about: [qualifiedTypeReference("N9::A")],
                         body: "/* comment about A */",
                     },
-                    { name: "Comment2", body: "/* comment about N9 */" },
+                    { declaredName: "Comment2", body: "/* comment about N9 */" },
                     { body: "/* also comment about N9 */" },
                 ],
-                docs: [{ name: "N9_Doc", body: "/* doc about N9 */" }],
+                docs: [{ declaredName: "N9_Doc", body: "/* doc about N9 */" }],
             },
         ],
     });
@@ -124,9 +128,7 @@ test("namespaces can have comments", async () => {
 
 test("all top-level elements are in the root namespace", async () => {
     return expect(`doc /* root doc */
-    element A {
-        relationship B to C;
-    }
+    type A;
     class C;
     datatype D;
     feature f: C;
@@ -135,20 +137,13 @@ test("all top-level elements are in the root namespace", async () => {
         docs: [{ $type: "Documentation", body: "/* root doc */" }],
         elements: [
             {
-                $type: Element,
-                name: "A",
-                relationships: [
-                    {
-                        $type: Relationship,
-                        name: "B",
-                        target: [qualifiedTypeReference("C")],
-                    },
-                ],
+                $type: Type,
+                declaredName: "A",
             },
-            { name: "C", $type: Class },
-            { name: "D", $type: DataType },
-            { name: "P", $type: Package },
+            { declaredName: "C", $type: Class },
+            { declaredName: "D", $type: DataType },
+            { declaredName: "P", $type: Package },
         ],
-        features: [{ name: "f", $type: Feature }],
+        features: [{ declaredName: "f", $type: Feature }],
     });
 });

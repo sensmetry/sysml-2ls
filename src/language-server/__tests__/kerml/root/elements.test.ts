@@ -16,29 +16,29 @@
 
 describe("elements are parseable without bodies", () => {
     test("with no names", async () => {
-        return expect("element;").toParseKerML({
+        return expect("type;").toParseKerML({
             elements: [{}],
         });
     });
 
     test("with name", async () => {
-        return expect("element Any_;").toParseKerML({
-            elements: [{ name: "Any_" }],
+        return expect("type Any_;").toParseKerML({
+            elements: [{ declaredName: "Any_" }],
         });
     });
 
     test("with short name", async () => {
-        return expect("element <any>;").toParseKerML({
-            elements: [{ shortName: "any" }],
+        return expect("type <any>;").toParseKerML({
+            elements: [{ declaredShortName: "any" }],
         });
     });
 
     test("with both names", async () => {
-        return expect("element <'1.1'> Any;").toParseKerML({
+        return expect("type <'1.1'> Any;").toParseKerML({
             elements: [
                 {
-                    name: "Any",
-                    shortName: "'1.1'",
+                    declaredName: "Any",
+                    declaredShortName: "'1.1'",
                 },
             ],
         });
@@ -46,31 +46,30 @@ describe("elements are parseable without bodies", () => {
 
     // might be best to keep '' around unrestricted names, names could then be written as is when generating code from AST
     test("with unrestricted name", async () => {
-        return expect("element 'arbitrary/ name+';").toParseKerML({
-            elements: [{ name: "'arbitrary/ name+'" }],
+        return expect("type 'arbitrary/ name+';").toParseKerML({
+            elements: [{ declaredName: "'arbitrary/ name+'" }],
         });
     });
 });
 
-// fixed the grammar to disallow nesting
-test.failing("elements can be nested", async () => {
-    return expect(`element A {
-    element B {
-        element C;
+test("elements can be nested", async () => {
+    return expect(`type A {
+    type B {
+        type C;
     }
 
-    element D;
+    type D;
 }`).toParseKerML({
         elements: [
             {
-                name: "A",
+                declaredName: "A",
                 elements: [
                     {
-                        name: "B",
-                        elements: [{ name: "C" }],
+                        declaredName: "B",
+                        elements: [{ declaredName: "C" }],
                     },
                     {
-                        name: "D",
+                        declaredName: "D",
                     },
                 ],
             },

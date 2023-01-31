@@ -161,8 +161,6 @@ interface JoinNode extends ControlNode {}
 
 interface DecisionNode extends ControlNode {}
 
-interface Dependency extends Relationship {}
-
 interface SuccessionAsUsage extends ConnectorAsUsage, Succession {}
 
 interface Expose extends Import {}

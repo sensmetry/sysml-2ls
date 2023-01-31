@@ -32,17 +32,7 @@ export class FeatureReferenceMeta extends TypeReferenceMeta {
         super(node, id);
     }
 
-    override initialize(node: FeatureReference): void {
-        // TODO: do this modification in parsing step, or rewrite the rule as an
-        // alternative since LL(*) works now
-        if (node.prefix) {
-            // workaround for Langium discarding parsed results if a new type is
-            // inferred
-            node.chain.unshift(...node.prefix.chain);
-            // TODO: this may screw formatting, make sure it doesn't
-            node.prefix = undefined;
-        }
-
+    override initialize(_node: FeatureReference): void {
         if (this.text) {
             // TODO: use $refText.length to find separators as unrestricted
             // names may have separators themselves

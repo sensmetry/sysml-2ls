@@ -26,7 +26,7 @@ import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(TransitionUsage, {
     base: "Actions::transitionActions",
-    actionTransition: "Actions::Action::transitions",
+    actionTransition: "Actions::Action::decisionTransitions",
     stateTransition: "States::StateAction::stateTransitions",
 })
 export class TransitionUsageMeta extends ActionUsageMeta {

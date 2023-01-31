@@ -31,8 +31,8 @@ export class SysMLNameProvider extends DefaultNameProvider {
 
     override getNameNode(node: AstNode): CstNode | undefined {
         return (
-            findNodeForProperty(node.$cstNode, "name") ??
-            findNodeForProperty(node.$cstNode, "shortName")
+            findNodeForProperty(node.$cstNode, "declaredName") ??
+            findNodeForProperty(node.$cstNode, "declaredShortName")
         );
     }
 }

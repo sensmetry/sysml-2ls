@@ -44,6 +44,15 @@ fragment Portion:
 entry Model returns Namespace:
     PackageBodyItems;
 
+// Dependencies
+
+Dependency<visible> returns Dependency:
+    (<visible> Visibility?)? PrefixMetadataMembers? 'dependency' Identification? 'from'?
+    client+=ElementReference ( ',' client+=ElementReference )* 'to'
+    supplier+=ElementReference ( ',' supplier+=ElementReference )*
+    RelationshipBody
+;
+
 // Annotations
 // ===================================================================================================
 
@@ -150,7 +159,7 @@ DefinitionElement<visible> returns Element:
     Package<visible>
 	| LibraryPackage<visible>
 	// | AnnotatingElement<visible>
-	| Dependency<visible>
+    | Dependency<visible>
 	| AttributeDefinition<visible>
 	| EnumerationDefinition<visible>
 	| OccurrenceDefinition<visible>
@@ -252,16 +261,6 @@ fragment OwnedMultiplicity:
 
 MultiplicityBounds returns MultiplicityRange:
     '[' range=InlineExpression ']';
-
-// Dependencies
-// ===================================================================================================
-
-Dependency<visible> returns Dependency:
-    (<visible> Visibility?)? PrefixMetadataMembers? 'dependency' Identification? 'from'?
-    client+=ElementReference ( ',' client+=ElementReference )* 'to'
-    supplier+=ElementReference ( ',' supplier+=ElementReference )*
-    RelationshipBody
-;
 
 // Definition and Usage
 // ===================================================================================================
@@ -551,7 +550,7 @@ PortUsage<visible> returns PortUsage:
 // Connectors
 
 ConnectorEnd returns Feature:
-    ( name=Name ReferencesToken )? OwnedReferenceSubsetting OwnedMultiplicity?;
+    ( RegularName ReferencesToken )? OwnedReferenceSubsetting OwnedMultiplicity?;
 
 // Binding Connectors
 
@@ -830,8 +829,6 @@ TargetExpression returns InlineExpression:
         | {InvocationExpression.args+=current} '->' type=TypeReference 
             ( args+=BodyExpression
             | args+=TypeReference // FunctionReferenceExpression in pilot
-    // https://gitlab.com/sensmetry/internal/tech/offering/product/sysml-v2-language-server/-/issues/20
-    // | ArgumentList
             | '(' (args+=Argument (',' args+=Argument)* | args+=NamedArgument (',' args+=NamedArgument)*)? ')'
             )
         | {CollectExpression.args+=current} '.' args+=BodyExpression // collect
@@ -1388,8 +1385,6 @@ PrimaryExpression returns InlineExpression:
         | {InvocationExpression.args+=current} '->' type=TypeReference 
             ( args+=BodyExpression
             | args+=FunctionReferenceExpression
-    // https://gitlab.com/sensmetry/internal/tech/offering/product/sysml-v2-language-server/-/issues/20
-    // | ArgumentList
             | '(' (args+=Argument (',' args+=Argument)* | args+=NamedArgument (',' args+=NamedArgument)*)? ')'
             )
         | {CollectExpression.args+=current} '.' args+=BodyExpression // collect
@@ -1651,9 +1646,6 @@ JoinNodeHierarchy returns ControlNode:
     JoinNode<true>;
 DecisionNodeHierarchy returns ControlNode:
     DecisionNode<true>;
-
-DependencyHierarchy returns Relationship:
-    Dependency<true>;
 
 SuccessionAsUsageHierarchy1 returns ConnectorAsUsage:
     Succession<true>;
