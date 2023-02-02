@@ -265,6 +265,16 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Show trace of linking order"
+                },
+                "sysml.plugins": {
+                    "scope": "window",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string",
+                        "description": "Path to a .js script or directory of .js scripts"
+                    },
+                    "description": "Additional plugin paths (.js scripts or directories with .js scripts) that will be loaded on server start-up"
                 }
             }
         }

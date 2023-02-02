@@ -34,6 +34,8 @@ import { SysMLLinker } from "./references/linker";
 import { SysMLNodeDescriptionProvider } from "./shared/workspace/ast-descriptions";
 import { SysMLScopeComputation } from "./references/scope-computation";
 import { SysMLFileSystemProvider } from "./shared/workspace/file-system-provider";
+import { LanguageEvents, SharedEvents } from "./events";
+import { ExtensionManager } from "./shared/extension-manager";
 
 export type SysMLAddedSharedServices = {
     workspace: {
@@ -55,6 +57,8 @@ export type SysMLAddedSharedServices = {
     modelLevelExpressionEvaluator: ModelLevelExpressionEvaluator;
     statistics: Statistics;
     AstReflection: SysMLAstReflection;
+    ExtensionManager: ExtensionManager;
+    Events: SharedEvents;
 };
 export type SysMLSharedServices = LangiumSharedServices & SysMLAddedSharedServices;
 
@@ -74,6 +78,7 @@ export type SysMLDefaultAddedServices = {
         AstNodeDescriptionProvider: SysMLNodeDescriptionProvider;
     };
     shared: SysMLSharedServices;
+    Events: LanguageEvents;
 };
 export type KerMLAddedServices = {
     validation: {

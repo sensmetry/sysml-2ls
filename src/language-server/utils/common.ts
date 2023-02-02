@@ -396,8 +396,13 @@ export function mergeWithPartial<T>(left: T, right?: DeepPartial<T>): T {
     if (typeof left !== "object" || left === null) return (right ?? left) as T;
     if (right === undefined) return left;
 
-    const out: Record<string, unknown> = {};
+    if (Array.isArray(left)) {
+        // shallow copies on arrays
+        return right as T;
+    }
+
     const rhs = right as Record<string, unknown>;
+    const out: Record<string, unknown> = { ...rhs };
     for (const [key, value] of Object.entries(left)) {
         if (key in rhs) {
             out[key] = mergeWithPartial(value, rhs[key]);
@@ -528,4 +533,33 @@ export function backtrackToDirname(p: string, dirname: string | RegExp): string 
 
         p = prev;
     }
+}
+
+/**
+ * Wait until all promises have resolved/rejected and report rejection reasons
+ * @param value promises to wait on
+ * @param onRejected rejection message generator
+ * @returns resolved values
+ */
+export async function waitAllPromises<T>(
+    value: Iterable<T | PromiseLike<T>>,
+    onRejected?: (result: PromiseRejectedResult, index: number) => string
+): Promise<T[]> {
+    const resolved: T[] = [];
+
+    await Promise.allSettled(value).then((results) => {
+        results.forEach((result, index) => {
+            if (result.status === "rejected") {
+                let message =
+                    onRejected?.call(undefined, result, index) ??
+                    `Promise failed: ${result.reason}`;
+                if (result.reason instanceof Error) message += "\n" + result.reason.stack;
+                console.error(message);
+            } else {
+                resolved.push(result.value);
+            }
+        });
+    });
+
+    return resolved;
 }

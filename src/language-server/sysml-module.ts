@@ -68,6 +68,8 @@ import { KerMLValidationRegistry } from "./services/validation/kerml-validation-
 import { KerMLValidator } from "./services/validation/kerml-validator";
 import { SysMLValidator } from "./services/validation/sysml-validator";
 import { SysMLFileSystemProvider } from "./services/shared/workspace/file-system-provider";
+import { LanguageEvents, SharedEvents } from "./services/events";
+import { ExtensionManager } from "./services/shared/extension-manager";
 
 /**
  * Dependency injection module that overrides Langium default services and
@@ -99,6 +101,7 @@ export const SysMLDefaultModule: Module<SysMLDefaultServices, PartialSysMLDefaul
     workspace: {
         AstNodeDescriptionProvider: (services) => new SysMLNodeDescriptionProvider(services.shared),
     },
+    Events: () => new LanguageEvents(),
 };
 
 export const SysMLModule: Module<SysMLServices, PartialSysMLDefaultServices & SysMLAddedServices> =
@@ -121,7 +124,7 @@ export const SysMLSharedModule: Module<
     SysMLSharedServices,
     PartialLangiumSharedServices &
         Omit<SysMLAddedSharedServices, "workspace"> & {
-            // provider is setup from the context parameter
+            // provider is set-up from the context parameter
             workspace: PartialKeys<SysMLAddedSharedServices["workspace"], "FileSystemProvider">;
         }
 > = {
@@ -140,9 +143,11 @@ export const SysMLSharedModule: Module<
         ExecuteCommandHandler: (services) => new SysMLExecuteCommandHandler(services),
         LanguageServer: (services) => new SysMLLanguageServer(services),
     },
-    config: () => DefaultSysMLConfig,
+    config: () => DefaultSysMLConfig as SysMLConfig,
     modelLevelExpressionEvaluator: () => new BuiltinFunctionEvaluator(),
     statistics: () => new Statistics(),
+    ExtensionManager: (services) => new ExtensionManager(services),
+    Events: () => new SharedEvents(),
 };
 
 export interface SharedModuleContext extends DefaultSharedModuleContext {
@@ -175,7 +180,7 @@ export function createSysMLServices(
 } {
     const sharedModule = {
         ...SysMLSharedModule,
-        config: () => mergeWithPartial<SysMLConfig>(DefaultSysMLConfig, config),
+        config: () => mergeWithPartial(DefaultSysMLConfig as SysMLConfig, config),
     };
 
     const shared = inject(

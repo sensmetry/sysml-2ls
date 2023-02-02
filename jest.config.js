@@ -22,4 +22,5 @@ module.exports = {
         // server CLI entry point
         "<rootDir>/src/language-server/main.ts",
     ],
+    testRegex: "(\\.|/)(test|spec)\\.[jt]sx?$"
 };

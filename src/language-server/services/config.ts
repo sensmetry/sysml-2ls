@@ -77,6 +77,12 @@ export interface SysMLConfig {
      * Trace options
      */
     trace: TraceConfig;
+
+    /**
+     * Additional plugin paths (.js scripts or directories with .js scripts)
+     * that will be loaded on server start-up
+     */
+    plugins: string[];
 }
 
 export const DefaultDebugConfig: Readonly<DebugConfig> = {
@@ -104,4 +110,5 @@ export const DefaultSysMLConfig: DeepReadonly<SysMLConfig> = {
     defaultBuildOptions: DefaultBuildOptions,
     logStatistics: true,
     trace: DefaultTraceConfig,
+    plugins: [],
 };

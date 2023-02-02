@@ -17,15 +17,18 @@
 import { DeepPartial, DefaultConfigurationProvider } from "langium";
 import { DidChangeConfigurationNotification } from "vscode-languageserver";
 import { backtrackToDirname, mergeWithPartial } from "../../../utils/common";
-import { DefaultSysMLConfig, SysMLConfig } from "../../config";
+import { SysMLConfig } from "../../config";
 import { SysMLSharedServices } from "../../services";
 
 export const SETTINGS_KEY = "sysml";
 
 export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
+    readonly defaultConfig: SysMLConfig;
+
     constructor(services: SysMLSharedServices) {
         super(services);
 
+        this.defaultConfig = services.config;
         this.settings[SETTINGS_KEY] = services.config;
         services.lsp.LanguageServer.onInitialized((_params) => {
             services.lsp.Connection?.client.register(DidChangeConfigurationNotification.type, {
@@ -75,7 +78,7 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
             super.updateSectionConfiguration(
                 section,
                 mergeWithPartial<SysMLConfig>(
-                    DefaultSysMLConfig,
+                    this.defaultConfig,
                     configuration as DeepPartial<SysMLConfig>
                 )
             );

@@ -14,9 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { SysMLHoverProvider } from "../hover-provider";
-
-import { Hover, MarkupContent, Position, TextDocumentIdentifier } from "vscode-languageserver";
+import { MarkupContent, Position, TextDocumentIdentifier } from "vscode-languageserver";
 import { parseSysML, services } from "../../../../testing";
 
 const sysMLExampleRaw = `part def Camera {
@@ -33,11 +31,18 @@ const sysMLExampleRaw = `part def Camera {
 	}
 }`;
 
-const getHoverAtPosition = async (
+type StringMatch =
+    | string
+    | RegExp
+    | ReturnType<jest.Expect["stringContaining"]>
+    | ReturnType<jest.Expect["stringMatching"]>;
+
+const testHover = async (
     position: Position,
+    expected: StringMatch | StringMatch[] | undefined,
     raw: string = sysMLExampleRaw
-): Promise<Hover | undefined> => {
-    const hoverProvider = new SysMLHoverProvider(services.SysML);
+): Promise<void> => {
+    const hoverProvider = services.SysML.lsp.HoverProvider;
 
     const {
         value: { $document },
@@ -45,76 +50,113 @@ const getHoverAtPosition = async (
 
     if (!$document) throw new Error("Document should be present");
 
-    const hoverResult = await hoverProvider.getHoverContent($document, {
+    const hoverResult = await hoverProvider?.getHoverContent($document, {
         position,
         textDocument: TextDocumentIdentifier.create($document.uri.toString()),
     });
 
-    return hoverResult;
+    if (!expected) {
+        expect(hoverResult).toBeUndefined();
+    } else {
+        expect(hoverResult).toBeDefined();
+        const contents = hoverResult?.contents as MarkupContent;
+        expect(contents.kind).toEqual("markdown");
+
+        const test = (value: StringMatch): void => {
+            if (value instanceof RegExp || typeof value === "string") {
+                expect(contents.value).toMatch(value);
+            } else {
+                // expect.stringContaining
+                expect(contents.value).toEqual(value);
+            }
+        };
+
+        if (!Array.isArray(expected)) test(expected);
+        else expected.forEach((value) => test(value));
+    }
 };
 
 describe("SysMLHoverProvider", () => {
     it("should provide hover info for Camera", async () => {
-        const hoverResult = await getHoverAtPosition({
-            line: 0,
-            character: 12, // Camera
-        });
-
-        if (!hoverResult) throw new Error("Hover result should be defined");
-
-        const contents = hoverResult.contents as MarkupContent;
-
-        expect(contents.kind).toEqual("markdown");
-        expect(contents.value).toMatch(
+        await testHover(
+            {
+                line: 0,
+                character: 12, // Camera
+            },
             /#### `Camera`\n`PartDefinition` in ` [a-zA-Z0-9]+\.sysml` {2}\n/
         );
     });
 
     it("should not provide result", async () => {
-        const hoverResult = await getHoverAtPosition({
-            line: 1,
-            character: 5, // import
-        });
-
-        expect(hoverResult).toBeUndefined();
+        await testHover(
+            {
+                line: 1,
+                character: 5, // import
+            },
+            undefined
+        );
     });
 
     it("should provide hover", async () => {
-        const hoverResult = await getHoverAtPosition({
-            line: 3,
-            character: 24, // takePicture[*]
-        });
-
-        if (!hoverResult) throw new Error("Hover result should be defined");
-
-        const contents = hoverResult.contents as MarkupContent;
-
-        expect(contents.kind).toEqual("markdown");
-        expect(contents.value).toMatch(
+        await testHover(
+            {
+                line: 3,
+                character: 24, // takePicture[*]
+            },
             /#### `Camera::takePicture`\n`PerformActionUsage` in ` [a-zA-Z0-9]+\.sysml` {2}\n/
         );
     });
 
     it("should combine doc comments for repeating properties into one", async () => {
-        const hoverResult = await getHoverAtPosition(
+        await testHover(
             {
                 line: 0,
                 character: 12,
             },
+            /#### `Camera`\n`PartDefinition` in ` [a-zA-Z0-9]+\.sysml` {2}\n\ndoc about Camera\n\nanother doc/,
             `part def Camera {
                 doc /* doc about Camera */
                 doc /* another doc */
             }`
         );
-
-        if (!hoverResult) throw new Error("Hover result should be defined");
-        const contents = hoverResult.contents as MarkupContent;
-
-        expect(contents.kind).toEqual("markdown");
-        expect(contents.value).toMatch(
-            /#### `Camera`\n`PartDefinition` in ` [a-zA-Z0-9]+\.sysml` {2}\n\ndoc about Camera\n\nanother doc/
-        );
     });
 
     // TODO: Feel free to add more tests like the above. Just need to provide the position where you want to hover and test that result is what you expect.
+
+    it("should add additional text from successful hover events", async () => {
+        const extra = "additional hover text";
+        const disposable = services.SysML.Events.onHoverRequest.add(() => extra);
+
+        await testHover(
+            {
+                line: 0,
+                character: 12, // Camera
+            },
+            expect.stringContaining(extra)
+        ).finally(() => disposable.dispose());
+    });
+
+    it("should not add additional text from throwing callbacks", async () => {
+        const extra = "additional hover text";
+        const disposable = services.SysML.Events.onHoverRequest.add(() => {
+            throw extra;
+        });
+
+        const error = console.error;
+        const errorMock = jest.fn();
+        console.error = errorMock;
+        await testHover(
+            {
+                line: 0,
+                character: 12, // Camera
+            },
+            []
+        ).finally(() => {
+            console.error = error;
+            disposable.dispose();
+        });
+
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(expect.stringContaining(extra));
+    });
 });

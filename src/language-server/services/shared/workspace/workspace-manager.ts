@@ -22,12 +22,14 @@ import {
     ShowMessageRequest,
     WorkspaceFolder,
 } from "vscode-languageserver";
-import { URI } from "vscode-uri";
+import { URI, Utils } from "vscode-uri";
 import { SysMLSharedServices } from "../../services";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { FindStdlibRequest } from "../../../../common/protocol-extensions";
 import { performance } from "perf_hooks";
 import { SysMLFileSystemProvider } from "./file-system-provider";
+import { ExtensionManager } from "../extension-manager";
+import path from "path";
 
 /**
  * Extension of Langium workspace manager that loads the standard library on
@@ -37,6 +39,7 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
     protected readonly config: SysMLConfigurationProvider;
     protected readonly connection?: Connection;
     protected override readonly fileSystemProvider: SysMLFileSystemProvider;
+    protected readonly extensions: ExtensionManager;
 
     constructor(services: SysMLSharedServices) {
         super(services);
@@ -44,6 +47,7 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
         this.fileSystemProvider = services.workspace.FileSystemProvider;
         this.config = services.workspace.ConfigurationProvider;
         this.connection = services.lsp.Connection;
+        this.extensions = services.ExtensionManager;
     }
 
     override async initializeWorkspace(
@@ -56,7 +60,27 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
             return;
         }
 
+        await this.loadPlugins(folders);
         await super.initializeWorkspace(folders, cancelToken);
+    }
+
+    /**
+     * Load declared .js plugins
+     * @param folders workspace folders used to resolve relative paths
+     */
+    protected async loadPlugins(folders: WorkspaceFolder[]): Promise<void> {
+        const plugins = this.config.get().plugins;
+        const promises = folders.map((folder) => {
+            const uri = URI.parse(folder.uri);
+            this.extensions.loadScripts(
+                plugins.map((plugin) => {
+                    if (path.isAbsolute(plugin)) return URI.file(plugin);
+                    return Utils.joinPath(uri, plugin);
+                })
+            );
+        });
+
+        await Promise.allSettled(promises);
     }
 
     protected override async loadAdditionalDocuments(
