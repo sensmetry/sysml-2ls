@@ -22,6 +22,7 @@ specifiers:
   expect: ^29.4.0
   fs-extra: ^11.1.0
   jest: ^29.3.1
+  jest-junit: ^15.0.0
   jest-matcher-utils: ^29.4.0
   jsonschema: ^1.4.1
   langium: ^1.0.1
@@ -69,6 +70,7 @@ devDependencies:
   eslint-plugin-unused-imports: 2.0.0_virssgr5omih4ylyae2gddvmxu
   expect: 29.4.0
   jest: 29.3.1_@types+node@14.18.36
+  jest-junit: 15.0.0
   jest-matcher-utils: 29.4.0
   jsonschema: 1.4.1
   langium-workspaces: github.com/langium/langium/c07bc1bc142777a5386dce6528d163758f52ed67
@@ -2870,6 +2872,16 @@ packages:
       fsevents: 2.3.2
     dev: true
 
+  /jest-junit/15.0.0:
+    resolution: {integrity: sha512-Z5sVX0Ag3HZdMUnD5DFlG+1gciIFSy7yIVPhOdGUi8YJaI9iLvvBb530gtQL2CHmv0JJeiwRZenr0VrSR7frvg==}
+    engines: {node: '>=10.12.0'}
+    dependencies:
+      mkdirp: 1.0.4
+      strip-ansi: 6.0.1
+      uuid: 8.3.2
+      xml: 1.0.1
+    dev: true
+
   /jest-leak-detector/29.3.1:
     resolution: {integrity: sha512-3DA/VVXj4zFOPagGkuqHnSQf1GZBmmlagpguxEERO6Pla2g84Q1MaVIB3YMxgUaFIaYag8ZnTyQgiZ35YEqAQA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -3385,6 +3397,12 @@ packages:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
     dev: true
     optional: true
+
+  /mkdirp/1.0.4:
+    resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dev: true
 
   /ms/2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -4120,6 +4138,11 @@ packages:
     dev: true
     optional: true
 
+  /uuid/8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+    dev: true
+
   /v8-to-istanbul/9.0.1:
     resolution: {integrity: sha512-74Y4LqY74kLE6IFyIjPtkSTWzUZmj8tdHT9Ii/26dvQ6K9Dl2NbEfj0XgU2sHCtKgt5VupqhlO/5aWuqS+IY1w==}
     engines: {node: '>=10.12.0'}
@@ -4215,6 +4238,10 @@ packages:
     dependencies:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
+    dev: true
+
+  /xml/1.0.1:
+    resolution: {integrity: sha512-huCv9IH9Tcf95zuYCsQraZtWnJvBtLVE0QHMOs8bWyZAFZNDcYjsPq1nEx8jKA9y+Beo9v+7OBPRisQTjinQMw==}
     dev: true
 
   /xml2js/0.4.23:

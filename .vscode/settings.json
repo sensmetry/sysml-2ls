@@ -22,10 +22,20 @@
         "typescript"
     ],
     "[typescript]": {
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[langium]": {
         "editor.formatOnSave": true
+    },
+    "[yaml]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "gitlens.codeLens.scopes": [
+            "document"
+        ],
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "debug.onTaskErrors": "debugAnyway",
 }

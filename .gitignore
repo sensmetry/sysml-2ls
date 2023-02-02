@@ -145,4 +145,7 @@ src/language-server/grammar/reference
 # tsc trace
 trace/**
 
+# junit
+junit.xml
+
 SysML-v2-Release

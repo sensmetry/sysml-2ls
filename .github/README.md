@@ -2,6 +2,9 @@
 
 **NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
 
+[![pipeline status](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/pipeline.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/commits/main)
+[![coverage report](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/coverage.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/commits/main)
+
 Provides language support for systems modeling in SysML v2 in VS Code.
 
 SysML2 Tools is a language server for SysML v2 and KerML [2022-12 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2022-12) specifications.

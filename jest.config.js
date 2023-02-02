@@ -22,5 +22,6 @@ module.exports = {
         // server CLI entry point
         "<rootDir>/src/language-server/main.ts",
     ],
-    testRegex: "(\\.|/)(test|spec)\\.[jt]sx?$"
+    coverageReporters: ["html", "text", "text-summary", "cobertura"],
+    testRegex: "(\\.|/)(test|spec)\\.[jt]sx?$",
 };
