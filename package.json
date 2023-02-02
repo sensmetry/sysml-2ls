@@ -300,6 +300,7 @@
         "vscode:prepublish": "pnpm run esbuild-base --minify",
         "vscode:package": "vsce package --no-dependencies --gitlabBranch=main",
         "esbuild-base": "esbuild ./src/extension.ts ./src/language-server/main.ts ./src/cli/index.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
+        "install-hooks": "esbuild ./.githooks/pre-commit.ts --outfile=.git/hooks/pre-commit --bundle --format=cjs --platform=node",
         "esbuild": "pnpm run esbuild-base --sourcemap",
         "watch": "pnpm run esbuild-base --sourcemap --watch",
         "tstrace": "tsc -p tsconfig.json --generateTrace trace",

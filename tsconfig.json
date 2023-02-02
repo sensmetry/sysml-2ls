@@ -17,15 +17,15 @@
         "inlineSourceMap": true,
         "experimentalDecorators": true,
         "noImplicitOverride": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
     },
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "scripts/**/*.ts",
+        ".githooks/**/*.ts",
     ],
     "exclude": [
         "out",
         "node_modules",
-        "src/**/*.test.ts",
-        "src/testing"
-    ]
+    ],
 }

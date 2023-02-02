@@ -1,4 +1,3 @@
-
 # SysML2 Tools
 
 **NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
@@ -67,6 +66,7 @@ The extension provides basic features to support SysMLv2 document editing:
 
 ### Make changes
 
+- Run `pnpm run install-hooks` to install git hooks.
 - Run `pnpm run watch` to have the TypeScript compiler run automatically after
   every change of the source files.
 - Run `pnpm run grammar:watch` to have the Langium generator run automatically

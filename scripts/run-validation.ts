@@ -17,12 +17,12 @@
 import path from "path";
 import fs from "fs";
 import { createSysMLServices } from "../src/language-server/sysml-module";
-import { NodeFileSystem } from "langium/node";
 import { URI, Utils } from "vscode-uri";
 import { LangiumDocument, LangiumSharedServices } from "langium";
 import { Diagnostic, Position, Range } from "vscode-languageserver";
 import * as ExpectedDiagnostics from "./expected-diagnostics.json";
 import { Command } from "commander";
+import { SysMLNodeFileSystem } from "../src/language-server/node/node-file-system-provider";
 
 function equalPosition(lhs: Position, rhs: Position): boolean {
     return lhs.line === rhs.line && lhs.character === rhs.character;
@@ -164,7 +164,7 @@ function validate(docs: LangiumDocument[], exportDiagnostics = false, ignoreKnow
     let count = 0;
     let expected = 0;
     console.warn("Found validation errors!");
-    const print = (d: Diagnostic) =>
+    const print = (d: Diagnostic): void =>
         console.info(
             `  Line ${d.range.start.line}|${d.range.start.character}: ${d.message} (${d.code})`
         );
@@ -192,7 +192,7 @@ function validate(docs: LangiumDocument[], exportDiagnostics = false, ignoreKnow
 
 async function run(exportDiagnostics = false, ignoreKnown = false): Promise<number> {
     const submodule = findSubmodule();
-    const services = createSysMLServices(NodeFileSystem, {
+    const services = createSysMLServices(SysMLNodeFileSystem, {
         standardLibrary: false,
         skipWorkspaceInit: true,
     });
@@ -201,7 +201,7 @@ async function run(exportDiagnostics = false, ignoreKnown = false): Promise<numb
     return validate(docs, exportDiagnostics, ignoreKnown);
 }
 
-async function main() {
+async function main(): Promise<void> {
     const program = new Command();
 
     program

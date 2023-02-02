@@ -292,14 +292,8 @@ interface CustomMatchResult {
 }
 
 interface CustomMatchers<R = unknown> {
-    toParseKerML(
-        ast: object | Namespace,
-        { parserErrors, lexerErrors, diagnostics, buildOptions }?: MatchOptions
-    ): R;
-    toParseSysML(
-        ast: object | Namespace,
-        { parserErrors, lexerErrors, diagnostics, buildOptions }?: MatchOptions
-    ): R;
+    toParseKerML(ast: object | Namespace, options?: MatchOptions): R;
+    toParseSysML(ast: object | Namespace, options?: MatchOptions): R;
 }
 
 declare global {

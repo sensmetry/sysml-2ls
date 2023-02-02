@@ -278,6 +278,14 @@ async function executeCompletionTestCase({
     triggerCharacter,
     expectedLabel,
     expectedNewText,
+}: {
+    text: string;
+    line: number;
+    character: number;
+    triggerKind?: CompletionTriggerKind;
+    triggerCharacter?: string;
+    expectedLabel: string;
+    expectedNewText?: string;
 }): Promise<void> {
     const { services, document, completionParams } = await buildDocumentAndCompletionParams(
         text,
