@@ -2,5 +2,15 @@
   "tabWidth": 4,
   "useTabs": false,
   "trailingComma": "es5",
-  "printWidth": 100
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": [
+        "*yml"
+      ],
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ]
 }
