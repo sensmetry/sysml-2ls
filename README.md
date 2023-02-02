@@ -1,4 +1,3 @@
-
 # SysML2 Tools
 
 Provides language support for systems modeling in SysML v2 in VS Code.
@@ -65,6 +64,7 @@ The extension provides basic features to support SysMLv2 document editing:
 
 ### Make changes
 
+- Run `pnpm run install-hooks` to install git hooks.
 - Run `pnpm run watch` to have the TypeScript compiler run automatically after
   every change of the source files.
 - Run `pnpm run grammar:watch` to have the Langium generator run automatically

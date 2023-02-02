@@ -66,12 +66,12 @@ class NullLogger implements Logger {
 }
 
 class TestStream extends Duplex {
-    _write(chunk: string, _encoding: string, done: () => void): void {
+    override _write(chunk: string, _encoding: string, done: () => void): void {
         this.emit("data", chunk);
         done();
     }
 
-    _read(_size: number): void {}
+    override _read(_size: number): void {}
 }
 
 class TestClientExtender extends SysMLClientExtender {
