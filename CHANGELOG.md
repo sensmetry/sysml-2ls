@@ -6,6 +6,10 @@
 
 ### Added
 
+- Dynamic loading of JS plugins similar to how VS Code loads plugins at start up
+  for non-intrusively extending server functionality. Plugins are loaded during
+  workspace initialization through an exported `activate(context:
+  SysMLSharedServices)` function. Also see `sysml.plugins` setting
 - Users who have downloaded the standard library through this extension will be
   prompted to download a compatible standard library again when the compatible
   version changes

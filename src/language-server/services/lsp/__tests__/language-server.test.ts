@@ -238,7 +238,11 @@ describe("package.json exports custom contributions", () => {
                 // alternatives since compile time types are discarded at
                 // runtime
                 expect(data.type).toContain(
-                    typeof section === "undefined" ? "null" : typeof section
+                    typeof section === "undefined"
+                        ? "null"
+                        : Array.isArray(section)
+                        ? "array"
+                        : typeof section
                 );
             }
         );

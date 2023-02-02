@@ -14,12 +14,22 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, AstNodeHoverProvider, getDocument, MaybePromise } from "langium";
-import { Hover } from "vscode-languageserver";
+import { AstNode, AstNodeHoverProvider, getDocument, LangiumDocument, MaybePromise } from "langium";
+import { Hover, HoverParams } from "vscode-languageserver";
 import { Utils } from "vscode-uri";
 import { isAlias, isElement, isType } from "../../generated/ast";
+import { LanguageEvents } from "../events";
+import { SysMLDefaultServices } from "../services";
 
 export class SysMLHoverProvider extends AstNodeHoverProvider {
+    protected readonly events: LanguageEvents;
+
+    constructor(services: SysMLDefaultServices) {
+        super(services);
+
+        this.events = services.Events;
+    }
+
     protected override getAstNodeHoverContent(node: AstNode): MaybePromise<Hover | undefined> {
         if (!isElement(node)) return;
         let content = `#### \`${node.$meta.qualifiedName}\`
@@ -60,5 +70,36 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
             };
         }
         return undefined;
+    }
+
+    override async getHoverContent(
+        document: LangiumDocument,
+        params: HoverParams
+    ): Promise<Hover | undefined> {
+        const hover = await super.getHoverContent(document, params);
+
+        const additional = (await this.events.onHoverRequest.emit(document, params)).filter(
+            (value) => value
+        ) as string[];
+        if (additional.length === 0) return hover;
+
+        if (!hover) {
+            return {
+                contents: {
+                    value: additional.join("\n\n"),
+                    kind: "markdown",
+                },
+            };
+        }
+
+        if (typeof hover.contents === "string") {
+            hover.contents += "\n\n" + additional.join("\n\n");
+        } else if (Array.isArray(hover.contents)) {
+            hover.contents.push(...additional);
+        } else {
+            hover.contents.value += "\n\n" + additional.join("\n\n");
+        }
+
+        return hover;
     }
 }
