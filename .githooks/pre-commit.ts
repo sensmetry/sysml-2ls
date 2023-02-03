@@ -78,14 +78,14 @@ async function main(): Promise<void> {
     if (hooks.length === 0) return;
 
     // stash unstaged changes
-    await execPromise("git stash -q --keep-index", CHILD_OPTIONS);
+    await execPromise("git stash -u -q --keep-index", CHILD_OPTIONS);
 
     // run hooks
     let failed = false;
     await Promise.all(hooks.map((hook) => execHook(hook)))
         .then(async () => {
             // stage changed files
-            await execPromise("git add --all", CHILD_OPTIONS);
+            await execPromise("git add -u", CHILD_OPTIONS);
         })
         .catch((reason) => {
             console.error(reason);
