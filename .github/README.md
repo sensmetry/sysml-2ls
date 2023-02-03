@@ -4,6 +4,7 @@
 
 [![pipeline status](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/pipeline.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/commits/main)
 [![coverage report](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/coverage.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/commits/main)
+[![Latest Release](https://gitlab.com/sensmetry/public/sysml-2ls/-/badges/release.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/releases)
 
 Provides language support for systems modeling in SysML v2 in VS Code.
 
@@ -38,20 +39,28 @@ The extension provides basic features to support SysMLv2 document editing:
 
 - Autocompletion  
   ![Autocompletion](/docs/images/completion.gif)
+  <br> <br>
 - Code navigation  
   ![Navigation](/docs/images/navigation.gif)
+  <br> <br>
 - Semantic highlighting  
   ![Semantic highlighting](/docs/images/semantic-highlighting.png)
-- Indenting  
-  ![Indenting](/docs/images/indentation.gif)
+  <br> <br>
+- Auto-formatting: indentation
+  ![Indentation](/docs/images/indentation.gif)
+  <br> <br>
 - Renaming  
   ![Renaming](/docs/images/renaming.gif)
+  <br> <br>
 - Hovers  
   ![Hovers](/docs/images/hover.gif)
+  <br> <br>
 - References  
   ![References](/docs/images/references.gif)
+  <br> <br>
 - Document symbols  
   ![Symbols](/docs/images/symbols.gif)
+  <br> <br>
 - Folding  
   ![Folding](/docs/images/folding.gif)
 
