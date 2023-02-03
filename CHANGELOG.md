@@ -2,7 +2,7 @@
 
 <!-- Include links to comparison to the previous version -->
 
-## [unreleased]
+## 0.2.0
 
 ### Added
 
