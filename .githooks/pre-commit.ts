@@ -23,6 +23,12 @@ function fileHook(name: string) {
 const GITHUB_ISSUE_TEMPLATE_DIR = ".github/ISSUE_TEMPLATE";
 const GITHUB_PR_TEMPLATE_DIR = ".github/PULL_REQUEST_TEMPLATE";
 
+async function copyWithHeader(src: string, dst: string, header?: string): Promise<void> {
+    let contents = await fs.readFile(src, "utf-8");
+    if (header) contents = header + "\n\n" + contents;
+    await fs.writeFile(dst, contents);
+}
+
 //@ts-expect-error unused class but needed to let decorators be applied to methods
 class GitHooks {
     @fileHook("README.md")
@@ -40,25 +46,52 @@ class GitHooks {
 
     @fileHook(".gitlab/issue_templates/bug_report.md")
     static async bugReportHook(): Promise<void> {
-        await fs.copyFile(
+        await copyWithHeader(
             ".gitlab/issue_templates/bug_report.md",
-            path.join(GITHUB_ISSUE_TEMPLATE_DIR, "bug_report.md")
+            path.join(GITHUB_ISSUE_TEMPLATE_DIR, "bug_report.md"),
+            `
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
+
+---`.trim()
         );
     }
 
     @fileHook(".gitlab/issue_templates/feature_request.md")
     static async featureRequestHook(): Promise<void> {
-        await fs.copyFile(
+        await copyWithHeader(
             ".gitlab/issue_templates/feature_request.md",
-            path.join(GITHUB_ISSUE_TEMPLATE_DIR, "feature_request.md")
+            path.join(GITHUB_ISSUE_TEMPLATE_DIR, "feature_request.md"),
+            `
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---`.trim()
         );
     }
 
     @fileHook(".gitlab/merge_request_templates/merge_request.md")
     static async mergeRequestHook(): Promise<void> {
-        await fs.copyFile(
+        await copyWithHeader(
             ".gitlab/merge_request_templates/merge_request.md",
-            path.join(GITHUB_PR_TEMPLATE_DIR, "pull_request_template.md")
+            path.join(GITHUB_PR_TEMPLATE_DIR, "pull_request_template.md"),
+            `
+---
+name: Pull request
+about: Improve this project
+title: ''
+labels: ''
+assignees: ''
+
+---`.trim()
         );
     }
 }

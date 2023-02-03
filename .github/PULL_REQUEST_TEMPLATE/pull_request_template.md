@@ -1,3 +1,12 @@
+---
+name: Pull request
+about: Improve this project
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 ## Checklist before submitting a merge request
 
 - [ ] I have reviewed `CONTRIBUTING.md` document

@@ -1,3 +1,12 @@
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 ## Checklist before submitting a feature request
 
 - [ ] I have reviewed `CONTRIBUTING.md` document
