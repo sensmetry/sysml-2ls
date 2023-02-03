@@ -27,6 +27,7 @@ specifiers:
   jsonschema: ^1.4.1
   langium: ^1.0.1
   langium-workspaces: github:langium/langium#c07bc1bc142777a5386dce6528d163758f52ed67
+  ovsx: ^0.8.0
   ts-mixer: ^6.0.1
   tsx: ^3.12.2
   typescript: ^4.8.4
@@ -74,6 +75,7 @@ devDependencies:
   jest-matcher-utils: 29.4.0
   jsonschema: 1.4.1
   langium-workspaces: github.com/langium/langium/c07bc1bc142777a5386dce6528d163758f52ed67
+  ovsx: 0.8.0
   tsx: 3.12.2
   typescript: 4.9.4
   typescript-string-operations: 1.5.0
@@ -1654,6 +1656,10 @@ packages:
     dev: true
     optional: true
 
+  /ci-info/2.0.0:
+    resolution: {integrity: sha512-5tK7EtrZ0N+OLFMthtqOj4fI2Jeb88C4CAZPu25LDVUgXJ0A3Js4PMGqrn0JU1W0Mh1/Z8wZzYPxqUrXeBboCQ==}
+    dev: true
+
   /ci-info/3.7.1:
     resolution: {integrity: sha512-4jYS4MOAaCIStSRwiuxc4B8MYhIe676yO1sYGzARnjXkWpmzZMMYxY6zu8WYWDhSuth5zhrQ1rhNSibyyvv4/w==}
     engines: {node: '>=8'}
@@ -2373,6 +2379,16 @@ packages:
     resolution: {integrity: sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==}
     dev: true
 
+  /follow-redirects/1.15.2:
+    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+    dev: true
+
   /fs-constants/1.0.0:
     resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
     dev: true
@@ -2592,6 +2608,13 @@ packages:
 
   /is-arrayish/0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
+    dev: true
+
+  /is-ci/2.0.0:
+    resolution: {integrity: sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==}
+    hasBin: true
+    dependencies:
+      ci-info: 2.0.0
     dev: true
 
   /is-core-module/2.11.0:
@@ -3491,6 +3514,21 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
       word-wrap: 1.2.3
+    dev: true
+
+  /ovsx/0.8.0:
+    resolution: {integrity: sha512-W1U7lgBIbhSB1DcqyGKeenKzmwWYY78SkWd+BUKKyLyqN6w39Uekdr0PKAM7dyBGb0JLtLE7d86A1jJVn8bEng==}
+    engines: {node: '>= 14'}
+    hasBin: true
+    dependencies:
+      '@vscode/vsce': 2.16.0
+      commander: 6.2.1
+      follow-redirects: 1.15.2
+      is-ci: 2.0.0
+      leven: 3.1.0
+      tmp: 0.2.1
+    transitivePeerDependencies:
+      - debug
     dev: true
 
   /p-limit/2.3.0:

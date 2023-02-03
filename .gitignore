@@ -149,3 +149,8 @@ trace/**
 junit.xml
 
 SysML-v2-Release
+
+# CI
+release.description
+.npmrc
+.pnpm-store/

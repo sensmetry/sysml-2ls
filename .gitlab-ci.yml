@@ -1,3 +1,8 @@
+variables:
+  PACKAGE_NAME: sensmetry.sysml-2ls
+  EXTENSION_NAME: $PACKAGE_NAME-${CI_COMMIT_SHORT_SHA}
+  EXTENSION_PATH: $EXTENSION_NAME.vsix
+
 default:
   image: node:19.2
   before_script:
@@ -15,13 +20,14 @@ stages:
   - build
   - test
   - deploy
+  - publish
 
-build-job:
+build:
   stage: build
   script:
     - pnpm run esbuild-base
 
-test-job:
+test:
   stage: test
   coverage: /Lines\s*:\s*(\d+.?\d*)%/
   script:
@@ -37,12 +43,12 @@ test-job:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
 
-lint-job:
+lint:
   stage: test
   script:
     - pnpm run lint
 
-validate-job:
+validate:
   stage: test
   script:
     - git clone -n --shallow-exclude=2022-11 https://github.com/Systems-Modeling/SysML-v2-Release.git
@@ -51,24 +57,41 @@ validate-job:
     - cd ..
     - pnpm run run-validation
 
-package-job:
+.package-template:
   stage: deploy
-  environment: production
-  variables:
-    EXTENSION_NAME: sensmetry.sysml-2ls-${CI_COMMIT_SHA}
   script:
-    - pnpm run vscode:package -o "$EXTENSION_NAME.vsix"
+    - pnpm run vscode:package -o $EXTENSION_PATH
   artifacts:
     paths:
-      - $EXTENSION_NAME.vsix
+      - $EXTENSION_PATH
     name: $EXTENSION_NAME
     expire_in: 1 mos
+
+package:production:
+  extends: .package-template
+  rules:
+    # do not run on tags
+    - if: $VERSION
+      when: never
+    # only on pushes to main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  environment: production
+
+package:development:
+  extends: .package-template
+  rules:
+    # do not run on tags
+    - if: $VERSION || $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: never
+    # only on pushes to other branches (i.e. MRs)
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+  environment: development
 
 pages:
   stage: deploy
   before_script: []
   needs:
-    - job: test-job
+    - job: test
       artifacts: true
   script:
     - mkdir .public
@@ -79,3 +102,87 @@ pages:
       - public
   only:
     - main
+
+# =======================================================================
+# Jobs for release
+# =======================================================================
+
+.on-release-template:
+  rules:
+    - if: $VERSION && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    EXTENSION_NAME: $PACKAGE_NAME-$VERSION
+    EXTENSION_FILENAME: $EXTENSION_NAME.vsix
+    EXTENSION_PATH: $EXTENSION_FILENAME
+
+package:release:
+  stage: deploy
+  environment: release
+  extends: .on-release-template
+  script:
+    - >
+      if [ $(git tag -l "$VERSION") ]; then
+        echo "$VERSION tag already exists, bailing out"
+        exit 1
+      fi
+    - echo "Preparing for $VERSION release"
+    # update version fields
+    - pnpm run --silent prepare-release $VERSION -o release.description
+    # setup bot
+    - git config user.email "${GITLAB_USER_EMAIL}"
+    - git config user.name "${GITLAB_USER_NAME}"
+    - git remote add gitlab_origin https://gitlab-ci-token:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    # commit version changes
+    - git add --all
+    - git commit -m "Release $VERSION"
+    - git tag ${VERSION}
+    # package the extension
+    - pnpm run vscode:package -o $EXTENSION_PATH
+    - echo PACKAGE_JOB_ID=$CI_JOB_ID >> release.env
+    # push changes as the last command, prevent triggering pipeline again with
+    # -o ci.skip
+    - git push gitlab_origin HEAD:main -o ci.skip
+    - git push gitlab_origin HEAD:main --tags -o ci.skip
+  artifacts:
+    paths:
+      - $EXTENSION_PATH
+      - release.description
+    name: $EXTENSION_NAME
+    # release builds never expire
+    expire_in: never
+    reports:
+      dotenv: release.env
+
+.publish-template:
+  stage: publish
+  extends: .on-release-template
+  needs:
+    - job: package:release
+      artifacts: true
+
+publish:release:
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  extends: .publish-template
+  before_script: []
+  # cache is not needed, not running TS
+  cache:
+  script:
+    - echo "Releasing $VERSION"
+  release:
+    # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
+    tag_name: "$VERSION"
+    description: ./release.description
+    assets:
+      links:
+        - name: $EXTENSION_FILENAME
+          url: ${CI_SERVER_PROTOCOL}://${CI_SERVER_HOST}/${CI_PROJECT_PATH}/-/jobs/${PACKAGE_JOB_ID}/artifacts/raw/$EXTENSION_PATH
+
+publish:vscode:
+  extends: .publish-template
+  script:
+    - pnpm run vscode:publish --packagePath $EXTENSION_PATH
+
+publish:ovsx:
+  extends: .publish-template
+  script:
+    - pnpm run ovsx:publish --packagePath $EXTENSION_PATH

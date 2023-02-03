@@ -11,6 +11,10 @@
 .swcrc
 .pnpm-store
 
+# CI artifacts
+release.env
+release.description
+
 # local testing files
 ast.json
 test.kerml
