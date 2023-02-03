@@ -298,8 +298,11 @@
         "langium:watch": "langium generate --watch",
         "test": "jest",
         "test:ci": "jest --config ./jest.config.js --collectCoverage --coverageDirectory=\"./coverage\" --ci --reporters=default --reporters=jest-junit --watchAll=false",
+        "prepare-release": "pnpm tsx ./scripts/prepare-release.ts",
         "vscode:prepublish": "pnpm run esbuild-base --minify",
-        "vscode:package": "vsce package --no-dependencies --gitlabBranch=main",
+        "vscode:package": "vsce package",
+        "vscode:publish": "vsce publish",
+        "ovsx:publish": "ovsx publish",
         "esbuild-base": "esbuild ./src/extension.ts ./src/language-server/main.ts ./src/cli/index.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
         "install-hooks": "esbuild ./.githooks/pre-commit.ts --outfile=.git/hooks/pre-commit --bundle --format=cjs --platform=node",
         "esbuild": "pnpm run esbuild-base --sourcemap",
@@ -349,8 +352,14 @@
         "jest-matcher-utils": "^29.4.0",
         "jsonschema": "^1.4.1",
         "langium-workspaces": "github:langium/langium#c07bc1bc142777a5386dce6528d163758f52ed67",
+        "ovsx": "^0.8.0",
         "tsx": "^3.12.2",
         "typescript": "^4.8.4",
         "typescript-string-operations": "^1.5.0"
+    },
+    "vsce": {
+        "dependencies": false,
+        "gitlabBranch": "main",
+        "githubBranch": "main"
     }
 }
