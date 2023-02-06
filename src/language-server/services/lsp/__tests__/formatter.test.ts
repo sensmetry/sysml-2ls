@@ -22,8 +22,7 @@ import { parseSysML } from "../../../../testing";
 
 const unformattedSysMLExample = `
 /* Camera Example from SysML-v2-Release/sysml/src/examples folder */
-part def Camera {import PictureTaking::*;
-perform action takePicture[*] :> PictureTaking::takePicture
+part def Camera {import PictureTaking::*;perform action takePicture[*] :> PictureTaking::takePicture;
 part focusingSubsystem {perform takePicture.focus;}
 part imagingSubsystem {perform takePicture.shoot;}
 }
@@ -35,10 +34,11 @@ interface FormatOriginalDocumentReturnType {
 }
 
 const formatOriginalDocument = async (
+    text: string,
     options: FormattingOptions
 ): Promise<FormatOriginalDocumentReturnType> => {
     const formatter = new SysMLFormatter();
-    const documentToFormat = await parseSysML(unformattedSysMLExample);
+    const documentToFormat = await parseSysML(text);
 
     expect(documentToFormat.value.$document).toBeDefined();
 
@@ -54,20 +54,38 @@ const formatOriginalDocument = async (
     return { $document, formatChanges };
 };
 
+const DefaultFormattingOptions: FormattingOptions = {
+    tabSize: 4,
+    insertSpaces: true,
+};
+
+async function testFormatting(
+    text: string,
+    expected: string | undefined,
+    options: FormattingOptions = DefaultFormattingOptions
+): Promise<void> {
+    const { $document, formatChanges } = await formatOriginalDocument(text, options);
+
+    if (expected) {
+        expect($document.parseResult.parserErrors).toHaveLength(0);
+        expect($document.parseResult.lexerErrors).toHaveLength(0);
+        expect(TextDocument.applyEdits($document.textDocument, formatChanges)).toEqual(
+            expected.trimStart()
+        );
+    } else {
+        expect(formatChanges).toEqual([]);
+    }
+}
+
 describe("SysMLFormatter", () => {
     it("should format whole document correctly with 4 tabsize, with spaces", async () => {
-        const { $document, formatChanges } = await formatOriginalDocument({
-            tabSize: 4,
-            insertSpaces: true,
-        });
-
-        expect(TextDocument.applyEdits($document.textDocument, formatChanges))
-            .toMatchInlineSnapshot(`
-"/* Camera Example from SysML-v2-Release/sysml/src/examples folder */
+        await testFormatting(
+            unformattedSysMLExample,
+            `
+/* Camera Example from SysML-v2-Release/sysml/src/examples folder */
 part def Camera {
-    
     import PictureTaking::*;
-    perform action takePicture [*] :> PictureTaking::takePicture
+    perform action takePicture [*] :> PictureTaking::takePicture;
     part focusingSubsystem {
         perform takePicture.focus;
     }
@@ -75,23 +93,18 @@ part def Camera {
         perform takePicture.shoot;
     }
 }
-"
-`);
+`
+        );
     });
 
     it("should format whole document correctly with 2 tabsize, with spaces", async () => {
-        const { $document, formatChanges } = await formatOriginalDocument({
-            tabSize: 2,
-            insertSpaces: true,
-        });
-
-        expect(TextDocument.applyEdits($document.textDocument, formatChanges))
-            .toMatchInlineSnapshot(`
-"/* Camera Example from SysML-v2-Release/sysml/src/examples folder */
+        await testFormatting(
+            unformattedSysMLExample,
+            `
+/* Camera Example from SysML-v2-Release/sysml/src/examples folder */
 part def Camera {
-  
   import PictureTaking::*;
-  perform action takePicture [*] :> PictureTaking::takePicture
+  perform action takePicture [*] :> PictureTaking::takePicture;
   part focusingSubsystem {
     perform takePicture.focus;
   }
@@ -99,23 +112,22 @@ part def Camera {
     perform takePicture.shoot;
   }
 }
-"
-`);
+`,
+            {
+                tabSize: 2,
+                insertSpaces: true,
+            }
+        );
     });
 
     it("should format whole document correctly with 2 tabsize, with tabs", async () => {
-        const { $document, formatChanges } = await formatOriginalDocument({
-            tabSize: 2,
-            insertSpaces: false,
-        });
-
-        expect(TextDocument.applyEdits($document.textDocument, formatChanges))
-            .toMatchInlineSnapshot(`
-"/* Camera Example from SysML-v2-Release/sysml/src/examples folder */
+        await testFormatting(
+            unformattedSysMLExample,
+            `
+/* Camera Example from SysML-v2-Release/sysml/src/examples folder */
 part def Camera {
-	
 	import PictureTaking::*;
-	perform action takePicture [*] :> PictureTaking::takePicture
+	perform action takePicture [*] :> PictureTaking::takePicture;
 	part focusingSubsystem {
 		perform takePicture.focus;
 	}
@@ -123,7 +135,188 @@ part def Camera {
 		perform takePicture.shoot;
 	}
 }
-"
-`);
+`,
+            {
+                tabSize: 2,
+                insertSpaces: false,
+            }
+        );
+    });
+
+    it("should remove any extraneous empty lines to the first child element", async () => {
+        await testFormatting(
+            `part def A{
+            
+            
+
+    
+
+    part a: A;
+}`,
+            `
+part def A {
+    part a: A;
+}`
+        );
+    });
+
+    it("should leave a single empty line between children element", async () => {
+        await testFormatting(
+            `part def A{
+    part a: A;
+
+
+
+
+
+    part b: A;
+}`,
+            `
+part def A {
+    part a: A;
+
+    part b: A;
+}`
+        );
+    });
+
+    it("should a new line to the first child element", async () => {
+        await testFormatting(
+            "part def A{part a: A;}",
+            `
+part def A {
+    part a: A;
+}`
+        );
+    });
+
+    it("should remove extraneous lines to single line comments when the comment is the first child element", async () => {
+        await testFormatting(
+            `part A{
+            
+            
+            
+            // comment
+        }`,
+            `
+part A {
+    // comment
+}`
+        );
+    });
+
+    it("should remove extraneous lines to multiline comments when the comment is the first child element", async () => {
+        await testFormatting(
+            `part A{
+            
+            
+            
+            //* comment
+            */
+        }`,
+            `
+part A {
+    //* comment
+    */
+}`
+        );
+    });
+
+    it("should remove extraneous lines to single line comments when the comment is not the first child element", async () => {
+        await testFormatting(
+            `part A{part a: A;
+            
+            
+            
+            // comment
+        }`,
+            `
+part A {
+    part a: A;
+
+    // comment
+}`
+        );
+    });
+
+    it("should remove extraneous lines to multiline comments when the comment is not the first child element", async () => {
+        await testFormatting(
+            `part A{part a: A;
+            
+            
+            
+            //* comment
+            */
+        }`,
+            `
+part A {
+    part a: A;
+
+    //* comment
+    */
+}`
+        );
+    });
+
+    it("should remove any whitespace to the root comment if it's the first element", async () => {
+        await testFormatting(
+            `
+        
+        
+        // comment
+`,
+            "// comment\n"
+        );
+    });
+
+    it("should remove any whitespace in-between braces if there are no children", async () => {
+        await testFormatting(
+            `part P {     
+
+        }`,
+            "part P {}"
+        );
+    });
+
+    it("should remove any whitespace to metadata declarators", async () => {
+        await testFormatting(
+            `#     Meta part P {
+            @
+            
+            Meta;
+        }`,
+            `#Meta part P {
+    @Meta;
+}`
+        );
+    });
+
+    it("should format multiple elements in the root namespace", async () => {
+        await testFormatting(
+            `
+
+// comment
+        part def A;
+        
+        
+        
+        part def B;part def C;`,
+            `
+// comment
+part def A;
+
+part def B;
+part def C;`
+        );
+    });
+
+    it("should not format documents with parser errors", async () => {
+        await testFormatting(
+            `
+        
+        
+        part a`,
+            undefined
+        );
     });
 });

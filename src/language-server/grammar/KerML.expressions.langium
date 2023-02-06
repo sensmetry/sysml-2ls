@@ -195,8 +195,8 @@ EqualityOperator returns string:
 
 // Metadata
 MetadataPrefix returns MetadataFeature:
-    typedBy+=MetaclassReference;
+    '#' typedBy+=MetaclassReference;
 fragment PrefixMetadataMember:
-    '#' prefixes+=MetadataPrefix;
+    prefixes+=MetadataPrefix;
 fragment PrefixMetadataMembers:
-    PrefixMetadataMember ('#' prefixes+=MetadataPrefix)*;
+    PrefixMetadataMember (prefixes+=MetadataPrefix)*;

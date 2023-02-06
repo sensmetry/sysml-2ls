@@ -14002,16 +14002,25 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "$ref": "#/interfaces@20"
       },
       "definition": {
-        "$type": "Assignment",
-        "feature": "typedBy",
-        "operator": "+=",
-        "terminal": {
-          "$type": "RuleCall",
-          "rule": {
-            "$ref": "#/rules@280"
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Keyword",
+            "value": "#"
           },
-          "arguments": []
-        }
+          {
+            "$type": "Assignment",
+            "feature": "typedBy",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@280"
+              },
+              "arguments": []
+            }
+          }
+        ]
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -14025,25 +14034,16 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "PrefixMetadataMember",
       "fragment": true,
       "definition": {
-        "$type": "Group",
-        "elements": [
-          {
-            "$type": "Keyword",
-            "value": "#"
+        "$type": "Assignment",
+        "feature": "prefixes",
+        "operator": "+=",
+        "terminal": {
+          "$type": "RuleCall",
+          "rule": {
+            "$ref": "#/rules@286"
           },
-          {
-            "$type": "Assignment",
-            "feature": "prefixes",
-            "operator": "+=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@286"
-              },
-              "arguments": []
-            }
-          }
-        ]
+          "arguments": []
+        }
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -14066,25 +14066,16 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "arguments": []
           },
           {
-            "$type": "Group",
-            "elements": [
-              {
-                "$type": "Keyword",
-                "value": "#"
+            "$type": "Assignment",
+            "feature": "prefixes",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@286"
               },
-              {
-                "$type": "Assignment",
-                "feature": "prefixes",
-                "operator": "+=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@286"
-                  },
-                  "arguments": []
-                }
-              }
-            ],
+              "arguments": []
+            },
             "cardinality": "*"
           }
         ]
@@ -42757,16 +42748,25 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "$ref": "#/interfaces@20"
       },
       "definition": {
-        "$type": "Assignment",
-        "feature": "typedBy",
-        "operator": "+=",
-        "terminal": {
-          "$type": "RuleCall",
-          "rule": {
-            "$ref": "#/rules@458"
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Keyword",
+            "value": "#"
           },
-          "arguments": []
-        }
+          {
+            "$type": "Assignment",
+            "feature": "typedBy",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@458"
+              },
+              "arguments": []
+            }
+          }
+        ]
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -42780,25 +42780,16 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PrefixMetadataMember",
       "fragment": true,
       "definition": {
-        "$type": "Group",
-        "elements": [
-          {
-            "$type": "Keyword",
-            "value": "#"
+        "$type": "Assignment",
+        "feature": "prefixes",
+        "operator": "+=",
+        "terminal": {
+          "$type": "RuleCall",
+          "rule": {
+            "$ref": "#/rules@464"
           },
-          {
-            "$type": "Assignment",
-            "feature": "prefixes",
-            "operator": "+=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@464"
-              },
-              "arguments": []
-            }
-          }
-        ]
+          "arguments": []
+        }
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -42821,25 +42812,16 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "arguments": []
           },
           {
-            "$type": "Group",
-            "elements": [
-              {
-                "$type": "Keyword",
-                "value": "#"
+            "$type": "Assignment",
+            "feature": "prefixes",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@464"
               },
-              {
-                "$type": "Assignment",
-                "feature": "prefixes",
-                "operator": "+=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@464"
-                  },
-                  "arguments": []
-                }
-              }
-            ],
+              "arguments": []
+            },
             "cardinality": "*"
           }
         ]

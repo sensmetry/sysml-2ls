@@ -18,13 +18,17 @@ import {
     AbstractFormatter,
     AstNode,
     CstNode,
-    findCommentNode,
     Formatting,
+    FormattingAction,
+    FormattingContext,
+    getDocument,
+    LangiumDocument,
     NodeFormatter,
 } from "langium";
 import { typeIndex, TypeMap } from "../../model";
 import * as ast from "../../generated/ast";
 import { SysMLType } from "../sysml-ast-reflection";
+import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 
 type Format<T extends AstNode = AstNode> = (node: T, formatter: NodeFormatter<T>) => void;
 type FormatMap = {
@@ -48,8 +52,6 @@ const Options = {
     uptoTwoLines: Formatting.fit(Formatting.newLines(1), Formatting.newLines(2)),
     inline: Formatting.oneSpace(),
 } as const;
-
-const COMMENT_RULES = ["SL_NOTE", "ML_NOTE"];
 
 export class SysMLFormatter extends AbstractFormatter {
     /**
@@ -94,18 +96,26 @@ export class SysMLFormatter extends AbstractFormatter {
         switch (depth) {
             case 1: {
                 // elements inside root namespace
-                const isFirst = node.$cstNode?.offset === node.$container.$cstNode?.offset;
-                const isLast = node.$cstNode?.end === node.$container.$cstNode?.end;
+                const start = node.$cstNode?.offset;
+                const isFirst = start === node.$container.$cstNode?.offset;
                 if (isFirst) {
-                    region.prepend(Options.noSpace);
+                    // comments are not a part of the AST so have to check in the document directly
+                    try {
+                        const doc = getDocument(node);
+                        if (doc.textDocument.getText().substring(0, start).trim().length === 0) {
+                            region.prepend(Options.noSpace);
+                            return;
+                        }
+                    } catch {
+                        /* empty */
+                    }
+
+                    // no empty space to the first element
+                    region.prepend(Formatting.fit(Options.noSpace, Options.newLine));
+                    return;
                 }
-                // TODO: add trailing new line, the following doesn't work
-                // if (isLast) {
-                //     region.append(Options.newLine);
-                // }
-                if (!isFirst && !isLast) {
-                    region.prepend(Options.noIndent);
-                }
+
+                region.prepend(Formatting.fit(Options.noIndent, Options.uptoTwoLines));
 
                 break;
             }
@@ -115,7 +125,6 @@ export class SysMLFormatter extends AbstractFormatter {
                 const isLast = node.$cstNode?.end === node.$cstNode?.parent?.end;
 
                 if (isFirst) {
-                    region.prepend(Options.newLine);
                     if (isLast) {
                         // for some reason a single item is not indented with
                         // interior...
@@ -168,8 +177,6 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         if (prepend) this.formatPrepend(node, formatter);
 
-        // TODO: enable when it works
-        // this.formatRelatedComments(node.$cstNode, formatter);
         this.formatBody(formatter);
     }
 
@@ -210,25 +217,64 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("]").prepend(Options.noSpace);
     }
 
-    /**
-     * Format comments preceding {@link node} removing extraneous empty lines
-     * TODO: doesn't work
-     * @param node CST node to look for related comments
-     * @param formatter generic formatter
-     */
-    protected formatRelatedComments(
-        node: CstNode | undefined,
-        formatter: NodeFormatter<AstNode>
-    ): void {
-        const nodes: CstNode[] = [];
-        for (;;) {
-            node = findCommentNode(node, COMMENT_RULES);
-            if (!node) break;
-            nodes.push(node);
+    protected override doDocumentFormat(
+        document: LangiumDocument,
+        options: FormattingOptions,
+        range?: Range
+    ): TextEdit[] {
+        if (
+            document.parseResult.lexerErrors.length > 0 ||
+            document.parseResult.parserErrors.length > 0
+        ) {
+            // do not format invalid documents
+            return [];
         }
 
-        // TODO: leave only up to 1 empty line before a comment, somehow cst
-        // formatting doesn't work
-        formatter.cst(nodes).prepend(Options.uptoTwoLines);
+        return super.doDocumentFormat(document, options, range);
+    }
+
+    protected override createHiddenTextEdits(
+        previous: CstNode | undefined,
+        hidden: CstNode,
+        formatting: FormattingAction | undefined,
+        context: FormattingContext
+    ): TextEdit[] {
+        const edits = super.createHiddenTextEdits(previous, hidden, formatting, context);
+
+        // remove any extraneous empty lines before comments
+        let line = hidden.range.start.line;
+        const text = context.document.getText();
+
+        let str = "";
+        do {
+            line--;
+            if (line < 0) break;
+
+            const start = context.document.offsetAt({ line, character: 0 });
+            const end = context.document.offsetAt({ line: line + 1, character: 0 });
+
+            str = text.substring(start, end).trim();
+        } while (str.length === 0);
+
+        // line points to a non-empty line so add +1
+        const emptyLines = hidden.range.start.line - line + 1;
+        if (emptyLines > 1) {
+            const isFirst = !str.endsWith(";");
+            edits.unshift({
+                newText: isFirst ? "" : "\n",
+                range: {
+                    start: {
+                        line: line + 1,
+                        character: -1,
+                    },
+                    end: {
+                        line: hidden.range.start.line,
+                        character: 0,
+                    },
+                },
+            });
+        }
+
+        return edits;
     }
 }
