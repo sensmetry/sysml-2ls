@@ -2,6 +2,16 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## [unreleased]
+
+### Fixed
+
+- Automatic indentation
+
+### Changed
+
+- Invalid KerML/SysML documents will not be formatted
+
 ## 0.2.0
 
 ### Added
