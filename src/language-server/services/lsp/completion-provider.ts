@@ -126,7 +126,8 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         }
 
         if (list) {
-            // filter out duplicate names since they would be hidden by scope resolution anyway
+            // filter out duplicate names since they would be hidden by scope
+            // resolution anyway
             list.items = stream(list.items)
                 .distinct((item) => item.label)
                 .toArray();
@@ -136,7 +137,8 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
     }
 
     /**
-     * Custom completion computation method that only computes reference completions
+     * Custom completion computation method that only computes reference
+     * completions
      * @see {@link getCompletion}
      */
     protected async getTriggerCompletion(
@@ -171,7 +173,8 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         let token = "";
         let tokenStart: number;
         if (!node) {
-            // failed to find a valid node, this can happen on unbalanced quotes or keywords
+            // failed to find a valid node, this can happen on unbalanced quotes
+            // or keywords
             tokenStart = this.backtrackToAnyTriggerStart(text, tokenEnd);
 
             // -1 to leave the trigger token
@@ -193,6 +196,45 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
 
         if (!node) return;
 
+        // wrapper over base `fillCompletionItem` to account for multi-words and
+        // quotes
+        const fillCompletionItem = (value: CompletionValueItem): CompletionItem | undefined => {
+            // need at least a single quote to start multi-word matching
+            if ((!startQuote && !endQuote) || value.textEdit)
+                return this.fillCompletionItem(textDocument, offset, value);
+
+            const label = this.getLabel(value);
+            if (!label) return;
+
+            let start = tokenStart;
+            let end = tokenEnd;
+            let identifier = token;
+
+            // strip quotes from the identifier and update editing offsets
+            if (startQuote) {
+                start++;
+                identifier = token.substring(1);
+            }
+            if (endQuote) {
+                end--;
+                identifier = identifier.substring(0, identifier.length - 1);
+            }
+
+            if (!this.charactersFuzzyMatch(identifier, label)) return;
+
+            value.textEdit = {
+                newText: label,
+                range: {
+                    start: textDocument.positionAt(start),
+                    end: textDocument.positionAt(end),
+                },
+            };
+
+            // base method will not attempt to rebuild `textEdit` since one
+            // already exists
+            return this.fillCompletionItem(textDocument, offset, value);
+        };
+
         const items: CompletionItem[] = [];
         // if offset equals start, the cursor is before the quote
         const startQuote = offset !== tokenStart && token.startsWith("'");
@@ -202,7 +244,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         // clashes with a keyword or it doesn't match a regular ID rule, enclose
         // the new text in quotes if it doesn't already
         const refAcceptor: CompletionAcceptor = (value) => {
-            const completionItem = this.fillCompletionItem(textDocument, offset, value);
+            const completionItem = fillCompletionItem(value);
             if (completionItem) {
                 if (
                     !withQuotes &&
@@ -290,7 +332,8 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         token = CancellationToken.None
     ): MaybePromise<void> {
         if (token === CancellationToken.None)
-            // check tokens cache (i.e. here from super.getCompletion which doesn't pass token)
+            // check tokens cache (i.e. here from super.getCompletion which
+            // doesn't pass token)
             token = this.cancelTokens.get(context.document) ?? token;
 
         // Prioritise completion for references over keywords in the default
@@ -415,7 +458,8 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
      * @param text document test
      * @param offset starting search offset
      * @param token token to backtrack to, expects `token.length === 1`
-     * @returns the offset at which `text.charAt(offset) === token` if found, 0 otherwise
+     * @returns the offset at which `text.charAt(offset) === token` if found, 0
+     * otherwise
      */
     protected backtrackToToken(text: string, offset: number, token: string): number {
         if (token.length !== 1) return offset;
@@ -461,5 +505,24 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         }
 
         return item;
+    }
+
+    /**
+     * Get a label for completion item
+     */
+    protected getLabel(value: CompletionValueItem): string | undefined {
+        if (typeof value.label === "string") {
+            return value.label;
+        }
+
+        if ("node" in value) {
+            return this.nameProvider.getName(value.node);
+        }
+
+        if ("nodeDescription" in value) {
+            return value.nodeDescription.name;
+        }
+
+        return;
     }
 }

@@ -14,41 +14,51 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { URI } from "vscode-uri";
-import { TEST_BUILD_OPTIONS, generateString } from "../../../../testing";
+import {
+    TEST_BUILD_OPTIONS,
+    services,
+    parseSysML,
+    recursiveObjectContaining,
+    findCursor,
+} from "../../../../testing";
 import { LangiumDocument } from "langium";
-import { createSysMLServices } from "../../../sysml-module";
 import {
     CompletionParams,
     TextDocumentIdentifier,
-    Position,
     CompletionTriggerKind,
+    CompletionItem,
 } from "vscode-languageserver";
-import { Namespace } from "../../../generated/ast";
-import { SysMLServices, KerMLServices, SysMLSharedServices } from "../../services";
-import { SysMLNodeFileSystem } from "../../../node/node-file-system-provider";
 
-const test_table = [
+//eslint-disable-next-line @typescript-eslint/ban-types
+export type DeepPartial<T> = T extends object | undefined
+    ? {
+          [P in keyof T]?: DeepPartial<T[P]>;
+      }
+    : T;
+
+interface Case {
+    // use | to denote cursor position
+    text: string;
+    // TriggerCharacter kind will infer the actual trigger character
+    triggerKind?: CompletionTriggerKind;
+    expected: DeepPartial<CompletionItem>;
+}
+
+const test_table: Case[] = [
     {
-        text: `pack
+        text: `pack|
 `,
-        line: 0,
-        character: 3,
-        triggerKind: undefined,
-        triggerCharacter: undefined,
-        expectedLabel: "package",
-        expectedNewText: undefined,
+        expected: {
+            label: "package",
+        },
     },
 
     {
-        text: `lib
+        text: `lib|
 `,
-        line: 0,
-        character: 3,
-        triggerKind: undefined,
-        triggerCharacter: undefined,
-        expectedLabel: "library",
-        expectedNewText: undefined,
+        expected: {
+            label: "library",
+        },
     },
 
     {
@@ -58,15 +68,13 @@ const test_table = [
         part eng : Engine;
     }
     part def Engine;
-    part def MyEngine :>
+    part def MyEngine :>|
 }
 `,
-        line: 7,
-        character: 24,
         triggerKind: CompletionTriggerKind.TriggerCharacter,
-        triggerCharacter: ">",
-        expectedLabel: "Engine",
-        expectedNewText: undefined,
+        expected: {
+            label: "Engine",
+        },
     },
 
     {
@@ -78,15 +86,13 @@ const test_table = [
         enum Red;
     }
     
-    currentColor = TrafficLightColor::
+    currentColor = TrafficLightColor::|
 }
 `,
-        line: 8,
-        character: 38,
         triggerKind: CompletionTriggerKind.TriggerCharacter,
-        triggerCharacter: ":",
-        expectedLabel: "Green",
-        expectedNewText: undefined,
+        expected: {
+            label: "Green",
+        },
     },
 
     {
@@ -95,30 +101,27 @@ const test_table = [
     part def Cylinder;
     part def '1myCylinder' :> Cylinder;
     part engine : Engine {
-        part cylinder : '';
+        part cylinder : '|';
     }
 }
 `,
-        line: 5,
-        character: 25,
         triggerKind: CompletionTriggerKind.TriggerCharacter,
-        triggerCharacter: "'",
-        expectedLabel: "1myCylinder",
-        expectedNewText: undefined,
+        expected: {
+            label: "1myCylinder",
+        },
     },
 
     {
         text: `part def Engine;
 part engine : Engine {
-    part cyl = Engine.
+    part cyl = Engine.|
 }
 `,
-        line: 2,
-        character: 22,
         triggerKind: CompletionTriggerKind.TriggerCharacter,
-        triggerCharacter: ".",
-        expectedLabel: "metadata",
-        expectedNewText: "metadata",
+        expected: {
+            label: "metadata",
+            textEdit: { newText: "metadata" },
+        },
     },
 
     {
@@ -127,16 +130,15 @@ part engine : Engine {
     part def Cylinders
     part def '6Cylinders' :> Cylinders;
     part engine : Engine {
-        part cyls :  
+        part cyls : |
     }
 }
 `,
-        line: 5,
-        character: 20,
         triggerKind: CompletionTriggerKind.Invoked,
-        triggerCharacter: undefined,
-        expectedLabel: "6Cylinders",
-        expectedNewText: "'6Cylinders'",
+        expected: {
+            label: "6Cylinders",
+            textEdit: { newText: "'6Cylinders'" },
+        },
     },
 
     {
@@ -145,14 +147,13 @@ part engine : Engine {
     part def Cylinders;
     part def '6Cylinders' :> Cylinders;
 }
-import myPack::'
+import myPack::'|
 `,
-        line: 5,
-        character: 16,
         triggerKind: CompletionTriggerKind.Invoked,
-        triggerCharacter: undefined,
-        expectedLabel: "6Cylinders",
-        expectedNewText: "6Cylinders'",
+        expected: {
+            label: "6Cylinders",
+            textEdit: { newText: "6Cylinders'" },
+        },
     },
 
     {
@@ -161,57 +162,59 @@ import myPack::'
     part def Cylinders;
     part def '6Cylinders' :> Cylinders;
 }
-import myPack::'
+import myPack::|'
 `,
-        line: 5,
-        character: 15,
         triggerKind: CompletionTriggerKind.Invoked,
-        triggerCharacter: undefined,
-        expectedLabel: "6Cylinders",
-        expectedNewText: "'6Cylinders",
+        expected: {
+            label: "6Cylinders",
+            textEdit: { newText: "'6Cylinders" },
+        },
     },
 
     {
         text: `part a { part b; }
-part c : a { :>> }
+part c : a { :>>| }
 `,
-        line: 1,
-        character: 16,
         triggerKind: CompletionTriggerKind.Invoked,
-        triggerCharacter: undefined,
-        expectedLabel: "b",
-        expectedNewText: "b",
+        expected: {
+            label: "b",
+            textEdit: { newText: "b" },
+        },
     },
 
     {
         text: `part a { part b; }
-part c : a { :>> }
+part c : a { :>>| }
 `,
-        line: 1,
-        character: 16,
         triggerKind: CompletionTriggerKind.TriggerCharacter,
-        triggerCharacter: ">",
-        expectedLabel: "b",
-        expectedNewText: "b",
+        expected: {
+            label: "b",
+            textEdit: { newText: "b" },
+        },
     },
     {
         text: `package 'Vehicle' {
     part def Cylinder;
     part def Engine {
-        part cylinder : Cy
+        part cylinder : Cy|
     }
 }
 `,
-        line: 3,
-        character: 26,
-        triggerKind: undefined,
-        triggerCharacter: undefined,
-        expectedLabel: "Cylinder",
-        expectedNewText: undefined,
+        expected: {
+            label: "Cylinder",
+        },
+    },
+    {
+        text: `
+    part def 'Abstract Ball Corner';
+    part Example : 'Abstract Ba|'`,
+        expected: {
+            label: "Abstract Ball Corner",
+        },
     },
 ];
 
-const failing_test_table = [
+const failing_test_table: Case[] = [
     // Test case currently fails due to parser limitation
     {
         text: `package 'myPack' {
@@ -219,104 +222,69 @@ const failing_test_table = [
     part def Cylinder;
     part def '1MyCylinder' :> Cylinder;
     part engine : Engine {
-        part myCylinder : '
+        part myCylinder : '|
     }
 }
 `,
-        line: 5,
-        character: 27,
         triggerKind: CompletionTriggerKind.Invoked,
-        triggerCharacter: undefined,
-        expectedLabel: "1MyCylinder",
-        expectedNewText: "1MyCylinder'",
+        expected: {
+            label: "1MyCylinder",
+            textEdit: { newText: "1MyCylinder'" },
+        },
     },
 ];
 
-const defaultSysMLservices = createSysMLServices(SysMLNodeFileSystem, {
-    standardLibrary: false,
-    logStatistics: false,
-});
-
 // Builds a document, provides completion params.
-// Also provides SysML services reference that is separate from the rest of unit tests
-async function buildDocumentAndCompletionParams(
-    text: string,
-    line: number,
-    character: number,
-    triggerKind?: CompletionTriggerKind,
-    triggerCharacter?: string
-): Promise<{
-    services: {
-        shared: SysMLSharedServices;
-        SysML: SysMLServices;
-        KerML: KerMLServices;
-    };
-    document: LangiumDocument<Namespace>;
+async function buildDocumentAndCompletionParams(description: Case): Promise<{
+    document: LangiumDocument;
     completionParams: CompletionParams;
 }> {
-    const uri = URI.file(generateString(16) + ".sysml");
+    const { text, cursor } = findCursor(description.text);
+
+    const result = await parseSysML(text);
+    const document = result.value.$document;
+    expect(document).toBeDefined();
+    if (!document) throw new Error();
+
     const completionParams: CompletionParams = {
-        textDocument: TextDocumentIdentifier.create(uri.toString()),
-        position: Position.create(line, character),
-        context: triggerKind ? { triggerKind, triggerCharacter } : undefined,
+        textDocument: TextDocumentIdentifier.create(document.uriString),
+        position: document.textDocument.positionAt(cursor),
+        context: description.triggerKind
+            ? {
+                  triggerKind: description.triggerKind,
+                  triggerCharacter:
+                      description.triggerKind === CompletionTriggerKind.TriggerCharacter
+                          ? text.charAt(cursor - 1)
+                          : undefined,
+              }
+            : undefined,
     };
 
-    const services = defaultSysMLservices;
-    const document = services.shared.workspace.LangiumDocumentFactory.fromString<Namespace>(
-        text,
-        uri
-    );
     await services.shared.workspace.DocumentBuilder.build([document], TEST_BUILD_OPTIONS);
-    return { services, document, completionParams };
+    return { document, completionParams };
 }
 
-async function executeCompletionTestCase({
-    text,
-    line,
-    character,
-    triggerKind,
-    triggerCharacter,
-    expectedLabel,
-    expectedNewText,
-}: {
-    text: string;
-    line: number;
-    character: number;
-    triggerKind?: CompletionTriggerKind;
-    triggerCharacter?: string;
-    expectedLabel: string;
-    expectedNewText?: string;
-}): Promise<void> {
-    const { services, document, completionParams } = await buildDocumentAndCompletionParams(
-        text,
-        line,
-        character,
-        triggerKind,
-        triggerCharacter
-    );
+async function executeCompletionTestCase(description: Case): Promise<void> {
+    const { document, completionParams } = await buildDocumentAndCompletionParams(description);
     const completionList = await services.SysML.lsp.CompletionProvider?.getCompletion(
         document,
         completionParams
     );
-    const expectation =
-        expectedNewText !== undefined
-            ? {
-                  label: expectedLabel,
-                  textEdit: expect.objectContaining({ newText: expectedNewText }),
-              }
-            : { label: expectedLabel };
+    const expectation = Array.isArray(description.expected)
+        ? description.expected
+        : [description.expected];
 
     expect(completionList?.items).toEqual(
-        expect.arrayContaining([expect.objectContaining(expectation)])
+        expect.arrayContaining(expectation.map((item) => recursiveObjectContaining(item)))
     );
 }
 
 test.concurrent.each(test_table)(
-    "invoked completion for label '$expectedLabel'",
+    "invoked completion for label '$expected.label'",
     executeCompletionTestCase
 );
 
 test.failing.each(failing_test_table)(
-    "invoked completion for label '$expectedLabel'",
+    "invoked completion for label '$expected.label'",
     executeCompletionTestCase
 );

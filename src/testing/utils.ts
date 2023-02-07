@@ -134,3 +134,19 @@ export function directScopeNames(namespace: Namespace): string[] {
             .map((d) => (d.node as Element).$meta.qualifiedName)
     );
 }
+
+/**
+ * Find and extract cursor offset from {@link text}
+ * @param text text with "|" for cursor position
+ * @returns text with "|" removed and cursor offset
+ */
+export function findCursor(text: string): { text: string; cursor: number } {
+    const cursor = text.indexOf("|");
+    text = text.substring(0, cursor) + text.substring(cursor + 1);
+
+    if (cursor < 0) {
+        throw new Error("No cursor found!");
+    }
+
+    return { text, cursor };
+}

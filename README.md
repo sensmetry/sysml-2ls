@@ -44,7 +44,7 @@ The extension provides basic features to support SysMLv2 document editing:
 - Semantic highlighting  
   ![Semantic highlighting](/docs/images/semantic-highlighting.png)
   <br> <br>
-- Auto-formatting: indentation
+- Auto-formatting: indentation  
   ![Indentation](/docs/images/indentation.gif)
   <br> <br>
 - Renaming  

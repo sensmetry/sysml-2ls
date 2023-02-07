@@ -7,6 +7,7 @@
 ### Fixed
 
 - Automatic indentation
+- Completion sometimes returning no suggestions for multi-word unrestricted names
 
 ### Changed
 
