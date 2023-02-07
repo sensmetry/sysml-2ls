@@ -69,9 +69,8 @@ async function testFormatting(
     if (expected) {
         expect($document.parseResult.parserErrors).toHaveLength(0);
         expect($document.parseResult.lexerErrors).toHaveLength(0);
-        expect(TextDocument.applyEdits($document.textDocument, formatChanges)).toEqual(
-            expected.trimStart()
-        );
+        const formatted = TextDocument.applyEdits($document.textDocument, formatChanges);
+        expect(formatted).toEqual(expected.trimStart());
     } else {
         expect(formatChanges).toEqual([]);
     }
@@ -295,7 +294,7 @@ part A {
         await testFormatting(
             `
 
-// comment
+        // comment
         part def A;
         
         
@@ -317,6 +316,64 @@ part def C;`
         
         part a`,
             undefined
+        );
+    });
+
+    it("should respect and indent AST continuations intersected by comments", async () => {
+        await testFormatting(
+            `
+        #   // a comment
+
+
+
+        Meta part P {
+        }`,
+            `
+# // a comment
+    Meta part P {}`
+        );
+    });
+
+    it("should respect and indent AST continuations intersected by comments and indented by tabs", async () => {
+        await testFormatting(
+            `
+        #   // a comment
+
+
+
+        Meta part P {
+        }`,
+            `
+# // a comment
+\tMeta part P {}`,
+            { ...DefaultFormattingOptions, insertSpaces: false }
+        );
+    });
+
+    it("should leave a single leading space to end of line comment", async () => {
+        await testFormatting("part P {}     // comment", "part P {} // comment");
+    });
+
+    it("should leave a single leading space to end of line multiline comment", async () => {
+        await testFormatting("part P {}     //* comment */", "part P {} //* comment */");
+    });
+
+    it("should format comments inside a reference", async () => {
+        await testFormatting(
+            "part P: A::       //* comment */   B {}",
+            "part P: A:: //* comment */ B {}"
+        );
+    });
+
+    it("should format comments inside a multiline reference", async () => {
+        await testFormatting(
+            `
+        part P: A::       // comment
+        
+            B {}`,
+            `
+part P: A:: // comment
+    B {}`
         );
     });
 });
