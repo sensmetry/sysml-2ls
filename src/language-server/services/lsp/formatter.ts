@@ -22,6 +22,7 @@ import {
     FormattingAction,
     FormattingContext,
     getDocument,
+    getNextNode,
     LangiumDocument,
     NodeFormatter,
 } from "langium";
@@ -239,33 +240,22 @@ export class SysMLFormatter extends AbstractFormatter {
         formatting: FormattingAction | undefined,
         context: FormattingContext
     ): TextEdit[] {
-        const edits = super.createHiddenTextEdits(previous, hidden, formatting, context);
+        const edits: TextEdit[] = [];
 
         // remove any extraneous empty lines before comments
-        let line = hidden.range.start.line;
-        const text = context.document.getText();
+        const line = hidden.range.start.line;
+        const prevLine = previous?.range.end.line ?? -1;
+        const prevText = previous?.text ?? "";
 
-        let str = "";
-        do {
-            line--;
-            if (line < 0) break;
-
-            const start = context.document.offsetAt({ line, character: 0 });
-            const end = context.document.offsetAt({ line: line + 1, character: 0 });
-
-            str = text.substring(start, end).trim();
-        } while (str.length === 0);
-
-        // line points to a non-empty line so add +1
-        const emptyLines = hidden.range.start.line - line + 1;
+        const emptyLines = line - prevLine;
         if (emptyLines > 1) {
-            const isFirst = !str.endsWith(";");
-            edits.unshift({
+            const isFirst = !/(;|\})$/.test(prevText);
+            edits.push({
                 newText: isFirst ? "" : "\n",
                 range: {
                     start: {
-                        line: line + 1,
-                        character: -1,
+                        line: prevLine + 1,
+                        character: 0,
                     },
                     end: {
                         line: hidden.range.start.line,
@@ -275,6 +265,124 @@ export class SysMLFormatter extends AbstractFormatter {
             });
         }
 
+        edits.push(...super.createHiddenTextEdits(previous, hidden, formatting, context));
+
+        if (formatting) {
+            // we are here from an AST formatting append action, don't compute
+            // any append formatting for this hidden comment yet to avoid
+            // overlapping edits. This will be called through CST traversal
+            // later
+            return edits;
+        }
+
+        // ensure a single space between previous CST node and this comment if
+        // they are on the same line
+        if (previous) {
+            const edit = this.addSpaceBetween(previous, hidden, context);
+            if (edit) edits.push(edit);
+        }
+
+        const nextNode = getNextNode(hidden);
+        if (!nextNode) {
+            // nothing to do since there is no next node
+            return edits;
+        }
+
+        if (hidden.range.end.line === nextNode.range.start.line) {
+            const edit = this.addSpaceBetween(hidden, nextNode, context);
+            if (edit) {
+                edits.push(edit);
+            }
+            // next node is continued on the same line so nothing more to do
+            return edits;
+        }
+
+        const nextElem = this.owningElement(nextNode);
+        const prevElem = this.owningElement(previous);
+        if (nextElem != prevElem) {
+            return edits;
+        }
+
+        // this hidden node intersects a rule and the next CST node
+        // starts on another line -> indent the next CST node by an additional
+        // level
+
+        // remove any empty lines between the comment and the rule continuation
+        const lineDiff = nextNode.range.start.line - hidden.range.end.line;
+        if (lineDiff > 1) {
+            edits.push({
+                newText: "",
+                range: {
+                    start: {
+                        line: hidden.range.end.line + 1,
+                        character: 0,
+                    },
+                    end: {
+                        line: nextNode.range.start.line,
+                        character: 0,
+                    },
+                },
+            });
+        }
+
+        // add an indentation level for the rule continuation
+        const nextRange: Range = {
+            start: {
+                character: 0,
+                line: nextNode.range.start.line,
+            },
+            end: nextNode.range.start,
+        };
+        const nextText = context.document.getText(nextRange);
+        const nextStartChar = this.getExistingIndentationCharacterCount(nextText, context);
+        const expectedStartChar = this.getIndentationCharacterCount(context, {
+            tabs: context.indentation + 1,
+        });
+
+        const characterIncrease = expectedStartChar - nextStartChar;
+
+        if (characterIncrease !== 0) {
+            edits.push({
+                newText: (context.options.insertSpaces ? " " : "\t").repeat(expectedStartChar),
+                range: nextRange,
+            });
+        }
+
         return edits;
+    }
+
+    /**
+     * Get the CST node owning AST node
+     */
+    protected owningElement(node: CstNode | undefined): AstNode | undefined {
+        // have to skip reference elements when comparing AST nodes as they are
+        // always a part of some other AST element
+        if (ast.isElementReference(node?.element)) return node?.element.$container;
+        return node?.element;
+    }
+
+    /**
+     * Create a text edit for a single space between `left` and `right` if applicable
+     */
+    protected addSpaceBetween(
+        left: CstNode,
+        right: CstNode,
+        context: FormattingContext
+    ): TextEdit | undefined {
+        if (left.range.end.line !== right.range.start.line) return;
+
+        const spaceRange: Range = {
+            start: left.range.end,
+            end: right.range.start,
+        };
+        const space = context.document.getText(spaceRange);
+        if (space !== " ") {
+            return {
+                newText: " ",
+                range: spaceRange,
+            };
+        }
+
+        return;
     }
 }
