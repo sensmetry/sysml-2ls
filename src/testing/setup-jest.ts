@@ -304,3 +304,18 @@ declare global {
         interface InverseAsymmetricMatchers extends CustomMatchers {}
     }
 }
+
+/**
+ * Docs are wrong and {@link expect.objectContaining} is not recursive, use this instead
+ */
+export function recursiveObjectContaining(value: unknown): unknown {
+    if (typeof value !== "object") return value;
+    if (!value) return value;
+
+    const out: Record<string, unknown> = {};
+    Object.entries(value).forEach(([k, v]) => {
+        out[k] = recursiveObjectContaining(v);
+    });
+
+    return expect.objectContaining(out);
+}
