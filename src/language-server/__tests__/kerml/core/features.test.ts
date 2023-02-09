@@ -28,40 +28,36 @@ import { Feature, MultiplicityRange, LiteralNumber, LiteralInfinity } from "../.
 import { Visibility } from "../../../utils/ast-util";
 
 test.concurrent.each([
-    ["typed by A, B subsets f redefines g", false],
-    // TODO: Langium bug
-    ["redefines g typed by A subsets f typed by B", true],
-])(
-    "feature specializations can appear in any order: '%s'",
-    async (feature: string, fails: boolean) => {
-        const matcher = expect(
-            formatString(
-                `
+    "typed by A, B subsets f redefines g",
+    "redefines g typed by A subsets f typed by B",
+])("feature specializations can appear in any order: '%s'", async (feature: string) => {
+    const matcher = expect(
+        formatString(
+            `
     type A;
     type B;
     feature f;
     feature g;
     feature x {0};
     `,
-                feature
-            )
-        );
-        const expected = {
-            features: [
-                ...anything(2),
-                {
-                    $type: Feature,
-                    ...withQualifiedName("x"),
-                    typedBy: [qualifiedTypeReference("A"), qualifiedTypeReference("B")],
-                    subsets: [qualifiedTypeReference("f")],
-                    redefines: [qualifiedTypeReference("g")],
-                },
-            ],
-        };
+            feature
+        )
+    );
+    const expected = {
+        features: [
+            ...anything(2),
+            {
+                $type: Feature,
+                ...withQualifiedName("x"),
+                typedBy: [qualifiedTypeReference("A"), qualifiedTypeReference("B")],
+                subsets: [qualifiedTypeReference("f")],
+                redefines: [qualifiedTypeReference("g")],
+            },
+        ],
+    };
 
-        return fails ? matcher.not.toParseKerML(expected) : matcher.toParseKerML(expected);
-    }
-);
+    return matcher.toParseKerML(expected);
+});
 
 test("features without subsetting, redefinition and conjugation relationships subset Base::things", async () => {
     const result = await parseKerML(

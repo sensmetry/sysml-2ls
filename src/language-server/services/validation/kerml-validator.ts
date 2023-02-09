@@ -101,12 +101,16 @@ export class KerMLValidator {
     }
 
     checkFeatureChainingLength(feature: Feature, accept: ValidationAcceptor): void {
-        for (const ref of feature.chains) {
-            if (ref.$meta.featureIndices.length < 2) {
-                accept("error", "Feature chain must be a chain of 2 or more features", {
-                    node: ref,
-                });
-            }
+        if (feature.chains.length === 0) return;
+        const chains = feature.chains.reduce(
+            (total, ref) => total + ref.$meta.featureIndices.length,
+            0
+        );
+        if (chains < 2) {
+            accept("error", "Feature chain must be a chain of 2 or more features", {
+                node: feature,
+                property: "chains",
+            });
         }
     }
 }
