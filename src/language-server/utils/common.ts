@@ -423,15 +423,11 @@ export function isPowerOf2(v: number): boolean {
     return v !== 0 && !(v & (v - 1));
 }
 
-/**
- * Convert {@link v} to a string of flags
- * @param v Value
- * @param names Map of flag values to names
- * @returns string representation of the flags
- */
-export function stringifyFlags(v: number, names: Map<number, string>): string {
+export function flagNames(v: number, names: Map<number, string>): string[] {
+    if (v == 0) return [];
+
     const name = names.get(v);
-    if (name) return name; // existing member
+    if (name) return [name]; // existing member
 
     // most likely a combination -> decompose
     const flags: string[] = [];
@@ -442,8 +438,17 @@ export function stringifyFlags(v: number, names: Map<number, string>): string {
             flags.push(name);
         }
     }
+    return flags;
+}
 
-    return flags.join(" | ");
+/**
+ * Convert {@link v} to a string of flags
+ * @param v Value
+ * @param names Map of flag values to names
+ * @returns string representation of the flags
+ */
+export function stringifyFlags(v: number, names: Map<number, string>): string {
+    return flagNames(v, names).join(" | ");
 }
 
 /**
