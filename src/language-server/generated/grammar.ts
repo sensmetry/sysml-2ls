@@ -30,7 +30,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@17"
+              "$ref": "#/rules@18"
             },
             "arguments": [
               {
@@ -48,7 +48,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@64"
+              "$ref": "#/rules@66"
             },
             "arguments": [
               {
@@ -66,7 +66,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@65"
+              "$ref": "#/rules@67"
             },
             "arguments": [
               {
@@ -84,7 +84,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@69"
+              "$ref": "#/rules@72"
             },
             "arguments": [
               {
@@ -102,7 +102,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@24"
+              "$ref": "#/rules@25"
             },
             "arguments": [
               {
@@ -120,25 +120,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@95"
-            },
-            "arguments": [
-              {
-                "$type": "NamedArgument",
-                "value": {
-                  "$type": "ParameterReference",
-                  "parameter": {
-                    "$ref": "#/rules@0/parameters@0"
-                  }
-                },
-                "calledByName": false
-              }
-            ]
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@37"
+              "$ref": "#/rules@98"
             },
             "arguments": [
               {
@@ -174,7 +156,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@52"
+              "$ref": "#/rules@41"
             },
             "arguments": [
               {
@@ -192,7 +174,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@35"
+              "$ref": "#/rules@54"
             },
             "arguments": [
               {
@@ -210,7 +192,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@43"
+              "$ref": "#/rules@37"
             },
             "arguments": [
               {
@@ -228,7 +210,43 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@42"
+              "$ref": "#/rules@45"
+            },
+            "arguments": [
+              {
+                "$type": "NamedArgument",
+                "value": {
+                  "$type": "ParameterReference",
+                  "parameter": {
+                    "$ref": "#/rules@0/parameters@0"
+                  }
+                },
+                "calledByName": false
+              }
+            ]
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@44"
+            },
+            "arguments": [
+              {
+                "$type": "NamedArgument",
+                "value": {
+                  "$type": "ParameterReference",
+                  "parameter": {
+                    "$ref": "#/rules@0/parameters@0"
+                  }
+                },
+                "calledByName": false
+              }
+            ]
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@51"
             },
             "arguments": [
               {
@@ -262,24 +280,6 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             ]
           },
           {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@47"
-            },
-            "arguments": [
-              {
-                "$type": "NamedArgument",
-                "value": {
-                  "$type": "ParameterReference",
-                  "parameter": {
-                    "$ref": "#/rules@0/parameters@0"
-                  }
-                },
-                "calledByName": false
-              }
-            ]
-          },
-          {
             "$type": "Group",
             "elements": [
               {
@@ -291,7 +291,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@54"
+                  "$ref": "#/rules@56"
                 },
                 "arguments": [
                   {
@@ -311,7 +311,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@155"
+              "$ref": "#/rules@159"
             },
             "arguments": [
               {
@@ -352,7 +352,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@16"
+              "$ref": "#/rules@17"
             },
             "arguments": [
               {
@@ -370,7 +370,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@107"
+              "$ref": "#/rules@110"
             },
             "arguments": [
               {
@@ -388,7 +388,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@109"
+              "$ref": "#/rules@112"
             },
             "arguments": [
               {
@@ -406,7 +406,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@99"
+              "$ref": "#/rules@102"
             },
             "arguments": [
               {
@@ -424,7 +424,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@101"
+              "$ref": "#/rules@104"
             },
             "arguments": [
               {
@@ -442,7 +442,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@111"
+              "$ref": "#/rules@114"
             },
             "arguments": [
               {
@@ -460,7 +460,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@119"
+              "$ref": "#/rules@123"
             },
             "arguments": [
               {
@@ -478,7 +478,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@103"
+              "$ref": "#/rules@106"
             },
             "arguments": [
               {
@@ -496,7 +496,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@105"
+              "$ref": "#/rules@108"
             },
             "arguments": [
               {
@@ -514,7 +514,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@121"
+              "$ref": "#/rules@125"
             },
             "arguments": [
               {
@@ -588,7 +588,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@244"
+              "$ref": "#/rules@248"
             },
             "arguments": [],
             "cardinality": "?"
@@ -596,7 +596,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@245"
+              "$ref": "#/rules@249"
             },
             "arguments": [],
             "cardinality": "?"
@@ -604,7 +604,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@246"
+              "$ref": "#/rules@250"
             },
             "arguments": [],
             "cardinality": "?"
@@ -612,7 +612,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -650,7 +650,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -664,7 +664,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@238"
+                "$ref": "#/rules@242"
               },
               "arguments": []
             },
@@ -673,7 +673,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@241"
+              "$ref": "#/rules@245"
             },
             "arguments": [],
             "cardinality": "?"
@@ -710,7 +710,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@78"
+              "$ref": "#/rules@81"
             },
             "arguments": [
               {
@@ -728,79 +728,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@123"
-            },
-            "arguments": [
-              {
-                "$type": "NamedArgument",
-                "value": {
-                  "$type": "ParameterReference",
-                  "parameter": {
-                    "$ref": "#/rules@5/parameters@0"
-                  }
-                },
-                "calledByName": false
-              }
-            ]
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@130"
-            },
-            "arguments": [
-              {
-                "$type": "NamedArgument",
-                "value": {
-                  "$type": "ParameterReference",
-                  "parameter": {
-                    "$ref": "#/rules@5/parameters@0"
-                  }
-                },
-                "calledByName": false
-              }
-            ]
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@133"
-            },
-            "arguments": [
-              {
-                "$type": "NamedArgument",
-                "value": {
-                  "$type": "ParameterReference",
-                  "parameter": {
-                    "$ref": "#/rules@5/parameters@0"
-                  }
-                },
-                "calledByName": false
-              }
-            ]
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@149"
-            },
-            "arguments": [
-              {
-                "$type": "NamedArgument",
-                "value": {
-                  "$type": "ParameterReference",
-                  "parameter": {
-                    "$ref": "#/rules@5/parameters@0"
-                  }
-                },
-                "calledByName": false
-              }
-            ]
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@139"
+              "$ref": "#/rules@127"
             },
             "arguments": [
               {
@@ -836,7 +764,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@152"
+              "$ref": "#/rules@137"
             },
             "arguments": [
               {
@@ -854,7 +782,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@157"
+              "$ref": "#/rules@153"
             },
             "arguments": [
               {
@@ -872,7 +800,79 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@159"
+              "$ref": "#/rules@143"
+            },
+            "arguments": [
+              {
+                "$type": "NamedArgument",
+                "value": {
+                  "$type": "ParameterReference",
+                  "parameter": {
+                    "$ref": "#/rules@5/parameters@0"
+                  }
+                },
+                "calledByName": false
+              }
+            ]
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@138"
+            },
+            "arguments": [
+              {
+                "$type": "NamedArgument",
+                "value": {
+                  "$type": "ParameterReference",
+                  "parameter": {
+                    "$ref": "#/rules@5/parameters@0"
+                  }
+                },
+                "calledByName": false
+              }
+            ]
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@156"
+            },
+            "arguments": [
+              {
+                "$type": "NamedArgument",
+                "value": {
+                  "$type": "ParameterReference",
+                  "parameter": {
+                    "$ref": "#/rules@5/parameters@0"
+                  }
+                },
+                "calledByName": false
+              }
+            ]
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@161"
+            },
+            "arguments": [
+              {
+                "$type": "NamedArgument",
+                "value": {
+                  "$type": "ParameterReference",
+                  "parameter": {
+                    "$ref": "#/rules@5/parameters@0"
+                  }
+                },
+                "calledByName": false
+              }
+            ]
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@163"
             },
             "arguments": [
               {
@@ -909,7 +909,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@261"
+                "$ref": "#/rules@265"
               },
               "arguments": []
             }
@@ -921,7 +921,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@263"
+                "$ref": "#/rules@267"
               },
               "arguments": []
             }
@@ -933,7 +933,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@265"
+                "$ref": "#/rules@269"
               },
               "arguments": []
             }
@@ -945,7 +945,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@115"
+                "$ref": "#/rules@118"
               },
               "arguments": []
             }
@@ -969,7 +969,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@20"
+          "$ref": "#/rules@21"
         },
         "arguments": []
       },
@@ -1046,7 +1046,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1054,7 +1054,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1062,7 +1062,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1141,121 +1141,11 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": "{"
               },
               {
-                "$type": "Alternatives",
-                "elements": [
-                  {
-                    "$type": "Assignment",
-                    "feature": "comments",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@261"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "docs",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@263"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "reps",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@265"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "metadata",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@115"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "features",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@5"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": false
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "elements",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@0"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": false
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "relationships",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@1"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": false
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  }
-                ],
-                "cardinality": "*"
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@14"
+                },
+                "arguments": []
               },
               {
                 "$type": "Keyword",
@@ -1264,6 +1154,133 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             ]
           }
         ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "RelationshipItems",
+      "fragment": true,
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "comments",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@265"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "docs",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@267"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "reps",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@269"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "metadata",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@118"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "features",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@5"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": false
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "elements",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@0"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": false
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "relationships",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@1"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": false
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          }
+        ],
+        "cardinality": "*"
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -1294,7 +1311,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             }
@@ -1306,7 +1323,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             }
@@ -1329,7 +1346,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@14"
+          "$ref": "#/rules@15"
         },
         "arguments": []
       },
@@ -1360,14 +1377,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@16/parameters@0"
+                "$ref": "#/rules@17/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -1378,7 +1395,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1390,7 +1407,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1407,7 +1424,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             }
@@ -1426,7 +1443,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@269"
+                    "$ref": "#/rules@273"
                   },
                   "arguments": []
                 }
@@ -1445,7 +1462,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             }
@@ -1464,7 +1481,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@269"
+                    "$ref": "#/rules@273"
                   },
                   "arguments": []
                 }
@@ -1507,14 +1524,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@17/parameters@0"
+                "$ref": "#/rules@18/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -1524,7 +1541,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1536,7 +1553,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1544,7 +1561,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@19"
+              "$ref": "#/rules@20"
             },
             "arguments": []
           }
@@ -1565,7 +1582,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@17"
+          "$ref": "#/rules@18"
         },
         "arguments": [
           {
@@ -1606,7 +1623,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@20"
+                  "$ref": "#/rules@21"
                 },
                 "arguments": []
               },
@@ -1701,7 +1718,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@76"
+                "$ref": "#/rules@79"
               },
               "arguments": []
             }
@@ -1713,7 +1730,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@21"
+                "$ref": "#/rules@22"
               },
               "arguments": []
             }
@@ -1725,7 +1742,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@261"
+                "$ref": "#/rules@265"
               },
               "arguments": []
             }
@@ -1737,7 +1754,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@263"
+                "$ref": "#/rules@267"
               },
               "arguments": []
             }
@@ -1749,7 +1766,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@265"
+                "$ref": "#/rules@269"
               },
               "arguments": []
             }
@@ -1761,7 +1778,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@115"
+                "$ref": "#/rules@118"
               },
               "arguments": []
             }
@@ -1787,7 +1804,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1799,7 +1816,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1815,7 +1832,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             }
@@ -1823,7 +1840,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -1845,7 +1862,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@21"
+          "$ref": "#/rules@22"
         },
         "arguments": []
       },
@@ -1877,14 +1894,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@23/parameters@0"
+                "$ref": "#/rules@24/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -1894,7 +1911,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@241"
+              "$ref": "#/rules@245"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1902,7 +1919,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -1932,7 +1949,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -1940,7 +1957,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@24/parameters@0"
+                    "$ref": "#/rules@25/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -1954,14 +1971,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@26"
+              "$ref": "#/rules@27"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -1982,7 +1999,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@24"
+          "$ref": "#/rules@25"
         },
         "arguments": [
           {
@@ -2012,7 +2029,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@247"
+              "$ref": "#/rules@251"
             },
             "arguments": [],
             "cardinality": "?"
@@ -2020,7 +2037,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -2028,7 +2045,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@73"
+              "$ref": "#/rules@76"
             },
             "arguments": [],
             "cardinality": "?"
@@ -2039,14 +2056,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@27"
+                  "$ref": "#/rules@28"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@28"
+                  "$ref": "#/rules@29"
                 },
                 "arguments": []
               }
@@ -2056,7 +2073,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@29"
+              "$ref": "#/rules@30"
             },
             "arguments": [],
             "cardinality": "*"
@@ -2079,7 +2096,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@234"
+              "$ref": "#/rules@238"
             },
             "arguments": []
           },
@@ -2090,7 +2107,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@270"
+                "$ref": "#/rules@274"
               },
               "arguments": []
             }
@@ -2109,7 +2126,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@270"
+                    "$ref": "#/rules@274"
                   },
                   "arguments": []
                 }
@@ -2146,7 +2163,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@270"
+                "$ref": "#/rules@274"
               },
               "arguments": []
             }
@@ -2169,13 +2186,6 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@30"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
               "$ref": "#/rules@31"
             },
             "arguments": []
@@ -2191,6 +2201,13 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "$type": "RuleCall",
             "rule": {
               "$ref": "#/rules@33"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@34"
             },
             "arguments": []
           }
@@ -2224,7 +2241,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -2243,7 +2260,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -2278,7 +2295,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -2297,7 +2314,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -2332,7 +2349,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -2351,7 +2368,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -2386,7 +2403,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -2405,7 +2422,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -2441,157 +2458,11 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": "{"
               },
               {
-                "$type": "Alternatives",
-                "elements": [
-                  {
-                    "$type": "Assignment",
-                    "feature": "features",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@5"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "members",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@114"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "relationships",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@1"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "elements",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@0"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "comments",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@261"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "docs",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@263"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "reps",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@265"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "metadata",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@115"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "imports",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@76"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "aliases",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@21"
-                      },
-                      "arguments": []
-                    }
-                  }
-                ],
-                "cardinality": "*"
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@36"
+                },
+                "arguments": []
               },
               {
                 "$type": "Keyword",
@@ -2600,6 +2471,169 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             ]
           }
         ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "TypeItems",
+      "fragment": true,
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "features",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@5"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "members",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@117"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "relationships",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@1"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "elements",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@0"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "comments",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@265"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "docs",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@267"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "reps",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@269"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "metadata",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@118"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "imports",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@79"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "aliases",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@22"
+              },
+              "arguments": []
+            }
+          }
+        ],
+        "cardinality": "*"
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -2625,7 +2659,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -2633,7 +2667,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@35/parameters@0"
+                    "$ref": "#/rules@37/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -2647,14 +2681,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -2675,7 +2709,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@35"
+          "$ref": "#/rules@37"
         },
         "arguments": [
           {
@@ -2713,7 +2747,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -2721,7 +2755,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@37/parameters@0"
+                    "$ref": "#/rules@39/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -2735,14 +2769,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -2763,7 +2797,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@37"
+          "$ref": "#/rules@39"
         },
         "arguments": [
           {
@@ -2801,7 +2835,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -2809,7 +2843,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@39/parameters@0"
+                    "$ref": "#/rules@41/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -2823,14 +2857,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -2851,7 +2885,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@39"
+          "$ref": "#/rules@41"
         },
         "arguments": [
           {
@@ -2883,14 +2917,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -2921,7 +2955,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -2929,7 +2963,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@42/parameters@0"
+                    "$ref": "#/rules@44/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -2947,14 +2981,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -2984,7 +3018,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -2992,7 +3026,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@43/parameters@0"
+                    "$ref": "#/rules@45/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -3006,7 +3040,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@41"
+              "$ref": "#/rules@43"
             },
             "arguments": []
           }
@@ -3027,7 +3061,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@43"
+          "$ref": "#/rules@45"
         },
         "arguments": [
           {
@@ -3056,7 +3090,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@42"
+          "$ref": "#/rules@44"
         },
         "arguments": [
           {
@@ -3085,7 +3119,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@42"
+          "$ref": "#/rules@44"
         },
         "arguments": [
           {
@@ -3123,7 +3157,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -3131,7 +3165,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@47/parameters@0"
+                    "$ref": "#/rules@49/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -3145,14 +3179,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -3173,7 +3207,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@47"
+          "$ref": "#/rules@49"
         },
         "arguments": [
           {
@@ -3211,7 +3245,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -3219,7 +3253,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@49/parameters@0"
+                    "$ref": "#/rules@51/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -3233,14 +3267,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -3261,7 +3295,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@49"
+          "$ref": "#/rules@51"
         },
         "arguments": [
           {
@@ -3290,7 +3324,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@49"
+          "$ref": "#/rules@51"
         },
         "arguments": [
           {
@@ -3328,7 +3362,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -3336,7 +3370,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@52/parameters@0"
+                    "$ref": "#/rules@54/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -3350,14 +3384,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -3378,7 +3412,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@52"
+          "$ref": "#/rules@54"
         },
         "arguments": [
           {
@@ -3416,7 +3450,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -3424,7 +3458,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@54/parameters@0"
+                    "$ref": "#/rules@56/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -3438,14 +3472,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@56"
+              "$ref": "#/rules@58"
             },
             "arguments": []
           }
@@ -3466,7 +3500,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@54"
+          "$ref": "#/rules@56"
         },
         "arguments": [
           {
@@ -3510,7 +3544,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@57"
+                  "$ref": "#/rules@59"
                 },
                 "arguments": []
               },
@@ -3608,7 +3642,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@114"
+                    "$ref": "#/rules@117"
                   },
                   "arguments": []
                 }
@@ -3620,7 +3654,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@76"
+                    "$ref": "#/rules@79"
                   },
                   "arguments": []
                 }
@@ -3632,7 +3666,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@21"
+                    "$ref": "#/rules@22"
                   },
                   "arguments": []
                 }
@@ -3644,7 +3678,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@261"
+                    "$ref": "#/rules@265"
                   },
                   "arguments": []
                 }
@@ -3656,7 +3690,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@263"
+                    "$ref": "#/rules@267"
                   },
                   "arguments": []
                 }
@@ -3668,7 +3702,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@265"
+                    "$ref": "#/rules@269"
                   },
                   "arguments": []
                 }
@@ -3680,7 +3714,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@115"
+                    "$ref": "#/rules@118"
                   },
                   "arguments": []
                 }
@@ -3692,7 +3726,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@58"
+                    "$ref": "#/rules@60"
                   },
                   "arguments": []
                 }
@@ -3707,7 +3741,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@59"
+                "$ref": "#/rules@61"
               },
               "arguments": []
             },
@@ -3733,7 +3767,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -3779,7 +3813,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -3791,7 +3825,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -3814,7 +3848,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@59"
+          "$ref": "#/rules@61"
         },
         "arguments": []
       },
@@ -3892,7 +3926,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -3918,7 +3952,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -3934,7 +3968,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -3961,7 +3995,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@62"
+          "$ref": "#/rules@64"
         },
         "arguments": []
       },
@@ -3992,14 +4026,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@64/parameters@0"
+                "$ref": "#/rules@66/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -4009,7 +4043,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4021,7 +4055,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4029,7 +4063,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@66"
+              "$ref": "#/rules@68"
             },
             "arguments": []
           }
@@ -4061,14 +4095,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@65/parameters@0"
+                "$ref": "#/rules@67/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -4078,7 +4112,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@248"
+              "$ref": "#/rules@252"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4090,7 +4124,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@288"
+              "$ref": "#/rules@292"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4102,7 +4136,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4110,7 +4144,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@66"
+              "$ref": "#/rules@68"
             },
             "arguments": []
           }
@@ -4141,157 +4175,11 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": "{"
               },
               {
-                "$type": "Alternatives",
-                "elements": [
-                  {
-                    "$type": "Assignment",
-                    "feature": "features",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@5"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "elements",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@0"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "relationships",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@1"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "imports",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@76"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "aliases",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@21"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "comments",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@261"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "docs",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@263"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "reps",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@265"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "metadata",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@115"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "filters",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@62"
-                      },
-                      "arguments": []
-                    }
-                  }
-                ],
-                "cardinality": "*"
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@69"
+                },
+                "arguments": []
               },
               {
                 "$type": "Keyword",
@@ -4309,6 +4197,169 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
     },
     {
       "$type": "ParserRule",
+      "name": "PackageItems",
+      "fragment": true,
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "features",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@5"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "elements",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@0"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "relationships",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@1"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "imports",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@79"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "aliases",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@22"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "comments",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@265"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "docs",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@267"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "reps",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@269"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "metadata",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@118"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "filters",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@64"
+              },
+              "arguments": []
+            }
+          }
+        ],
+        "cardinality": "*"
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
       "name": "DummyPackage",
       "returnType": {
         "$ref": "#/interfaces@6"
@@ -4316,7 +4367,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@64"
+          "$ref": "#/rules@66"
         },
         "arguments": [
           {
@@ -4345,7 +4396,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@65"
+          "$ref": "#/rules@67"
         },
         "arguments": [
           {
@@ -4385,14 +4436,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@69/parameters@0"
+                "$ref": "#/rules@72/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -4406,7 +4457,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4417,14 +4468,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@71"
+                  "$ref": "#/rules@74"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@75"
+                  "$ref": "#/rules@78"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -4434,7 +4485,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -4455,7 +4506,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@69"
+          "$ref": "#/rules@72"
         },
         "arguments": [
           {
@@ -4495,7 +4546,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -4522,7 +4573,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@71"
+          "$ref": "#/rules@74"
         },
         "arguments": []
       },
@@ -4544,7 +4595,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@71"
+            "$ref": "#/rules@74"
           },
           "arguments": []
         }
@@ -4568,14 +4619,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@73"
+                  "$ref": "#/rules@76"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@250"
+                  "$ref": "#/rules@254"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -4585,7 +4636,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@250"
+              "$ref": "#/rules@254"
             },
             "arguments": []
           }
@@ -4607,7 +4658,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@235"
+              "$ref": "#/rules@239"
             },
             "arguments": []
           },
@@ -4618,7 +4669,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -4637,7 +4688,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@275"
+                    "$ref": "#/rules@279"
                   },
                   "arguments": []
                 }
@@ -4665,7 +4716,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4677,7 +4728,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@249"
+              "$ref": "#/rules@253"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4685,7 +4736,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@251"
+              "$ref": "#/rules@255"
             },
             "arguments": []
           },
@@ -4703,7 +4754,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@193"
+                    "$ref": "#/rules@197"
                   },
                   "arguments": []
                 }
@@ -4740,7 +4791,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@76"
+          "$ref": "#/rules@79"
         },
         "arguments": []
       },
@@ -4777,7 +4828,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@78/parameters@0"
+                    "$ref": "#/rules@81/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -4798,7 +4849,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@81"
+                      "$ref": "#/rules@84"
                     },
                     "arguments": []
                   }
@@ -4813,7 +4864,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@89"
+              "$ref": "#/rules@92"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4821,7 +4872,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -4842,7 +4893,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@78"
+          "$ref": "#/rules@81"
         },
         "arguments": [
           {
@@ -4878,7 +4929,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@233"
+                      "$ref": "#/rules@237"
                     },
                     "arguments": []
                   },
@@ -4888,14 +4939,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "RuleCall",
                         "rule": {
-                          "$ref": "#/rules@82"
+                          "$ref": "#/rules@85"
                         },
                         "arguments": []
                       },
                       {
                         "$type": "RuleCall",
                         "rule": {
-                          "$ref": "#/rules@87"
+                          "$ref": "#/rules@90"
                         },
                         "arguments": []
                       }
@@ -4907,14 +4958,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@82"
+                  "$ref": "#/rules@85"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@87"
+                  "$ref": "#/rules@90"
                 },
                 "arguments": []
               }
@@ -4923,7 +4974,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@90"
+              "$ref": "#/rules@93"
             },
             "arguments": [],
             "cardinality": "*"
@@ -4946,7 +4997,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@247"
+              "$ref": "#/rules@251"
             },
             "arguments": [],
             "cardinality": "?"
@@ -4954,7 +5005,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@80"
+              "$ref": "#/rules@83"
             },
             "arguments": []
           }
@@ -4979,7 +5030,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@84"
+                  "$ref": "#/rules@87"
                 },
                 "arguments": [],
                 "cardinality": "+"
@@ -4987,7 +5038,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@74"
+                  "$ref": "#/rules@77"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -4995,7 +5046,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@84"
+                  "$ref": "#/rules@87"
                 },
                 "arguments": [],
                 "cardinality": "*"
@@ -5008,14 +5059,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@74"
+                  "$ref": "#/rules@77"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@84"
+                  "$ref": "#/rules@87"
                 },
                 "arguments": [],
                 "cardinality": "*"
@@ -5050,7 +5101,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@256"
+              "$ref": "#/rules@260"
             },
             "arguments": []
           }
@@ -5072,28 +5123,28 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@83"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@75"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@85"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
               "$ref": "#/rules@86"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@78"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@88"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@89"
             },
             "arguments": []
           }
@@ -5115,7 +5166,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@236"
+              "$ref": "#/rules@240"
             },
             "arguments": []
           },
@@ -5126,7 +5177,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -5145,7 +5196,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@275"
+                    "$ref": "#/rules@279"
                   },
                   "arguments": []
                 }
@@ -5171,7 +5222,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@237"
+              "$ref": "#/rules@241"
             },
             "arguments": []
           },
@@ -5182,7 +5233,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -5201,7 +5252,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@275"
+                    "$ref": "#/rules@279"
                   },
                   "arguments": []
                 }
@@ -5238,7 +5289,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@88"
+                "$ref": "#/rules@91"
               },
               "arguments": []
             }
@@ -5260,7 +5311,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@274"
+          "$ref": "#/rules@278"
         },
         "arguments": []
       },
@@ -5282,7 +5333,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@61"
+            "$ref": "#/rules@63"
           },
           "arguments": []
         }
@@ -5303,28 +5354,28 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@29"
+              "$ref": "#/rules@30"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@91"
+              "$ref": "#/rules@94"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@92"
+              "$ref": "#/rules@95"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@93"
+              "$ref": "#/rules@96"
             },
             "arguments": []
           }
@@ -5354,7 +5405,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -5389,7 +5440,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -5424,7 +5475,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@270"
+                "$ref": "#/rules@274"
               },
               "arguments": []
             }
@@ -5443,7 +5494,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@270"
+                    "$ref": "#/rules@274"
                   },
                   "arguments": []
                 }
@@ -5469,7 +5520,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@247"
+              "$ref": "#/rules@251"
             },
             "arguments": [],
             "cardinality": "?"
@@ -5477,7 +5528,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -5485,7 +5536,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@73"
+              "$ref": "#/rules@76"
             },
             "arguments": [],
             "cardinality": "?"
@@ -5499,7 +5550,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@234"
+                      "$ref": "#/rules@238"
                     },
                     "arguments": []
                   },
@@ -5510,7 +5561,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@272"
+                        "$ref": "#/rules@276"
                       },
                       "arguments": []
                     }
@@ -5529,7 +5580,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@272"
+                            "$ref": "#/rules@276"
                           },
                           "arguments": []
                         }
@@ -5556,7 +5607,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@272"
+                        "$ref": "#/rules@276"
                       },
                       "arguments": []
                     }
@@ -5575,7 +5626,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@272"
+                            "$ref": "#/rules@276"
                           },
                           "arguments": []
                         }
@@ -5591,7 +5642,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@29"
+              "$ref": "#/rules@30"
             },
             "arguments": [],
             "cardinality": "*"
@@ -5622,7 +5673,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -5630,7 +5681,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@95/parameters@0"
+                    "$ref": "#/rules@98/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -5644,14 +5695,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -5672,7 +5723,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@95"
+          "$ref": "#/rules@98"
         },
         "arguments": [
           {
@@ -5702,14 +5753,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@234"
+              "$ref": "#/rules@238"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@98"
+              "$ref": "#/rules@101"
             },
             "arguments": []
           },
@@ -5723,7 +5774,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@98"
+                  "$ref": "#/rules@101"
                 },
                 "arguments": []
               }
@@ -5749,7 +5800,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@270"
+            "$ref": "#/rules@274"
           },
           "arguments": []
         }
@@ -5780,14 +5831,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@99/parameters@0"
+                "$ref": "#/rules@102/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -5804,7 +5855,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -5823,7 +5874,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@274"
+                "$ref": "#/rules@278"
               },
               "arguments": []
             }
@@ -5838,7 +5889,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@254"
+              "$ref": "#/rules@258"
             },
             "arguments": []
           },
@@ -5866,7 +5917,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@99"
+          "$ref": "#/rules@102"
         },
         "arguments": [
           {
@@ -5906,14 +5957,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@101/parameters@0"
+                "$ref": "#/rules@104/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -5930,7 +5981,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -5949,7 +6000,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@272"
+                "$ref": "#/rules@276"
               },
               "arguments": []
             }
@@ -5957,7 +6008,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@234"
+              "$ref": "#/rules@238"
             },
             "arguments": []
           },
@@ -5968,7 +6019,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@272"
+                "$ref": "#/rules@276"
               },
               "arguments": []
             }
@@ -5997,7 +6048,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@101"
+          "$ref": "#/rules@104"
         },
         "arguments": [
           {
@@ -6037,14 +6088,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@103/parameters@0"
+                "$ref": "#/rules@106/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -6061,7 +6112,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -6076,21 +6127,21 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@253"
+              "$ref": "#/rules@257"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@235"
+              "$ref": "#/rules@239"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@255"
+              "$ref": "#/rules@259"
             },
             "arguments": []
           },
@@ -6118,7 +6169,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@103"
+          "$ref": "#/rules@106"
         },
         "arguments": [
           {
@@ -6158,14 +6209,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@105/parameters@0"
+                "$ref": "#/rules@108/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -6182,7 +6233,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -6197,21 +6248,21 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@253"
+              "$ref": "#/rules@257"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@237"
+              "$ref": "#/rules@241"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@255"
+              "$ref": "#/rules@259"
             },
             "arguments": []
           },
@@ -6239,7 +6290,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@105"
+          "$ref": "#/rules@108"
         },
         "arguments": [
           {
@@ -6279,14 +6330,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@107/parameters@0"
+                "$ref": "#/rules@110/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -6303,7 +6354,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -6318,21 +6369,21 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@252"
+              "$ref": "#/rules@256"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@234"
+              "$ref": "#/rules@238"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@254"
+              "$ref": "#/rules@258"
             },
             "arguments": []
           },
@@ -6360,7 +6411,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@107"
+          "$ref": "#/rules@110"
         },
         "arguments": [
           {
@@ -6400,14 +6451,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@109/parameters@0"
+                "$ref": "#/rules@112/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -6424,7 +6475,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -6439,7 +6490,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@252"
+              "$ref": "#/rules@256"
             },
             "arguments": []
           },
@@ -6453,7 +6504,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@254"
+              "$ref": "#/rules@258"
             },
             "arguments": []
           },
@@ -6481,7 +6532,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@109"
+          "$ref": "#/rules@112"
         },
         "arguments": [
           {
@@ -6521,14 +6572,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@111/parameters@0"
+                "$ref": "#/rules@114/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -6545,7 +6596,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -6564,7 +6615,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -6576,14 +6627,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@113"
+              "$ref": "#/rules@116"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -6604,7 +6655,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@111"
+          "$ref": "#/rules@114"
         },
         "arguments": [
           {
@@ -6635,7 +6686,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@277"
+            "$ref": "#/rules@281"
           },
           "arguments": []
         }
@@ -6658,7 +6709,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@242"
+              "$ref": "#/rules@246"
             },
             "arguments": [],
             "cardinality": "?"
@@ -6720,7 +6771,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": []
               },
@@ -6741,7 +6792,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@280"
+                "$ref": "#/rules@284"
               },
               "arguments": []
             }
@@ -6760,7 +6811,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@269"
+                    "$ref": "#/rules@273"
                   },
                   "arguments": []
                 }
@@ -6779,7 +6830,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@269"
+                        "$ref": "#/rules@273"
                       },
                       "arguments": []
                     }
@@ -6793,7 +6844,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@117"
+              "$ref": "#/rules@120"
             },
             "arguments": []
           }
@@ -6815,7 +6866,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@115"
+          "$ref": "#/rules@118"
         },
         "arguments": []
       },
@@ -6845,136 +6896,11 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": "{"
               },
               {
-                "$type": "Alternatives",
-                "elements": [
-                  {
-                    "$type": "Assignment",
-                    "feature": "elements",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@0"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "relationships",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@1"
-                      },
-                      "arguments": [
-                        {
-                          "$type": "NamedArgument",
-                          "value": {
-                            "$type": "LiteralCondition",
-                            "true": true
-                          },
-                          "calledByName": false
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "comments",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@261"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "docs",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@263"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "reps",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@265"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "metadata",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@115"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "features",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@118"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "imports",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@76"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "aliases",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@21"
-                      },
-                      "arguments": []
-                    }
-                  }
-                ],
-                "cardinality": "*"
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@121"
+                },
+                "arguments": []
               },
               {
                 "$type": "Keyword",
@@ -6983,6 +6909,148 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             ]
           }
         ]
+      },
+      "definesHiddenTokens": false,
+      "entry": false,
+      "hiddenTokens": [],
+      "parameters": [],
+      "wildcard": false
+    },
+    {
+      "$type": "ParserRule",
+      "name": "MetadataItems",
+      "fragment": true,
+      "definition": {
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "elements",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@0"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "relationships",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@1"
+              },
+              "arguments": [
+                {
+                  "$type": "NamedArgument",
+                  "value": {
+                    "$type": "LiteralCondition",
+                    "true": true
+                  },
+                  "calledByName": false
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "comments",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@265"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "docs",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@267"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "reps",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@269"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "metadata",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@118"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "features",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@122"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "imports",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@79"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "aliases",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@22"
+              },
+              "arguments": []
+            }
+          }
+        ],
+        "cardinality": "*"
       },
       "definesHiddenTokens": false,
       "entry": false,
@@ -7007,7 +7075,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@237"
+              "$ref": "#/rules@241"
             },
             "arguments": [],
             "cardinality": "?"
@@ -7019,7 +7087,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -7027,7 +7095,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@82"
+              "$ref": "#/rules@85"
             },
             "arguments": [],
             "cardinality": "?"
@@ -7035,7 +7103,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@89"
+              "$ref": "#/rules@92"
             },
             "arguments": [],
             "cardinality": "?"
@@ -7043,7 +7111,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@117"
+              "$ref": "#/rules@120"
             },
             "arguments": []
           }
@@ -7076,14 +7144,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@119/parameters@0"
+                "$ref": "#/rules@123/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -7100,7 +7168,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -7119,7 +7187,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -7135,7 +7203,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -7143,7 +7211,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -7164,7 +7232,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@119"
+          "$ref": "#/rules@123"
         },
         "arguments": [
           {
@@ -7204,14 +7272,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "guardCondition": {
               "$type": "ParameterReference",
               "parameter": {
-                "$ref": "#/rules@121/parameters@0"
+                "$ref": "#/rules@125/parameters@0"
               }
             },
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@242"
+                  "$ref": "#/rules@246"
                 },
                 "arguments": []
               }
@@ -7228,7 +7296,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -7247,7 +7315,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@274"
+                "$ref": "#/rules@278"
               },
               "arguments": []
             }
@@ -7263,7 +7331,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@270"
+                "$ref": "#/rules@274"
               },
               "arguments": []
             }
@@ -7271,7 +7339,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -7292,7 +7360,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@121"
+          "$ref": "#/rules@125"
         },
         "arguments": [
           {
@@ -7338,7 +7406,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@123/parameters@0"
+                    "$ref": "#/rules@127/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -7353,14 +7421,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@125"
+              "$ref": "#/rules@129"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -7381,7 +7449,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@123"
+          "$ref": "#/rules@127"
         },
         "arguments": [
           {
@@ -7411,14 +7479,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@126"
+              "$ref": "#/rules@130"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@127"
+              "$ref": "#/rules@131"
             },
             "arguments": []
           }
@@ -7446,7 +7514,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@81"
+                      "$ref": "#/rules@84"
                     },
                     "arguments": [],
                     "cardinality": "?"
@@ -7486,7 +7554,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@128"
+                "$ref": "#/rules@132"
               },
               "arguments": []
             }
@@ -7502,7 +7570,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@128"
+                "$ref": "#/rules@132"
               },
               "arguments": []
             }
@@ -7525,7 +7593,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@81"
+              "$ref": "#/rules@84"
             },
             "arguments": [],
             "cardinality": "?"
@@ -7544,7 +7612,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@128"
+                    "$ref": "#/rules@132"
                   },
                   "arguments": []
                 }
@@ -7560,7 +7628,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@128"
+                    "$ref": "#/rules@132"
                   },
                   "arguments": []
                 }
@@ -7579,7 +7647,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -7617,14 +7685,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@232"
+                  "$ref": "#/rules@236"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@236"
+                  "$ref": "#/rules@240"
                 },
                 "arguments": []
               }
@@ -7638,7 +7706,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -7646,7 +7714,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@73"
+              "$ref": "#/rules@76"
             },
             "arguments": [],
             "cardinality": "?"
@@ -7669,7 +7737,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@128"
+          "$ref": "#/rules@132"
         },
         "arguments": []
       },
@@ -7706,7 +7774,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@130/parameters@0"
+                    "$ref": "#/rules@134/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -7721,14 +7789,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@132"
+              "$ref": "#/rules@136"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -7749,7 +7817,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@130"
+          "$ref": "#/rules@134"
         },
         "arguments": [
           {
@@ -7785,7 +7853,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@81"
+                  "$ref": "#/rules@84"
                 },
                 "arguments": []
               },
@@ -7803,7 +7871,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -7819,7 +7887,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -7835,7 +7903,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@247"
+                  "$ref": "#/rules@251"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -7855,7 +7923,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -7871,7 +7939,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -7915,7 +7983,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@133/parameters@0"
+                    "$ref": "#/rules@137/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -7930,14 +7998,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@138"
+              "$ref": "#/rules@142"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -7975,7 +8043,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@134/parameters@0"
+                    "$ref": "#/rules@138/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -7994,14 +8062,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@142"
+              "$ref": "#/rules@146"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -8022,7 +8090,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@133"
+          "$ref": "#/rules@137"
         },
         "arguments": [
           {
@@ -8051,7 +8119,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@134"
+          "$ref": "#/rules@138"
         },
         "arguments": [
           {
@@ -8080,7 +8148,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@134"
+          "$ref": "#/rules@138"
         },
         "arguments": [
           {
@@ -8116,7 +8184,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@81"
+                  "$ref": "#/rules@84"
                 },
                 "arguments": []
               },
@@ -8134,7 +8202,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -8150,7 +8218,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -8166,7 +8234,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@247"
+                  "$ref": "#/rules@251"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8186,7 +8254,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -8202,7 +8270,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@128"
+                        "$ref": "#/rules@132"
                       },
                       "arguments": []
                     }
@@ -8246,7 +8314,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@139/parameters@0"
+                    "$ref": "#/rules@143/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -8261,14 +8329,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@145"
+              "$ref": "#/rules@149"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -8289,7 +8357,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@139"
+          "$ref": "#/rules@143"
         },
         "arguments": [
           {
@@ -8318,7 +8386,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@139"
+          "$ref": "#/rules@143"
         },
         "arguments": [
           {
@@ -8354,7 +8422,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@81"
+                  "$ref": "#/rules@84"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8362,7 +8430,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@89"
+                  "$ref": "#/rules@92"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8381,7 +8449,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@146"
+                        "$ref": "#/rules@150"
                       },
                       "arguments": []
                     }
@@ -8403,7 +8471,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@143"
+                        "$ref": "#/rules@147"
                       },
                       "arguments": []
                     }
@@ -8419,7 +8487,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@143"
+                        "$ref": "#/rules@147"
                       },
                       "arguments": []
                     }
@@ -8435,7 +8503,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@247"
+                  "$ref": "#/rules@251"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8447,7 +8515,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@143"
+                    "$ref": "#/rules@147"
                   },
                   "arguments": []
                 }
@@ -8463,7 +8531,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@143"
+                    "$ref": "#/rules@147"
                   },
                   "arguments": []
                 }
@@ -8491,7 +8559,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@275"
+            "$ref": "#/rules@279"
           },
           "arguments": []
         }
@@ -8512,7 +8580,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@143"
+          "$ref": "#/rules@147"
         },
         "arguments": []
       },
@@ -8532,7 +8600,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@142"
+          "$ref": "#/rules@146"
         },
         "arguments": []
       },
@@ -8558,7 +8626,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8572,14 +8640,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "RuleCall",
                         "rule": {
-                          "$ref": "#/rules@147"
+                          "$ref": "#/rules@151"
                         },
                         "arguments": []
                       },
                       {
                         "$type": "RuleCall",
                         "rule": {
-                          "$ref": "#/rules@89"
+                          "$ref": "#/rules@92"
                         },
                         "arguments": [],
                         "cardinality": "?"
@@ -8589,7 +8657,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@89"
+                      "$ref": "#/rules@92"
                     },
                     "arguments": []
                   }
@@ -8607,7 +8675,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -8615,7 +8683,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@73"
+                  "$ref": "#/rules@76"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8628,7 +8696,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@73"
+                  "$ref": "#/rules@76"
                 },
                 "arguments": []
               },
@@ -8639,7 +8707,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -8668,7 +8736,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@84"
+                  "$ref": "#/rules@87"
                 },
                 "arguments": [],
                 "cardinality": "+"
@@ -8676,7 +8744,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@74"
+                  "$ref": "#/rules@77"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -8684,7 +8752,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@84"
+                  "$ref": "#/rules@87"
                 },
                 "arguments": [],
                 "cardinality": "*"
@@ -8697,14 +8765,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@74"
+                  "$ref": "#/rules@77"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@84"
+                  "$ref": "#/rules@87"
                 },
                 "arguments": [],
                 "cardinality": "+"
@@ -8728,7 +8796,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@146"
+          "$ref": "#/rules@150"
         },
         "arguments": []
       },
@@ -8765,7 +8833,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@149/parameters@0"
+                    "$ref": "#/rules@153/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -8780,14 +8848,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@151"
+              "$ref": "#/rules@155"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@34"
+              "$ref": "#/rules@35"
             },
             "arguments": []
           }
@@ -8808,7 +8876,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@149"
+          "$ref": "#/rules@153"
         },
         "arguments": [
           {
@@ -8838,14 +8906,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@81"
+              "$ref": "#/rules@84"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@89"
+              "$ref": "#/rules@92"
             },
             "arguments": [],
             "cardinality": "?"
@@ -8884,7 +8952,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@152/parameters@0"
+                    "$ref": "#/rules@156/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -8899,14 +8967,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@154"
+              "$ref": "#/rules@158"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@56"
+              "$ref": "#/rules@58"
             },
             "arguments": []
           }
@@ -8927,7 +8995,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@152"
+          "$ref": "#/rules@156"
         },
         "arguments": [
           {
@@ -8957,7 +9025,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@81"
+              "$ref": "#/rules@84"
             },
             "arguments": [],
             "cardinality": "?"
@@ -8965,7 +9033,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@89"
+              "$ref": "#/rules@92"
             },
             "arguments": [],
             "cardinality": "?"
@@ -8996,7 +9064,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@23"
+              "$ref": "#/rules@24"
             },
             "arguments": [
               {
@@ -9004,7 +9072,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@155/parameters@0"
+                    "$ref": "#/rules@159/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -9018,14 +9086,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@94"
+              "$ref": "#/rules@97"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@56"
+              "$ref": "#/rules@58"
             },
             "arguments": []
           }
@@ -9046,7 +9114,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@155"
+          "$ref": "#/rules@159"
         },
         "arguments": [
           {
@@ -9092,7 +9160,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@157/parameters@0"
+                    "$ref": "#/rules@161/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -9107,14 +9175,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@154"
+              "$ref": "#/rules@158"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@56"
+              "$ref": "#/rules@58"
             },
             "arguments": []
           }
@@ -9135,7 +9203,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@157"
+          "$ref": "#/rules@161"
         },
         "arguments": [
           {
@@ -9181,7 +9249,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "value": {
                   "$type": "ParameterReference",
                   "parameter": {
-                    "$ref": "#/rules@159/parameters@0"
+                    "$ref": "#/rules@163/parameters@0"
                   }
                 },
                 "calledByName": false
@@ -9215,14 +9283,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@154"
+              "$ref": "#/rules@158"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@56"
+              "$ref": "#/rules@58"
             },
             "arguments": []
           }
@@ -9243,7 +9311,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@159"
+          "$ref": "#/rules@163"
         },
         "arguments": [
           {
@@ -9277,7 +9345,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@193"
+            "$ref": "#/rules@197"
           },
           "arguments": []
         }
@@ -9314,7 +9382,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@164"
+                "$ref": "#/rules@168"
               },
               "arguments": []
             }
@@ -9330,7 +9398,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@161"
+                "$ref": "#/rules@165"
               },
               "arguments": []
             }
@@ -9346,7 +9414,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@161"
+                "$ref": "#/rules@165"
               },
               "arguments": []
             }
@@ -9372,14 +9440,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@164"
+              "$ref": "#/rules@168"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@162"
+              "$ref": "#/rules@166"
             },
             "arguments": []
           }
@@ -9404,7 +9472,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@165"
+              "$ref": "#/rules@169"
             },
             "arguments": []
           },
@@ -9435,7 +9503,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@166"
+                    "$ref": "#/rules@170"
                   },
                   "arguments": []
                 }
@@ -9464,7 +9532,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@167"
+              "$ref": "#/rules@171"
             },
             "arguments": []
           },
@@ -9495,7 +9563,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@168"
+                    "$ref": "#/rules@172"
                   },
                   "arguments": []
                 }
@@ -9526,7 +9594,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@165"
+            "$ref": "#/rules@169"
           },
           "arguments": []
         }
@@ -9550,7 +9618,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@169"
+              "$ref": "#/rules@173"
             },
             "arguments": []
           },
@@ -9587,7 +9655,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@169"
+                            "$ref": "#/rules@173"
                           },
                           "arguments": []
                         }
@@ -9613,7 +9681,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@170"
+                            "$ref": "#/rules@174"
                           },
                           "arguments": []
                         }
@@ -9648,7 +9716,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@167"
+            "$ref": "#/rules@171"
           },
           "arguments": []
         }
@@ -9672,7 +9740,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@171"
+              "$ref": "#/rules@175"
             },
             "arguments": []
           },
@@ -9703,7 +9771,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@171"
+                    "$ref": "#/rules@175"
                   },
                   "arguments": []
                 }
@@ -9734,7 +9802,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@169"
+            "$ref": "#/rules@173"
           },
           "arguments": []
         }
@@ -9758,7 +9826,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@172"
+              "$ref": "#/rules@176"
             },
             "arguments": []
           },
@@ -9795,7 +9863,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@172"
+                            "$ref": "#/rules@176"
                           },
                           "arguments": []
                         }
@@ -9821,7 +9889,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@173"
+                            "$ref": "#/rules@177"
                           },
                           "arguments": []
                         }
@@ -9854,7 +9922,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@174"
+              "$ref": "#/rules@178"
             },
             "arguments": []
           },
@@ -9876,7 +9944,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@285"
+                    "$ref": "#/rules@289"
                   },
                   "arguments": []
                 }
@@ -9888,7 +9956,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@174"
+                    "$ref": "#/rules@178"
                   },
                   "arguments": []
                 }
@@ -9919,7 +9987,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@172"
+            "$ref": "#/rules@176"
           },
           "arguments": []
         }
@@ -9946,7 +10014,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@176"
+                  "$ref": "#/rules@180"
                 },
                 "arguments": []
               },
@@ -9971,7 +10039,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@283"
+                            "$ref": "#/rules@287"
                           },
                           "arguments": []
                         },
@@ -9989,7 +10057,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@270"
+                        "$ref": "#/rules@274"
                       },
                       "arguments": []
                     }
@@ -10018,7 +10086,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@283"
+                        "$ref": "#/rules@287"
                       },
                       "arguments": []
                     },
@@ -10036,7 +10104,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@270"
+                    "$ref": "#/rules@274"
                   },
                   "arguments": []
                 }
@@ -10059,7 +10127,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@175"
+                    "$ref": "#/rules@179"
                   },
                   "arguments": []
                 }
@@ -10089,7 +10157,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@270"
+                    "$ref": "#/rules@274"
                   },
                   "arguments": []
                 }
@@ -10118,7 +10186,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@269"
+            "$ref": "#/rules@273"
           },
           "arguments": []
         }
@@ -10142,7 +10210,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@177"
+              "$ref": "#/rules@181"
             },
             "arguments": []
           },
@@ -10164,7 +10232,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@284"
+                    "$ref": "#/rules@288"
                   },
                   "arguments": []
                 }
@@ -10176,7 +10244,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@177"
+                    "$ref": "#/rules@181"
                   },
                   "arguments": []
                 }
@@ -10205,7 +10273,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@178"
+              "$ref": "#/rules@182"
             },
             "arguments": []
           },
@@ -10236,7 +10304,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@178"
+                    "$ref": "#/rules@182"
                   },
                   "arguments": []
                 }
@@ -10265,7 +10333,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@179"
+              "$ref": "#/rules@183"
             },
             "arguments": []
           },
@@ -10305,7 +10373,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@179"
+                    "$ref": "#/rules@183"
                   },
                   "arguments": []
                 }
@@ -10334,7 +10402,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@180"
+              "$ref": "#/rules@184"
             },
             "arguments": []
           },
@@ -10378,7 +10446,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@180"
+                    "$ref": "#/rules@184"
                   },
                   "arguments": []
                 }
@@ -10407,7 +10475,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@181"
+              "$ref": "#/rules@185"
             },
             "arguments": []
           },
@@ -10447,7 +10515,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@181"
+                    "$ref": "#/rules@185"
                   },
                   "arguments": []
                 }
@@ -10489,7 +10557,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@282"
+                    "$ref": "#/rules@286"
                   },
                   "arguments": []
                 }
@@ -10501,7 +10569,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@182"
+                    "$ref": "#/rules@186"
                   },
                   "arguments": []
                 }
@@ -10511,7 +10579,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@182"
+              "$ref": "#/rules@186"
             },
             "arguments": []
           }
@@ -10558,7 +10626,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@270"
+                    "$ref": "#/rules@274"
                   },
                   "arguments": []
                 }
@@ -10568,7 +10636,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@194"
+              "$ref": "#/rules@198"
             },
             "arguments": []
           }
@@ -10593,7 +10661,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@193"
+              "$ref": "#/rules@197"
             },
             "arguments": []
           },
@@ -10631,7 +10699,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@183"
+                        "$ref": "#/rules@187"
                       },
                       "arguments": []
                     }
@@ -10663,7 +10731,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@193"
+            "$ref": "#/rules@197"
           },
           "arguments": []
         }
@@ -10691,7 +10759,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@274"
+                "$ref": "#/rules@278"
               },
               "arguments": []
             }
@@ -10707,7 +10775,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -10735,7 +10803,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@184"
+                "$ref": "#/rules@188"
               },
               "arguments": []
             }
@@ -10754,7 +10822,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@184"
+                    "$ref": "#/rules@188"
                   },
                   "arguments": []
                 }
@@ -10784,7 +10852,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@185"
+                "$ref": "#/rules@189"
               },
               "arguments": []
             }
@@ -10803,7 +10871,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@185"
+                    "$ref": "#/rules@189"
                   },
                   "arguments": []
                 }
@@ -10836,14 +10904,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@186"
+                  "$ref": "#/rules@190"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@187"
+                  "$ref": "#/rules@191"
                 },
                 "arguments": []
               }
@@ -10874,35 +10942,28 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@230"
+              "$ref": "#/rules@234"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@229"
+              "$ref": "#/rules@233"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@190"
+              "$ref": "#/rules@194"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@191"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@192"
+              "$ref": "#/rules@195"
             },
             "arguments": []
           },
@@ -10910,6 +10971,13 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "$type": "RuleCall",
             "rule": {
               "$ref": "#/rules@196"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@200"
             },
             "arguments": []
           },
@@ -10923,7 +10991,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@183"
+                  "$ref": "#/rules@187"
                 },
                 "arguments": []
               },
@@ -10956,7 +11024,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@274"
+            "$ref": "#/rules@278"
           },
           "arguments": []
         }
@@ -10984,7 +11052,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             }
@@ -11022,7 +11090,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -11030,7 +11098,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@188"
+              "$ref": "#/rules@192"
             },
             "arguments": []
           }
@@ -11052,7 +11120,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@163"
+          "$ref": "#/rules@167"
         },
         "arguments": []
       },
@@ -11075,7 +11143,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@189"
+              "$ref": "#/rules@193"
             },
             "arguments": []
           },
@@ -11102,7 +11170,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@275"
+                    "$ref": "#/rules@279"
                   },
                   "arguments": []
                 }
@@ -11143,7 +11211,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@183"
+                            "$ref": "#/rules@187"
                           },
                           "arguments": []
                         }
@@ -11176,7 +11244,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@270"
+                            "$ref": "#/rules@274"
                           },
                           "arguments": []
                         }
@@ -11191,7 +11259,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                             "terminal": {
                               "$type": "RuleCall",
                               "rule": {
-                                "$ref": "#/rules@196"
+                                "$ref": "#/rules@200"
                               },
                               "arguments": []
                             }
@@ -11203,7 +11271,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                             "terminal": {
                               "$type": "RuleCall",
                               "rule": {
-                                "$ref": "#/rules@195"
+                                "$ref": "#/rules@199"
                               },
                               "arguments": []
                             }
@@ -11228,7 +11296,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                                         "terminal": {
                                           "$type": "RuleCall",
                                           "rule": {
-                                            "$ref": "#/rules@184"
+                                            "$ref": "#/rules@188"
                                           },
                                           "arguments": []
                                         }
@@ -11247,7 +11315,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                                             "terminal": {
                                               "$type": "RuleCall",
                                               "rule": {
-                                                "$ref": "#/rules@184"
+                                                "$ref": "#/rules@188"
                                               },
                                               "arguments": []
                                             }
@@ -11267,7 +11335,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                                         "terminal": {
                                           "$type": "RuleCall",
                                           "rule": {
-                                            "$ref": "#/rules@185"
+                                            "$ref": "#/rules@189"
                                           },
                                           "arguments": []
                                         }
@@ -11286,7 +11354,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                                             "terminal": {
                                               "$type": "RuleCall",
                                               "rule": {
-                                                "$ref": "#/rules@185"
+                                                "$ref": "#/rules@189"
                                               },
                                               "arguments": []
                                             }
@@ -11331,7 +11399,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@196"
+                            "$ref": "#/rules@200"
                           },
                           "arguments": []
                         }
@@ -11360,7 +11428,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@196"
+                            "$ref": "#/rules@200"
                           },
                           "arguments": []
                         }
@@ -11392,7 +11460,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@275"
+                        "$ref": "#/rules@279"
                       },
                       "arguments": []
                     }
@@ -11426,7 +11494,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@270"
+            "$ref": "#/rules@274"
           },
           "arguments": []
         }
@@ -11452,7 +11520,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@197"
+            "$ref": "#/rules@201"
           },
           "arguments": []
         }
@@ -11480,7 +11548,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@57"
+              "$ref": "#/rules@59"
             },
             "arguments": []
           },
@@ -11506,7 +11574,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@185"
+          "$ref": "#/rules@189"
         },
         "arguments": []
       },
@@ -11526,7 +11594,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@190"
+          "$ref": "#/rules@194"
         },
         "arguments": []
       },
@@ -11546,7 +11614,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@208"
+          "$ref": "#/rules@212"
         },
         "arguments": []
       },
@@ -11566,7 +11634,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@208"
+          "$ref": "#/rules@212"
         },
         "arguments": []
       },
@@ -11599,7 +11667,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@189"
+                "$ref": "#/rules@193"
               },
               "arguments": []
             }
@@ -11611,7 +11679,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@196"
+                "$ref": "#/rules@200"
               },
               "arguments": []
             }
@@ -11647,7 +11715,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@189"
+                "$ref": "#/rules@193"
               },
               "arguments": []
             }
@@ -11659,7 +11727,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@196"
+                "$ref": "#/rules@200"
               },
               "arguments": []
             }
@@ -11682,7 +11750,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@162"
+          "$ref": "#/rules@166"
         },
         "arguments": []
       },
@@ -11716,7 +11784,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -11728,7 +11796,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@275"
+                "$ref": "#/rules@279"
               },
               "arguments": []
             }
@@ -11751,7 +11819,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@191"
+          "$ref": "#/rules@195"
         },
         "arguments": []
       },
@@ -11778,7 +11846,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@193"
+                "$ref": "#/rules@197"
               },
               "arguments": []
             }
@@ -11790,7 +11858,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@270"
+                "$ref": "#/rules@274"
               },
               "arguments": []
             }
@@ -11817,7 +11885,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@222"
+            "$ref": "#/rules@226"
           },
           "arguments": []
         }
@@ -11838,7 +11906,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@16"
+          "$ref": "#/rules@17"
         },
         "arguments": [
           {
@@ -11885,7 +11953,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "TerminalRuleCall",
             "rule": {
-              "$ref": "#/rules@210"
+              "$ref": "#/rules@214"
             }
           }
         ]
@@ -11905,13 +11973,13 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "TerminalRuleCall",
                 "rule": {
-                  "$ref": "#/rules@210"
+                  "$ref": "#/rules@214"
                 }
               },
               {
                 "$type": "TerminalRuleCall",
                 "rule": {
-                  "$ref": "#/rules@211"
+                  "$ref": "#/rules@215"
                 },
                 "cardinality": "?"
               }
@@ -11920,7 +11988,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "TerminalRuleCall",
             "rule": {
-              "$ref": "#/rules@211"
+              "$ref": "#/rules@215"
             }
           }
         ]
@@ -11941,7 +12009,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "TerminalRuleCall",
             "rule": {
-              "$ref": "#/rules@210"
+              "$ref": "#/rules@214"
             }
           }
         ]
@@ -11961,13 +12029,13 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "TerminalRuleCall",
             "rule": {
-              "$ref": "#/rules@212"
+              "$ref": "#/rules@216"
             }
           },
           {
             "$type": "TerminalRuleCall",
             "rule": {
-              "$ref": "#/rules@213"
+              "$ref": "#/rules@217"
             },
             "cardinality": "?"
           }
@@ -12068,14 +12136,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@215"
+              "$ref": "#/rules@219"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@216"
+              "$ref": "#/rules@220"
             },
             "arguments": []
           }
@@ -12162,7 +12230,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@217"
+            "$ref": "#/rules@221"
           },
           "arguments": []
         }
@@ -12187,7 +12255,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@214"
+            "$ref": "#/rules@218"
           },
           "arguments": []
         }
@@ -12239,28 +12307,28 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@225"
+              "$ref": "#/rules@229"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@226"
+              "$ref": "#/rules@230"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@227"
+              "$ref": "#/rules@231"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@228"
+              "$ref": "#/rules@232"
             },
             "arguments": []
           }
@@ -12337,7 +12405,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@222"
+                "$ref": "#/rules@226"
               },
               "arguments": []
             }
@@ -12365,7 +12433,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@222"
+            "$ref": "#/rules@226"
           },
           "arguments": []
         }
@@ -12389,14 +12457,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@231"
+                  "$ref": "#/rules@235"
                 },
                 "arguments": []
               },
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@232"
+                  "$ref": "#/rules@236"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -12406,7 +12474,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@232"
+              "$ref": "#/rules@236"
             },
             "arguments": []
           }
@@ -12628,7 +12696,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@239"
+            "$ref": "#/rules@243"
           },
           "arguments": []
         }
@@ -12648,7 +12716,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@242"
+          "$ref": "#/rules@246"
         },
         "arguments": [],
         "cardinality": "?"
@@ -12851,7 +12919,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@269"
+                "$ref": "#/rules@273"
               },
               "arguments": []
             },
@@ -12864,7 +12932,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@240"
+                "$ref": "#/rules@244"
               },
               "arguments": []
             },
@@ -12889,7 +12957,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@277"
+            "$ref": "#/rules@281"
           },
           "arguments": []
         }
@@ -12911,7 +12979,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@275"
+            "$ref": "#/rules@279"
           },
           "arguments": []
         }
@@ -12933,7 +13001,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@277"
+            "$ref": "#/rules@281"
           },
           "arguments": []
         }
@@ -12955,7 +13023,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@275"
+            "$ref": "#/rules@279"
           },
           "arguments": []
         }
@@ -12980,7 +13048,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@277"
+                "$ref": "#/rules@281"
               },
               "arguments": []
             }
@@ -12999,7 +13067,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@277"
+                    "$ref": "#/rules@281"
                   },
                   "arguments": []
                 }
@@ -13026,7 +13094,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@277"
+            "$ref": "#/rules@281"
           },
           "arguments": []
         }
@@ -13048,7 +13116,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@218"
+            "$ref": "#/rules@222"
           },
           "arguments": []
         }
@@ -13068,7 +13136,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@258"
+          "$ref": "#/rules@262"
         },
         "arguments": []
       },
@@ -13088,7 +13156,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@259"
+          "$ref": "#/rules@263"
         },
         "arguments": []
       },
@@ -13118,7 +13186,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -13137,7 +13205,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@269"
+                        "$ref": "#/rules@273"
                       },
                       "arguments": []
                     }
@@ -13156,7 +13224,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                         "terminal": {
                           "$type": "RuleCall",
                           "rule": {
-                            "$ref": "#/rules@269"
+                            "$ref": "#/rules@273"
                           },
                           "arguments": []
                         }
@@ -13173,7 +13241,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@258"
+              "$ref": "#/rules@262"
             },
             "arguments": []
           }
@@ -13195,7 +13263,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@261"
+          "$ref": "#/rules@265"
         },
         "arguments": []
       },
@@ -13222,7 +13290,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@233"
+              "$ref": "#/rules@237"
             },
             "arguments": [],
             "cardinality": "?"
@@ -13230,7 +13298,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@258"
+              "$ref": "#/rules@262"
             },
             "arguments": []
           }
@@ -13252,7 +13320,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@263"
+          "$ref": "#/rules@267"
         },
         "arguments": []
       },
@@ -13282,7 +13350,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@233"
+                  "$ref": "#/rules@237"
                 },
                 "arguments": [],
                 "cardinality": "?"
@@ -13301,7 +13369,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@217"
+                "$ref": "#/rules@221"
               },
               "arguments": []
             }
@@ -13309,7 +13377,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@258"
+              "$ref": "#/rules@262"
             },
             "arguments": []
           }
@@ -13331,7 +13399,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@265"
+          "$ref": "#/rules@269"
         },
         "arguments": []
       },
@@ -13361,7 +13429,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               "terminal": {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@222"
+                  "$ref": "#/rules@226"
                 },
                 "arguments": []
               },
@@ -13374,7 +13442,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@223"
+                  "$ref": "#/rules@227"
                 },
                 "arguments": []
               },
@@ -13390,7 +13458,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   "terminal": {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@222"
+                      "$ref": "#/rules@226"
                     },
                     "arguments": []
                   },
@@ -13427,7 +13495,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               "terminal": {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@222"
+                  "$ref": "#/rules@226"
                 },
                 "arguments": []
               },
@@ -13440,7 +13508,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@223"
+                  "$ref": "#/rules@227"
                 },
                 "arguments": []
               },
@@ -13456,7 +13524,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   "terminal": {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@222"
+                      "$ref": "#/rules@226"
                     },
                     "arguments": []
                   },
@@ -13472,7 +13540,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@224"
+                  "$ref": "#/rules@228"
                 },
                 "arguments": []
               },
@@ -13488,7 +13556,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   "terminal": {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@222"
+                      "$ref": "#/rules@226"
                     },
                     "arguments": []
                   },
@@ -13501,7 +13569,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@223"
+                      "$ref": "#/rules@227"
                     },
                     "arguments": []
                   },
@@ -13517,7 +13585,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       "terminal": {
                         "$type": "RuleCall",
                         "rule": {
-                          "$ref": "#/rules@222"
+                          "$ref": "#/rules@226"
                         },
                         "arguments": []
                       },
@@ -13547,7 +13615,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@267"
+          "$ref": "#/rules@271"
         },
         "arguments": []
       },
@@ -13567,7 +13635,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@267"
+          "$ref": "#/rules@271"
         },
         "arguments": []
       },
@@ -13587,7 +13655,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@270"
+          "$ref": "#/rules@274"
         },
         "arguments": []
       },
@@ -13607,7 +13675,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@267"
+          "$ref": "#/rules@271"
         },
         "arguments": []
       },
@@ -13627,7 +13695,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@272"
+          "$ref": "#/rules@276"
         },
         "arguments": []
       },
@@ -13659,7 +13727,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               "terminal": {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@222"
+                  "$ref": "#/rules@226"
                 },
                 "arguments": []
               },
@@ -13672,7 +13740,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@223"
+                  "$ref": "#/rules@227"
                 },
                 "arguments": []
               },
@@ -13688,7 +13756,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   "terminal": {
                     "$type": "RuleCall",
                     "rule": {
-                      "$ref": "#/rules@222"
+                      "$ref": "#/rules@226"
                     },
                     "arguments": []
                   },
@@ -13716,7 +13784,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@268"
+          "$ref": "#/rules@272"
         },
         "arguments": []
       },
@@ -13736,7 +13804,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@274"
+          "$ref": "#/rules@278"
         },
         "arguments": []
       },
@@ -13759,14 +13827,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@270"
+              "$ref": "#/rules@274"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@275"
+              "$ref": "#/rules@279"
             },
             "arguments": []
           }
@@ -13788,7 +13856,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@277"
+          "$ref": "#/rules@281"
         },
         "arguments": []
       },
@@ -13811,14 +13879,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@269"
+              "$ref": "#/rules@273"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@275"
+              "$ref": "#/rules@279"
             },
             "arguments": []
           }
@@ -13840,7 +13908,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@267"
+          "$ref": "#/rules@271"
         },
         "arguments": []
       },
@@ -13860,7 +13928,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@280"
+          "$ref": "#/rules@284"
         },
         "arguments": []
       },
@@ -14015,7 +14083,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@280"
+                "$ref": "#/rules@284"
               },
               "arguments": []
             }
@@ -14040,7 +14108,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@286"
+            "$ref": "#/rules@290"
           },
           "arguments": []
         }
@@ -14061,7 +14129,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@287"
+              "$ref": "#/rules@291"
             },
             "arguments": []
           },
@@ -14072,7 +14140,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@286"
+                "$ref": "#/rules@290"
               },
               "arguments": []
             },

@@ -17,8 +17,8 @@
 import { FormattingOptions, TextDocumentIdentifier } from "vscode-languageserver";
 import { SysMLFormatter } from "../formatter";
 import { TextDocument, TextEdit } from "vscode-languageserver-textdocument";
-import type { LangiumDocument, AstNode } from "langium";
-import { parseSysML } from "../../../../testing";
+import type { LangiumDocument, AstNode, DeepPartial } from "langium";
+import { parseKerML, parseSysML } from "../../../../testing";
 
 const unformattedSysMLExample = `
 /* Camera Example from SysML-v2-Release/sysml/src/examples folder */
@@ -33,12 +33,16 @@ interface FormatOriginalDocumentReturnType {
     formatChanges: TextEdit[];
 }
 
+interface TestFormattingOptions extends FormattingOptions {
+    langId?: "kerml" | "sysml";
+}
+
 const formatOriginalDocument = async (
     text: string,
-    options: FormattingOptions
+    options: DeepPartial<TestFormattingOptions>
 ): Promise<FormatOriginalDocumentReturnType> => {
     const formatter = new SysMLFormatter();
-    const documentToFormat = await parseSysML(text);
+    const documentToFormat = await (options.langId === "kerml" ? parseKerML : parseSysML)(text);
 
     expect(documentToFormat.value.$document).toBeDefined();
 
@@ -47,7 +51,7 @@ const formatOriginalDocument = async (
     if (!$document) throw new Error("Check line above. Document should be defined.");
 
     const formatChanges = await formatter.formatDocument($document, {
-        options,
+        options: { ...DefaultFormattingOptions, ...options },
         textDocument: TextDocumentIdentifier.create($document.uri.toString()),
     });
 
@@ -62,7 +66,7 @@ const DefaultFormattingOptions: FormattingOptions = {
 async function testFormatting(
     text: string,
     expected: string | undefined,
-    options: FormattingOptions = DefaultFormattingOptions
+    options: DeepPartial<TestFormattingOptions> = DefaultFormattingOptions
 ): Promise<void> {
     const { $document, formatChanges } = await formatOriginalDocument(text, options);
 
@@ -352,6 +356,27 @@ part def C;`
 
     it("should leave a single leading space to end of line comment", async () => {
         await testFormatting("part P {}     // comment", "part P {} // comment");
+        await testFormatting("part P {} // comment", "part P {} // comment");
+    });
+
+    it("should format comments in the root namespace", async () => {
+        await testFormatting(
+            `part P {}
+        // comment`,
+            `
+part P {}
+// comment`
+        );
+        await testFormatting(
+            `part P {}
+
+
+        // comment`,
+            `
+part P {}
+
+// comment`
+        );
     });
 
     it("should leave a single leading space to end of line multiline comment", async () => {
@@ -374,6 +399,34 @@ part def C;`
             `
 part P: A:: // comment
     B {}`
+        );
+    });
+
+    it("should indent package children in KerML", async () => {
+        await testFormatting(
+            `
+        library package Pack {
+            abstract class <klass> Klass;
+            alias KK for Klass;
+            
+            comment Comment /* comment */
+            
+            type Type {
+            doc /* doc */
+            }
+            }`,
+            `
+library package Pack {
+    abstract class <klass> Klass;
+    alias KK for Klass;
+
+    comment Comment /* comment */
+
+    type Type {
+        doc /* doc */
+    }
+}`,
+            { langId: "kerml" }
         );
     });
 });

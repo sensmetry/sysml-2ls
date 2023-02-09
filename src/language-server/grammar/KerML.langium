@@ -98,16 +98,18 @@ DummyVisibleElement returns VisibilityElement:
 // Relationships
 
 fragment RelationshipBody:
-    ';' | '{'
-        (comments+=Comment
-        | docs+=Documentation
-        | reps+=TextualRepresentation
-        | metadata+=MetadataFeature
-        | features+=FeatureElement<false>
-        | elements+=NonFeatureElement<false>
-        | relationships+=RelationshipElement<false>
-        )*
-    '}'
+    ';' | '{' RelationshipItems '}'
+;
+
+fragment RelationshipItems:
+    ( comments+=Comment
+    | docs+=Documentation
+    | reps+=TextualRepresentation
+    | metadata+=MetadataFeature
+    | features+=FeatureElement<false>
+    | elements+=NonFeatureElement<false>
+    | relationships+=RelationshipElement<false>
+    )*
 ;
 
 DummyRelationship returns Relationship:
@@ -130,12 +132,10 @@ Namespace<visible> returns Namespace:
 DummyNamespace returns Element:
     Namespace<true>;
 fragment NamespaceBody:
-    ';' | '{'
-        NamespaceMembers
-    '}'
+    ';' | '{' NamespaceMembers '}'
 ;
 fragment NamespaceMembers:
-    (features+=FeatureElement<true>
+    ( features+=FeatureElement<true>
     | elements+=NonFeatureElement<true>
     | relationships+=RelationshipElement<true>
     | imports+=Import | aliases+=Alias
@@ -175,18 +175,19 @@ fragment IntersectingPart:
 fragment DifferencingPart:
     ('differences' differences+=TypeReferenceOrFeatureChain (',' differences+=TypeReferenceOrFeatureChain)*)+;
 fragment TypeBody:
-    ';' | '{' 
-        (features+=FeatureElement<true>
-        | members+=MemberFeature
-        | relationships+=RelationshipElement<true>
-        | elements+=NonFeatureElement<true>
-        | comments+=Comment
-        | docs+=Documentation
-        | reps+=TextualRepresentation
-        | metadata+=MetadataFeature
-        | imports+=Import | aliases+=Alias
-        )*
-     '}'
+    ';' | '{' TypeItems '}'
+;
+fragment TypeItems:
+    ( features+=FeatureElement<true>
+    | members+=MemberFeature
+    | relationships+=RelationshipElement<true>
+    | elements+=NonFeatureElement<true>
+    | comments+=Comment
+    | docs+=Documentation
+    | reps+=TextualRepresentation
+    | metadata+=MetadataFeature
+    | imports+=Import | aliases+=Alias
+    )*
 ;
 
 // Datatypes
@@ -283,18 +284,19 @@ Package<visible> returns Package:
 LibraryPackage<visible> returns LibraryPackage:
     (<visible> Visibility)? Standard? 'library' PrefixMetadataMembers? 'package' Identification? PackageBody;
 fragment PackageBody:
-    ';' | '{'
-        (features+=FeatureElement<true>
-        | elements+=NonFeatureElement<true>
-        | relationships+=RelationshipElement<true>
-        | imports+=Import | aliases+=Alias
-        | comments+=Comment
-        | docs+=Documentation
-        | reps+=TextualRepresentation
-        | metadata+=MetadataFeature
-        | filters+=Filter
-        )*
-    '}'
+    ';' | '{' PackageItems '}'
+;
+fragment PackageItems:
+    ( features+=FeatureElement<true>
+    | elements+=NonFeatureElement<true>
+    | relationships+=RelationshipElement<true>
+    | imports+=Import | aliases+=Alias
+    | comments+=Comment
+    | docs+=Documentation
+    | reps+=TextualRepresentation
+    | metadata+=MetadataFeature
+    | filters+=Filter
+    )*
 ;
 DummyPackage returns Namespace:
     Package<true>;
@@ -449,17 +451,18 @@ MetadataFeature returns MetadataFeature:
 DummyMetadataFeature returns Feature:
     MetadataFeature;
 fragment MetadataBody:
-    ';' | '{' 
-        (elements+=NonFeatureElement<true>
-        | relationships+=RelationshipElement<true>
-        | comments+=Comment
-        | docs+=Documentation
-        | reps+=TextualRepresentation
-        | metadata+=MetadataFeature
-        | features+=MetadataBodyFeature
-        | imports+=Import | aliases+=Alias
-        )*
-    '}'
+    ';' | '{' MetadataItems '}'
+;
+fragment MetadataItems:
+    ( elements+=NonFeatureElement<true>
+    | relationships+=RelationshipElement<true>
+    | comments+=Comment
+    | docs+=Documentation
+    | reps+=TextualRepresentation
+    | metadata+=MetadataFeature
+    | features+=MetadataBodyFeature
+    | imports+=Import | aliases+=Alias
+    )*
 ;
 MetadataBodyFeature returns Feature:
     'feature'? RedefinesToken? redefines+=FeatureChain 
