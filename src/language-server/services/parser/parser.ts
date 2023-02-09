@@ -195,3 +195,20 @@ declare module "langium" {
         readonly $childIndex: number;
     }
 }
+
+// TODO: temporary patch until we can update Langium with https://github.com/langium/langium/pull/898
+LangiumParser.prototype["assignWithoutOverride"] = function (
+    target: Record<string, unknown>,
+    source: object
+): Record<string, unknown> {
+    for (const [name, existingValue] of Object.entries(source)) {
+        const newValue = target[name];
+        if (newValue === undefined) {
+            target[name] = existingValue;
+        } else if (Array.isArray(newValue) && Array.isArray(existingValue)) {
+            existingValue.push(...newValue);
+            target[name] = existingValue;
+        }
+    }
+    return target;
+};

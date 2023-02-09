@@ -66,14 +66,11 @@ FeatureElement<visible> returns Feature:
     )
 ;
 
-// by adding at least 1 cardinality these fragments can be used with arbitrary
-// cardinality and assign all parsed nodes rather than the last only
 fragment AnnotatingMember:
-    ( comments+=Comment
+    comments+=Comment
     | docs+=Documentation
     | reps+=TextualRepresentation
     | metadata+=MetadataFeature
-    )+
 ;
 
 entry Model returns Namespace:
@@ -167,13 +164,13 @@ fragment ConjugationPart:
 fragment TypeRelationshipPart:
     DisjoiningPart | UnioningPart | IntersectingPart | DifferencingPart;
 fragment DisjoiningPart:
-    ('disjoint' 'from' disjoins+=TypeReferenceOrFeatureChain (',' disjoins+=TypeReferenceOrFeatureChain)*)+;
+    'disjoint' 'from' disjoins+=TypeReferenceOrFeatureChain (',' disjoins+=TypeReferenceOrFeatureChain)*;
 fragment UnioningPart:
-    ('unions' unions+=TypeReferenceOrFeatureChain (',' unions+=TypeReferenceOrFeatureChain)*)+;
+    'unions' unions+=TypeReferenceOrFeatureChain (',' unions+=TypeReferenceOrFeatureChain)*;
 fragment IntersectingPart:
-    ('intersects' intersects+=TypeReferenceOrFeatureChain (',' intersects+=TypeReferenceOrFeatureChain)*)+;
+    'intersects' intersects+=TypeReferenceOrFeatureChain (',' intersects+=TypeReferenceOrFeatureChain)*;
 fragment DifferencingPart:
-    ('differences' differences+=TypeReferenceOrFeatureChain (',' differences+=TypeReferenceOrFeatureChain)*)+;
+    'differences' differences+=TypeReferenceOrFeatureChain (',' differences+=TypeReferenceOrFeatureChain)*;
 fragment TypeBody:
     ';' | '{' TypeItems '}'
 ;

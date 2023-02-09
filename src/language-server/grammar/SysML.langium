@@ -219,15 +219,11 @@ fragment MultiplicityPart:
 ;
 
 fragment FeatureSpecialization:
-    ( DefinedByToken (typedBy+=TypeReferenceOrFeatureChain | '~' conjugates+=ConjugatedPortReference) ( ',' (typedBy+=TypeReferenceOrFeatureChain | '~' conjugates+=ConjugatedPortReference) )*
-    | SubsetsToken subsets+=FeatureChain ( ',' subsets+=FeatureChain )*
-    | ReferencesToken references+=FeatureChain
-    | RedefinesToken redefines+=FeatureChain ( ',' redefines+=FeatureChain )*
-    )+
+    Typings | Subsettings | References | Redefinitions
 ;
 
 fragment Typings:
-    DefinedByToken (typedBy+=TypeReferenceOrFeatureChain | '~' conjugates+=ConjugatedPortReference) ( ',' (typedBy+=TypeReferenceOrFeatureChain | '~' conjugates+=ConjugatedPortReference) )*;
+    DefinedByToken FeatureTypingFrag ( ',' FeatureTypingFrag )*;
 
 fragment Subsettings:
     SubsetsToken subsets+=FeatureChain ( ',' subsets+=FeatureChain )*;
