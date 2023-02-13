@@ -56,7 +56,7 @@ import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
 
 const ALPHA_NUM = /[a-zA-z\d_]/;
 const NON_ALPHA_NUM = /[^a-zA-z\d_\s]/;
-const NODE_END_CHAR = /\}$|;$/;
+const NODE_END_CHAR = /[{};]$/;
 
 // TODO: show docs in label details
 
