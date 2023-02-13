@@ -1,3 +1,5 @@
+<!-- markdownlint-disable-file no-duplicate-header -->
+
 # Changelog
 
 <!-- Include links to comparison to the previous version -->
@@ -6,6 +8,7 @@
 
 ### Fixed
 
+- Completion not inserting quotes around restricted names if the cursor is on `{`
 - Automatic indentation
 - Completion sometimes returning no suggestions for multi-word unrestricted names
 

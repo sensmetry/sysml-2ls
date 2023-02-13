@@ -212,6 +212,19 @@ part c : a { :>>| }
             label: "Abstract Ball Corner",
         },
     },
+    {
+        text: `
+    part def 'My part';
+    part def Part2 :> My|{
+        part foo;
+    }`,
+        expected: {
+            label: "My part",
+            textEdit: {
+                newText: "'My part'",
+            },
+        },
+    },
 ];
 
 const failing_test_table: Case[] = [
