@@ -6,6 +6,11 @@
 
 ## [unreleased]
 
+### Added
+
+- Full auto-formatting. However, there is no configuration for it currently and
+  there is no support for maximum line widths
+
 ### Fixed
 
 - Completion not inserting quotes around restricted names if the cursor is on `{`

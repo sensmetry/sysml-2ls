@@ -305,12 +305,14 @@ Multiplicity<visible> returns Multiplicity:
     (<visible> Visibility)? 'multiplicity' Identification? (MultiplicityBounds | Subsets?) TypeBody;
 DummyMultiplicity returns Feature:
     Multiplicity<true>;
-MultiplicityBounds returns MultiplicityRange:
+fragment MultiplicityBounds:
     '[' range=InlineExpression ']';
-DummyMultiplicityRange returns Multiplicity:
+MultiplicityRange returns MultiplicityRange:
     MultiplicityBounds;
+DummyMultiplicityRange returns Multiplicity:
+    MultiplicityRange;
 fragment OwnedMultiplicity:
-    multiplicity=MultiplicityBounds;
+    multiplicity=MultiplicityRange;
 fragment MultiplicityPart:
     OwnedMultiplicity MultiplicityProperties?
     | MultiplicityProperties
@@ -515,7 +517,7 @@ fragment BindingConnectorDeclaration returns BindingConnector:
 Succession<visible> returns Succession:
     FeaturePrefix<visible>? 'succession' SuccessionDeclaration TypeBody;
 SuccessionItemFlow<visible> returns SuccessionItemFlow:
-    FeaturePrefix<visible>? 'succession' 'flow' ItemFlowDeclarationFragment TypeBody;
+    FeaturePrefix<visible>? 'succession' 'flow' ItemFlowDeclaration TypeBody;
 DummySuccession returns Connector:
     Succession<true>;
 DummySuccessionItemFlow returns ItemFlow:
@@ -533,7 +535,7 @@ DummyItemFlow returns Connector:
     ItemFlow<true>;
 DummyItemFlow2 returns Step:
     ItemFlow<true>;
-fragment ItemFlowDeclarationFragment returns ItemFlow:
+fragment ItemFlowDeclaration:
     FeatureDeclaration? ValuePart?
       ( 'of'  of=ItemFeature )?
 	  ( 'from' ends+=ItemFlowEnd 
@@ -546,8 +548,6 @@ ItemFlowEnd returns ItemFlowEnd:
     redefines+=FeatureChain; // TODO: chain.length >= 2, first chain reference is referenced feature
 DummyItemFlowEnd returns ConnectorEnd:
     ItemFlowEnd;
-ItemFlowDeclaration returns ItemFlow:
-    ItemFlowDeclarationFragment;
 ItemFeature returns ItemFeature:
     Identification? (ItemFeatureSpecializationPart ValuePart? | ValuePart)
     | typedBy+=TypeReferenceOrFeatureChain OwnedMultiplicity?

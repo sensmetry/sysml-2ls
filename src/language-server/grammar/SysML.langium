@@ -235,7 +235,7 @@ fragment Redefinitions:
     RedefinesToken redefines+=FeatureChain ( ',' redefines+=FeatureChain )*;
 
 fragment FeatureTypingFrag:
-    typedBy+=TypeReferenceOrFeatureChain | '~' conjugates+=ConjugatedPortReference;
+    typedBy+=TypeReferenceOrFeatureChain | conjugates+=ConjugatedPortReference;
 
 fragment OwnedSubsetting:
     subsets+=FeatureChain;
@@ -247,7 +247,7 @@ fragment OwnedRedefinition:
     redefines+=FeatureChain;
 
 fragment ConjugatedPortTyping:
-    '~' conjugates+=ConjugatedPortReference;
+    conjugates+=ConjugatedPortReference;
 
 // Multiplicity
 // ---------------------------------------------------------------------------------------------------
@@ -531,7 +531,7 @@ PortDefinition<visible> returns PortDefinition:
     // more empty nodes in pilot
     (<visible> Visibility?)? DefinitionPrefix 'port' 'def' DefinitionSuffix;
 ConjugatedPortReference2 returns ConjugatedPortReference:
-    QualifiedReferenceChain;
+    '~' QualifiedReferenceChain;
 ConjugatedPortReference1 returns ClassifierReference:
     ConjugatedPortReference2;
 ConjugatedPortReference returns TypeReference:
@@ -545,7 +545,7 @@ PortUsage<visible> returns PortUsage:
 
 // Connectors
 
-ConnectorEnd returns Feature:
+ConnectorEnd returns ConnectorEnd:
     ( RegularName ReferencesToken )? OwnedReferenceSubsetting OwnedMultiplicity?;
 
 // Binding Connectors
@@ -905,12 +905,12 @@ ActionTargetSuccession<visible> returns Usage:
 ;
 
 TargetSuccession returns SuccessionAsUsage:
-    'then' OwnedMultiplicity? (ends+=ConnectorEnd)+ // TODO: validation check
+    'then' OwnedMultiplicity? ends+=ConnectorEnd // TODO: validation check
 ;
 
 GuardedTargetSuccession returns TransitionUsage:
     'if' guard=InlineExpression
-	'then' ends+=TransitionSuccession
+	'then' then=TransitionSuccession
 ;
 
 DefaultTargetSuccession returns TransitionUsage:
@@ -970,10 +970,10 @@ Subaction<visible> returns ActionUsage:
 	| ExitAction<visible>
 ;
 
-EntryTransition<visible> infers EntryTransition:
+EntryTransition<visible> returns Usage:
     (<visible> Visibility?)?
-	( guardedTarget=GuardedTargetSuccession 
-	| 'then' then=TransitionSuccession 
+	( GuardedTargetSuccession 
+	| {SuccessionAsUsage} 'then' then=TransitionSuccession 
 	) ';'
 ;
 EntryTransitionFeature<visible> returns Feature:

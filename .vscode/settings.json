@@ -4,7 +4,11 @@
         "onSave": "test-file"
     },
     "cSpell.words": [
-        "Langium"
+        "assoc",
+        "Classpath",
+        "Langium",
+        "nonunique",
+        "Sensmetry"
     ],
     "VSCodeCounter.exclude": [
         "**/.gitignore",

@@ -14,7 +14,15 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, EMPTY_STREAM, isAstNode, Stream, TreeStream, TreeStreamImpl } from "langium";
+import {
+    AstNode,
+    CstNode,
+    EMPTY_STREAM,
+    isAstNode,
+    Stream,
+    TreeStream,
+    TreeStreamImpl,
+} from "langium";
 import { Position, Range } from "vscode-languageserver";
 import { Alias, Element, Feature, isAlias, isElement } from "../generated/ast";
 import { SpecializationKind } from "../model/enums";
@@ -285,4 +293,11 @@ export function compareRanges(lhs?: Range, rhs?: Range): number {
     const lineDiff = left.line - right.line;
     if (lineDiff !== 0) return lineDiff;
     return left.character - right.character;
+}
+
+/**
+ * @returns number of lines between the end of `a` and `b`
+ */
+export function linesDiff(a: CstNode, b: CstNode): number {
+    return b.range.start.line - a.range.end.line;
 }
