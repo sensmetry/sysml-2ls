@@ -184,7 +184,6 @@ export class SysMLFormatter extends AbstractFormatter {
         if (!formatting) return;
         const formatter = this.getNodeFormatter(node);
         formatting.call(this, node, formatter);
-        console.log(`Formatted ${node.$type} with ${formatting.name}: ${node.$cstNode?.text}`);
     }
 
     /**
