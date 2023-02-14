@@ -54,11 +54,11 @@ The extension provides basic features to support SysMLv2 document editing:
 
 - Auto-formatting:
 
-  - Comment bodies
+  - Comment bodies  
   ![Comment bodies](/docs/images/comment-formatting.gif)
   <br> <br>
 
-  - Elements
+  - Elements  
   ![Elements](/docs/images/formatting.gif)
   <br> <br>
 
