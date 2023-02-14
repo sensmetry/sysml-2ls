@@ -35,6 +35,7 @@ import { typeIndex, TypeMap } from "../../model/types";
 import { SysMLDefaultServices } from "../services";
 import { cstNodeRuleName } from "../../utils/common";
 import { compareRanges } from "../../utils/ast-util";
+import { isRuleCall } from "langium/lib/grammar/generated/ast";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -198,8 +199,8 @@ declare module "langium" {
 
 // TODO: temporary patch until we can update Langium with https://github.com/langium/langium/pull/898
 LangiumParser.prototype["assignWithoutOverride"] = function (
-    target: Record<string, unknown>,
-    source: object
+    target: Record<string, unknown> & { $cstNode: CstNode },
+    source: object & { $cstNode?: CstNode }
 ): Record<string, unknown> {
     for (const [name, existingValue] of Object.entries(source)) {
         const newValue = target[name];
@@ -210,5 +211,25 @@ LangiumParser.prototype["assignWithoutOverride"] = function (
             target[name] = existingValue;
         }
     }
+
+    if (source.$cstNode) {
+        const feature = source.$cstNode.feature;
+        if (isRuleCall(feature) && feature.rule.ref && !feature.rule.ref.fragment) {
+            // Merging `source` from a subrule into target, need to update the
+            // source CST node to point to the merged AST node instead.
+            Object.defineProperty(source.$cstNode, "element", {
+                get() {
+                    // lazy getter to handle cases where this subrule
+                    // multiple layers deep
+                    return target.$cstNode.element ?? target;
+                },
+                set(element: object) {
+                    Object.defineProperty(source.$cstNode, "element", element);
+                },
+                configurable: true,
+            });
+        }
+    }
+
     return target;
 };

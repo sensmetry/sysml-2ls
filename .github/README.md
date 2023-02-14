@@ -37,32 +37,51 @@ The initial version has been created as an R&D effort, and contributions are hig
 
 The extension provides basic features to support SysMLv2 document editing:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable-file no-inline-html -->
+
 - Autocompletion  
   ![Autocompletion](/docs/images/completion.gif)
   <br> <br>
+
 - Code navigation  
   ![Navigation](/docs/images/navigation.gif)
   <br> <br>
+
 - Semantic highlighting  
   ![Semantic highlighting](/docs/images/semantic-highlighting.png)
   <br> <br>
-- Auto-formatting: indentation  
-  ![Indentation](/docs/images/indentation.gif)
+
+- Auto-formatting:
+
+  - Comment bodies
+  ![Comment bodies](/docs/images/comment-formatting.gif)
   <br> <br>
+
+  - Elements
+  ![Elements](/docs/images/formatting.gif)
+  <br> <br>
+
 - Renaming  
   ![Renaming](/docs/images/renaming.gif)
   <br> <br>
+
 - Hovers  
   ![Hovers](/docs/images/hover.gif)
   <br> <br>
+
 - References  
   ![References](/docs/images/references.gif)
   <br> <br>
+
 - Document symbols  
   ![Symbols](/docs/images/symbols.gif)
   <br> <br>
+
 - Folding  
   ![Folding](/docs/images/folding.gif)
+
+<!-- markdownlint-restore -->
 
 ## Developer instructions
 
