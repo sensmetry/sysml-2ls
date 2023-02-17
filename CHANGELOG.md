@@ -19,6 +19,7 @@
 
 ### Changed
 
+- VS Code extension exports `LanguageClient`
 - Invalid KerML/SysML documents will not be formatted
 
 ## 0.2.0

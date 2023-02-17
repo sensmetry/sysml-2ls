@@ -27,8 +27,9 @@ import { SysMLVSCodeClientExtender } from "./language-client/vscode";
 let client: LanguageClient;
 
 // This function is called when the extension is activated.
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
+export async function activate(context: vscode.ExtensionContext): Promise<LanguageClient> {
     client = await startLanguageClient(context);
+    return client;
 }
 
 // This function is called when the extension is deactivated.
