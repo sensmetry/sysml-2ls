@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { ValidationChecks, ValidationRegistry } from "langium";
-import { SysMlAstType } from "../../generated/ast";
 import { KerMLServices } from "../services";
+import { SysMLTypeList } from "../sysml-ast-reflection";
 
 /**
  * Registry for validation checks.
@@ -25,7 +25,7 @@ export class KerMLValidationRegistry extends ValidationRegistry {
     constructor(services: KerMLServices) {
         super(services);
         const validator = services.validation.KerMLValidator;
-        const checks: ValidationChecks<SysMlAstType> = {
+        const checks: ValidationChecks<SysMLTypeList> = {
             Type: [validator.checkTypeRelationships],
             Feature: [validator.checkSubsettedMultiplicities, validator.checkFeatureChainingLength],
             Subsetting: [validator.checkSubsettingMultiplicities],

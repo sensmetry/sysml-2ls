@@ -88,8 +88,13 @@ import {
 import { NonNullReference, SysMLLinker } from "../../references/linker";
 import { getExplicitSpecializations } from "../../../model/containers";
 import { KeysMatching, RecordKey, Statistics } from "../../../utils/common";
-import { ConstructParams, SysMLAstReflection, SysMLType } from "../../sysml-ast-reflection";
-import { AstParent, AstPropertiesMatching, streamAst } from "../../../utils/ast-util";
+import {
+    ConstructParams,
+    SysMLAstReflection,
+    SysMLType,
+    SysMLTypeList,
+} from "../../sysml-ast-reflection";
+import { AstParent, AstPropertiesFor, streamAst } from "../../../utils/ast-util";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { URI } from "vscode-uri";
 
@@ -251,7 +256,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         functions: PreLinkFunctionMap
     ): Map<string, Set<PreLinkFunction>> {
         const map = typeIndex.expandAndMerge(
-            functions as TypeMap<SysMlAstType, PreLinkFunction[]>,
+            functions as TypeMap<SysMLTypeList, PreLinkFunction[]>,
             // merge from supertypes to most derived types
             true
         );
@@ -469,9 +474,9 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      * @returns Constructed and valid AST node with metamodel constructed and initialized
      */
     construct<
-        V extends keyof SysMlAstType,
+        V extends SysMLType,
         T extends AstParent<SysMlAstType[V]>,
-        P extends AstPropertiesMatching<SysMlAstType[V], T>
+        P extends AstPropertiesFor<SysMlAstType[V], T>
     >(
         type: V,
         properties: ConstructParams<SysMlAstType[V], T, P>,

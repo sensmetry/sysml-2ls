@@ -15,10 +15,10 @@
  ********************************************************************************/
 
 import { AstNode, EMPTY_STREAM, Scope, stream, Stream, StreamImpl, TreeStreamImpl } from "langium";
-import { Element, Import, isElement, Namespace, SysMlAstType, Type } from "../generated/ast";
+import { Element, Import, isElement, Namespace, Type } from "../generated/ast";
 import { isVisible, typeIndex, TypeMap } from "../model";
 import { SysMLNodeDescription } from "../services/shared/workspace/ast-descriptions";
-import { SysMLType, SysMLInterface } from "../services/sysml-ast-reflection";
+import { SysMLType, SysMLInterface, SysMLTypeList } from "../services/sysml-ast-reflection";
 import {
     collectRedefinitions,
     Visibility,
@@ -473,7 +473,7 @@ export function makeScope(
     if (!element) return EMPTY_SYSML_SCOPE;
     if (!SCOPE_MAP) {
         SCOPE_MAP = typeIndex.expandToDerivedTypes(
-            SCOPE_CONSTRUCTORS as TypeMap<SysMlAstType, ScopeConstructor>
+            SCOPE_CONSTRUCTORS as TypeMap<SysMLTypeList, ScopeConstructor>
         );
     }
 

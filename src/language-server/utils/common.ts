@@ -252,6 +252,11 @@ export type RecordKey = string | number | symbol;
 export type KeysMatching<T, V> = { [K in keyof T]-?: T[K] extends V ? K : never }[keyof T];
 
 /**
+ * Keys of {@link T} that can be assigned {@link V}
+ */
+export type AssignableKeys<T, V> = { [K in keyof T]-?: V extends T[K] ? K : never }[keyof T];
+
+/**
  * A very simple timer
  */
 export class Timer {

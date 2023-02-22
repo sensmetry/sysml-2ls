@@ -129,23 +129,15 @@ fragment TextualAnnotatingElementBody:
     body=REGULAR_COMMENT;
 TextualAnnotatingElement returns TextualAnnotatingElement:
     TextualAnnotatingElementBody;
-DummyTextualAnnotatingElement returns Element:
-    TextualAnnotatingElement;
 Comment returns Comment:
     ('comment' Identification? ('about' about+=ElementReference ( ',' about+=ElementReference )*)?)?  TextualAnnotatingElementBody;
-DummyComment returns TextualAnnotatingElement: // dummy  to force Comment extend TextualAnnotatingElement
-    Comment;
 Documentation returns Documentation:
     'doc' Identification? TextualAnnotatingElementBody;
-DummyDocumentation returns Comment:
-    Documentation;
 
 // Textual representation
 
 TextualRepresentation returns TextualRepresentation:
     ( 'rep' Identification? )? 'language' language=STRING_VALUE TextualAnnotatingElementBody;
-DummyTextualRepresentation returns TextualAnnotatingElement:
-    TextualRepresentation;
 
 // References
 
@@ -158,28 +150,18 @@ ElementReference returns ElementReference:
     QualifiedReferenceChain;
 TypeReference returns TypeReference:
     QualifiedReferenceChain;
-DummyTypeReference returns ElementReference:
-    TypeReference;
 ClassifierReference returns ClassifierReference:
     QualifiedReferenceChain;
-DummyClassifierReference returns TypeReference:
-    ClassifierReference;
 QualifiedFeatureReference returns FeatureReference:
     chain+=[Element:Name] (ScopeToken chain+=[Element:Name])*;
 FeatureChain returns FeatureReference:
     AnyReferenceChain;
-DummyFeatureReference returns TypeReference:
-    QualifiedFeatureReference;
 TypeReferenceOrFeatureChain returns TypeReference:
     TypeReference | FeatureChain;
-DummyTypeOrFeatureReference returns TypeReference:
-    TypeReferenceOrFeatureChain;
 ElementReferenceOrFeatureChain returns ElementReference:
     ElementReference | FeatureChain;
 MetaclassReference returns MetaclassReference:
     QualifiedReferenceChain;
-DummyMetaclassReference returns TypeReference:
-    MetaclassReference;
 
 //! Cannot share expression parsing s since body expressions are parsed
 //differently between KerML and SysML

@@ -16,7 +16,7 @@
 
 import { MaybePromise } from "langium";
 import path from "path";
-import { ExecuteCommandRequest, ProtocolConnection } from "vscode-languageserver-protocol";
+import { ExecuteCommandRequest, ProtocolConnection } from "vscode-languageserver";
 import { cacheDir } from "../common/download";
 import {
     FindStdlibRequest,

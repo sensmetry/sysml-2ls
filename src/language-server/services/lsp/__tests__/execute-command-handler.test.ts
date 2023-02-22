@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LangiumDocument, ParseResult } from "langium";
-import { CancellationToken, TextDocumentIdentifier } from "vscode-languageserver-protocol";
+import { CancellationToken, TextDocumentIdentifier } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import { parseKerML, parseSysML, services, TEST_BUILD_OPTIONS } from "../../../../testing";
 import { RegisterTextEditorCommandsRequest } from "../../../../common/protocol-extensions";

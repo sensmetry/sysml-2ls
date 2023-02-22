@@ -111,8 +111,6 @@ fragment RelationshipItems:
 
 DummyRelationship returns Relationship:
     ElementFrag source+=ElementReference target+=ElementReference;
-RelationshipHierarchy returns Element:
-    DummyRelationship;
 
 // Dependencies
 
@@ -126,8 +124,6 @@ Dependency<visible> returns Dependency:
 // Namespaces
 Namespace<visible> returns Namespace:
     (<visible> Visibility)? PrefixMetadataMembers? 'namespace' Identification? NamespaceBody;
-DummyNamespace returns Element:
-    Namespace<true>;
 fragment NamespaceBody:
     ';' | '{' NamespaceMembers '}'
 ;
@@ -145,16 +141,12 @@ fragment NamespaceMembers:
 
 Alias returns Alias:
     Visibility? 'alias' Identification? 'for' for=ElementReference TypeBody;
-DummyAlias returns Relationship:
-    Alias;
 
 // Type
 fragment TypePrefix<visible> returns Type:
     (<visible> Visibility)? Abstract? PrefixMetadataMembers?;
 Type<visible> returns Type:
     TypePrefix<visible> 'type' TypeDeclaration TypeBody;
-DummyType returns Namespace:
-    Type<true>;
 fragment TypeDeclaration:
     Sufficient? Identification? OwnedMultiplicity? (SpecializationPart | ConjugationPart)* TypeRelationshipPart*;
 fragment SpecializationPart:
@@ -190,20 +182,14 @@ fragment TypeItems:
 // Datatypes
 DataType<visible> returns DataType:
     TypePrefix<visible> 'datatype' ClassifierDeclaration TypeBody;
-DummyDataType returns Classifier:
-    DataType<true>;
 
 // Classes
 Class<visible> returns Class:
     TypePrefix<visible> 'class' ClassifierDeclaration TypeBody;
-DummyClass returns Classifier:
-    Class<true>;
 
 // Structures
 Structure<visible> returns Structure:
     TypePrefix<visible> 'struct' ClassifierDeclaration TypeBody;
-DummyStructure returns Class:
-    Structure<true>;
 
 // Associations
 AssociationDeclaration returns Association:
@@ -212,38 +198,21 @@ AssociationStructure<visible> returns AssociationStructure:
     TypePrefix<visible> 'assoc' 'struct' ClassifierDeclaration TypeBody;
 Association<visible> returns Association:
     TypePrefix<visible> 'assoc' AssociationDeclaration;
-DummyAssociation returns Classifier:
-    Association<true>;
-DummyAssociationStruct returns Structure:
-    AssociationStructure<true>;
-DummyAssociationStruct2 returns Association:
-    AssociationStructure<true>;
 
 // Behaviours
 Behavior<visible> returns Behavior:
     TypePrefix<visible> 'behavior' ClassifierDeclaration TypeBody;
-DummyBehavior returns Class:
-    Behavior<true>;
 
 // Interactions
 Interaction<visible> returns Interaction:
     TypePrefix<visible> 'interaction' ClassifierDeclaration TypeBody;
-DummyInteraction returns Behavior:
-    Interaction<true>;
-DummyInteraction2 returns Association:
-    Interaction<true>;
-
 // Metadata
 Metaclass<visible> returns Metaclass:
     TypePrefix<visible> 'metaclass' ClassifierDeclaration TypeBody;
-DummyMetaclass returns Structure:
-    Metaclass<true>;
 
 // Functions
 SysMLFunction<visible> returns SysMLFunction:
     TypePrefix<visible> 'function' ClassifierDeclaration FunctionBody;
-DummyFunction returns Behavior:
-    SysMLFunction<true>;
 fragment FunctionBody returns Type:
     ';' | '{' FunctionBodyPart '}';
 fragment FunctionBodyPart:
@@ -274,8 +243,6 @@ FeatureValue returns FeatureValue:
 // Packages
 Filter returns ElementFilter:
     Visibility? 'filter' expression=InlineExpression ';';
-DummyFilter returns VisibilityElement:
-    Filter;
 Package<visible> returns Package:
     (<visible> Visibility)? PrefixMetadataMembers? 'package' Identification? PackageBody;
 LibraryPackage<visible> returns LibraryPackage:
@@ -295,22 +262,14 @@ fragment PackageItems:
     | filters+=Filter
     )*
 ;
-DummyPackage returns Namespace:
-    Package<true>;
-DummyLibraryPackage returns Package:
-    LibraryPackage<true>;
 
 // Multiplicity
 Multiplicity<visible> returns Multiplicity:
     (<visible> Visibility)? 'multiplicity' Identification? (MultiplicityBounds | Subsets?) TypeBody;
-DummyMultiplicity returns Feature:
-    Multiplicity<true>;
 fragment MultiplicityBounds:
     '[' range=InlineExpression ']';
 MultiplicityRange returns MultiplicityRange:
     MultiplicityBounds;
-DummyMultiplicityRange returns Multiplicity:
-    MultiplicityRange;
 fragment OwnedMultiplicity:
     multiplicity=MultiplicityRange;
 fragment MultiplicityPart:
@@ -323,8 +282,6 @@ fragment Subsets:
 
 Import returns Import:
     Visibility? 'import' ImportAll? ImportedNamespace ('[' conditions+=InlineExpression ']')*  RelationshipBody;
-DummyImportVisibility returns Relationship: // dummy  to add visibility member to imports without extending Element
-    Import;
 
 // Features
 
@@ -334,8 +291,6 @@ Feature<visible> returns Feature:
 	| 'feature'
 	)
     ValuePart? TypeBody;
-DummyFeature returns Type:
-    Feature<true>;
 
 fragment FeatureDeclarationSuffixPart:
     ( Identification (FeatureSpecializationPart | FeatureConjugationPart)?
@@ -390,8 +345,6 @@ fragment ClassifierDeclaration:
 ;
 Classifier<visible> returns Classifier:
     TypePrefix<visible> 'classifier' ClassifierDeclaration TypeBody;
-DummyClassifier returns Type:
-    Classifier<true>;
 fragment SuperclassingPart:
     SpecializesToken OwnedSubclassification ( ',' OwnedSubclassification )*;
 fragment OwnedSubclassification:
@@ -400,24 +353,14 @@ fragment OwnedSubclassification:
 // Specialization
 FeatureTyping<visible> returns FeatureTyping:
     (<visible> Visibility)? ('specialization' Identification?)? 'typing' specific=QualifiedFeatureReference TypedByToken GeneralType RelationshipBody;
-DummyFeatureTyping returns Specialization:
-    FeatureTyping<true>;
 Subclassification<visible> returns Subclassification:
     (<visible> Visibility)? ('specialization' Identification?)? 'subclassifier' specific=ClassifierReference SpecializesToken general=ClassifierReference RelationshipBody;
-DummySubclassification returns Specialization:
-    Subclassification<true>;
 Subsetting<visible> returns Subsetting:
     (<visible> Visibility)? ('specialization' Identification?)? 'subset' SpecificFeature SubsetsToken GeneralFeature RelationshipBody;
-DummySubsetting returns Specialization:
-    Subsetting<true>;
 Redefinition<visible> returns Redefinition:
     (<visible> Visibility)? ('specialization' Identification?)? 'redefinition' SpecificFeature RedefinesToken GeneralFeature RelationshipBody;
-DummyRedefinition returns Subsetting:
-    Redefinition<true>;
 Specialization<visible> returns Specialization:
     (<visible> Visibility)? ('specialization' Identification?)? 'subtype' SpecificType SpecializesToken GeneralType RelationshipBody;
-DummySpecialization returns Relationship:
-    Specialization<true>;
 
 // Conjugation
 Conjugation<visible> returns Conjugation:
@@ -428,14 +371,10 @@ Conjugation<visible> returns Conjugation:
     GeneralType
 	RelationshipBody
 ;
-DummyConjugation returns Specialization:
-    Conjugation<true>;
 
 // Disjoining
 Disjoining<visible> returns Disjoining:
     (<visible> Visibility)? ('disjoining' Identification? )? 'disjoint' disjoined=TypeReferenceOrFeatureChain 'from' OwnedDisjoining TypeBody;
-DummyDisjoining returns Relationship:
-    Disjoining<true>;
 fragment OwnedDisjoining:
     disjoining=TypeReferenceOrFeatureChain;
 
@@ -447,8 +386,6 @@ MemberFeature returns Feature:
 
 MetadataFeature returns MetadataFeature:
     ( '@' | 'metadata' ) (Identification TypedByToken)? typedBy+=MetaclassReference ( 'about' about+=ElementReference ( ',' about+=ElementReference)* )? MetadataBody;
-DummyMetadataFeature returns Feature:
-    MetadataFeature;
 fragment MetadataBody:
     ';' | '{' MetadataItems '}'
 ;
@@ -472,20 +409,14 @@ MetadataBodyFeature returns Feature:
 // Feature inverting
 FeatureInverting<visible> returns FeatureInverting:
     (<visible> Visibility)? ( 'inverting' Identification? )? 'inverse' ( featureInverted=FeatureChain) 'of' ( invertingFeature=FeatureChain ) TypeBody;
-DummyFeatureInverting returns Relationship:
-    FeatureInverting<true>;
 
 // Type featuring
 TypeFeaturing<visible> returns TypeFeaturing:
     (<visible> Visibility)? 'featuring' ( Identification? 'of')? feature=QualifiedFeatureReference 'by' featuringType=TypeReference TypeBody;
-DummyTypeFeaturing returns Relationship:
-    TypeFeaturing<true>;
 
 // Connectors
 Connector<visible> returns Connector:
     FeaturePrefix<visible>? 'connector' ConnectorDeclaration TypeBody;
-DummyConnector returns Feature:
-    Connector<true>;
 fragment ConnectorDeclaration:
     BinaryConnectorDeclaration | NaryConnectorDeclaration
 ;
@@ -500,14 +431,10 @@ fragment NaryConnectorDeclaration:
 ;
 ConnectorEnd returns ConnectorEnd:
     ( RegularName ReferencesToken )? references+=FeatureChain OwnedMultiplicity?;
-DummyConnectorEnd returns Feature:
-    ConnectorEnd;
 
 // Binding connectors
 BindingConnector<visible> returns BindingConnector:
     FeaturePrefix<visible>? 'binding' BindingConnectorDeclaration TypeBody;
-DummyBindingConnector returns Connector:
-    BindingConnector<true>;
 fragment BindingConnectorDeclaration returns BindingConnector:
     FeatureDeclaration ( 'of' ends+=ConnectorEnd '=' ends+=ConnectorEnd )?
 	| Sufficient? ( 'of'? ends+=ConnectorEnd '=' ends+=ConnectorEnd )?
@@ -518,12 +445,6 @@ Succession<visible> returns Succession:
     FeaturePrefix<visible>? 'succession' SuccessionDeclaration TypeBody;
 SuccessionItemFlow<visible> returns SuccessionItemFlow:
     FeaturePrefix<visible>? 'succession' 'flow' ItemFlowDeclaration TypeBody;
-DummySuccession returns Connector:
-    Succession<true>;
-DummySuccessionItemFlow returns ItemFlow:
-    SuccessionItemFlow<true>;
-DummySuccessionItemFlow2 returns Succession:
-    SuccessionItemFlow<true>;
 fragment SuccessionDeclaration returns Succession:
     FeatureDeclaration ( 'first' ends+=ConnectorEnd 'then' ends+=ConnectorEnd )?
     | Sufficient? ( 'first'? ends+=ConnectorEnd 'then' ends+=ConnectorEnd )?
@@ -531,10 +452,6 @@ fragment SuccessionDeclaration returns Succession:
 // Item flows
 ItemFlow<visible> returns ItemFlow:
     FeaturePrefix<visible>? 'flow' ItemFlowDeclaration TypeBody;
-DummyItemFlow returns Connector:
-    ItemFlow<true>;
-DummyItemFlow2 returns Step:
-    ItemFlow<true>;
 fragment ItemFlowDeclaration:
     FeatureDeclaration? ValuePart?
       ( 'of'  of=ItemFeature )?
@@ -546,8 +463,6 @@ fragment ItemFlowDeclaration:
 ;
 ItemFlowEnd returns ItemFlowEnd:
     redefines+=FeatureChain; // TODO: chain.length >= 2, first chain reference is referenced feature
-DummyItemFlowEnd returns ConnectorEnd:
-    ItemFlowEnd;
 ItemFeature returns ItemFeature:
     Identification? (ItemFeatureSpecializationPart ValuePart? | ValuePart)
     | typedBy+=TypeReferenceOrFeatureChain OwnedMultiplicity?
@@ -556,43 +471,31 @@ ItemFeature returns ItemFeature:
 fragment ItemFeatureSpecializationPart:
     FeatureSpecialization+ MultiplicityPart? FeatureSpecialization* | MultiplicityPart FeatureSpecialization+
 ;
-DummyItemFeature returns Feature:
-    ItemFeature;
 
 // Steps
 Step<visible> returns Step:
     FeaturePrefix<visible>? 'step' StepDeclaration TypeBody;
-DummyStep returns Feature:
-    Step<true>;
 fragment StepDeclaration:
     FeatureDeclaration ValuePart?;
 
 // Expressions
 Expression<visible> returns Expression:
     FeaturePrefix<visible>? 'expr' ExpressionDeclaration FunctionBody;
-DummyExpression returns Step:
-    Expression<true>;
 fragment ExpressionDeclaration:
     FeatureDeclaration? ValuePart?;
 
 // Predicates
 Predicate<visible> returns Predicate:
     TypePrefix<visible> 'predicate' ClassifierDeclaration FunctionBody;
-DummyPredicate returns SysMLFunction:
-    Predicate<true>;
 
 // Boolean expressions
 BooleanExpression<visible> returns BooleanExpression:
     FeaturePrefix<visible>? 'bool' ExpressionDeclaration FunctionBody;
-DummyBooleanExpression returns Expression:
-    BooleanExpression<true>;
 Invariant<visible> returns Invariant:
     FeaturePrefix<visible>? 'inv' ( 'true' | isNegated?='false' )? ExpressionDeclaration FunctionBody;
-DummyInvariant returns BooleanExpression:
-    Invariant<true>;
 
 // Operator expressions
-InlineExpressionReference infers FeatureReferenceExpression:
+InlineExpressionReference returns FeatureReferenceExpression:
     expression=InlineExpression;
 
 ConcreteConditionalExpression returns ConditionalExpression:
@@ -605,17 +508,17 @@ NullCoalescingExpression returns InlineExpression:
 
 ImpliesExpression returns InlineExpression:
     OrExpression ( {OperatorExpression.args+=current} operator='implies' args+=OrExpressionReference )*;
-ImpliesExpressionReference infers FeatureReferenceExpression:
+ImpliesExpressionReference returns FeatureReferenceExpression:
     expression=ImpliesExpression;
 
 OrExpression returns InlineExpression:
     XorExpression ( {OperatorExpression.args+=current}( operator='|' args+=XorExpression | operator='or' args+=XorExpressionReference) )*;
-OrExpressionReference infers FeatureReferenceExpression:
+OrExpressionReference returns FeatureReferenceExpression:
     expression=OrExpression;
 
 XorExpression returns InlineExpression:
     AndExpression ( {OperatorExpression.args+=current} operator='xor' args+=AndExpression )*;
-XorExpressionReference infers FeatureReferenceExpression:
+XorExpressionReference returns FeatureReferenceExpression:
     expression=XorExpression;
 
 AndExpression returns InlineExpression:
@@ -623,7 +526,7 @@ AndExpression returns InlineExpression:
 
 EqualityExpression returns InlineExpression:
     ClassificationExpression ( {OperatorExpression.args+=current} operator=EqualityOperator  args+=ClassificationExpression )*;
-EqualityExpressionReference infers FeatureReferenceExpression:
+EqualityExpressionReference returns FeatureReferenceExpression:
     expression=EqualityExpression;
 
 ClassificationExpression returns InlineExpression:
@@ -677,7 +580,7 @@ BaseExpression returns InlineExpression:
 	| '(' SequenceExpression ')'
 ;
 
-FeatureReferenceExpression infers FeatureReferenceExpression:
+FeatureReferenceExpression returns FeatureReferenceExpression:
     expression=QualifiedFeatureReference;
 MetadataAccessExpression returns MetadataAccessExpression:
     reference=ElementReference '.' 'metadata';
@@ -689,7 +592,7 @@ InlineExpression returns InlineExpression:
 
 PrimaryExpression returns InlineExpression:
     BaseExpression
-	( {infer FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
+	( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
 	(   ( {OperatorExpression.args+=current} operator='[' args+=SequenceExpression ']' // indexing
         | {InvocationExpression.args+=current} '->' type=TypeReference 
             ( args+=BodyExpression
@@ -699,47 +602,21 @@ PrimaryExpression returns InlineExpression:
         | {CollectExpression.args+=current} '.' args+=BodyExpression // collect
         | {SelectExpression.args+=current} '.?' args+=BodyExpression // select
         )
-        ( {infer FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
+        ( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
 	)*
 ;
 
-FunctionReferenceExpression infers FeatureReferenceExpression:
+FunctionReferenceExpression returns FeatureReferenceExpression:
     expression=TypeReference;
 
-BodyExpression infers FeatureReferenceExpression:
+BodyExpression returns FeatureReferenceExpression:
     expression=ExpressionBody;
 
 ExpressionBody returns Expression:
     '{' FunctionBodyPart '}';
-NamedArgumentHierarchy returns Argument:
-    NamedArgument;
 
-FeatureReferenceExpressionHierarchy returns InlineExpression:
-    FeatureReferenceExpression;
-OperatorExpressionHierarchy returns InlineExpression:
-    OperatorExpressionOperators;
-OperatorExpressionHierarchy2 returns InvocationExpression:
-    OperatorExpressionOperators;
-CollectExpressionHierarchy returns OperatorExpression:
-    {CollectExpression} args+=BaseExpression args+=BodyExpression;
-SelectExpressionHierarchy returns OperatorExpression:
-    {SelectExpression} args+=BaseExpression args+=BodyExpression;
-ConditionalExpressionHierarchy returns OperatorExpression:
-    ConcreteConditionalExpression;
-FeatureChainExpressionHierarchy returns OperatorExpression:
-    {infer FeatureChainExpression} args+=InlineExpression args+=FeatureChain;
-MetadataAccessExpressionHierarchy returns InlineExpression:
-    MetadataAccessExpression;
-InvocationExpressionTypings returns InvocationExpression:
-    args+=InlineExpression args+=TypeReference;
-
-// Langium doesn't propagate subtype literals to supertypes...
-// Also, inference breaks for explicit interfaces so have to use a string operator...
-OperatorExpressionOperators returns OperatorExpression:
-    operator=Name;
-
-// =========================================================================
-// Hierarchies
-
-DependencyHierarchy returns Relationship:
-    Dependency<true>;
+// programmatic AST
+SelfReferenceExpression returns SelfReferenceExpression:
+    {SelfReferenceExpression};
+SelfRefOperator returns OperatorExpression:
+    args+=SelfReferenceExpression;

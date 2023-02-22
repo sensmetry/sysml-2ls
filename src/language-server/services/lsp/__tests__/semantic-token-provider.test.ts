@@ -328,7 +328,4 @@ async function runSemanticTokenSnapshotTest(testCase: Case): Promise<void> {
 
 test.concurrent.each(testTable)("Semantic token provider test", runSemanticTokenTest);
 
-test.concurrent.each(snapshotTestTable)(
-    "Semantic token provider snapshot test",
-    runSemanticTokenSnapshotTest
-);
+test.each(snapshotTestTable)("Semantic token provider snapshot test", runSemanticTokenSnapshotTest);

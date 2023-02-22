@@ -19,6 +19,7 @@
 import { Duplex } from "stream";
 import {
     CancellationTokenSource,
+    ConfigurationParams,
     ConfigurationRequest,
     InitializedNotification,
     InitializeResult,
@@ -28,7 +29,7 @@ import {
     SemanticTokenModifiers,
     SemanticTokenTypes,
     ShutdownRequest,
-} from "vscode-languageserver-protocol";
+} from "vscode-languageserver";
 import * as CONFIG from "../../../../../package.json";
 import {
     Connection,
@@ -39,9 +40,9 @@ import {
     StreamMessageWriter,
 } from "vscode-languageserver/node";
 import { DeepPartial, startLanguageServer } from "langium";
-import { InitializeRequest } from "vscode-languageserver-protocol";
+import { InitializeRequest } from "vscode-languageserver";
 import { ClientParams } from "../../../../testing/server-initialize-params";
-import { Trace } from "vscode-languageserver-protocol";
+import { Trace } from "vscode-languageserver";
 import { TEST_SERVER_OPTIONS } from "../../../../testing";
 import { createSysMLServices } from "../../../sysml-module";
 import { asyncWaitWhile } from "../../../utils/common";
@@ -79,7 +80,7 @@ class TestClientExtender extends SysMLClientExtender {
 
     override async extend<T extends GenericLanguageClient>(client: T): Promise<T> {
         super.extend(client);
-        client.onRequest(ConfigurationRequest.type, (params) =>
+        client.onRequest(ConfigurationRequest.type, (params: ConfigurationParams) =>
             params.items.map((item) => {
                 if (item.section === "sysml") return this.configurationRequest();
                 return {};

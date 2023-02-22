@@ -11,9 +11,8 @@ type RelationalOperator = '<' | '<=' | '>' | '>=';
 // Unions
 
 type InlineExpression = 
-    Argument
-    | ConditionalExpression
-// | FeatureChainExpression
+    ConditionalExpression
+    | FeatureChainExpression
 // | FeatureChainMember
     | InvocationExpression
     | LiteralExpression
@@ -21,6 +20,9 @@ type InlineExpression =
     | NullExpression
     | OperatorExpression
     | SelfReferenceExpression
+    | CollectExpression
+    | SelectExpression
+    | FeatureReferenceExpression
 ;
 
 type Annotation =
@@ -68,6 +70,7 @@ interface TextualRepresentation extends TextualAnnotatingElement {
 interface Element extends VisibilityElement {
     aliases: Alias[];
     elements: Element[];
+    features: Feature[];
     imports: Import[];
     members: Feature[];
     relationships: Relationship[];
@@ -76,11 +79,12 @@ interface Element extends VisibilityElement {
     metadata: MetadataFeature[];
     prefixes: MetadataFeature[]
     reps: TextualRepresentation[];
-    name?: string;
-    shortName?: string;
+    declaredName?: string;
+    declaredShortName?: string;
 }
 
 interface Namespace extends Element {
+    filters: ElementFilter[];
 }
 
 interface Type extends Namespace {
@@ -153,19 +157,16 @@ interface Feature extends Type {
 
 interface MetadataFeature extends Feature {
     about: ElementReference[];
-    features: Feature[];
 }
 
 interface Multiplicity extends Feature {
+    range?: InlineExpression
 }
 
 interface MultiplicityRange extends Multiplicity {
-    range: InlineExpression
 }
 
 interface ItemFeature extends Feature {
-    refSuffix?: TypeReference
-    scope?: '.' | '::'
 }
 
 interface ConnectorEnd extends Feature {
@@ -190,10 +191,11 @@ interface BindingConnector extends Connector {
 interface Expression extends Step {
     result?: Result
     return: Feature[];
+    variants: Feature[];
 }
 
 interface ItemFlow extends Connector, Step {
-    of?: ItemFeature
+    of?: ItemFeature;
 }
 
 interface SuccessionItemFlow extends ItemFlow, Succession {
@@ -203,7 +205,7 @@ interface BooleanExpression extends Expression {
 }
 
 interface Invariant extends BooleanExpression {
-    isNegated: boolean
+    isNegated: boolean;
 }
 
 interface ElementFilter extends VisibilityElement {
@@ -212,17 +214,17 @@ interface ElementFilter extends VisibilityElement {
 
 interface Import extends Relationship {
     conditions: InlineExpression[];
-    importedNamespace?: ElementReference
-    importsAll: boolean
-    kind?: ImportKind
+    importedNamespace?: ElementReference;
+    importsAll: boolean;
+    kind?: ImportKind;
 }
 
 interface Package extends Namespace {
-    filters: ElementFilter[];
+
 }
 
 interface LibraryPackage extends Package {
-    isStandard: boolean
+    isStandard: boolean;
 }
 
 // Relationshipns
@@ -237,6 +239,8 @@ interface Relationship extends Element {
 }
 
 interface Specialization extends Relationship {
+    specific: TypeReference;
+    general: TypeReference;
 }
 
 interface Disjoining extends Relationship {
@@ -255,23 +259,20 @@ interface TypeFeaturing extends Relationship {
 }
 
 interface FeatureTyping extends Specialization {
-    specific: FeatureReference
 }
 
 interface Subclassification extends Specialization {
-    specific: ClassifierReference
 }
 
 interface Subsetting extends Specialization {
-    specific: FeatureReference
 }
 
 interface Subtype extends Specialization {
-    specific: TypeReference
 }
 
-interface Conjugation extends Specialization {
-    specific: TypeReference
+interface Conjugation extends Relationship {
+    specific: TypeReference;
+    general: TypeReference;
 }
 
 interface Redefinition extends Subsetting {
@@ -295,11 +296,12 @@ interface ClassifierReference extends TypeReference {
 }
 
 interface FeatureReference extends TypeReference {
-    prefix?: ElementReference | TypeReference;
 }
 
 interface MetaclassReference extends TypeReference {
 }
+
+interface ConjugatedPortReference extends ClassifierReference {}
 
 // Expressions
 
@@ -312,11 +314,10 @@ interface NamedArgument extends Argument {
 }
 
 interface OperatorExpression extends InvocationExpression {
-    operator: string;
+    operator?: string;
 }
 
 interface ConditionalExpression extends OperatorExpression {
-    condition: InlineExpression;
 }
 
 interface CollectExpression extends OperatorExpression {}
@@ -326,10 +327,8 @@ interface SelectExpression extends OperatorExpression {}
 //     value: ElementReference;
 // }
 
-// interface FeatureChainExpression {
-//     left: InlineExpression;
-//     right: InlineExpression;
-// }
+interface FeatureChainExpression extends OperatorExpression {
+}
 
 interface FeatureValue {
     expression: InlineExpression;
@@ -338,8 +337,8 @@ interface FeatureValue {
 }
 
 interface InvocationExpression {
-    args: Argument[];
-    type: TypeReference;
+    args: Argument[] | InlineExpression[] | TypeReference[];
+    type?: TypeReference;
 }
 
 interface LiteralBoolean {
@@ -369,4 +368,8 @@ interface Result extends VisibilityElement {
 }
 
 interface SelfReferenceExpression {
+}
+
+interface FeatureReferenceExpression {
+    expression: InlineExpression;
 }

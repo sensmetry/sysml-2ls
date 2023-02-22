@@ -21,7 +21,7 @@ import { SysMlAstType } from "../generated/ast";
 import { AstNode } from "langium";
 import { typeIndex, TypeMap } from "./types";
 import { BuildState, SpecializationKind } from "./enums";
-import { SysMLType } from "../services/sysml-ast-reflection";
+import { SysMLType, SysMLTypeList } from "../services/sysml-ast-reflection";
 
 // Additional metadata stored with the AST nodes from postprocessing steps N.B.
 // all AST nodes here are references
@@ -36,7 +36,7 @@ type ImplicitGeneralizations = {
 /**
  * Map of metamodel constructors
  */
-export const META_FACTORY: TypeMap<SysMlAstType, (node: AstNode, id: ElementID) => Metamodel> = {
+export const META_FACTORY: TypeMap<SysMLTypeList, (node: AstNode, id: ElementID) => Metamodel> = {
     default: (node, id) => new BasicMetamodel(node, id),
 };
 /**
@@ -45,7 +45,7 @@ export const META_FACTORY: TypeMap<SysMlAstType, (node: AstNode, id: ElementID) 
  * name will be called but not both), prototypes are stored so that inherited
  * functions can be called on all base types explicitly
  */
-export const META_PROTOTYPES: TypeMap<SysMlAstType, Metamodel> = {};
+export const META_PROTOTYPES: TypeMap<SysMLTypeList, Metamodel> = {};
 type MethodName = {
     // eslint-disable-next-line @typescript-eslint/ban-types
     [K in keyof Metamodel]: Metamodel[K] extends Function ? K : never;
@@ -122,7 +122,7 @@ type Metatype<T extends AstNode> = { new (node: T, id: ElementID): Metamodel };
 // seems class decorators are called during module processing so this should
 // work
 export function metamodelOf(
-    type: keyof SysMlAstType,
+    type: keyof SysMLTypeList,
     generalizations: ImplicitGeneralizations = {}
 ): <T extends AstNode>(target: Metatype<T>) => void {
     IMPLICIT_MAP[type] = Object.entries(generalizations);

@@ -306,7 +306,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         } else if (isFeatureValue(node)) {
             return toJSON(evaluator.evaluate(node.expression, node.$container), JSONreplacer);
         } else if (isInlineExpression(node)) {
-            let parent = node.$container;
+            let parent: AstNode | undefined = node.$container;
             while (parent && !isElement(parent)) parent = parent.$container;
             if (parent) return toJSON(evaluator.evaluate(node, parent), JSONreplacer);
         }

@@ -28,7 +28,7 @@ import { Alias, Element, Feature, isAlias, isElement } from "../generated/ast";
 import { SpecializationKind } from "../model/enums";
 import { resolveAlias } from "../model/util";
 import { SysMLNodeDescription } from "../services/shared/workspace/ast-descriptions";
-import { DeepReadonly, KeysMatching } from "./common";
+import { AssignableKeys, DeepReadonly } from "./common";
 
 /**
  * Visibility level.
@@ -246,20 +246,17 @@ export type AstParent<T extends AstNode> = T["$container"];
 /**
  * Keys of potentially AstNode {@link T} that match either {@link V}? or {@link Array}<{@link V}>
  */
-export type AstKeysMatching<T, V> = KeysMatching<T, V | undefined> | KeysMatching<T, Array<V>>;
+export type AstKeysFor<T, V> = AssignableKeys<T, V | undefined> | AssignableKeys<T, Array<V>>;
 
 /**
  * Keys that can be used to assign AST node {@link V} to a parent AST node {@link T}
  */
-export type AstPropertiesMatching<V extends AstNode, T extends AstParent<V>> = AstKeysMatching<
-    T,
-    V
->;
+export type AstPropertiesFor<V extends AstNode, T extends AstParent<V>> = AstKeysFor<T, V>;
 
 export type AstContainer<
     V extends AstNode,
     T extends AstParent<V>,
-    P extends AstPropertiesMatching<V, T>
+    P extends AstPropertiesFor<V, T>
 > = {
     /**
      * The container node in the AST; every node except the root node has a
