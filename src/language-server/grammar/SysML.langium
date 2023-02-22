@@ -798,7 +798,7 @@ PayloadParameter returns ReferenceUsage:
 	| Identification? PayloadFeatureSpecializationPart? trigger=TriggerExpression
 ;
 
-TriggerExpression infers TriggerInvocationExpression:
+TriggerExpression returns TriggerInvocationExpression:
     kind=TriggerKind expression=InlineExpression;
 
 SendNode<visible> returns SendActionUsage:
@@ -820,7 +820,7 @@ fragment AssignmentNodeDeclaration returns ActionUsage:
 
 TargetExpression returns InlineExpression:
     BaseExpression
-	( {infer FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
+	( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
 	(   ( {OperatorExpression.args+=current} operator='[' args+=SequenceExpression ']' // indexing
         | {InvocationExpression.args+=current} '->' type=TypeReference 
             ( args+=BodyExpression
@@ -852,10 +852,6 @@ ForLoopNode<visible> returns ForLoopActionUsage:
     (<visible> Visibility?)? ActionNodePrefix 'for' for=ForVariableDeclaration 'in' expression=InlineExpression body=ActionBodyParameter
 ;
 
-DummyLoopActionUsage returns LoopActionUsage:
-    // force interface instead of a union
-    (expression=InlineExpression)? body=ActionBodyParameter;
-
 ForVariableDeclaration returns ReferenceUsage:
     UsageDeclaration
 ;
@@ -866,10 +862,6 @@ ControlNode<visible> returns ControlNode:
 	| JoinNode<visible>
 	| ForkNode<visible>
 ;
-
-DummyControlNode returns ControlNode:
-    // force ControlNode interface instead of a union
-    Visibility? ControlNodePrefix UsageDeclaration? ActionNodeBody;
 
 fragment ControlNodePrefix returns OccurrenceUsage:
     RefPrefix Individual? Portion?;
@@ -1036,9 +1028,9 @@ CalculationUsage<visible> returns CalculationUsage:
 
 fragment CalculationUsageDeclaration:
     UsageDeclaration? ValuePart?;
-fragment CalculationBody returns Type:
+fragment CalculationBody:
     ';' | '{' CalculationBodyPart '}';
-fragment CalculationBodyPart returns Type:
+fragment CalculationBodyPart:
     (imports+=Import
     | aliases+=Alias
     | elements+=DefinitionElement<true>
@@ -1084,7 +1076,7 @@ RequirementDefinition<visible> returns RequirementDefinition:
 fragment RequirementBody:
     ';' | '{' RequirementBodyItems '}';
 
-fragment RequirementBodyItems returns Type:
+fragment RequirementBodyItems:
     (elements+=DefinitionElement<true>
     | comments+=VisibleComment
 	| docs+=VisibleDocumentation
@@ -1128,7 +1120,7 @@ RequirementUsage<visible> returns RequirementUsage:
 SatisfyRequirementUsage<visible> returns SatisfyRequirementUsage:
     (<visible> Visibility?)? OccurrenceUsagePrefix 'assert'? (isNegated?='not')? 'satisfy'
     (OwnedReferenceSubsetting FeatureSpecializationPart? | 'requirement' UsageDeclaration?)
-    ValuePart? ('by' by+=FeatureChain)? RequirementBody
+    ValuePart? ('by' by=FeatureChain)? RequirementBody
 ;
 
 // Concerns
@@ -1279,7 +1271,7 @@ RenderingUsage<visible> returns RenderingUsage:
 
 // Operator expressions
 
-InlineExpressionReference infers FeatureReferenceExpression:
+InlineExpressionReference returns FeatureReferenceExpression:
     expression=InlineExpression;
 
 ConcreteConditionalExpression returns ConditionalExpression:
@@ -1292,17 +1284,17 @@ NullCoalescingExpression returns InlineExpression:
 
 ImpliesExpression returns InlineExpression:
     OrExpression ( {OperatorExpression.args+=current} operator='implies' args+=OrExpressionReference )*;
-ImpliesExpressionReference infers FeatureReferenceExpression:
+ImpliesExpressionReference returns FeatureReferenceExpression:
     expression=ImpliesExpression;
 
 OrExpression returns InlineExpression:
     XorExpression ( {OperatorExpression.args+=current}( operator='|' args+=XorExpression | operator='or' args+=XorExpressionReference) )*;
-OrExpressionReference infers FeatureReferenceExpression:
+OrExpressionReference returns FeatureReferenceExpression:
     expression=OrExpression;
 
 XorExpression returns InlineExpression:
     AndExpression ( {OperatorExpression.args+=current} operator='xor' args+=AndExpression )*;
-XorExpressionReference infers FeatureReferenceExpression:
+XorExpressionReference returns FeatureReferenceExpression:
     expression=XorExpression;
 
 AndExpression returns InlineExpression:
@@ -1310,7 +1302,7 @@ AndExpression returns InlineExpression:
 
 EqualityExpression returns InlineExpression:
     ClassificationExpression ( {OperatorExpression.args+=current} operator=EqualityOperator  args+=ClassificationExpression )*;
-EqualityExpressionReference infers FeatureReferenceExpression:
+EqualityExpressionReference returns FeatureReferenceExpression:
     expression=EqualityExpression;
 
 ClassificationExpression returns InlineExpression:
@@ -1364,7 +1356,7 @@ BaseExpression returns InlineExpression:
 	| '(' SequenceExpression ')'
 ;
 
-FeatureReferenceExpression infers FeatureReferenceExpression:
+FeatureReferenceExpression returns FeatureReferenceExpression:
     expression=QualifiedFeatureReference;
 MetadataAccessExpression returns MetadataAccessExpression:
     reference=ElementReference '.' 'metadata';
@@ -1376,7 +1368,7 @@ InlineExpression returns InlineExpression:
 
 PrimaryExpression returns InlineExpression:
     BaseExpression
-	( {infer FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
+	( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
 	(   ( {OperatorExpression.args+=current} operator='[' args+=SequenceExpression ']' // indexing
         | {InvocationExpression.args+=current} '->' type=TypeReference 
             ( args+=BodyExpression
@@ -1386,267 +1378,16 @@ PrimaryExpression returns InlineExpression:
         | {CollectExpression.args+=current} '.' args+=BodyExpression // collect
         | {SelectExpression.args+=current} '.?' args+=BodyExpression // select
         )
-        ( {infer FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
+        ( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
 	)*
 ;
 
-FunctionReferenceExpression infers FeatureReferenceExpression:
+FunctionReferenceExpression returns FeatureReferenceExpression:
     expression=TypeReference;
 
-BodyExpression infers FeatureReferenceExpression:
+BodyExpression returns FeatureReferenceExpression:
     expression=ExpressionBody;
 
 // The only different expression element to KerML
 ExpressionBody returns Expression:
     CalculationBody;
-
-// Hierarchies
-
-MetadataUsageHierarchy1 returns MetadataFeature:
-    MetadataUsage;
-MetadataUsageHierarchy2 returns ItemUsage:
-    MetadataUsage;
-MetadataDefinitionHierarchy1 returns ItemDefinition:
-    MetadataDefinition<true>;
-MetadataDefinitionHierarchy2 returns Metaclass:
-    MetadataDefinition<true>;
-
-DefinitionHierarchy returns Classifier:
-    ExtendedDefinition<true>;
-UsageHierarchy returns Feature:
-    ExtendedUsage<true>;
-
-ReferenceUsageHierarchy returns Usage:
-    MetadataBodyUsage;
-
-OccurrenceDefinitionHierarchy1 returns Definition:
-    OccurrenceDefinition<true>;
-OccurrenceDefinitionHierarchy2 returns Class:
-    OccurrenceDefinition<true>;
-OccurrenceUsageHierarchy returns Usage:
-    OccurrenceUsage<true>;
-
-AttributeDefinitionHierarchy1 returns Definition:
-    AttributeDefinition<true>;
-AttributeDefinitionHierarchy2 returns DataType:
-    AttributeDefinition<true>;
-AttributeUsageHierarchy returns Usage:
-    AttributeUsage<true>;
-
-ItemDefinitionHierarchy1 returns OccurrenceDefinition:
-    ItemDefinition<true>;
-ItemDefinitionHierarchy2 returns Structure:
-    ItemDefinition<true>;
-ItemUsageHierarchy returns OccurrenceUsage:
-    ItemUsage<true>;
-
-PartDefinitionHierarchy returns ItemDefinition:
-    PartDefinition<true>;
-PartUsageHierarchy returns ItemUsage:
-    PartUsage<true>;
-
-PortUsageHierarchy returns OccurrenceUsage:
-    PortUsage<true>;
-PortDefinitionHierarchy1 returns OccurrenceDefinition:
-    PortDefinition<true>;
-PortDefinitionHierarchy2 returns Structure:
-    PortDefinition<true>;
-
-// ConjugatedPortReferenceHierarchy returns ClassifierReference:
-//     ConjugatedPortReference;
-
-ActionDefinitionHierarchy1 returns OccurrenceDefinition:
-    ActionDefinition<true>;
-ActionDefinitionHierarchy2 returns Behavior:
-    ActionDefinition<true>;
-ActionUsageHierarchy1 returns OccurrenceUsage:
-    ActionUsage<true>;
-ActionUsageHierarchy2 returns Step:
-    ActionUsage<true>;
-
-IfActionUsageHierarchy returns ActionUsage:
-    IfNode<true>;
-
-StateDefinitionHierarchy returns ActionDefinition:
-    StateDefinition<true>;
-StateUsageHierarchy returns ActionUsage:
-    StateUsage<true>;
-ExhibitStateUsageHierarchy1 returns StateUsage:
-    ExhibitStateUsage<true>;
-ExhibitStateUsageHierarchy2 returns PerformActionUsage:
-    ExhibitStateUsage<true>;
-
-ConstraintDefinitionHierarchy1 returns OccurrenceDefinition:
-    ConstraintDefinition<true>;
-ConstraintDefinitionHierarchy2 returns Predicate:
-    ConstraintDefinition<true>;
-ConstraintUsageHierarchy1 returns OccurrenceUsage:
-    ConstraintUsage<true>;
-ConstraintUsageHierarchy2 returns BooleanExpression:
-    ConstraintUsage<true>;
-AssertConstraintUsageHierarchy1 returns ConstraintUsage:
-    AssertConstraintUsage<true>;
-AssertConstraintUsageHierarchy2 returns Invariant:
-    AssertConstraintUsage<true>;
-
-TransitionUsageHierarchy returns ActionUsage:
-    TransitionUsage<true>;
-AcceptActionUsageHierarchy returns ActionUsage:
-    AcceptNode<true>;
-
-RequirementDefinitionHierarchy returns ConstraintDefinition:
-    RequirementDefinition<true>;
-RequirementUsageHierarchy returns ConstraintUsage:
-    RequirementUsage<true>;
-SatisfyRequirementUsageHierarchy1 returns RequirementUsage:
-    SatisfyRequirementUsage<true>;
-SatisfyRequirementUsageHierarchy2 returns AssertConstraintUsage:
-    SatisfyRequirementUsage<true>;
-
-ConcernDefinitionHierarchy returns RequirementDefinition:
-    ConcernDefinition<true>;
-ConcernUsageHierarchy returns RequirementUsage:
-    ConcernUsage<true>;
-
-CalculationDefinitionHierarchy1 returns ActionDefinition:
-    CalculationDefinition<true>;
-CalculationDefinitionHierarchy2 returns SysMLFunction:
-    CalculationDefinition<true>;
-CalculationUsageHierarchy1 returns ActionUsage:
-    CalculationUsage<true>;
-CalculationUsageHierarchy2 returns Expression:
-    CalculationUsage<true>;
-
-CaseDefinitionHierarchy returns CalculationDefinition:
-    CaseDefinition<true>;
-CaseUsageHierarchy returns CalculationUsage:
-    CaseUsage<true>;
-
-AnalysisCaseDefinitionHierarchy returns CaseDefinition:
-    AnalysisCaseDefinition<true>;
-AnalysisCaseUsageHierarchy returns CaseUsage:
-    AnalysisCaseUsage<true>;
-
-DummyConnectorAsUsage returns ConnectorAsUsage:
-    // force interface instead of a union
-    UsageSuffix;
-ConnectorAsUsageHierarchy1 returns Usage:
-    DummyConnectorAsUsage;
-ConnectorAsUsageHierarchy2 returns Connector:
-    DummyConnectorAsUsage;
-BindingConnectorAsUsageHierarchy1 returns ConnectorAsUsage:
-    BindingConnector<true>;
-BindingConnectorAsUsageHierarchy2 returns BindingConnector:
-    BindingConnector<true>;
-
-ConnectionDefinitionHierarchy1 returns PartDefinition:
-    ConnectionDefinition<true>;
-ConnectionDefinitionHierarchy2 returns AssociationStructure:
-    ConnectionDefinition<true>;
-ConnectionUsageHierarchy1 returns PartUsage:
-    ConnectionUsage<true>;
-ConnectionUsageHierarchy2 returns ConnectorAsUsage:
-    ConnectionUsage<true>;
-
-InterfaceDefinitionHierarchy returns ConnectionDefinition:
-    InterfaceDefinition<true>;
-InterfaceUsageHierarchy returns ConnectionUsage:
-    InterfaceUsage<true>;
-
-ViewDefinitionHierarchy returns PartDefinition:
-    ViewDefinition<true>;
-ViewUsageHierarchy returns PartUsage:
-    ViewUsage<true>;
-
-ViewpointDefinitionHierarchy returns RequirementDefinition:
-    ViewpointDefinition<true>;
-ViewpointUsageHierarchy returns RequirementUsage:
-    ViewpointUsage<true>;
-
-RenderingDefinitionHierarchy returns PartDefinition:
-    RenderingDefinition<true>;
-RenderingUsageHierarchy returns PartUsage:
-    RenderingUsage<true>;
-
-VerificationCaseDefinitionHierarchy returns CaseDefinition:
-    VerificationCaseDefinition<true>;
-VerificationCaseUsageHierarchy returns CaseUsage:
-    VerificationCaseUsage<true>;
-
-EnumerationDefinitionHierarchy returns AttributeDefinition:
-    EnumerationDefinition<true>;
-EnumerationUsageHierarchy returns AttributeUsage:
-    EnumerationUsage<true>;
-
-AllocationDefinitionHierarchy returns ConnectionDefinition:
-    AllocationDefinition<true>;
-AllocationUsageHierarchy returns ConnectionUsage:
-    AllocationUsage<true>;
-
-UseCaseDefinitionHierarchy returns CaseDefinition:
-    UseCaseDefinition<true>;
-UseCaseUsageHierarchy returns CaseUsage:
-    UseCaseUsage<true>;
-IncludeUseCaseUsageHierarchy1 returns UseCaseUsage:
-    IncludeUseCaseUsage<true>;
-IncludeUseCaseUsageHierarchy2 returns PerformActionUsage:
-    IncludeUseCaseUsage<true>;
-
-FlowConnectionDefinitionHierarchy1 returns ConnectionDefinition:
-    FlowConnectionDefinition<true>;
-FlowConnectionDefinitionHierarchy2 returns ActionDefinition:
-    FlowConnectionDefinition<true>;
-FlowConnectionDefinitionHierarchy3 returns Interaction:
-    FlowConnectionDefinition<true>;
-FlowConnectionUsageHierarchy1 returns ConnectionUsage:
-    FlowConnectionUsage<true>;
-FlowConnectionUsageHierarchy2 returns ActionUsage:
-    FlowConnectionUsage<true>;
-FlowConnectionUsageHierarchy3 returns ItemFlow:
-    FlowConnectionUsage<true>;
-SuccessionFlowConnectionUsageHierarchy2 returns FlowConnectionUsage:
-    SuccessionFlowConnectionUsage<true>;
-SuccessionFlowConnectionUsageHierarchy3 returns SuccessionItemFlow:
-    SuccessionFlowConnectionUsage<true>;
-
-AssignmentActionUsageHierarchy returns ActionUsage:
-    AssignmentNode<true>;
-TriggerInvocationExpressionHierarchy returns InvocationExpression:
-    TriggerExpression;
-
-PerformActionUsageHierarchy1 returns ActionUsage:
-    PerformActionUsage<true>;
-PerformActionUsageHierarchy2 returns EventOccurrenceUsage:
-    PerformActionUsage<true>;
-
-EventOccurrenceUsageHierarchy returns OccurrenceUsage:
-    EventOccurrenceUsage<true>;
-
-WhileLoopActionUsageHierarchy returns LoopActionUsage:
-    WhileLoopNode<true>;
-ForLoopActionUsageHierarchy returns LoopActionUsage:
-    ForLoopNode<true>;
-LoopActionUsageHierarchy returns ActionUsage:
-    WhileLoopActionUsageHierarchy;
-
-SendActionUsageHierarchy returns ActionUsage:
-    SendNode<true>;
-
-ControlNodeHierarchy returns ActionUsage:
-    ControlNode<true>;
-ForkNodeHierarchy returns ControlNode:
-    ForkNode<true>;
-MergeNodeHierarchy returns ControlNode:
-    MergeNode<true>;
-JoinNodeHierarchy returns ControlNode:
-    JoinNode<true>;
-DecisionNodeHierarchy returns ControlNode:
-    DecisionNode<true>;
-
-SuccessionAsUsageHierarchy1 returns ConnectorAsUsage:
-    Succession<true>;
-SuccessionAsUsageHierarchy2 returns Succession:
-    Succession<true>;
-
-ExposeHierarchy returns Import:
-    Expose<true>;

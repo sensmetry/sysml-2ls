@@ -17,11 +17,14 @@
 import { AstNode, Mutable, stream, TypeMetaData } from "langium";
 import * as ast from "../generated/ast";
 import { typeIndex } from "../model/types";
-import { AstContainer, AstParent, AstPropertiesMatching } from "../utils/ast-util";
+import { AstContainer, AstParent, AstPropertiesFor } from "../utils/ast-util";
 import { SysMLReferenceInfo } from "./references/linker";
 
-export type SysMLType = keyof ast.SysMlAstType;
+export type SysMLType = {
+    [K in keyof ast.SysMlAstType]: ast.SysMlAstType[K] extends string ? never : K;
+}[keyof ast.SysMlAstType];
 export type SysMLInterface<K extends SysMLType> = ast.SysMlAstType[K];
+export type SysMLTypeList = { [K in SysMLType]: ast.SysMlAstType[K] };
 
 /**
  * Get the owning expression of an AST node that determines the reference type
@@ -143,7 +146,7 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
     createNode<
         V extends SysMLType,
         T extends AstParent<SysMLInterface<V>>,
-        P extends AstPropertiesMatching<SysMLInterface<V>, T>
+        P extends AstPropertiesFor<SysMLInterface<V>, T>
     >(type: V, values: ConstructParams<SysMLInterface<V>, T, P>): SysMLInterface<V> {
         const partialNode = { $type: type, ...values };
         this.assignMandatoryProperties(partialNode);
@@ -156,7 +159,7 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
      * @param info Properties defining {@link child} parent and its relationship
      * @returns child
      */
-    assignNode<V extends AstNode, T extends AstParent<V>, P extends AstPropertiesMatching<V, T>>(
+    assignNode<V extends AstNode, T extends AstParent<V>, P extends AstPropertiesFor<V, T>>(
         child: V,
         info: AstContainer<V, T, P>
     ): V {
@@ -197,6 +200,6 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
 export type ConstructParams<
     V extends AstNode,
     T extends AstParent<V>,
-    P extends AstPropertiesMatching<V, T>
+    P extends AstPropertiesFor<V, T>
 > = Omit<Partial<V>, "$type" | "$container" | "$containerProperty" | "$containerIndex"> &
     AstContainer<V, T, P>;

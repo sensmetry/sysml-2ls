@@ -53,7 +53,6 @@ import {
 } from "vscode-languageserver";
 import { SysMLDefaultServices } from "../services";
 import { TypeMap, typeIndex } from "../../model";
-import { streamAllContents } from "../../utils/ast-util";
 import { SysMLDocumentBuilder } from "../shared/workspace/document-builder";
 
 type ReturnType = void | "prune" | undefined;
@@ -451,11 +450,11 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
      * tokens and refresh requests
      * @inheritdoc
      */
-    override semanticHighlight(
+    override async semanticHighlight(
         document: LangiumDocument,
         params: SemanticTokensParams,
         cancelToken = CancellationToken.None
-    ): SemanticTokens {
+    ): Promise<SemanticTokens> {
         try {
             const uri = document.uriString ?? document.uri.toString();
 
@@ -470,7 +469,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
                 }
             }
 
-            const tokens = super.semanticHighlight(document, params, cancelToken);
+            const tokens = await super.semanticHighlight(document, params, cancelToken);
 
             // only cache the tokens if the document is in a state for full
             // highlighting
@@ -484,11 +483,11 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         }
     }
 
-    override semanticHighlightRange(
+    override async semanticHighlightRange(
         document: LangiumDocument,
         params: SemanticTokensRangeParams,
         cancelToken = CancellationToken.None
-    ): SemanticTokens {
+    ): Promise<SemanticTokens> {
         try {
             return super.semanticHighlightRange(document, params, cancelToken);
         } catch (e) {
@@ -498,11 +497,11 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         }
     }
 
-    override semanticHighlightDelta(
+    override async semanticHighlightDelta(
         document: LangiumDocument,
         params: SemanticTokensDeltaParams,
         cancelToken = CancellationToken.None
-    ): SemanticTokens | SemanticTokensDelta {
+    ): Promise<SemanticTokens | SemanticTokensDelta> {
         try {
             return super.semanticHighlightDelta(document, params, cancelToken);
         } catch (e) {
@@ -510,50 +509,5 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
             if (e instanceof Error) console.error(e.stack);
             return { data: [] };
         }
-    }
-
-    /**
-     * Bugfix of {@link AbstractSemanticTokenProvider.computeHighlighting} that
-     * doesn't crash on AST nodes without CST nodes
-     * @inheritdoc
-     */
-    protected override computeHighlighting(
-        document: LangiumDocument,
-        acceptor: SemanticTokenAcceptor,
-        cancelToken: CancellationToken
-    ): void {
-        const root = document.parseResult.value;
-        if (this.highlightElement(root, acceptor) === "prune") {
-            // If the root node is pruned, we can return here already
-            return;
-        }
-        const treeIterator = streamAllContents(root).iterator();
-        let result: IteratorResult<AstNode>;
-        do {
-            result = treeIterator.next();
-            if (!result.done) {
-                if (cancelToken.isCancellationRequested) {
-                    break;
-                }
-                const node = result.value;
-
-                // TODO: merge in Langium the next 2 lines of code
-                // probably a programmatic node with no reference to the
-                // document, just skip it
-                const nodeRange = node.$cstNode?.range;
-                if (!nodeRange) continue;
-                // TODO: ----------------------------------------
-
-                const comparedRange = this.compareRange(nodeRange);
-                if (comparedRange === 1) {
-                    break; // Every following element will not be in range, so end the loop
-                } else if (comparedRange === -1) {
-                    continue; // Current element is ending before range starts, skip to next element
-                }
-                if (this.highlightElement(node, acceptor) === "prune") {
-                    treeIterator.prune();
-                }
-            }
-        } while (!result.done);
     }
 }

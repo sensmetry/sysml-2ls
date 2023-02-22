@@ -23,7 +23,7 @@ import {
     ProtocolRequestType0,
     RequestHandler,
     RequestHandler0,
-} from "vscode-languageserver-protocol";
+} from "vscode-languageserver";
 
 export interface Selection extends Range {
     /**

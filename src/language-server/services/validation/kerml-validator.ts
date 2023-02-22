@@ -97,7 +97,8 @@ export class KerMLValidator {
         const feature = subsetting.specific.$meta.to.target;
         const subsetted = subsetting.general.$meta.to.target;
         if (!feature || !subsetted) return;
-        this.validateSubsettingMultiplicities(feature, [subsetted], accept);
+        // Langium doesn't allow overriding interface properties but Subsetting always references features
+        this.validateSubsettingMultiplicities(feature as Feature, [subsetted as Feature], accept);
     }
 
     checkFeatureChainingLength(feature: Feature, accept: ValidationAcceptor): void {

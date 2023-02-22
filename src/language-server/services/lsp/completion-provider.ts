@@ -182,8 +182,16 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
             node = findLeafNodeAtOffset(cst, nodeOffset);
             if (node) token = text.substring(node.end, tokenEnd + 1).trim();
         } else {
-            token = node.text;
-            tokenStart = node.offset;
+            // Langium 1.1.0 may no longer parse token keywords into CST nodes,
+            // check the text for the token instead
+            const maybeToken = text.substring(node.end, tokenEnd + 1).trim();
+            if (maybeToken.length > 0) {
+                token = maybeToken;
+                tokenStart = this.backtrackToAnyTriggerStart(text, tokenEnd);
+            } else {
+                token = node.text;
+                tokenStart = node.offset;
+            }
         }
 
         if (token === ".") {

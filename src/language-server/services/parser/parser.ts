@@ -36,6 +36,7 @@ import { SysMLDefaultServices } from "../services";
 import { cstNodeRuleName } from "../../utils/common";
 import { compareRanges } from "../../utils/ast-util";
 import { isRuleCall } from "langium/lib/grammar/generated/ast";
+import { SysMLType } from "../sysml-ast-reflection";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -44,7 +45,11 @@ const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
  * with Langium, resolve it here.
  */
 function fixOperatorExpression(expr: OperatorExpression, services: SysMLDefaultServices): void {
-    if (expr.args.length === 1 && ClassificationTestOperator.includes(expr.operator)) {
+    if (
+        expr.args.length === 1 &&
+        expr.operator &&
+        ClassificationTestOperator.includes(expr.operator)
+    ) {
         expr.args.forEach((arg, index) => ((arg as Mutable<AstNode>).$containerIndex = index + 1));
         // Langium discards unused explicit union types
         (expr.args as Array<AstNode>).unshift(
@@ -89,7 +94,7 @@ type ProcessingFunction<T extends AstNode = AstNode> = (
     node: T,
     services: SysMLDefaultServices
 ) => void;
-type ProcessingMap = { [K in keyof SysMlAstType]?: ProcessingFunction<SysMlAstType[K]> };
+type ProcessingMap = { [K in SysMLType]?: ProcessingFunction<SysMlAstType[K]> };
 
 /**
  * Extension of Langium CST node builder that performs some postprocessing on

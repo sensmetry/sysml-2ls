@@ -950,6 +950,7 @@ export class SysMLFormatter extends AbstractFormatter {
             }
 
             default: {
+                if (!node.operator) break;
                 if (node.args.length === 1) {
                     operator.append(
                         /not|all/.test(node.operator) ? Options.oneSpace : Options.noSpace

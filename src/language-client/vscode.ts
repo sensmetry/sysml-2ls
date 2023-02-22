@@ -17,7 +17,7 @@
 import { ClientConfig, SysMLClientExtender } from "./sysml-language-client";
 import * as vscode from "vscode";
 import { TextEditor } from "../common/protocol-extensions";
-import { TextDocumentIdentifier } from "vscode-languageserver-protocol";
+import { TextDocumentIdentifier } from "vscode-languageserver";
 import fs from "fs-extra";
 import path from "path";
 import { downloadFile, DownloadInfo, formatBytes, mkTmpdir, unzipFile } from "../common/download";

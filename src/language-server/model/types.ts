@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { AstReflection } from "langium";
-import { reflection, SysMlAstReflection, SysMlAstType } from "../generated/ast";
+import { reflection, SysMlAstReflection } from "../generated/ast";
+import { SysMLTypeList } from "../services/sysml-ast-reflection";
 
 export type TypeMap<TKey, T> = {
     [type in keyof TKey]?: T;
@@ -28,7 +29,7 @@ type Keys<T> = keyof T;
 /**
  * Utilities for constructing generic maps of type names to specific values
  */
-class TypesIndex<S = SysMlAstType> {
+class TypesIndex<S = SysMLTypeList> {
     protected readonly base: AstReflection;
     protected readonly supertypes = new Map<string, Set<string>>();
 

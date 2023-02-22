@@ -14,76 +14,110 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Command } from "commander";
-import { spawn, execSync, ExecSyncOptions } from "child_process";
-import CONFIG from "../package.json";
+import { DefaultDocumentBuilder, LangiumDocument, BuildOptions } from "langium";
+import {
+    InterfaceType,
+    isArrayType,
+    isInterfaceType,
+    isPrimitiveType,
+    isPropertyUnion,
+    Property,
+    PropertyType,
+    TypeOption,
+} from "langium/lib/grammar/type-system";
+import { CancellationToken } from "vscode";
 
-const GENERATE = "file:node_modules/langium-workspaces/packages/langium";
-const RUNTIME = CONFIG.dependencies.langium;
-
-const CHILD_OPTIONS: ExecSyncOptions = {
-    stdio: [0, 1, 2],
+const build = DefaultDocumentBuilder.prototype.build;
+DefaultDocumentBuilder.prototype.build = async function (
+    this: DefaultDocumentBuilder,
+    documents: LangiumDocument[],
+    options?: BuildOptions,
+    cancelToken?: CancellationToken
+): Promise<void> {
+    await build.call(this, documents, options, cancelToken);
+    documents.forEach((doc) => {
+        doc.diagnostics = doc.diagnostics?.filter(
+            (diagnostic) => !/is not compatible/.test(diagnostic.message)
+        );
+    });
 };
 
-async function generate(watch = false): Promise<void> {
-    const install = (pack: string): void => {
-        execSync(`pnpm install langium@${pack}`, CHILD_OPTIONS);
-    };
+// patching infinite recursion
+InterfaceType.prototype["getSubTypeProperties"] = function (
+    this: InterfaceType,
+    type: TypeOption,
+    map: Map<string, Property>,
+    visited?: Set<TypeOption>
+): void {
+    visited ??= new Set();
+    if (visited.has(type)) return;
+    visited.add(type);
 
-    let reverted = false;
-    const revert = (): void => {
-        if (reverted) return;
-        reverted = true;
-        install(RUNTIME);
-    };
+    const props = isInterfaceType(type) ? type.properties : [];
+    for (const prop of props) {
+        if (!map.has(prop.name)) {
+            map.set(prop.name, prop);
+        }
+    }
+    for (const subType of type.subTypes) {
+        this["getSubTypeProperties"](subType, map, visited);
+    }
+};
 
-    const args = [
-        "tsx",
-        "node_modules/langium-workspaces/packages/langium-cli/bin/langium.js",
-        "generate",
-    ];
+// patching infinite recursion and false positive diagnostics
+function getSuperProperties(
+    type: InterfaceType,
+    map: Map<string, Property>,
+    visited: Set<InterfaceType>
+): void {
+    if (visited.has(type)) return;
+    visited.add(type);
 
-    if (watch) args.push("--watch");
+    for (const property of type.properties) {
+        map.set(property.name, property);
+    }
+    for (const superType of type.interfaceSuperTypes) {
+        getSuperProperties(superType, map, visited);
+    }
+}
 
-    return new Promise((resolve, reject) => {
-        install(GENERATE);
-        const child = spawn("pnpm", args, CHILD_OPTIONS);
-
-        child.on("spawn", () => {
-            revert();
-        });
-
-        let exited = false;
-        const onExit = (code: number | null, error: unknown): void => {
-            revert();
-            if (exited) return;
-            exited = true;
-            if (!code) {
-                if (code === 0) resolve();
-                else reject(code);
-            } else reject(error);
+Object.defineProperty(InterfaceType.prototype, "superProperties", {
+    get: function (): Property[] {
+        const map = new Map<string, Property>();
+        getSuperProperties(this, map, new Set());
+        const isOptional = (type: PropertyType): boolean => {
+            return isArrayType(type) || (isPrimitiveType(type) && type.primitive === "boolean");
         };
 
-        child.on("error", (e) => {
-            onExit(null, e);
-        });
+        return Array.from(map.values()).map((prop) => {
+            const p = {
+                ...prop,
+                optional:
+                    prop.optional ||
+                    // arrays and boolean will be created automatically, no
+                    // issues with them missing
+                    isOptional(prop.type) ||
+                    (isPropertyUnion(prop.type) && !prop.type.types.some((p) => !isOptional(p))),
+            };
 
-        child.on("exit", onExit);
-    });
+            return p;
+        });
+    },
+    configurable: true,
+});
+
+const toAstTypesString = InterfaceType.prototype.toAstTypesString;
+InterfaceType.prototype.toAstTypesString = function (reflectionInfo: boolean): string {
+    // $type inference seems to be broken currently
+    return toAstTypesString.call(this, reflectionInfo).replace(/\$type:.*$/m, "$type: string;");
+};
+
+async function generate(): Promise<void> {
+    import("langium-cli/lib/langium");
 }
 
 async function main(): Promise<void> {
-    const program = new Command();
-
-    program
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        .version(require("../package.json").version);
-
-    program.option("--watch", "Watch for file changes", false);
-    program.parse(process.argv);
-
-    const options = program.opts();
-    await generate(options.watch);
+    await generate();
 }
 
 main().catch((reason) => {

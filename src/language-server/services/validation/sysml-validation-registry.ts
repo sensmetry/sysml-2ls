@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { ValidationChecks, ValidationRegistry } from "langium";
-import { SysMlAstType } from "../../generated/ast";
 import { SysMLServices } from "../services";
+import { SysMLTypeList } from "../sysml-ast-reflection";
 
 /**
  * Registry for validation checks.
@@ -25,7 +25,7 @@ export class SysMLValidationRegistry extends ValidationRegistry {
     constructor(services: SysMLServices) {
         super(services);
         const validator = services.validation.SysMLValidator;
-        const checks: ValidationChecks<SysMlAstType> = {};
+        const checks: ValidationChecks<SysMLTypeList> = {};
         this.register(checks, validator);
     }
 }

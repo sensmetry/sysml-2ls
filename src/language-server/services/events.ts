@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LangiumDocument, MaybePromise } from "langium";
-import { Disposable, HoverParams } from "vscode-languageserver-protocol";
+import { Disposable, HoverParams } from "vscode-languageserver";
 import { erase } from "../utils/common";
 
 interface Callback<T extends unknown[], Return> {
