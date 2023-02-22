@@ -58,6 +58,28 @@
                 "language": "sysml",
                 "scopeName": "source.sysml",
                 "path": "./syntaxes/sysml.tmLanguage.json"
+            },
+            {
+                "language": "sysml",
+                "path": "./syntaxes/sysml.md.tmLanguage.json",
+                "scopeName": "markdown.sysml.codeblock",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.sysml": "sysml"
+                }
+            },
+            {
+                "language": "kerml",
+                "path": "./syntaxes/kerml.md.tmLanguage.json",
+                "scopeName": "markdown.kerml.codeblock",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.kerml": "kerml"
+                }
             }
         ],
         "semanticTokenTypes": [

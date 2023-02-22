@@ -8,6 +8,7 @@
 
 ### Added
 
+- Syntax highlighting in markdown fenced blocks with `kerml` and `sysml` identifiers
 - Full auto-formatting. However, there is no configuration for it currently and
   there is no support for maximum line widths
 
