@@ -24,8 +24,6 @@ import {
     FormattingMove,
     FormattingRegion,
     getDocument,
-    getNextNode,
-    getPreviousNode,
     LangiumDocument,
     NodeFormatter,
 } from "langium";
@@ -36,6 +34,7 @@ import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { KeysMatching } from "../../utils/common";
 import { isKeyword } from "langium/lib/grammar/generated/ast";
 import { linesDiff } from "../../utils/ast-util";
+import { getNextNode, getPreviousNode } from "../../utils/cst-util";
 
 type Format<T extends AstNode = AstNode> = (node: T, formatter: NodeFormatter<T>) => void;
 type FormatMap = {

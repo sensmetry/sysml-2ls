@@ -17,8 +17,9 @@
 import {
     AstNode,
     DefaultScopeProvider,
+    findLeafNodeAtOffset,
     getDocument,
-    isAstNode,
+    isLeafCstNode,
     LangiumDocument,
     ReferenceInfo,
 } from "langium";
@@ -27,17 +28,12 @@ import {
     ElementReference,
     Feature,
     isAlias,
-    isCollectExpression,
     isConnectorEnd,
     isElementReference,
     isExpression,
     isFeature,
-    isFeatureChainExpression,
     isInlineExpression,
-    isInvocationExpression,
     isNamedArgument,
-    isOperatorExpression,
-    isSelectExpression,
     isSysMLFunction,
     isType,
     Type,
@@ -60,6 +56,7 @@ import { SysMLDefaultServices } from "../services";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { MetamodelBuilder } from "../shared/workspace/metamodel-builder";
 import { CancellationToken } from "vscode-languageserver";
+import { getPreviousNode } from "../../utils/cst-util";
 
 type SpecializationKeys = KeysMatching<Type & Feature, Array<TypeReference>>;
 
@@ -135,16 +132,17 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
         index: number,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
     ): SysMLScope | ScopeStream | undefined {
-        let parent: AstNode | undefined;
+        let parent: ReturnType<typeof this.getContext>;
         if (index === 0) {
             // either not a reference or start of qualified type chain only the
             // first part in the chain can use its parent scope, every other
             // part has to use the resolved element scope skipping the reference
             // scope itself since it doesn't contain anything anyway
             const context = this.getContext(container);
+            if (context === "error") return;
             if (context) {
                 parent = context;
-            } else if (context === undefined) {
+            } else {
                 return this.initialScope(
                     container.$container,
                     container.$meta.document,
@@ -273,15 +271,15 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     /**
      * Get node final reference target
      * @param node
-     * @returns Element referenced by the node if linked, null if failed to link
-     * and undefined for no reference
+     * @returns Element referenced by `node` if linked, `"error"` if failed to link
+     * and `undefined` for no reference
      */
-    protected getElementTarget(node: AstNode): Element | undefined | null {
+    protected getElementTarget(node: AstNode): Element | undefined | "error" {
         if (isElementReference(node)) {
-            return node.$meta.to.target;
+            return node.$meta.to.target ?? "error";
         } else if (isInlineExpression(node) || isExpression(node) || isSysMLFunction(node)) {
             const target = node.$meta.returnType();
-            return this.indexManager.findType(target);
+            return this.indexManager.findType(target) ?? "error";
         }
 
         return undefined;
@@ -290,39 +288,34 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     /**
      * Get context for scope resolution
      * @param ref Reference to resolve context for
-     * @returns undefined if implicit parent context, null if context failed to
-     * be linked and {@link AstNode} for existing context
+     * @returns `undefined` if implicit parent context, `"error"` if context failed to
+     * be linked and {@link Element} for existing context
      */
-    protected getContext(ref: AstNode): Element | undefined | null {
-        const container = ref.$container;
-        if (
-            isFeatureChainExpression(container) ||
-            isSelectExpression(container) ||
-            isCollectExpression(container)
-        ) {
-            if (ref.$containerIndex === 0) {
-                // context from parent
-                return this.getContext(container);
+    protected getContext(ref: ElementReference): Element | undefined | "error" {
+        const cst = ref.$cstNode;
+        if (!cst) return;
+
+        // check if the previous CST node is a scope token (`::` or `.`)
+        const previous = getPreviousNode(cst, false);
+        if (!previous || ![".", "::"].includes(previous.text)) {
+            const owner = ref.$container;
+            if (isNamedArgument(owner) && owner.$container.type) {
+                return owner.$container.type.$meta.to.target ?? "error";
             }
-            // left should have been linked, use its target directly
-            if (!isAstNode(container.args[0])) return undefined;
-            // otherwise follow deeper
-            return this.getElementTarget(container.args[0]);
-        } else if (isInvocationExpression(container)) {
-            if (isOperatorExpression(container)) {
-                return undefined;
-            }
-            // context from parent
-            return this.getContext(container);
-        } else if (isNamedArgument(container)) {
-            // name properties are resolved in the context of the called
-            // function
-            if (ref.$containerProperty === "name" && container.$container.type)
-                return this.getElementTarget(container.$container.type);
-            return undefined;
+            return;
         }
 
-        return undefined;
+        // if it is, traverse one CST node backward again and find the reference node
+        let contextCst = getPreviousNode(previous, false);
+        if (!contextCst) return;
+        // need to use leaf in case the found node is composite and only
+        // contains the single reference node inside
+        if (!isLeafCstNode(contextCst)) {
+            contextCst = findLeafNodeAtOffset(contextCst, contextCst.end);
+        }
+        const element = contextCst?.element;
+        if (!element) return;
+        return this.getElementTarget(element);
     }
 
     /**
