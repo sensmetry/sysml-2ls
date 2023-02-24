@@ -35,6 +35,7 @@ import { KeysMatching } from "../../utils/common";
 import { isKeyword } from "langium/lib/grammar/generated/ast";
 import { linesDiff } from "../../utils/ast-util";
 import { getNextNode, getPreviousNode } from "../../utils/cst-util";
+import { TextDocument } from "vscode-languageserver-textdocument";
 
 type Format<T extends AstNode = AstNode> = (node: T, formatter: NodeFormatter<T>) => void;
 type FormatMap = {
@@ -82,7 +83,6 @@ function addIndent(action: FormattingAction, indent: number): FormattingAction {
         }),
     };
 }
-
 export class SysMLFormatter extends AbstractFormatter {
     /**
      * Map of AST node types to formatting functions that apply to that type
@@ -283,7 +283,9 @@ export class SysMLFormatter extends AbstractFormatter {
         }
 
         if (node.prefixes.length > 0) {
-            formatter.property("prefixes").append(Options.spaceOrIndent);
+            const prefixes = formatter.property("prefixes");
+            const next = getNextNode(prefixes.nodes[prefixes.nodes.length - 1]);
+            if (next?.text !== ";") prefixes.append(Options.spaceOrIndent);
         }
 
         if (node.declaredShortName && !node.$cstNode?.text.startsWith("<")) {
@@ -1016,7 +1018,13 @@ export class SysMLFormatter extends AbstractFormatter {
         const arrow = formatter.keyword("->");
         if (arrow.nodes.length > 0) {
             arrow.prepend(Options.noSpaceOrIndent).append(Options.noSpace);
-            formatter.property("type").append(Options.spaceOrIndent);
+            const type = formatter.property("type");
+            type.append(
+                // braces should be formatted with no space
+                braces.nodes.length > 0 || /\{|\(/.test(getNextNode(type.nodes[0])?.text ?? "")
+                    ? Options.noSpace
+                    : Options.spaceOrIndent
+            );
         }
     }
 
@@ -1313,7 +1321,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ConstraintUsage>
     ): void {
         this.occurrenceUsage(node, formatter);
-        formatter.property("constraintKind").append(Options.oneSpace);
+        if (node.constraintKind) formatter.property("constraintKind").append(Options.oneSpace);
     }
 
     protected concernUsage(
@@ -1375,6 +1383,12 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("include").append(Options.oneSpace);
     }
 
+    protected override isNecessary(edit: TextEdit, document: TextDocument): boolean {
+        // preserve new line edits so that they are not overridden when the
+        // document is already formatted
+        return /\n/.test(edit.newText) || super.isNecessary(edit, document);
+    }
+
     protected override doDocumentFormat(
         document: LangiumDocument,
         options: FormattingOptions,
@@ -1388,7 +1402,14 @@ export class SysMLFormatter extends AbstractFormatter {
             return [];
         }
 
-        return super.doDocumentFormat(document, options, range);
+        const text = document.textDocument;
+        return (
+            super
+                .doDocumentFormat(document, options, range)
+                // filter out edits matching the document since we have preserved
+                // some in `isNecessary`
+                .filter((edit) => super.isNecessary(edit, text))
+        );
     }
 
     protected override createHiddenTextEdits(
