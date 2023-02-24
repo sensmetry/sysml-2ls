@@ -4,7 +4,7 @@
 
 <!-- Include links to comparison to the previous version -->
 
-## [unreleased]
+## 0.2.1
 
 ### Added
 
