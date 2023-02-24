@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { OperatorExpression, Element, ConditionalExpression } from "../../../generated/ast";
+import { ElementMeta, OperatorExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
@@ -29,8 +29,8 @@ abstract class ConditionalLogicalFunction extends BuiltinFunction {
     protected abstract result(): boolean;
 
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const first = evaluator.asBoolean(expression, 0, target);
@@ -76,8 +76,8 @@ export class ConditionalOrFunction extends ConditionalLogicalFunction {
 @functionFor(PACKAGE, "'if'")
 export class ConditionalFunction extends BuiltinFunction {
     override call(
-        expression: ConditionalExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const test = evaluator.asBoolean(expression, 0, target);
@@ -98,8 +98,8 @@ export class ConditionalFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "'??'")
 export class NullCoalescingFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);

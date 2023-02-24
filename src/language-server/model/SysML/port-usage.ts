@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { isPartDefinition, isPortDefinition, isPortUsage, PortUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { PartDefinition, PortDefinition, PortUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(PortUsage, {
@@ -24,8 +24,8 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     subport: "Ports::Port::subports",
 })
 export class PortUsageMeta extends OccurrenceUsageMeta {
-    constructor(node: PortUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<PortUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -35,15 +35,19 @@ export class PortUsageMeta extends OccurrenceUsageMeta {
     }
 
     isOwnedPort(): boolean {
-        return this.isComposite && (isPartDefinition(this.parent()) || isPortUsage(this.parent()));
+        return this.isComposite && this.parent().isAny([PartDefinition, PortUsage]);
     }
 
     isSubport(): boolean {
-        return this.isComposite && (isPortDefinition(this.parent()) || isPortUsage(this.parent()));
+        return this.isComposite && this.parent().isAny([PortDefinition, PortUsage]);
     }
 
-    override self(): PortUsage {
+    override self(): PortUsage | undefined {
         return super.self() as PortUsage;
+    }
+
+    override parent(): ModelContainer<PortUsage> {
+        return this._parent;
     }
 }
 

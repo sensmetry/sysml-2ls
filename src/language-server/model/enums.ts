@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import * as ast from "../generated/ast";
-import { Visibility } from "../utils/ast-util";
 import { stringifyFlags } from "../utils/common";
+import { Visibility } from "../utils/scope-util";
 
 /**
  * Build state

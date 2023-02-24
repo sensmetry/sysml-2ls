@@ -15,13 +15,13 @@
  ********************************************************************************/
 
 import {
-    isActionDefinition,
-    isActionUsage,
-    isStateDefinition,
-    isStateUsage,
+    ActionDefinition,
+    ActionUsage,
+    StateDefinition,
+    StateUsage,
     TransitionUsage,
 } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(TransitionUsage, {
@@ -30,8 +30,8 @@ import { ActionUsageMeta } from "./action-usage";
     stateTransition: "States::StateAction::stateTransitions",
 })
 export class TransitionUsageMeta extends ActionUsageMeta {
-    constructor(node: TransitionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<TransitionUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -43,17 +43,21 @@ export class TransitionUsageMeta extends ActionUsageMeta {
     isActionTransition(): boolean {
         if (!this.isComposite) return false;
         const parent = this.parent();
-        return isActionDefinition(parent) || isActionUsage(parent);
+        return parent.isAny([ActionUsage, ActionDefinition]);
     }
 
     isStateTransition(): boolean {
         if (!this.isComposite) return false;
         const parent = this.parent();
-        return isStateDefinition(parent) || isStateUsage(parent);
+        return parent.isAny([StateDefinition, StateUsage]);
     }
 
-    override self(): TransitionUsage {
+    override self(): TransitionUsage | undefined {
         return super.self() as TransitionUsage;
+    }
+
+    override parent(): ModelContainer<TransitionUsage> {
+        return this._parent;
     }
 }
 

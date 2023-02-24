@@ -16,14 +16,14 @@
 
 import { Definition, Usage } from "../../generated/ast";
 import { ClassifierMeta } from "../KerML/classifier";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(Definition)
 export class DefinitionMeta extends ClassifierMeta {
     isVariation = false;
 
-    constructor(node: Definition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Definition>) {
+        super(id, parent);
     }
 
     override initialize(node: Definition): void {
@@ -31,8 +31,12 @@ export class DefinitionMeta extends ClassifierMeta {
         this.isAbstract ||= this.isVariation;
     }
 
-    override self(): Definition {
+    override self(): Definition | undefined {
         return super.self() as Definition;
+    }
+
+    override parent(): ModelContainer<Definition> {
+        return this._parent;
     }
 
     getSubjectParameter(): Usage | undefined {

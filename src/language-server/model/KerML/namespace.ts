@@ -14,47 +14,49 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Import, Alias, Namespace } from "../../generated/ast";
+import { Namespace } from "../../generated/ast";
 import { ElementMeta } from "./element";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { BuildState } from "../enums";
+import { ImportMeta, AliasMeta } from "./_internal";
 
 @metamodelOf(Namespace)
 export class NamespaceMeta extends ElementMeta {
     /**
      * Import statements
      */
-    imports: Import[] = [];
+    imports: ImportMeta[] = [];
 
     /**
      * Alias members
      */
-    aliases: Alias[] = [];
+    aliases: AliasMeta[] = [];
 
     /**
      * Imports resolution state
      */
     importResolutionState: BuildState = "none";
 
-    constructor(node: Namespace, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<Namespace>) {
+        super(elementId, parent);
     }
 
     override initialize(node: Namespace): void {
-        this.imports.push(...node.imports);
-        this.aliases.push(...node.aliases);
+        this.imports = node.imports.map((v) => v.$meta);
+        this.aliases = node.aliases.map((v) => v.$meta);
     }
 
-    override self(): Namespace {
+    override self(): Namespace | undefined {
         return super.deref() as Namespace;
     }
 
-    override reset(): void {
-        super.reset();
+    override parent(): ModelContainer<Namespace> {
+        return this._parent;
+    }
+
+    override reset(node: Namespace): void {
         this.importResolutionState = "none";
-        const node = this.self();
-        this.imports = [...node.imports];
-        this.aliases = [...node.aliases];
+        this.initialize(node);
     }
 }
 

@@ -11,8 +11,7 @@ type RelationalOperator = '<' | '<=' | '>' | '>=';
 // Unions
 
 type InlineExpression = 
-    ConditionalExpression
-    | FeatureChainExpression
+    FeatureChainExpression
 // | FeatureChainMember
     | InvocationExpression
     | LiteralExpression
@@ -315,9 +314,6 @@ interface NamedArgument extends Argument {
 
 interface OperatorExpression extends InvocationExpression {
     operator?: string;
-}
-
-interface ConditionalExpression extends OperatorExpression {
 }
 
 interface CollectExpression extends OperatorExpression {}

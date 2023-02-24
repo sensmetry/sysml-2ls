@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 import { VisibilityElement } from "../../generated/ast";
-import { Visibility } from "../../utils/ast-util";
+import { Visibility } from "../../utils/scope-util";
 import { getVisibility } from "../enums";
-import { metamodelOf, BasicMetamodel, ElementID } from "../metamodel";
+import { metamodelOf, BasicMetamodel, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(VisibilityElement)
 export class VisibilityMeta extends BasicMetamodel<VisibilityElement> {
@@ -26,12 +26,20 @@ export class VisibilityMeta extends BasicMetamodel<VisibilityElement> {
      */
     visibility: Visibility = Visibility.public;
 
-    constructor(node: VisibilityElement, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<VisibilityElement>) {
+        super(id, parent);
     }
 
     override initialize(node: VisibilityElement): void {
         this.visibility = getVisibility(node.visibility);
+    }
+
+    override self(): VisibilityElement | undefined {
+        return super.self() as VisibilityElement;
+    }
+
+    override parent(): ModelContainer<VisibilityElement> {
+        return this._parent;
     }
 }
 

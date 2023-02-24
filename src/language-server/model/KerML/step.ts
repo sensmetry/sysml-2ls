@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { isElement, isItemFeature, Step } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { Element, ItemFeature, Step } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { FeatureMeta } from "./feature";
 
 export const ImplicitSteps = {
@@ -29,12 +29,16 @@ export const ImplicitSteps = {
 
 @metamodelOf(Step, ImplicitSteps)
 export class StepMeta extends FeatureMeta {
-    constructor(node: Step, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Step>) {
+        super(id, parent);
     }
 
-    override self(): Step {
+    override self(): Step | undefined {
         return super.deref() as Step;
+    }
+
+    override parent(): ModelContainer<Step> {
+        return this._parent;
     }
 
     override defaultSupertype(): string {
@@ -47,8 +51,8 @@ export class StepMeta extends FeatureMeta {
 
     protected isIncomingTransfer(): boolean {
         const parent = this.parent();
-        if (!isElement(parent)) return false;
-        return parent.$meta.features.some(isItemFeature);
+        if (!parent.is(Element)) return false;
+        return parent.features.some((f) => f.element.is(ItemFeature));
     }
 }
 

@@ -16,15 +16,15 @@
 
 import { Usage } from "../../generated/ast";
 import { FeatureMeta } from "../KerML/feature";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(Usage)
 export class UsageMeta extends FeatureMeta {
     isSubjectParameter = false;
     isVariant = false;
 
-    constructor(node: Usage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Usage>) {
+        super(id, parent);
     }
 
     override initialize(node: Usage): void {
@@ -44,8 +44,12 @@ export class UsageMeta extends FeatureMeta {
         return super.isIgnoredParameter() || this.isSubjectParameter;
     }
 
-    override self(): Usage {
+    override self(): Usage | undefined {
         return super.self() as Usage;
+    }
+
+    override parent(): ModelContainer<Usage> {
+        return this._parent;
     }
 
     protected isVariantNode(node: Usage): boolean {

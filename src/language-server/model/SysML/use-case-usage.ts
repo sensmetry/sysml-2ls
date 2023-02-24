@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { UseCaseUsage, isUseCaseDefinition, isUseCaseUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { UseCaseUsage, UseCaseDefinition } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CaseUsageMeta } from "./case-usage";
 
 @metamodelOf(UseCaseUsage, {
@@ -23,8 +23,8 @@ import { CaseUsageMeta } from "./case-usage";
     subUseCase: "UseCases::UseCase::subUseCases",
 })
 export class UseCaseUsageMeta extends CaseUsageMeta {
-    constructor(node: UseCaseUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<UseCaseUsage>) {
+        super(id, parent);
     }
 
     override getSubactionType(): string | undefined {
@@ -33,11 +33,15 @@ export class UseCaseUsageMeta extends CaseUsageMeta {
 
     isSubUseCase(): boolean {
         const parent = this.parent();
-        return isUseCaseDefinition(parent) || isUseCaseUsage(parent);
+        return parent.isAny([UseCaseUsage, UseCaseDefinition]);
     }
 
-    override self(): UseCaseUsage {
+    override self(): UseCaseUsage | undefined {
         return super.self() as UseCaseUsage;
+    }
+
+    override parent(): ModelContainer<UseCaseUsage> {
+        return this._parent;
     }
 }
 

@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { MetadataUsage } from "../../generated/ast";
 import { MetadataFeatureMeta } from "../KerML/metadata-feature";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ItemUsageMeta } from "./item-usage";
 
 @metamodelOf(MetadataUsage, {
@@ -26,16 +26,20 @@ import { ItemUsageMeta } from "./item-usage";
     baseType: "Metaobjects::SemanticMetadata::baseType",
 })
 export class MetadataUsageMeta extends Mixin(MetadataFeatureMeta, ItemUsageMeta) {
-    constructor(node: MetadataUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<MetadataUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
         return "base";
     }
 
-    override self(): MetadataUsage {
+    override self(): MetadataUsage | undefined {
         return super.self() as MetadataUsage;
+    }
+
+    override parent(): ModelContainer<MetadataUsage> {
+        return this._parent;
     }
 }
 

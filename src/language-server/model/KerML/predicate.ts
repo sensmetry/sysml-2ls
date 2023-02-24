@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Predicate } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { FunctionMeta } from "./function";
 
 export const ImplicitPredicates = {
@@ -24,12 +24,16 @@ export const ImplicitPredicates = {
 
 @metamodelOf(Predicate, ImplicitPredicates)
 export class PredicateMeta extends FunctionMeta {
-    constructor(node: Predicate, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Predicate>) {
+        super(id, parent);
     }
 
-    override self(): Predicate {
+    override self(): Predicate | undefined {
         return super.deref() as Predicate;
+    }
+
+    override parent(): ModelContainer<Predicate> {
+        return this._parent;
     }
 }
 

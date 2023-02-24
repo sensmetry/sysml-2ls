@@ -14,12 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    VerificationCaseUsage,
-    isVerificationCaseDefinition,
-    isVerificationCaseUsage,
-} from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { VerificationCaseUsage, VerificationCaseDefinition } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CaseUsageMeta } from "./case-usage";
 
 @metamodelOf(VerificationCaseUsage, {
@@ -27,8 +23,8 @@ import { CaseUsageMeta } from "./case-usage";
     subVerificationCase: "VerificationCases::VerificationCase::subVerificationCases",
 })
 export class VerificationCaseUsageMeta extends CaseUsageMeta {
-    constructor(node: VerificationCaseUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<VerificationCaseUsage>) {
+        super(id, parent);
     }
 
     override getSubactionType(): string | undefined {
@@ -37,11 +33,15 @@ export class VerificationCaseUsageMeta extends CaseUsageMeta {
 
     isSubVerificationCase(): boolean {
         const parent = this.parent();
-        return isVerificationCaseDefinition(parent) || isVerificationCaseUsage(parent);
+        return parent.isAny([VerificationCaseUsage, VerificationCaseDefinition]);
     }
 
-    override self(): VerificationCaseUsage {
+    override self(): VerificationCaseUsage | undefined {
         return super.self() as VerificationCaseUsage;
+    }
+
+    override parent(): ModelContainer<VerificationCaseUsage> {
+        return this._parent;
     }
 }
 

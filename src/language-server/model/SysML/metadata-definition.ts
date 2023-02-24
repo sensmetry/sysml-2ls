@@ -17,19 +17,23 @@
 import { Mixin } from "ts-mixer";
 import { MetadataDefinition } from "../../generated/ast";
 import { MetaclassMeta } from "../KerML/metaclass";
-import { ElementID, metamodelOf } from "../metamodel";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { ItemDefinitionMeta } from "./item-definition";
 
 @metamodelOf(MetadataDefinition, {
     base: "Metadata::MetadataItem",
 })
 export class MetadataDefinitionMeta extends Mixin(ItemDefinitionMeta, MetaclassMeta) {
-    constructor(node: MetadataDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<MetadataDefinition>) {
+        super(id, parent);
     }
 
-    override self(): MetadataDefinition {
+    override self(): MetadataDefinition | undefined {
         return super.self() as MetadataDefinition;
+    }
+
+    override parent(): ModelContainer<MetadataDefinition> {
+        return this._parent;
     }
 }
 

@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { IncludeUseCaseUsage, isCaseDefinition, isCaseUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { CaseDefinition, CaseUsage, IncludeUseCaseUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PerformActionUsageMeta } from "./perform-action-usage";
 import { UseCaseUsageMeta } from "./use-case-usage";
 
@@ -25,12 +25,16 @@ import { UseCaseUsageMeta } from "./use-case-usage";
     performedAction: "Parts::Part::performedActions",
 })
 export class IncludeUseCaseUsageMeta extends Mixin(UseCaseUsageMeta, PerformActionUsageMeta) {
-    constructor(node: IncludeUseCaseUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<IncludeUseCaseUsage>) {
+        super(id, parent);
     }
 
-    override self(): IncludeUseCaseUsage {
+    override self(): IncludeUseCaseUsage | undefined {
         return super.self() as IncludeUseCaseUsage;
+    }
+
+    override parent(): ModelContainer<IncludeUseCaseUsage> {
+        return this._parent;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -41,7 +45,7 @@ export class IncludeUseCaseUsageMeta extends Mixin(UseCaseUsageMeta, PerformActi
 
     hasRelevantSubjectParameter(): boolean {
         const parent = this.parent();
-        return isCaseDefinition(parent) || isCaseUsage(parent);
+        return parent.isAny([CaseDefinition, CaseUsage]);
     }
 }
 

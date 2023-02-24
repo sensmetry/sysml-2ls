@@ -162,9 +162,7 @@ test("implicitly inherited members are visible", async () => {
     expect(result).toMatchObject(NO_ERRORS);
     expect(
         Array.from(
-            stream((result.value.elements[1] as Type).$meta.types()).map(
-                (t) => t.$meta.qualifiedName
-            )
+            stream((result.value.elements[1] as Type).$meta.types()).map((t) => t.qualifiedName)
         )
     ).toEqual(["Base::Anything"]);
     expect(directScopeNames(result.value.elements[1] as Namespace)).toEqual([

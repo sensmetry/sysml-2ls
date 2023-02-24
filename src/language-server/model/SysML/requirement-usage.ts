@@ -15,14 +15,13 @@
  ********************************************************************************/
 
 import {
-    isRequirementDefinition,
-    isRequirementUsage,
-    isVerificationCaseDefinition,
-    isVerificationCaseUsage,
+    RequirementDefinition,
     RequirementUsage,
+    VerificationCaseDefinition,
+    VerificationCaseUsage,
 } from "../../generated/ast";
 import { getRequirementKind, RequirementKind } from "../enums";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConstraintUsageMeta } from "./constraint-usage";
 
 @metamodelOf(RequirementUsage, {
@@ -32,8 +31,8 @@ import { ConstraintUsageMeta } from "./constraint-usage";
 export class RequirementUsageMeta extends ConstraintUsageMeta {
     requirementKind: RequirementKind = "none";
 
-    constructor(node: RequirementUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<RequirementUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: RequirementUsage): void {
@@ -48,21 +47,24 @@ export class RequirementUsageMeta extends ConstraintUsageMeta {
         if (this.requirementKind !== "verification") return false;
 
         let parent = this.parent();
-        if (!isRequirementUsage(parent) || parent.$meta.requirementKind !== "objective")
-            return false;
+        if (!parent.is(RequirementUsage) || parent.requirementKind !== "objective") return false;
 
-        parent = parent.$meta.parent();
-        return isVerificationCaseDefinition(parent) || isVerificationCaseUsage(parent);
+        parent = parent.parent();
+        return parent.isAny([VerificationCaseDefinition, VerificationCaseUsage]);
     }
 
     isSubrequirement(): boolean {
         if (this.constraintKind === "assumption") return false;
         const parent = this.parent();
-        return isRequirementDefinition(parent) || isRequirementUsage(parent);
+        return parent.isAny([RequirementUsage, RequirementDefinition]);
     }
 
-    override self(): RequirementUsage {
+    override self(): RequirementUsage | undefined {
         return super.self() as RequirementUsage;
+    }
+
+    override parent(): ModelContainer<RequirementUsage> {
+        return this._parent;
     }
 }
 

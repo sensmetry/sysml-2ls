@@ -14,12 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    AnalysisCaseUsage,
-    isAnalysisCaseDefinition,
-    isAnalysisCaseUsage,
-} from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { AnalysisCaseDefinition, AnalysisCaseUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CaseUsageMeta } from "./case-usage";
 
 @metamodelOf(AnalysisCaseUsage, {
@@ -27,12 +23,16 @@ import { CaseUsageMeta } from "./case-usage";
     subAnalysisCase: "AnalysisCases::AnalysisCase::subAnalysisCases",
 })
 export class AnalysisCaseUsageMeta extends CaseUsageMeta {
-    constructor(node: AnalysisCaseUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AnalysisCaseUsage>) {
+        super(id, parent);
     }
 
-    override self(): AnalysisCaseUsage {
+    override self(): AnalysisCaseUsage | undefined {
         return super.self() as AnalysisCaseUsage;
+    }
+
+    override parent(): ModelContainer<AnalysisCaseUsage> {
+        return this._parent;
     }
 
     override getSubactionType(): string | undefined {
@@ -41,7 +41,7 @@ export class AnalysisCaseUsageMeta extends CaseUsageMeta {
 
     isSubAnalysisCase(): boolean {
         const parent = this.parent();
-        return isAnalysisCaseDefinition(parent) || isAnalysisCaseUsage(parent);
+        return parent.isAny([AnalysisCaseUsage, AnalysisCaseDefinition]);
     }
 }
 

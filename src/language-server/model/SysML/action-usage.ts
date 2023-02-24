@@ -16,16 +16,15 @@
 
 import { Mixin } from "ts-mixer";
 import {
+    ActionDefinition,
     ActionUsage,
-    isActionDefinition,
-    isActionUsage,
-    isPartDefinition,
-    isPartUsage,
+    Feature,
+    PartDefinition,
+    PartUsage,
 } from "../../generated/ast";
 import { StepMeta } from "../KerML/step";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
-import { isFeature } from "../../generated/ast";
 import { StateSubactionKind, getStateSubactionKind } from "../enums";
 
 @metamodelOf(ActionUsage, {
@@ -37,16 +36,20 @@ import { StateSubactionKind, getStateSubactionKind } from "../enums";
 export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
     stateSubactionKind: StateSubactionKind = "none";
 
-    constructor(node: ActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ActionUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: ActionUsage): void {
         this.stateSubactionKind = getStateSubactionKind(node);
     }
 
-    override self(): ActionUsage {
+    override self(): ActionUsage | undefined {
         return super.self() as ActionUsage;
+    }
+
+    override parent(): ModelContainer<ActionUsage> {
+        return this._parent;
     }
 
     override defaultSupertype(): string {
@@ -69,18 +72,16 @@ export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
     isSubaction(): boolean {
         const parent = this.parent();
         return (
-            isFeature(parent) &&
-            parent.$meta.isComposite &&
-            (isActionUsage(parent) || isActionDefinition(parent))
+            parent.is(Feature) &&
+            parent.isComposite &&
+            parent.isAny([ActionUsage, ActionDefinition])
         );
     }
 
     isOwnedAction(): boolean {
         const parent = this.parent();
         return (
-            isFeature(parent) &&
-            parent.$meta.isComposite &&
-            (isPartUsage(parent) || isPartDefinition(parent))
+            parent.is(Feature) && parent.isComposite && parent.isAny([PartUsage, PartDefinition])
         );
     }
 
@@ -90,7 +91,7 @@ export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
 
     isPerformedAction(): boolean {
         const parent = this.parent();
-        return isPartDefinition(parent) || isPartUsage(parent);
+        return parent.isAny([PartUsage, PartDefinition]);
     }
 }
 

@@ -15,22 +15,23 @@
  ********************************************************************************/
 
 import { LangiumDocument } from "langium";
-import { Element, ElementReference } from "../../generated/ast";
+import { ElementReference } from "../../generated/ast";
 import { Target } from "../../utils/containers";
-import { metamodelOf, BasicMetamodel, ElementID } from "../metamodel";
+import { metamodelOf, BasicMetamodel, ElementID, ModelContainer } from "../metamodel";
+import { ElementMeta, Exported } from "./_internal";
 
 @metamodelOf(ElementReference)
 export class ElementReferenceMeta extends BasicMetamodel<ElementReference> {
     /**
      * Final reference target of this reference chain
      */
-    readonly to = new Target<Element>();
+    readonly to = new Target<Exported<ElementMeta>>();
 
     /**
      * Found references during reference resolution even if they reference an
      * invalid type. Main use is for generating completion suggestion scopes.
      */
-    readonly found: (Element | undefined)[] = [];
+    readonly found: (ElementMeta | undefined)[] = [];
 
     /**
      * Text used to parse this reference chain
@@ -42,8 +43,8 @@ export class ElementReferenceMeta extends BasicMetamodel<ElementReference> {
      */
     document: LangiumDocument | undefined;
 
-    constructor(node: ElementReference, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ElementReference>) {
+        super(id, parent);
     }
 
     override initialize(node: ElementReference): void {
@@ -51,12 +52,11 @@ export class ElementReferenceMeta extends BasicMetamodel<ElementReference> {
         this.found.length = node.chain.length;
     }
 
-    override self(): ElementReference {
+    override self(): ElementReference | undefined {
         return super.deref() as ElementReference;
     }
 
-    override reset(): void {
-        super.reset();
+    override reset(_: ElementReference): void {
         this.to.reset();
         this.found.fill(undefined);
     }

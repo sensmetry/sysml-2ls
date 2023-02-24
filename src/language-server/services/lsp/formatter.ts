@@ -27,7 +27,7 @@ import {
     LangiumDocument,
     NodeFormatter,
 } from "langium";
-import { typeIndex, TypeMap } from "../../model";
+import { TextualAnnotatingMeta, typeIndex, TypeMap } from "../../model";
 import * as ast from "../../generated/ast";
 import { SysMLType } from "../sysml-ast-reflection";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
@@ -1536,28 +1536,28 @@ export class SysMLFormatter extends AbstractFormatter {
         previous: CstNode | undefined,
         context: FormattingContext
     ): TextEdit | undefined {
-        let element: ast.TextualAnnotatingElement;
+        let element: TextualAnnotatingMeta;
         if (!ast.isTextualAnnotatingElement(node.element)) {
             // i.e. the text document is a single comment body
             /* istanbul ignore next (safe-guard and type hint) */
             if (!ast.isNamespace(node.element)) return;
-            element = node.element.$meta.comments[0];
+            element = node.element.$meta.comments[0].element;
         } else {
-            element = node.element;
+            element = node.element.$meta;
         }
 
-        const body = element.$meta.body;
+        const body = element.body;
         let offset = 0;
 
-        if (element.$type === ast.Comment) {
-            if (previous?.text === "comment") {
-                // body is on the same line as `comment`
-                offset = 8; // offset for "comment "
-            }
-        } else if (element.$type === ast.Documentation) {
+        if (element.is(ast.Documentation)) {
             if (previous?.text === "doc") {
                 // body is on the same line as `doc`
                 offset = 4; // offset for "doc "
+            }
+        } else if (element.is(ast.Comment)) {
+            if (previous?.text === "comment") {
+                // body is on the same line as `comment`
+                offset = 8; // offset for "comment "
             }
         }
 

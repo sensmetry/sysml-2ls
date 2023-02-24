@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Expression, SysMLFunction, Type } from "../../generated/ast";
+import { ExpressionMeta, FunctionMeta, TypeMeta } from "../KerML/_internal";
 
 export class FunctionMixin {
     /**
@@ -22,12 +22,15 @@ export class FunctionMixin {
      * @param self AST node that owns this metamodel
      * @returns the return type or its qualified name if one was inferred, undefined otherwise
      */
-    protected getReturnType(self: SysMLFunction | Expression): Type | string | undefined {
+    protected getReturnType(
+        self: FunctionMeta | ExpressionMeta | undefined
+    ): TypeMeta | string | undefined {
+        if (!self) return;
         if (self.result) {
-            return self.result.expression.$meta.returnType();
+            return self.result.element.returnType();
         }
         // TODO: multiple return statements?
-        if (self.return.length === 0) return;
-        return self.return[0];
+        if (self.returns.length === 0) return;
+        return self.returns[0].element;
     }
 }

@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { ViewpointDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { RequirementDefinitionMeta } from "./requirement-definition";
 
 @metamodelOf(ViewpointDefinition, {
     base: "Views::ViewpointCheck",
 })
 export class ViewpointDefinitionMeta extends RequirementDefinitionMeta {
-    constructor(node: ViewpointDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ViewpointDefinition>) {
+        super(id, parent);
     }
 
-    override self(): ViewpointDefinition {
+    override self(): ViewpointDefinition | undefined {
         return super.self() as ViewpointDefinition;
+    }
+
+    override parent(): ModelContainer<ViewpointDefinition> {
+        return this._parent;
     }
 }
 

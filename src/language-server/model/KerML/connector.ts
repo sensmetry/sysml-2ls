@@ -14,9 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Connector, ConnectorEnd } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
-import { FeatureMeta } from "./feature";
+import { Connector } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { Related, ConnectorEndMeta, FeatureMeta } from "./_internal";
 
 export const ImplicitConnectors = {
     base: "Links::links",
@@ -30,14 +30,14 @@ export class ConnectorMeta extends FeatureMeta {
     /**
      * Owned connector ends
      */
-    readonly ends: ConnectorEnd[] = [];
+    ends: Related<ConnectorEndMeta>[] = [];
 
-    constructor(node: Connector, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Connector>) {
+        super(id, parent);
     }
 
     override initialize(node: Connector): void {
-        this.ends.push(...node.ends);
+        this.ends = node.ends.map((end) => ({ element: end.$meta }));
     }
 
     override defaultSupertype(): string {
@@ -50,14 +50,16 @@ export class ConnectorMeta extends FeatureMeta {
         return ends === 2 ? "binary" : "base";
     }
 
-    override self(): Connector {
+    override self(): Connector | undefined {
         return super.deref() as Connector;
     }
 
-    override reset(): void {
-        super.reset();
-        this.ends.length = 0;
-        this.ends.push(...this.self().ends);
+    override parent(): ModelContainer<Connector> {
+        return this._parent;
+    }
+
+    override reset(node: Connector): void {
+        this.initialize(node);
     }
 }
 

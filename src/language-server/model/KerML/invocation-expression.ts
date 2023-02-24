@@ -14,37 +14,43 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { InvocationExpression, Type, isExpression, isSysMLFunction } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { InvocationExpression, Expression, SysMLFunction } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { InlineExpressionMeta } from "./inline-expression";
+import { ArgumentMeta, TypeMeta } from "./_internal";
 
 @metamodelOf(InvocationExpression)
 export class InvocationExpressionMeta extends InlineExpressionMeta {
-    constructor(node: InvocationExpression, id: ElementID) {
-        super(node, id);
+    type?: TypeMeta;
+    // undefined for references that failed to link
+    args: (ArgumentMeta | TypeMeta | InlineExpressionMeta | undefined)[] = [];
+
+    constructor(id: ElementID, parent: ModelContainer<InvocationExpression>) {
+        super(id, parent);
     }
 
-    override self(): InvocationExpression {
+    override reset(_: InvocationExpression): void {
+        this.args.length = 0;
+    }
+
+    override self(): InvocationExpression | undefined {
         return super.self() as InvocationExpression;
+    }
+
+    override parent(): ModelContainer<InvocationExpression> {
+        return this._parent;
     }
 
     /**
      * @returns fully qualified name of the invoked function
      */
     getFunction(): string | undefined {
-        return this.invoked()?.$meta.qualifiedName;
+        return this.type?.qualifiedName;
     }
 
-    /**
-     * @returns explicitly invoked function type
-     */
-    private invoked(): Type | undefined {
-        return this.self().type?.$meta.to.target;
-    }
-
-    override returnType(): string | Type | undefined {
-        const type = this.invoked();
-        if (isExpression(type) || isSysMLFunction(type)) return type.$meta.returnType();
+    override returnType(): string | TypeMeta | undefined {
+        const type = this.type;
+        if (type?.isAny([Expression, SysMLFunction])) return type.returnType();
         return type;
     }
 }

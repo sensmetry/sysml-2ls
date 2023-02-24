@@ -14,33 +14,36 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    FeatureReferenceExpression,
-    Type,
-    isExpression,
-    isSysMLFunction,
-    isTypeReference,
-} from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { FeatureReferenceExpression, TypeReference } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { InlineExpressionMeta } from "./inline-expression";
+import { Related, TypeMeta } from "./_internal";
 
 @metamodelOf(FeatureReferenceExpression)
 export class FeatureReferenceExpressionMeta extends InlineExpressionMeta {
-    constructor(node: FeatureReferenceExpression, id: ElementID) {
-        super(node, id);
+    expression?: Related<InlineExpressionMeta>;
+
+    constructor(id: ElementID, parent: ModelContainer<FeatureReferenceExpression>) {
+        super(id, parent);
     }
 
-    override self(): FeatureReferenceExpression {
+    override initialize(node: FeatureReferenceExpression): void {
+        this.expression = { element: node.expression.$meta };
+    }
+
+    override self(): FeatureReferenceExpression | undefined {
         return super.self() as FeatureReferenceExpression;
     }
 
-    override returnType(): Type | string | undefined {
-        const expr = this.self().expression;
-        if (isTypeReference(expr)) return expr.$meta.to.target;
-        // OR-ing (||) results in ridiculous compile times...
-        if (isExpression(expr)) return expr.$meta.returnType();
-        if (isSysMLFunction(expr)) return expr.$meta.returnType();
-        return expr.$meta.returnType();
+    override parent(): ModelContainer<FeatureReferenceExpression> {
+        return this._parent;
+    }
+
+    override returnType(): TypeMeta | string | undefined {
+        const expr = this.expression?.element;
+        if (!expr) return;
+        if (expr.is(TypeReference)) return expr.to.target?.element;
+        return expr.returnType();
     }
 }
 

@@ -127,16 +127,19 @@ const EditorCommands = [
         command: "sysml.evaluate",
         position: { line: 1, character: 68 }, // '=|'
         expected: [7],
+        name: "feature value",
     },
     {
         command: "sysml.evaluate",
         position: { line: 1, character: 77 }, // '*|'
         expected: [6],
+        name: "expression",
     },
     {
         command: "sysml.evaluate",
         position: { line: 1, character: 62 }, // 'attribu|te'
         expected: [7],
+        name: "feature",
     },
 ];
 
@@ -160,24 +163,27 @@ describe("editor commands can be executed", () => {
 
     const handler = services.shared.lsp.ExecuteCommandHandler;
 
-    test.each(EditorCommands)("command: $command", async ({ command, position, expected }) => {
-        const argument: RegisterTextEditorCommandsRequest.Parameters = {
-            document: id,
-            selection: {
-                start: position,
-                end: position,
-                anchor: position,
-                active: position,
-                isReversed: false,
-            },
-            selections: [],
-        };
-        let result = await handler?.executeCommand(command, [argument]);
-        expect(result).toBeDefined();
-        expect(result).toEqual(expected);
+    test.each(EditorCommands.map((item) => ("name" in item ? item : { ...item, name: "" })))(
+        "command: $command - $name",
+        async ({ command, position, expected }) => {
+            const argument: RegisterTextEditorCommandsRequest.Parameters = {
+                document: id,
+                selection: {
+                    start: position,
+                    end: position,
+                    anchor: position,
+                    active: position,
+                    isReversed: false,
+                },
+                selections: [],
+            };
+            let result = await handler?.executeCommand(command, [argument]);
+            expect(result).toBeDefined();
+            expect(result).toEqual(expected);
 
-        result = await handler?.executeCommand(command + ".console", [argument]);
-        expect(result).toEqual(expected);
-        expect(mockLock).toHaveBeenCalledTimes(1);
-    });
+            result = await handler?.executeCommand(command + ".console", [argument]);
+            expect(result).toEqual(expected);
+            expect(mockLock).toHaveBeenCalledTimes(1);
+        }
+    );
 });

@@ -17,19 +17,23 @@
 import { Mixin } from "ts-mixer";
 import { AttributeDefinition } from "../../generated/ast";
 import { DataTypeMeta } from "../KerML/data-type";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { DefinitionMeta } from "./definition";
 
 @metamodelOf(AttributeDefinition, {
     base: "Base::DataValue",
 })
 export class AttributeDefinitionMeta extends Mixin(DefinitionMeta, DataTypeMeta) {
-    constructor(node: AttributeDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AttributeDefinition>) {
+        super(id, parent);
     }
 
-    override self(): AttributeDefinition {
+    override self(): AttributeDefinition | undefined {
         return super.self() as AttributeDefinition;
+    }
+
+    override parent(): ModelContainer<AttributeDefinition> {
+        return this._parent;
     }
 }
 

@@ -1,18 +1,23 @@
-import { SelfReferenceExpression, Type } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { SelfReferenceExpression } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { InlineExpressionMeta } from "./inline-expression";
+import { TypeMeta } from "./_internal";
 
 @metamodelOf(SelfReferenceExpression)
 export class SelfReferenceExpressionMeta extends InlineExpressionMeta {
-    constructor(node: SelfReferenceExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SelfReferenceExpression>) {
+        super(id, parent);
     }
 
-    override self(): SelfReferenceExpression {
+    override self(): SelfReferenceExpression | undefined {
         return super.self() as SelfReferenceExpression;
     }
 
-    override returnType(): string | Type | undefined {
+    override parent(): ModelContainer<SelfReferenceExpression> {
+        return this._parent;
+    }
+
+    override returnType(): string | TypeMeta | undefined {
         return "KerML::Core::Feature";
     }
 }

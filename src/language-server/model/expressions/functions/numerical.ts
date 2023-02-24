@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { InvocationExpression, Element } from "../../../generated/ast";
+import { ElementMeta, InvocationExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ExpressionResult,
@@ -27,8 +27,8 @@ const PACKAGE = "NumericalFunctions";
 @functionFor(PACKAGE, "product")
 export class ProductFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);
@@ -47,8 +47,8 @@ export class ProductFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "sum")
 export class SumFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);

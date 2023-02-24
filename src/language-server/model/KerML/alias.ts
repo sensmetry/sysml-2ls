@@ -16,27 +16,30 @@
 
 import { Alias } from "../../generated/ast";
 import { Target } from "../../utils/containers";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { RelationshipMeta } from "./relationship";
-import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
+import { Exported } from "./_internal";
 
 @metamodelOf(Alias)
 export class AliasMeta extends RelationshipMeta {
     /**
      * Final alias target description
      */
-    readonly for = new Target<SysMLNodeDescription>();
+    readonly for = new Target<Exported>();
 
-    constructor(node: Alias, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<Alias>) {
+        super(elementId, parent);
     }
 
-    override self(): Alias {
+    override self(): Alias | undefined {
         return super.deref() as Alias;
     }
 
-    override reset(): void {
-        super.reset();
+    override parent(): ModelContainer<Alias> {
+        return this._parent;
+    }
+
+    override reset(_: Alias): void {
         this.for.reset();
     }
 }

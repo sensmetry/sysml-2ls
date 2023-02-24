@@ -91,5 +91,5 @@ test("features typed by aliases resolve to aliased types", async () => {
     );
 
     expect(typings).toHaveLength(1);
-    expect(sanitizeTree(typings[0].type)).toMatchObject(withQualifiedName("A"));
+    expect(sanitizeTree(typings[0].type.self())).toMatchObject(withQualifiedName("A"));
 });

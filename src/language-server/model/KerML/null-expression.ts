@@ -14,9 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { NullExpression, Type } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { NullExpression } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { InlineExpressionMeta } from "./inline-expression";
+import { TypeMeta } from "./_internal";
 
 export const ImplicitNullExpressions = {
     base: "Performances::nullEvaluations",
@@ -26,15 +27,19 @@ export const ImplicitNullExpressions = {
 
 @metamodelOf(NullExpression, ImplicitNullExpressions)
 export class NullExpressionMeta extends InlineExpressionMeta {
-    constructor(node: NullExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<NullExpression>) {
+        super(id, parent);
     }
 
-    override self(): NullExpression {
+    override self(): NullExpression | undefined {
         return super.deref() as NullExpression;
     }
 
-    override returnType(): string | Type | undefined {
+    override parent(): ModelContainer<NullExpression> {
+        return this._parent;
+    }
+
+    override returnType(): string | TypeMeta | undefined {
         return undefined;
     }
 }

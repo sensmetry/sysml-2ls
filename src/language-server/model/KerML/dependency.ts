@@ -16,16 +16,20 @@
 
 import { Dependency } from "../../generated/ast";
 import { RelationshipMeta } from "./relationship";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(Dependency)
 export class DependencyMeta extends RelationshipMeta {
-    constructor(node: Dependency, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Dependency>) {
+        super(id, parent);
     }
 
-    override self(): Dependency {
+    override self(): Dependency | undefined {
         return super.self() as Dependency;
+    }
+
+    override parent(): ModelContainer<Dependency> {
+        return this._parent;
     }
 }
 

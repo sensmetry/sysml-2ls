@@ -14,10 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { OperatorExpression, Type } from "../../generated/ast";
+import { OperatorExpression } from "../../generated/ast";
 import { OPERATOR_FUNCTIONS, typeArgument, typeOf } from "../expressions/util";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { InvocationExpressionMeta } from "./invocation-expression";
+import { TypeMeta } from "./_internal";
 
 @metamodelOf(OperatorExpression)
 export class OperatorExpressionMeta extends InvocationExpressionMeta {
@@ -26,31 +27,35 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
      */
     operator = "";
 
-    constructor(node: OperatorExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<OperatorExpression>) {
+        super(id, parent);
     }
 
     override initialize(node: OperatorExpression): void {
         if (node.operator) this.operator = `'${node.operator}'`;
     }
 
-    override self(): OperatorExpression {
+    override self(): OperatorExpression | undefined {
         return super.self() as OperatorExpression;
+    }
+
+    override parent(): ModelContainer<OperatorExpression> {
+        return this._parent;
     }
 
     override getFunction(): string | undefined {
         return OPERATOR_FUNCTIONS[this.operator];
     }
 
-    override returnType(): string | Type | undefined {
+    override returnType(): string | TypeMeta | undefined {
         if (this.operator === "'as'" || this.operator === "'meta'") {
             // cast operators should be treated as its type arguments
-            return typeArgument(this.self());
+            return typeArgument(this);
         }
         if (this.operator === "'['") {
             // TODO: indexing with a feature (like SI::mm) should probably
             // return args[1]
-            return typeOf(this.self().args[0]);
+            return typeOf(this.args[0]);
         }
         return super.returnType();
     }

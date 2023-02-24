@@ -25,7 +25,8 @@ import {
 } from "langium";
 import { CancellationToken } from "vscode-languageserver";
 import { URI, Utils } from "vscode-uri";
-import { Type, isElement, isType, Namespace } from "../../../generated/ast";
+import { Type, isElement, Namespace } from "../../../generated/ast";
+import { ElementMeta, Exported, TypeMeta } from "../../../model";
 import { streamAst } from "../../../utils/ast-util";
 import { makeScope, ScopeStream } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
@@ -152,10 +153,10 @@ export class SysMLIndexManager extends DefaultIndexManager {
      * @param document document context
      * @returns the global scope
      */
-    getGlobalScope(document?: LangiumDocument): ScopeStream {
+    getGlobalScope(document?: LangiumDocument<Namespace>): ScopeStream {
         if (document?.buildOptions?.standalone) {
             // standalone documents use their own root scope as global scope
-            return new ScopeStream([makeScope(document.parseResult.value)]);
+            return new ScopeStream([makeScope(document.parseResult.value.$meta)]);
         }
 
         let rootNamespaces: Stream<SysMLNodeDescription[]> = EMPTY_STREAM;
@@ -172,7 +173,12 @@ export class SysMLIndexManager extends DefaultIndexManager {
             // first description in the root namespace
             rootNamespaces = stream(this.simpleIndex.values());
         }
-        return new ScopeStream(rootNamespaces.map((d) => makeScope(d[0])));
+        return new ScopeStream(
+            rootNamespaces
+                .map((d) => d[0].node?.$meta)
+                .nonNullable()
+                .map((m) => makeScope(m))
+        );
     }
 
     /**
@@ -206,7 +212,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         if (description !== undefined) return description ?? undefined;
 
         let parts = qualifiedName.split("::");
-        let children: Map<string, SysMLNodeDescription> | undefined;
+        let children: Map<string, Exported<ElementMeta>> | undefined;
         const root = parts[0];
         parts = parts.slice(1);
         let candidate = cache.get(root)?.node;
@@ -230,7 +236,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
 
         // traverse the name chain
         for (const part of parts) {
-            description = children?.get(part);
+            description = children?.get(part)?.description;
             if (!description || !isElement(description.node)) break;
             children = description.node.$meta.children;
         }
@@ -260,14 +266,14 @@ export class SysMLIndexManager extends DefaultIndexManager {
      * @returns the found type or undefined otherwise
      */
     findType(
-        type: string | Type | undefined,
+        type: string | TypeMeta | undefined,
         document?: LangiumDocument,
         addDependency = false
-    ): Type | undefined {
+    ): TypeMeta | undefined {
         if (!type) return;
         if (typeof type !== "string") return type;
         const result = this.findGlobalElement(type, document, addDependency)?.node;
-        if (isType(result)) return result;
+        if (result?.$meta.is(Type)) return result.$meta;
         return;
     }
 

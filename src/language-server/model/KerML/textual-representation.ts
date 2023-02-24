@@ -16,7 +16,7 @@
 
 import { TextualRepresentation } from "../../generated/ast";
 import { TextualAnnotatingMeta } from "./textual-annotating-element";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { AnnotationMeta } from "./annotating-element";
 import { Mixin } from "ts-mixer";
 
@@ -27,16 +27,20 @@ export class TextualRepresentationMeta extends Mixin(TextualAnnotatingMeta, Anno
      */
     language = "";
 
-    constructor(node: TextualRepresentation, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<TextualRepresentation>) {
+        super(elementId, parent);
     }
 
     override initialize(node: TextualRepresentation): void {
         this.language = node.language.substring(1, node.language.length - 1);
     }
 
-    override self(): TextualRepresentation {
+    override self(): TextualRepresentation | undefined {
         return super.deref() as TextualRepresentation;
+    }
+
+    override parent(): ModelContainer<TextualRepresentation> {
+        return this._parent;
     }
 }
 

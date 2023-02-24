@@ -14,173 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    AstNode,
-    CstNode,
-    EMPTY_STREAM,
-    isAstNode,
-    Stream,
-    TreeStream,
-    TreeStreamImpl,
-} from "langium";
+import { AstNode, CstNode, TreeStream, TreeStreamImpl } from "langium";
 import { Position, Range } from "vscode-languageserver";
-import { Alias, Element, Feature, isAlias, isElement } from "../generated/ast";
-import { SpecializationKind } from "../model/enums";
-import { resolveAlias } from "../model/util";
-import { SysMLNodeDescription } from "../services/shared/workspace/ast-descriptions";
-import { AssignableKeys, DeepReadonly } from "./common";
-
-/**
- * Visibility level.
- *
- * For example, to check if an `element` is visible from protected use
- * `element.visibility <= Visibility.protected`
- */
-export const enum Visibility {
-    public = 0,
-    protected = 1,
-    private = 2,
-}
-
-export type AliasResolver = (node: Alias) => Element | undefined;
-
-export interface VisibilityOptions {
-    /**
-     * Visibility level filter
-     */
-    visibility: Visibility;
-
-    /**
-     * Number of nested scopes `visibility` applies to including the root scope
-     */
-    depth: number;
-
-    /**
-     * Next set of visibility options after depth reaches 0, defaults to public
-     * visibility
-     */
-    next?: VisibilityOptions;
-}
-
-export interface ContentsOptions {
-    imported: VisibilityOptions;
-    inherited: VisibilityOptions;
-    aliasResolver: undefined | AliasResolver;
-    visited: Set<object>;
-    specializations: Set<AstNode>;
-}
-export type PartialContentOptions = Partial<ContentsOptions>;
-
-export const DEFAULT_ALIAS_RESOLVER: AliasResolver = (node) => resolveAlias(node, isElement);
-
-export const PARENT_CONTENTS_OPTIONS: DeepReadonly<PartialContentOptions> = {
-    // private visibility by default for parent scopes
-    imported: {
-        visibility: Visibility.private,
-        depth: 1,
-    },
-    inherited: {
-        visibility: Visibility.private,
-        depth: 1,
-    },
-    aliasResolver: DEFAULT_ALIAS_RESOLVER,
-};
-
-export const CHILD_CONTENTS_OPTIONS: DeepReadonly<PartialContentOptions> = {
-    // only publicly visible contents by default
-    imported: {
-        visibility: Visibility.public,
-        depth: 0,
-    },
-    inherited: {
-        visibility: Visibility.public,
-        depth: 0,
-    },
-    aliasResolver: undefined,
-};
-
-export function resolveVisibility(opts: Partial<VisibilityOptions>): VisibilityOptions {
-    return {
-        visibility: opts.visibility ?? Visibility.public,
-        depth: opts.depth ?? 10000000,
-        next: opts.next,
-    };
-}
-
-const DEFAULT_VISIBILITY: Readonly<VisibilityOptions> = {
-    visibility: Visibility.public,
-    depth: 0,
-    next: undefined,
-};
-
-export function decrementVisibility(options: VisibilityOptions): VisibilityOptions {
-    const depth = options.depth - 1;
-    if (depth < 0) {
-        if (options.next) return resolveVisibility(options.next);
-        return DEFAULT_VISIBILITY;
-    }
-
-    return { visibility: options.visibility, depth, next: options.next };
-}
-
-export function fillContentOptions({
-    imported = DEFAULT_VISIBILITY,
-    inherited = DEFAULT_VISIBILITY,
-    aliasResolver = DEFAULT_ALIAS_RESOLVER,
-    visited = undefined,
-    specializations = undefined,
-}: PartialContentOptions = {}): ContentsOptions {
-    const cache = visited ?? new Set();
-    const specs = specializations ?? new Set();
-    return {
-        imported: resolveVisibility(imported),
-        inherited: resolveVisibility(inherited),
-        aliasResolver: aliasResolver,
-        visited: cache,
-        specializations: specs,
-    };
-}
-
-/**
- * Resolve element for contents and fill in partial options
- * @param description
- * @param opts
- * @returns
- */
-export function resolveContentInputs(
-    description: SysMLNodeDescription | AstNode,
-    opts?: PartialContentOptions
-): { element?: Element; options: ContentsOptions } {
-    const options = fillContentOptions(opts);
-    const node = isAstNode(description) ? description : description.node;
-    let resolved: Element | undefined = undefined;
-    if (node && options.aliasResolver && isAlias(node)) resolved = options.aliasResolver(node);
-    else if (isElement(node)) resolved = node;
-
-    return {
-        element: resolved,
-        options: options,
-    };
-}
-
-/**
- * Recursively collect feature redefinitions into `redefinitions`
- * @param feature Top level feature to collect redefinitions for
- * @param redefinitions
- */
-export function collectRedefinitions(feature: Feature, redefinitions: Set<object>): void {
-    const visitRedefinitions = (node: Feature): void => {
-        node.$meta.types(SpecializationKind.Redefinition).forEach((t) => {
-            // only features can be redefined
-            const f = t as Feature;
-            if (redefinitions.has(f)) return;
-            redefinitions.add(f);
-            visitRedefinitions(f);
-        });
-    };
-
-    visitRedefinitions(feature);
-}
+import { Alias, isAlias } from "../generated/ast";
+import { AliasMeta, ElementMeta, Metamodel } from "../model";
+import { AssignableKeys } from "./common";
 
 /**
  * Create a stream of all AST nodes that are directly and indirectly contained
@@ -196,46 +34,6 @@ export function streamAllContents(root: AstNode): TreeStream<AstNode> {
  */
 export function streamAst(root: AstNode): TreeStream<AstNode> {
     return new TreeStreamImpl(root, (node) => node.$children, { includeRoot: true });
-}
-
-/**
- * Create a stream of all parents to {@link root}, including the root node
- * itself
- * @param root
- * @returns
- */
-export function streamParents(root: AstNode): Stream<AstNode> {
-    return new TreeStreamImpl(
-        root,
-        (node) => {
-            return node.$container ? [node.$container] : EMPTY_STREAM;
-        },
-        { includeRoot: true }
-    );
-}
-
-export interface ScopeOptions {
-    /**
-     * Alias resolution function, i.e. a linker may want to link an alias if it
-     * is not linked yet while other services would simply follow to the alias
-     * target
-     */
-    aliasResolver?: AliasResolver;
-
-    /**
-     * Element to skip in the root namespace
-     */
-    skip?: AstNode;
-
-    /**
-     * Set of already visited/resolved AST nodes
-     */
-    visited?: Set<AstNode>;
-
-    /**
-     * Skip parent scopes
-     */
-    skipParents?: boolean;
 }
 
 /**
@@ -297,4 +95,46 @@ export function compareRanges(lhs?: Range, rhs?: Range): number {
  */
 export function linesDiff(a: CstNode, b: CstNode): number {
     return b.range.start.line - a.range.end.line;
+}
+
+/**
+ * Follow through alias to get a node matching `fn` predicate
+ * @param node Alias or AstNode
+ * @param fn type predicate
+ * @returns node for which `fn` returns true or undefined otherwise
+ */
+export function resolveAlias<T extends AstNode>(
+    node: AstNode,
+    fn: (n: unknown) => n is T
+): T | undefined {
+    const target = followAstAlias(node);
+    return fn(target) ? target : undefined;
+}
+
+/**
+ * Same as `resolveAlias` but without type checking
+ * @param node
+ * @returns
+ */
+export function followAstAlias(node: AstNode | undefined): AstNode | undefined {
+    if (isAlias(node)) {
+        return node.$meta.for.target?.element.self();
+    }
+    return node;
+}
+
+export function followAlias(node: AliasMeta | undefined): ElementMeta | undefined;
+export function followAlias(node: ElementMeta | undefined): ElementMeta | undefined;
+export function followAlias(node: Metamodel | undefined): Metamodel | undefined;
+
+/**
+ * Same as `resolveAlias` but without type checking
+ * @param node
+ * @returns
+ */
+export function followAlias(node: Metamodel | undefined): Metamodel | undefined {
+    if (node?.is(Alias)) {
+        return node.for.target?.element;
+    }
+    return node;
 }

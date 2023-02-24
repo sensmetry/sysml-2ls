@@ -14,15 +14,25 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode } from "langium";
-import * as ast from "../../generated/ast";
+import {
+    Argument,
+    Expression,
+    FeatureReferenceExpression,
+    InlineExpression,
+    LiteralExpression,
+    MetadataFeature,
+    OperatorExpression,
+    Type,
+} from "../../generated/ast";
+import * as meta from "../KerML";
+import { isMetamodel } from "../metamodel";
 import { concatNames } from "../naming";
 
 // TODO: we may need to add a range generator type as well for extent
 // expressions, generating a large extent upfront may crash the server otherwise
-export type ExpressionResult = AstNode | number | boolean | string;
-export type ExpressionLike = ast.InvocationExpression["args"][0];
-export type Evaluable = ast.InlineExpression | ast.ElementReference;
+export type ExpressionResult = meta.ElementMeta | number | boolean | string;
+export type ExpressionLike = meta.InvocationExpressionMeta["args"][0];
+export type Evaluable = meta.InlineExpressionMeta | meta.ElementMeta;
 
 export abstract class BuiltinFunction {
     get isModelLevelEvaluable(): boolean {
@@ -37,8 +47,8 @@ export abstract class BuiltinFunction {
      * @return result if successful evaluation, undefined otherwise
      */
     abstract call(
-        expression: ast.InvocationExpression,
-        target: ast.Element,
+        expression: meta.InvocationExpressionMeta,
+        target: meta.ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined;
 }
@@ -50,7 +60,7 @@ export interface ModelLevelExpressionEvaluator {
      * @param target evaluation context
      * @return result if successful evaluation, undefined otherwise
      */
-    evaluate(expression: Evaluable, target: ast.Element): ExpressionResult[] | undefined;
+    evaluate(expression: Evaluable, target: meta.ElementMeta): ExpressionResult[] | undefined;
 
     /**
      * Try evaluate the {@link expression} argument at {@link index}, i.e.
@@ -61,9 +71,9 @@ export interface ModelLevelExpressionEvaluator {
      * @return result if successful evaluation, undefined otherwise
      */
     evaluateArgument(
-        expression: ast.InvocationExpression,
+        expression: meta.InvocationExpressionMeta,
         index: number,
-        target: ast.Element
+        target: meta.ElementMeta
     ): ExpressionResult[] | undefined;
 
     /**
@@ -75,9 +85,9 @@ export interface ModelLevelExpressionEvaluator {
      * @return boolean if successful evaluation, undefined otherwise
      */
     asBoolean(
-        expression: ast.InvocationExpression,
+        expression: meta.InvocationExpressionMeta,
         index: number,
-        target: ast.Element
+        target: meta.ElementMeta
     ): boolean | undefined;
 
     /**
@@ -88,9 +98,9 @@ export interface ModelLevelExpressionEvaluator {
      * @return string if successful evaluation, undefined otherwise
      */
     asString(
-        expression: ast.InvocationExpression,
+        expression: meta.InvocationExpressionMeta,
         index: number,
-        target: ast.Element
+        target: meta.ElementMeta
     ): string | undefined;
 
     /**
@@ -101,9 +111,9 @@ export interface ModelLevelExpressionEvaluator {
      * @return number if successful evaluation, undefined otherwise
      */
     asNumber(
-        expression: ast.InvocationExpression,
+        expression: meta.InvocationExpressionMeta,
         index: number,
-        target: ast.Element
+        target: meta.ElementMeta
     ): number | undefined;
 
     /**
@@ -115,9 +125,9 @@ export interface ModelLevelExpressionEvaluator {
      * @return single result if successful evaluation, undefined otherwise
      */
     asArgument(
-        expression: ast.InvocationExpression,
+        expression: meta.InvocationExpressionMeta,
         index: number,
-        target: ast.Element
+        target: meta.ElementMeta
     ): ExpressionResult | undefined;
 
     /**
@@ -159,9 +169,9 @@ export function functionFor(
  * @returns the corresponding builtin function if one was registered, undefined
  * otherwise
  */
-export function builtinFunction(fn: ast.SysMLFunction | string): BuiltinFunction | undefined {
+export function builtinFunction(fn: meta.FunctionMeta | string): BuiltinFunction | undefined {
     if (typeof fn === "string") return BUILTIN_FUNCTIONS[fn];
-    return BUILTIN_FUNCTIONS[fn.$meta.qualifiedName];
+    return BUILTIN_FUNCTIONS[fn.qualifiedName];
 }
 
 /**
@@ -169,7 +179,7 @@ export function builtinFunction(fn: ast.SysMLFunction | string): BuiltinFunction
  * @returns true if corresponding builtin function exists and is model level
  * evaluable, false otherwise
  */
-export function isModelLevelEvaluable(fn: ast.SysMLFunction): boolean {
+export function isModelLevelEvaluable(fn: meta.FunctionMeta): boolean {
     return builtinFunction(fn)?.isModelLevelEvaluable === true;
 }
 
@@ -179,64 +189,64 @@ export function isModelLevelEvaluable(fn: ast.SysMLFunction): boolean {
  * @param expr owning operator expression
  * @returns type if a type parameter was found, undefined otherwise
  */
-export function typeArgument(expr: ast.OperatorExpression): ast.Type | undefined {
+export function typeArgument(expr: meta.OperatorExpressionMeta): meta.TypeMeta | undefined {
     const arg = expr.args.at(1);
-    if (ast.isTypeReference(arg)) return arg.$meta.to.target;
-    if (ast.isFeatureReferenceExpression(arg)) {
-        if (ast.isTypeReference(arg.expression)) return arg.expression.$meta.to.target;
-        if (ast.isOperatorExpression(arg.expression)) return typeArgument(arg.expression);
-    }
+    if (arg?.is(FeatureReferenceExpression)) {
+        const expr = arg.expression?.element;
+        if (expr?.is(Type)) return expr;
+        if (expr?.is(OperatorExpression)) return typeArgument(expr);
+    } else if (arg?.is(Type)) return arg;
 
     return;
 }
 
 /**
- * Check if an AST node directly or indirectly specializes a type
+ * Check if an element directly or indirectly specializes a type
  * @see {@link hasType}
- * @param node AST node to check
+ * @param node element to check
  * @param type expected type
  * @returns true if {@link node} directly or indirectly specializes {@link type}
  */
-export function isType(node: unknown, type: ast.Type): boolean {
-    if (ast.isType(node)) return node === type || node.$meta.allTypes().includes(type);
-    if (ast.isLiteralExpression(node)) {
-        return node.$meta.returnType() === type.$meta.qualifiedName;
+export function isType(node: unknown, type: meta.TypeMeta): boolean {
+    if (!isMetamodel(node)) return false;
+    if (node.is(Type)) return node === type || node.allTypes().includes(type);
+    if (node.is(LiteralExpression)) {
+        return node.returnType() === type.qualifiedName;
     }
     return false;
 }
 
 /**
- * Check if an AST node directly specializes a type
+ * Check if an element directly specializes a type
  * @see {@link isType}
- * @param node AST node to check
+ * @param node element to check
  * @param type expected type
  * @returns true if {@link node} directly specializes {@link type}
  */
-export function hasType(node: unknown, type: ast.Type): boolean {
-    if (ast.isType(node)) return node === type || node.$meta.types().includes(type);
-    if (ast.isLiteralExpression(node)) {
-        return node.$meta.returnType() === type.$meta.qualifiedName;
+export function hasType(node: unknown, type: meta.TypeMeta): boolean {
+    if (!isMetamodel(node)) return false;
+    if (node.is(Type)) return node === type || node.types().includes(type);
+    if (node.is(LiteralExpression)) {
+        return node.returnType() === type.qualifiedName;
     }
     return false;
 }
 
 /**
  * Try get the annotated metaclass element
- * @param element AST node
+ * @param element element
  * @returns the annotated element if {@link element} is metaclass feature
  * @see {@link isMetaclassFeature}
  */
-export function metaclassReferenceOf(element: AstNode): AstNode | undefined {
-    if (!ast.isMetadataFeature(element)) return;
-    return element.$meta.annotates.find(
-        (node) => ast.isElement(node) && node.$meta.metaclass === element
-    );
+export function metaclassReferenceOf(element: meta.ElementMeta): meta.ElementMeta | undefined {
+    if (!element.is(MetadataFeature)) return;
+    return element.annotates.find((node) => node.metaclass === element);
 }
 
 /**
  * @returns true if {@link element} is a metadata feature to a metaclass
  */
-export function isMetaclassFeature(element: AstNode): boolean {
+export function isMetaclassFeature(element: meta.ElementMeta): boolean {
     return metaclassReferenceOf(element) !== undefined;
 }
 
@@ -246,13 +256,15 @@ export function isMetaclassFeature(element: AstNode): boolean {
  * @returns the return type or its fully qualified name if one was inferred,
  * undefined otherwise
  */
-export function resultType(value: ExpressionResult | undefined): ast.Type | string | undefined {
+export function resultType(
+    value: ExpressionResult | undefined
+): meta.TypeMeta | string | undefined {
     if (typeof value === "boolean") return "ScalarValues::Boolean";
     if (typeof value === "string") return "ScalarValues::String";
     if (typeof value === "number")
         return Number.isInteger(value) ? "ScalarValues::Integer" : "ScalarValues::Rational";
-    if (ast.isExpression(value) || ast.isInlineExpression(value)) return value.$meta.returnType();
-    if (ast.isType(value)) return value;
+    if (value?.isAny([InlineExpression, Expression])) return value.returnType();
+    if (value?.is(Type)) return value;
     return;
 }
 
@@ -263,9 +275,11 @@ export function resultType(value: ExpressionResult | undefined): ast.Type | stri
  * @returns return type or its fully qualified name for each result type, or
  * undefined if any were not found
  */
-export function typeFor(result: ExpressionResult[] | undefined): (ast.Type | string)[] | undefined {
+export function typeFor(
+    result: ExpressionResult[] | undefined
+): (meta.TypeMeta | string)[] | undefined {
     if (!result || result.length === 0) return;
-    const types: (ast.Type | string)[] = [];
+    const types: (meta.TypeMeta | string)[] = [];
     for (const value of result) {
         const type = resultType(value);
         if (type) types.push(type);
@@ -279,8 +293,9 @@ export function typeFor(result: ExpressionResult[] | undefined): (ast.Type | str
  * @returns argument type or its fully qualified name if one was inferred,
  * undefined otherwise
  */
-export function typeOf(arg: ast.InvocationExpression["args"][0]): ast.Type | string | undefined {
-    if (ast.isTypeReference(arg)) return arg.$meta.to.target;
-    if (ast.isArgument(arg)) return arg.value.$meta.returnType();
-    return arg.$meta.returnType();
+export function typeOf(arg: ExpressionLike): meta.TypeMeta | string | undefined {
+    if (!arg) return;
+    if (arg.is(Type)) return arg;
+    if (arg.is(Argument)) return arg.value?.returnType();
+    return arg.returnType();
 }

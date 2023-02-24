@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Class } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ClassifierMeta } from "./classifier";
 
 export const ImplicitClasses = {
@@ -24,12 +24,16 @@ export const ImplicitClasses = {
 
 @metamodelOf(Class, ImplicitClasses)
 export class ClassMeta extends ClassifierMeta {
-    constructor(node: Class, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Class>) {
+        super(id, parent);
     }
 
-    override self(): Class {
+    override self(): Class | undefined {
         return super.deref() as Class;
+    }
+
+    override parent(): ModelContainer<Class> {
+        return this._parent;
     }
 }
 

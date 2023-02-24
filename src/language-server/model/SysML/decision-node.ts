@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { DecisionNode } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ControlNodeMeta } from "./control-node";
 
 @metamodelOf(DecisionNode, {
     subaction: "Actions::Action::decisions",
 })
 export class DecisionNodeMeta extends ControlNodeMeta {
-    constructor(node: DecisionNode, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<DecisionNode>) {
+        super(id, parent);
     }
 
-    override self(): DecisionNode {
+    override self(): DecisionNode | undefined {
         return super.self() as DecisionNode;
+    }
+
+    override parent(): ModelContainer<DecisionNode> {
+        return this._parent;
     }
 }
 

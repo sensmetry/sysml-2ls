@@ -379,7 +379,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                 await asyncWaitWhile(predicate, {}, token);
 
                 if (index === 0 || meta.found.at(index - 1))
-                    scope = this.scopeProvider.getElementReferenceScope(node, index);
+                    scope = this.scopeProvider.getElementReferenceScope(meta, index);
                 // failed to resolve reference so don't return any completion
                 else return;
 
@@ -395,7 +395,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                 const predicate = (): boolean => document.state < DocumentState.ComputedScopes;
                 await asyncWaitWhile(predicate, {}, token);
                 // completion for parent items
-                scope = this.scopeProvider.initialScope(node, document, property);
+                scope = this.scopeProvider.initialScope(node.$meta, document, property);
             }
 
             if (!scope) return;

@@ -15,13 +15,7 @@
  ********************************************************************************/
 
 import { formatString } from "typescript-string-operations";
-import {
-    parseKerML,
-    NO_ERRORS,
-    sanitizeTree,
-    withQualifiedName,
-    anything,
-} from "../../../../testing";
+import { parseKerML, NO_ERRORS, sanitizeTree, anything } from "../../../../testing";
 import { SpecializationKind } from "../../../model";
 import { SysMLBuildOptions } from "../../../services/shared/workspace/document-builder";
 import { Type } from "../../../generated/ast";
@@ -88,9 +82,9 @@ test.concurrent.each(TABLE)(
         const type = result.value.elements[1] as Type;
         expect(sanitizeTree(type.$meta.specializations())).toMatchObject([
             {
-                type: withQualifiedName(`${pack}::${klass}`),
+                type: { qualifiedName: `${pack}::${klass}` },
                 kind: SpecializationKind.Subclassification,
-                isImplicit: true,
+                source: "implicit",
             },
         ]);
     }
@@ -119,9 +113,9 @@ test.concurrent.each(TABLE)(
             sanitizeTree((result.value.elements[2] as Type).$meta.specializations())
         ).toMatchObject([
             {
-                type: withQualifiedName("B"),
+                type: { qualifiedName: "B" },
                 kind: SpecializationKind.Subclassification,
-                isImplicit: false,
+                source: "explicit",
             },
         ]);
     }
@@ -148,9 +142,9 @@ test.concurrent.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
         expect(sanitizeTree(result.value.features[0].$meta.specializations())).toMatchObject([
             ...anything(1),
             {
-                type: withQualifiedName(`${pack}::${feature}`),
+                type: { qualifiedName: `${pack}::${feature}` },
                 kind: SpecializationKind.Subsetting,
-                isImplicit: true,
+                source: "implicit",
             },
         ]);
     }

@@ -14,12 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, CstNode, DeepPartial, isAstNode, OperationCancelled } from "langium";
+import { AstNode, CstNode, DeepPartial, OperationCancelled } from "langium";
 import { isAbstractRule, isRuleCall } from "langium/lib/grammar/generated/ast";
 import { CancellationToken, Range } from "vscode-languageserver";
-import { isElement, isElementReference } from "../generated/ast";
+import { Element, isElement, isElementReference } from "../generated/ast";
 import { performance } from "perf_hooks";
-import { Metamodel } from "../model";
+import { isMetamodel, Metamodel } from "../model";
 import path from "path";
 
 /**
@@ -57,10 +57,10 @@ export function JSONMetaReplacer(key: string, value: unknown): unknown {
     // skip internal/implementation members
     if (key.startsWith("$") || key.startsWith("_")) return;
 
-    if (isAstNode(value)) {
-        // serialize all AST nodes as fully qualified names
-        if (isElement(value)) return value.$meta.qualifiedName;
-        return `[Node ${value.$type}]`;
+    if (key.length > 0 && isMetamodel(value)) {
+        // serialize all internal nodes
+        if (value.is(Element)) return value.qualifiedName;
+        return `[Node ${value.nodeType()}]`;
     }
 
     return value;
@@ -154,7 +154,7 @@ export function JSONreplacer(key: string, value: unknown): unknown {
     if (isElementReference(value)) {
         // serialize human readable data for references, also avoid circular
         // dependencies in AST
-        const target = value.$meta.to.target?.$meta.qualifiedName ?? null;
+        const target = value.$meta.to.target?.element.qualifiedName ?? null;
         return {
             $type: value.$type,
             $cstNode: value.$cstNode,

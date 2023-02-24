@@ -15,15 +15,15 @@
  ********************************************************************************/
 
 import { ReferenceUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { UsageMeta } from "./usage";
 
 // TODO: Redefinitions
 
 @metamodelOf(ReferenceUsage)
 export class ReferenceUsageMeta extends UsageMeta {
-    constructor(node: ReferenceUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ReferenceUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: ReferenceUsage): void {
@@ -41,8 +41,12 @@ export class ReferenceUsageMeta extends UsageMeta {
         return supertypes;
     }
 
-    override self(): ReferenceUsage {
+    override self(): ReferenceUsage | undefined {
         return super.self() as ReferenceUsage;
+    }
+
+    override parent(): ModelContainer<ReferenceUsage> {
+        return this._parent;
     }
 }
 

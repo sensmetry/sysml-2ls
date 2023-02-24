@@ -23,7 +23,7 @@ import {
     childrenNames,
 } from "../../../../testing";
 import { Redefinition, Feature, Namespace } from "../../../generated/ast";
-import { Visibility } from "../../../utils/ast-util";
+import { Visibility } from "../../../utils/scope-util";
 
 test.concurrent.each(["redefines", ":>>"])(
     "redefinition can be parsed with '%s'",

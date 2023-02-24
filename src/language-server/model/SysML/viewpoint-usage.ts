@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ViewpointUsage, isViewDefinition, isViewUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { ViewpointUsage, ViewDefinition, ViewUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { RequirementUsageMeta } from "./requirement-usage";
 
 @metamodelOf(ViewpointUsage, {
@@ -23,8 +23,8 @@ import { RequirementUsageMeta } from "./requirement-usage";
     satisfied: "Views::View::viewpointSatisfactions",
 })
 export class ViewpointUsageMeta extends RequirementUsageMeta {
-    constructor(node: ViewpointUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ViewpointUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -33,11 +33,15 @@ export class ViewpointUsageMeta extends RequirementUsageMeta {
 
     isSatisfiedViewpoint(): boolean {
         const parent = this.parent();
-        return isViewDefinition(parent) || isViewUsage(parent);
+        return parent.isAny([ViewDefinition, ViewUsage]);
     }
 
-    override self(): ViewpointUsage {
+    override self(): ViewpointUsage | undefined {
         return super.self() as ViewpointUsage;
+    }
+
+    override parent(): ModelContainer<ViewpointUsage> {
+        return this._parent;
     }
 }
 

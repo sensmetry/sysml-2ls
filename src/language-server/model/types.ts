@@ -26,12 +26,33 @@ export type TypeMap<TKey, T> = {
 
 type Keys<T> = keyof T;
 
+// non-AST types, i.e. operators and enums
+const NON_TYPES = new Set<string>([
+    "ClassificationTestOperator",
+    "EqualityOperator",
+    "FeatureDirectionKind",
+    "ImportKind",
+    "ParameterKind",
+    "PortionKind",
+    "RelationalOperator",
+    "RequirementConstraintKind",
+    "RequirementKind",
+    "StateSubactionKind",
+    "TransitionFeatureKind",
+    "TransparentElement",
+    "TriggerKind",
+    "TypeOrFeatureReference",
+    "UnaryOperator",
+    "VisibilityKind",
+]);
+
 /**
  * Utilities for constructing generic maps of type names to specific values
  */
 class TypesIndex<S = SysMLTypeList> {
     protected readonly base: AstReflection;
     protected readonly supertypes = new Map<string, Set<string>>();
+    protected readonly types: Keys<S>[];
 
     constructor() {
         this.base = new SysMlAstReflection();
@@ -46,13 +67,15 @@ class TypesIndex<S = SysMLTypeList> {
             );
             this.supertypes.set(type, new Set(supertypes));
         }
+
+        this.types = this.base.getAllTypes().filter((s) => !NON_TYPES.has(s)) as Keys<S>[];
     }
 
     /**
      * @returns names of all registered types in the grammar
      */
-    getAllTypes(): Keys<S>[] {
-        return this.base.getAllTypes() as Keys<S>[];
+    getAllTypes(): readonly Keys<S>[] {
+        return this.types;
     }
 
     /**

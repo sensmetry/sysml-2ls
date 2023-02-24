@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { IfActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { Related } from "../KerML";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(IfActionUsage, {
@@ -24,12 +25,26 @@ import { ActionUsageMeta } from "./action-usage";
     subaction: "Actions::Action::ifSubactions",
 })
 export class IfActionUsageMeta extends ActionUsageMeta {
-    constructor(node: IfActionUsage, id: ElementID) {
-        super(node, id);
+    else?: Related<ActionUsageMeta>;
+
+    constructor(id: ElementID, parent: ModelContainer<IfActionUsage>) {
+        super(id, parent);
     }
 
-    override self(): IfActionUsage {
+    override initialize(node: IfActionUsage): void {
+        if (node.else) this.else = { element: node.else.$meta };
+    }
+
+    override reset(node: IfActionUsage): void {
+        this.initialize(node);
+    }
+
+    override self(): IfActionUsage | undefined {
         return super.self() as IfActionUsage;
+    }
+
+    override parent(): ModelContainer<IfActionUsage> {
+        return this._parent;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -39,7 +54,7 @@ export class IfActionUsageMeta extends ActionUsageMeta {
     }
 
     isIfThenElse(): boolean {
-        return this.self().else !== undefined;
+        return this.else !== undefined;
     }
 }
 

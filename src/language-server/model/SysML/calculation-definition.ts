@@ -17,19 +17,23 @@
 import { Mixin } from "ts-mixer";
 import { CalculationDefinition } from "../../generated/ast";
 import { FunctionMeta } from "../KerML/function";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionDefinitionMeta } from "./action-definition";
 
 @metamodelOf(CalculationDefinition, {
     base: "Calculations::Calculation",
 })
 export class CalculationDefinitionMeta extends Mixin(ActionDefinitionMeta, FunctionMeta) {
-    constructor(node: CalculationDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<CalculationDefinition>) {
+        super(id, parent);
     }
 
-    override self(): CalculationDefinition {
+    override self(): CalculationDefinition | undefined {
         return super.self() as CalculationDefinition;
+    }
+
+    override parent(): ModelContainer<CalculationDefinition> {
+        return this._parent;
     }
 }
 

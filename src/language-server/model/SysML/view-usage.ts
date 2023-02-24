@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ViewUsage, isViewDefinition, isViewUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { ViewUsage, ViewDefinition } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PartUsageMeta } from "./part-usage";
 
 @metamodelOf(ViewUsage, {
@@ -23,8 +23,8 @@ import { PartUsageMeta } from "./part-usage";
     subview: "Views::View::subviews",
 })
 export class ViewUsageMeta extends PartUsageMeta {
-    constructor(node: ViewUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ViewUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -33,11 +33,15 @@ export class ViewUsageMeta extends PartUsageMeta {
 
     isSubview(): boolean {
         const parent = this.parent();
-        return isViewDefinition(parent) || isViewUsage(parent);
+        return parent.isAny([ViewDefinition, ViewUsage]);
     }
 
-    override self(): ViewUsage {
+    override self(): ViewUsage | undefined {
         return super.self() as ViewUsage;
+    }
+
+    override parent(): ModelContainer<ViewUsage> {
+        return this._parent;
     }
 }
 

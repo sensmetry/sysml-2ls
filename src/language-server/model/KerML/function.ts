@@ -14,11 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { BehaviorMeta } from "./behavior";
-import { SysMLFunction, Type } from "../../generated/ast";
+import { SysMLFunction } from "../../generated/ast";
 import { FunctionMixin } from "../mixins/function";
 import { Mixin } from "ts-mixer";
+import { Related, FeatureMeta, TypeMeta, castToRelated } from "./_internal";
 
 export const ImplicitFunctions = {
     base: "Performances::Evaluation",
@@ -26,24 +27,36 @@ export const ImplicitFunctions = {
 
 @metamodelOf(SysMLFunction, ImplicitFunctions)
 export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
-    constructor(node: SysMLFunction, id: ElementID) {
-        super(node, id);
+    returns: Related<FeatureMeta>[] = [];
+
+    constructor(id: ElementID, parent: ModelContainer<SysMLFunction>) {
+        super(id, parent);
     }
 
     override initialize(node: SysMLFunction): void {
-        this.result = node.result;
+        if (node.result) this.result = castToRelated(node.result.$meta);
+
+        this.returns = node.return.map((f) => ({ element: f.$meta }));
     }
 
-    override self(): SysMLFunction {
+    override reset(node: SysMLFunction): void {
+        this.initialize(node);
+    }
+
+    override self(): SysMLFunction | undefined {
         return super.deref() as SysMLFunction;
+    }
+
+    override parent(): ModelContainer<SysMLFunction> {
+        return this._parent;
     }
 
     /**
      * @returns fully qualified name or AST node of the return type of this
      * expression if one can be inferred, undefined otherwise
      */
-    returnType(): Type | string | undefined {
-        return this.getReturnType(this.self());
+    returnType(): TypeMeta | string | undefined {
+        return this.getReturnType(this);
     }
 }
 

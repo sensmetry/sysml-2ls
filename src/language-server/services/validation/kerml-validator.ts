@@ -87,15 +87,15 @@ export class KerMLValidator {
         this.validateSubsettingMultiplicities(
             feature,
             stream(feature.subsets)
-                .map((ref) => ref.$meta.to.target)
+                .map((ref) => ref.$meta.to.target?.element.self())
                 .nonNullable(),
             accept
         );
     }
 
     checkSubsettingMultiplicities(subsetting: Subsetting, accept: ValidationAcceptor): void {
-        const feature = subsetting.specific.$meta.to.target;
-        const subsetted = subsetting.general.$meta.to.target;
+        const feature = subsetting.specific.$meta.to.target?.element.self();
+        const subsetted = subsetting.general.$meta.to.target?.element.self();
         if (!feature || !subsetted) return;
         // Langium doesn't allow overriding interface properties but Subsetting always references features
         this.validateSubsettingMultiplicities(feature as Feature, [subsetted as Feature], accept);

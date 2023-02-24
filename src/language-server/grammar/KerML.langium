@@ -498,7 +498,7 @@ Invariant<visible> returns Invariant:
 InlineExpressionReference returns FeatureReferenceExpression:
     expression=InlineExpression;
 
-ConcreteConditionalExpression returns ConditionalExpression:
+ConcreteConditionalExpression returns OperatorExpression:
     operator='if' args+=NullCoalescingExpression '?' args+=InlineExpressionReference 'else' args+=InlineExpressionReference;
 ConditionalExpression returns InlineExpression:
     NullCoalescingExpression | ConcreteConditionalExpression;

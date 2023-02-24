@@ -14,22 +14,23 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Feature, FeatureReference } from "../../generated/ast";
+import { FeatureReference } from "../../generated/ast";
 import { Target } from "../../utils/containers";
 import { TypeReferenceMeta } from "./type-reference";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { Exported, FeatureMeta } from "./_internal";
 
 @metamodelOf(FeatureReference)
 export class FeatureReferenceMeta extends TypeReferenceMeta {
-    override readonly to = new Target<Feature>();
+    override readonly to = new Target<Exported<FeatureMeta>>();
 
     /**
      * Array of chain indices that should resolve to features
      */
     readonly featureIndices: number[] = [];
 
-    constructor(node: FeatureReference, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<FeatureReference>) {
+        super(id, parent);
     }
 
     override initialize(_node: FeatureReference): void {
@@ -56,8 +57,12 @@ export class FeatureReferenceMeta extends TypeReferenceMeta {
         return this.featureIndices.length > 1;
     }
 
-    override self(): FeatureReference {
+    override self(): FeatureReference | undefined {
         return super.deref() as FeatureReference;
+    }
+
+    override parent(): ModelContainer<FeatureReference> {
+        return this._parent;
     }
 }
 

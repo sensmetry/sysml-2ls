@@ -14,21 +14,28 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { MetadataAccessExpression, Type } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { MetadataAccessExpression } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { InlineExpressionMeta } from "./inline-expression";
+import { ElementMeta, TypeMeta } from "./_internal";
 
 @metamodelOf(MetadataAccessExpression)
 export class MetadataAccessExpressionMeta extends InlineExpressionMeta {
-    constructor(node: MetadataAccessExpression, id: ElementID) {
-        super(node, id);
+    reference?: ElementMeta;
+
+    constructor(id: ElementID, parent: ModelContainer<MetadataAccessExpression>) {
+        super(id, parent);
     }
 
-    override self(): MetadataAccessExpression {
+    override self(): MetadataAccessExpression | undefined {
         return super.self() as MetadataAccessExpression;
     }
 
-    override returnType(): string | Type | undefined {
+    override parent(): ModelContainer<MetadataAccessExpression> {
+        return this._parent;
+    }
+
+    override returnType(): string | TypeMeta | undefined {
         return "Metaobjects::Metaobject";
     }
 }

@@ -15,13 +15,12 @@
  ********************************************************************************/
 
 import {
-    isRenderingDefinition,
-    isRenderingUsage,
-    isViewDefinition,
-    isViewUsage,
+    RenderingDefinition,
     RenderingUsage,
+    ViewDefinition,
+    ViewUsage,
 } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PartUsageMeta } from "./part-usage";
 
 @metamodelOf(RenderingUsage, {
@@ -29,8 +28,8 @@ import { PartUsageMeta } from "./part-usage";
     subrendering: "Views::Rendering::subrenderings",
 })
 export class RenderingUsageMeta extends PartUsageMeta {
-    constructor(node: RenderingUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<RenderingUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -39,16 +38,20 @@ export class RenderingUsageMeta extends PartUsageMeta {
 
     isSubrendering(): boolean {
         const parent = this.parent();
-        return isRenderingDefinition(parent) || isRenderingUsage(parent);
+        return parent.isAny([RenderingUsage, RenderingDefinition]);
     }
 
     isRender(): boolean {
         const parent = this.parent();
-        return isViewDefinition(parent) || isViewUsage(parent);
+        return parent.isAny([ViewDefinition, ViewUsage]);
     }
 
-    override self(): RenderingUsage {
+    override self(): RenderingUsage | undefined {
         return super.self() as RenderingUsage;
+    }
+
+    override parent(): ModelContainer<RenderingUsage> {
+        return this._parent;
     }
 }
 

@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ElementID, metamodelOf } from "../metamodel";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { LiteralExpression } from "../../generated/ast";
 import { InlineExpressionMeta } from "./inline-expression";
 
@@ -26,11 +26,15 @@ export const ImplicitLiteralExpressions = {
 
 @metamodelOf(LiteralExpression, ImplicitLiteralExpressions)
 export class LiteralExpressionMeta extends InlineExpressionMeta {
-    constructor(node: LiteralExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<LiteralExpression>) {
+        super(id, parent);
     }
 
-    override self(): LiteralExpression {
+    override self(): LiteralExpression | undefined {
         return super.deref() as LiteralExpression;
+    }
+
+    override parent(): ModelContainer<LiteralExpression> {
+        return this._parent;
     }
 }

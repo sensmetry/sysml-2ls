@@ -14,19 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    ActionUsage,
-    isStateDefinition,
-    isStateUsage,
-    StateDefinition,
-    StateUsage,
-} from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { StateDefinition, StateUsage } from "../../generated/ast";
+import { Related } from "../KerML";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
-
-function isState(node: unknown): node is StateUsage | StateDefinition {
-    return isStateDefinition(node) || isStateUsage(node);
-}
 
 @metamodelOf(StateUsage, {
     base: "States::stateActions",
@@ -37,15 +28,15 @@ function isState(node: unknown): node is StateUsage | StateDefinition {
 export class StateUsageMeta extends ActionUsageMeta {
     isParallel = false;
 
-    subactions: ActionUsage[] = [];
+    subactions: Related<ActionUsageMeta>[] = [];
 
-    constructor(node: StateUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<StateUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: StateUsage): void {
         this.isParallel = node.isParallel;
-        this.subactions.push(...node.subactions);
+        this.subactions = node.subactions.map((a) => ({ element: a.$meta }));
     }
 
     override getSubactionType(): string | undefined {
@@ -56,20 +47,23 @@ export class StateUsageMeta extends ActionUsageMeta {
 
     isExclusiveState(): boolean {
         const parent = this.parent();
-        return isState(parent) && !parent.$meta.isParallel;
+        return parent.isAny([StateDefinition, StateUsage]) && !parent.isParallel;
     }
 
     isSubstate(): boolean {
-        return isState(this.parent());
+        return this.parent().isAny([StateDefinition, StateUsage]);
     }
 
-    override self(): StateUsage {
+    override self(): StateUsage | undefined {
         return super.self() as StateUsage;
     }
 
-    override reset(): void {
-        super.reset();
-        this.subactions = [...this.self().subactions];
+    override parent(): ModelContainer<StateUsage> {
+        return this._parent;
+    }
+
+    override reset(node: StateUsage): void {
+        this.initialize(node);
     }
 }
 

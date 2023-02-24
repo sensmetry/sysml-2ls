@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { CalculationUsage, isCalculationDefinition, isCalculationUsage } from "../../generated/ast";
+import { CalculationDefinition, CalculationUsage } from "../../generated/ast";
 import { ExpressionMeta } from "../KerML/expression";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(CalculationUsage, {
@@ -25,12 +25,16 @@ import { ActionUsageMeta } from "./action-usage";
     subcalculation: "Calculations::Calculation::subcalculations",
 })
 export class CalculationUsageMeta extends Mixin(ActionUsageMeta, ExpressionMeta) {
-    constructor(node: CalculationUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<CalculationUsage>) {
+        super(id, parent);
     }
 
-    override self(): CalculationUsage {
+    override self(): CalculationUsage | undefined {
         return super.self() as CalculationUsage;
+    }
+
+    override parent(): ModelContainer<CalculationUsage> {
+        return this._parent;
     }
 
     override getSubactionType(): string | undefined {
@@ -39,7 +43,7 @@ export class CalculationUsageMeta extends Mixin(ActionUsageMeta, ExpressionMeta)
 
     isSubcalculation(): boolean {
         const parent = this.parent();
-        return isCalculationDefinition(parent) || isCalculationUsage(parent);
+        return parent.isAny([CalculationUsage, CalculationDefinition]);
     }
 }
 

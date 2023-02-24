@@ -17,19 +17,23 @@
 import { Mixin } from "ts-mixer";
 import { PortDefinition } from "../../generated/ast";
 import { StructureMeta } from "../KerML/structure";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceDefinitionMeta } from "./occurrence-definition";
 
 @metamodelOf(PortDefinition, {
     base: "Ports::Port",
 })
 export class PortDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, StructureMeta) {
-    constructor(node: PortDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<PortDefinition>) {
+        super(id, parent);
     }
 
-    override self(): PortDefinition {
+    override self(): PortDefinition | undefined {
         return super.self() as PortDefinition;
+    }
+
+    override parent(): ModelContainer<PortDefinition> {
+        return this._parent;
     }
 }
 

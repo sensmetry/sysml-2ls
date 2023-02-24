@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { TextualAnnotatingElement } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { prettyAnnotationBody } from "../util";
 import { ElementMeta } from "./element";
 
@@ -26,8 +26,8 @@ export class TextualAnnotatingMeta extends ElementMeta {
      */
     body = "";
 
-    constructor(node: TextualAnnotatingElement, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<TextualAnnotatingElement>) {
+        super(elementId, parent);
     }
 
     override initialize(node: TextualAnnotatingElement): void {
@@ -35,8 +35,12 @@ export class TextualAnnotatingMeta extends ElementMeta {
         if (node.body as string | undefined) this.body = prettyAnnotationBody(node.body);
     }
 
-    override self(): TextualAnnotatingElement {
+    override self(): TextualAnnotatingElement | undefined {
         return super.deref() as TextualAnnotatingElement;
+    }
+
+    override parent(): ModelContainer<TextualAnnotatingElement> {
+        return this._parent;
     }
 }
 

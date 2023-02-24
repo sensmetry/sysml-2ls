@@ -16,18 +16,22 @@
 
 import { Mixin } from "ts-mixer";
 import { Comment } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { AnnotationMeta } from "./annotating-element";
 import { TextualAnnotatingMeta } from "./textual-annotating-element";
 
 @metamodelOf(Comment)
 export class CommentMeta extends Mixin(TextualAnnotatingMeta, AnnotationMeta) {
-    constructor(node: Comment, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Comment>) {
+        super(id, parent);
     }
 
-    override self(): Comment {
+    override self(): Comment | undefined {
         return super.deref() as Comment;
+    }
+
+    override parent(): ModelContainer<Comment> {
+        return this._parent;
     }
 }
 

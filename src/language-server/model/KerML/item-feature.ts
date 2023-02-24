@@ -16,7 +16,7 @@
 
 import { ItemFeature } from "../../generated/ast";
 import { FeatureMeta } from "./feature";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { SpecializationKind } from "../enums";
 
 export const ItemFeatureImplicits = {
@@ -25,12 +25,16 @@ export const ItemFeatureImplicits = {
 
 @metamodelOf(ItemFeature, ItemFeatureImplicits)
 export class ItemFeatureMeta extends FeatureMeta {
-    constructor(node: ItemFeature, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ItemFeature>) {
+        super(id, parent);
     }
 
-    override self(): ItemFeature {
+    override self(): ItemFeature | undefined {
         return super.deref() as ItemFeature;
+    }
+
+    override parent(): ModelContainer<ItemFeature> {
+        return this._parent;
     }
 
     override defaultSupertype(): string {

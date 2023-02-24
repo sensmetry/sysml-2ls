@@ -33,10 +33,10 @@ import {
     Comment,
     TextualRepresentation,
     OperatorExpression,
-    isType,
-    isClassifier,
-    isFeature,
-    isAlias,
+    Alias,
+    Type,
+    Classifier,
+    Feature,
 } from "../../generated/ast";
 import {
     CancellationToken,
@@ -52,7 +52,7 @@ import {
     SemanticTokensOptions,
 } from "vscode-languageserver";
 import { SysMLDefaultServices } from "../services";
-import { TypeMap, typeIndex } from "../../model";
+import { TypeMap, typeIndex, ElementMeta } from "../../model";
 import { SysMLDocumentBuilder } from "../shared/workspace/document-builder";
 
 type ReturnType = void | "prune" | undefined;
@@ -287,19 +287,19 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
      * @param node
      * @returns array of modifier names
      */
-    protected elementModifiers(node: AstNode): string[] {
+    protected elementModifiers(node: ElementMeta): string[] {
         const mods: string[] = [];
 
-        if (isType(node) && node.$meta.isAbstract) {
+        if (node.is(Type) && node.isAbstract) {
             mods.push(SysMLSemanticTokenModifiers.abstract);
         }
-        if (isClassifier(node)) {
+        if (node.is(Classifier)) {
             mods.push(SysMLSemanticTokenModifiers.definition);
         }
-        if (node.$meta?.isStandardElement) {
+        if (node.isStandardElement) {
             mods.push(SysMLSemanticTokenModifiers.defaultLibrary);
         }
-        if (isFeature(node) && node.$meta.isReadonly) {
+        if (node.is(Feature) && node.isReadonly) {
             mods.push(SysMLSemanticTokenModifiers.readonly);
         }
 
@@ -315,7 +315,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
     protected element(node: Element, acceptor: SemanticTokenAcceptor, type?: string): ReturnType {
         type ??= this.tokenMap.get(node.$type);
         if (!type) return;
-        const mods = this.elementModifiers(node);
+        const mods = this.elementModifiers(node.$meta);
 
         // this is also a declaration
         mods.push(SysMLSemanticTokenModifiers.declaration);
@@ -354,10 +354,10 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         let index = -1;
         for (const ref of node.chain) {
             ++index;
-            let target = ref.ref;
-            if (isAlias(target)) target = target.$meta.for.target?.node;
+            let target = ref.ref?.$meta;
+            if (target?.is(Alias)) target = target.for.target?.element;
             if (!target) continue;
-            const type = this.tokenMap.get(target.$type);
+            const type = this.tokenMap.get(target.nodeType());
             if (!type) continue;
             acceptor({
                 node: node,

@@ -14,10 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Classifier, Association, isAssociation } from "../../generated/ast";
+import { Association } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { ClassifierMeta } from "./classifier";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { stream } from "langium";
 
 export const ImplicitAssociations = {
@@ -31,11 +31,11 @@ export class AssociationMeta extends ClassifierMeta {
     private localEnds: number | undefined = undefined;
     private baseEnds: number | undefined = undefined;
 
-    constructor(node: Association, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<Association>) {
+        super(elementId, parent);
     }
 
-    protected override setupClassifiers(_: Classifier): void {
+    protected override setupClassifiers(): void {
         this.classifier = TypeClassifier.Association;
     }
 
@@ -43,12 +43,15 @@ export class AssociationMeta extends ClassifierMeta {
         return this.isBinary() ? "binary" : "base";
     }
 
-    override self(): Association {
+    override self(): Association | undefined {
         return super.deref() as Association;
     }
 
-    override reset(): void {
-        super.reset();
+    override parent(): ModelContainer<Association> {
+        return this._parent;
+    }
+
+    override reset(_: Association): void {
         this.localEnds = undefined;
         this.baseEnds = undefined;
     }
@@ -58,8 +61,8 @@ export class AssociationMeta extends ClassifierMeta {
      */
     inheritedEnds(): number {
         if (this.baseEnds === undefined) {
-            this.baseEnds = this.typesMatching(isAssociation).reduce((count, assoc) => {
-                return Math.max(count, assoc.$meta.totalEnds());
+            this.baseEnds = this.typesMatching(Association).reduce((count, assoc) => {
+                return Math.max(count, assoc.totalEnds());
             }, 0);
         }
 
@@ -72,7 +75,7 @@ export class AssociationMeta extends ClassifierMeta {
     ownedEnds(): number {
         if (this.localEnds === undefined) {
             this.localEnds = stream(this.features)
-                .filter((f) => f.$meta.isEnd)
+                .filter((f) => f.element.isEnd)
                 .count();
         }
 

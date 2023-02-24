@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ConcernUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { RequirementUsageMeta } from "./requirement-usage";
 
 @metamodelOf(ConcernUsage, {
@@ -23,12 +23,16 @@ import { RequirementUsageMeta } from "./requirement-usage";
     subrequirement: "Requirements::RequirementCheck::concerns",
 })
 export class ConcernUsageMeta extends RequirementUsageMeta {
-    constructor(node: ConcernUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ConcernUsage>) {
+        super(id, parent);
     }
 
-    override self(): ConcernUsage {
+    override self(): ConcernUsage | undefined {
         return super.self() as ConcernUsage;
+    }
+
+    override parent(): ModelContainer<ConcernUsage> {
+        return this._parent;
     }
 }
 

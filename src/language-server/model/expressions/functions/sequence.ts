@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Element, InvocationExpression } from "../../../generated/ast";
+import { ElementMeta, InvocationExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ExpressionResult,
@@ -27,8 +27,8 @@ const PACKAGE = "SequenceFunctions";
 @functionFor(PACKAGE, "includes")
 export class IncludesFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);
@@ -41,8 +41,8 @@ export class IncludesFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "isEmpty")
 export class IsEmptyFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);
@@ -54,8 +54,8 @@ export class IsEmptyFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "notEmpty")
 export class NotEmptyFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);
@@ -67,8 +67,8 @@ export class NotEmptyFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "size")
 export class SizeFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);

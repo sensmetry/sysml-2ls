@@ -14,30 +14,30 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode } from "langium";
 import { Annotation, isTextualRepresentation } from "../../generated/ast";
-import { metamodelOf, BasicMetamodel, ElementID } from "../metamodel";
+import { metamodelOf, BasicMetamodel, ElementID, ModelContainer } from "../metamodel";
+import { ElementMeta } from "./_internal";
 
 @metamodelOf(Annotation)
 export class AnnotationMeta extends BasicMetamodel<Annotation> {
-    readonly annotates: AstNode[] = [];
+    readonly annotates: ElementMeta[] = [];
 
-    constructor(node: Annotation, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Annotation>) {
+        super(id, parent);
     }
 
     override initialize(node: Annotation): void {
         if (isTextualRepresentation(node) || node.about.length === 0) {
-            this.annotates.push(node.$container);
+            this.annotates.push(node.$container.$meta);
         }
     }
 
-    override reset(): void {
+    override reset(node: Annotation): void {
         this.annotates.length = 0;
-        this.initialize(this.self());
+        this.initialize(node);
     }
 
-    override self(): Annotation {
+    override self(): Annotation | undefined {
         return super.self() as Annotation;
     }
 }

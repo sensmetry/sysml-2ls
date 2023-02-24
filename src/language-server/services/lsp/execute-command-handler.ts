@@ -28,15 +28,21 @@ import { CancellationToken, Connection } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import { UriComponents } from "vscode-uri/lib/umd/uri";
 import {
+    Element,
+    Feature,
+    FeatureValue,
+    InlineExpression,
     isElement,
-    isFeature,
-    isFeatureValue,
-    isInlineExpression,
-    isType,
+    Type,
 } from "../../generated/ast";
 import { JSONMetaReplacer, JSONreplacer, toJSON } from "../../utils/common";
 import { SysMLSharedServices } from "../services";
-import { getSpecializationKindString, SpecializationKind } from "../../model";
+import {
+    FeatureMeta,
+    getSpecializationKindString,
+    Metamodel,
+    SpecializationKind,
+} from "../../model";
 import { RegisterTextEditorCommandsRequest } from "../../../common/protocol-extensions";
 import { makeLinkingScope } from "../../utils/scopes";
 
@@ -239,15 +245,13 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
     ): string[] {
-        const node = this.findCursorNode(editor);
-        if (!isType(node)) return [];
-        return node.$meta
+        const node = this.findCursorNode(editor)?.$meta;
+        if (!node?.is(Type)) return [];
+        return node
             .allSpecializations(SpecializationKind.None, true)
             .map(
                 (s) =>
-                    `${s.type.$meta.qualifiedName} (${getSpecializationKindString(
-                        s.kind
-                    )}, implicit: ${s.isImplicit})`
+                    `${s.type.qualifiedName} (${getSpecializationKindString(s.kind)}, ${s.source})`
             )
             .toArray();
     }
@@ -261,8 +265,8 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
     ): string[] {
-        const node = this.findCursorNode(editor);
-        if (!isElement(node)) return [];
+        const node = this.findCursorNode(editor)?.$meta;
+        if (!node?.is(Element)) return [];
         // also return private children
         return makeLinkingScope(node, { skipParents: true })
             .getAllElements()
@@ -279,12 +283,12 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
     ): string[] {
-        const node = this.findCursorNode(editor);
-        if (!isElement(node)) return [];
+        const node = this.findCursorNode(editor)?.$meta;
+        if (!node?.is(Element)) return [];
         // also return private children
         return makeLinkingScope(node)
-            .getAllElements()
-            .map((d) => `${d.name} [${isElement(d.node) ? d.node.$meta.qualifiedName : ""}]`)
+            .getAllExportedElements()
+            .map((d) => `${d.name} [${d.element.qualifiedName}]`)
             .toArray();
     }
 
@@ -298,16 +302,21 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
     ): unknown | undefined {
-        const node = this.findCursorNode(editor);
+        const node = this.findCursorNode(editor)?.$meta;
+        if (!node) return;
         const evaluator = this.shared.modelLevelExpressionEvaluator;
-        if (isFeature(node)) {
+        if (node.is(Feature)) {
             if (node.value)
-                return toJSON(evaluator.evaluate(node.value.expression, node), JSONreplacer);
-        } else if (isFeatureValue(node)) {
-            return toJSON(evaluator.evaluate(node.expression, node.$container), JSONreplacer);
-        } else if (isInlineExpression(node)) {
-            let parent: AstNode | undefined = node.$container;
-            while (parent && !isElement(parent)) parent = parent.$container;
+                return toJSON(evaluator.evaluate(node.value.element, node), JSONreplacer);
+        } else if (node.is(FeatureValue)) {
+            if (!node.element) return;
+            return toJSON(
+                evaluator.evaluate(node.element, node.parent() as FeatureMeta),
+                JSONreplacer
+            );
+        } else if (node.is(InlineExpression)) {
+            let parent: Metamodel | undefined = node.parent();
+            while (parent && !parent.is(Element)) parent = parent.parent();
             if (parent) return toJSON(evaluator.evaluate(node, parent), JSONreplacer);
         }
         return;

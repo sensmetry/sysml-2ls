@@ -41,20 +41,23 @@ import {
     InvocationExpression,
     isAlias,
     isElement,
+    MetadataAccessExpression,
+    NamedArgument,
     Namespace,
     SysMlAstType,
 } from "../../generated/ast";
-import { isImportable, resolveAlias } from "../../model/util";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLScopeProvider } from "./scope-provider";
 import { SysMLError } from "../sysml-validation";
-import { AliasResolver } from "../../utils/ast-util";
 import { SysMLDefaultServices } from "../services";
 import { LinkedReferenceInfo, MetamodelBuilder } from "../shared/workspace/metamodel-builder";
 import { TypeMap, typeIndex } from "../../model/types";
 import { sanitizeName } from "../../model/naming";
 import { SysMLConfigurationProvider } from "../shared/workspace/configuration-provider";
 import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
+import { AliasMeta, ElementMeta, TypeMeta } from "../../model";
+import { AliasResolver, isVisibleWith, Visibility } from "../../utils/scope-util";
+import { followAlias } from "../../utils/ast-util";
 
 /**
  * Reference used by SysML services that makes use of knowing that only Elements can be referenced
@@ -87,7 +90,7 @@ export interface SysMLReferenceInfo extends ReferenceInfo {
     reference: SysMLReference<Element>;
 }
 
-type LinkFunction<T = AstNode> = (node: T, document: LangiumDocument) => Element | undefined;
+type LinkFunction<T = AstNode> = (node: T, document: LangiumDocument) => ElementMeta | undefined;
 type LinkMap = { [K in keyof SysMlAstType]?: LinkFunction<SysMlAstType[K]> };
 
 /**
@@ -106,11 +109,6 @@ export class SysMLLinker extends DefaultLinker {
     protected readonly importErrors = new MultiMap<LangiumDocument, SysMLError>();
 
     /**
-     * Map of document import dependencies
-     */
-    protected readonly importedDocs: MultiMap<string, string> = new MultiMap<string, string>();
-
-    /**
      * Map of AST node types to specific link functions as link order may be
      * important
      */
@@ -124,12 +122,17 @@ export class SysMLLinker extends DefaultLinker {
         this.metamodelBuilder = services.shared.workspace.MetamodelBuilder;
         this.config = services.shared.workspace.ConfigurationProvider;
 
-        this.linkFunctions = typeIndex.expandToDerivedTypes({
+        const linkers: LinkMap = {
             ElementReference: this.linkReference,
             FeatureChainExpression: this.linkFeatureChainExpression,
             InvocationExpression: this.linkInvocationExpression,
             FeatureReferenceExpression: this.linkFeatureReferenceExpression,
-        } as LinkMap as TypeMap<SysMlAstType, LinkFunction>);
+            MetadataAccessExpression: this.linkMetadataAccessExpression,
+            NamedArgument: this.namedArgument,
+        };
+        this.linkFunctions = typeIndex.expandToDerivedTypes(
+            linkers as TypeMap<SysMlAstType, LinkFunction>
+        );
     }
 
     override async link(
@@ -155,7 +158,7 @@ export class SysMLLinker extends DefaultLinker {
      * @param doc document that contains {@link node}
      * @returns the linked element or undefined
      */
-    linkNode(node: AstNode, doc: LangiumDocument): Element | undefined {
+    linkNode(node: AstNode, doc: LangiumDocument): ElementMeta | undefined {
         const linker = this.linkFunctions.get(node.$type);
         return linker?.call(this, node, doc);
     }
@@ -167,22 +170,22 @@ export class SysMLLinker extends DefaultLinker {
      */
     resolveImports(node: Namespace, document: LangiumDocument): void {
         if (!node.$meta.imports) return; // nothing to import
-        const path = document.uri.toString();
 
         let index = -1;
         for (const imp of node.$meta.imports) {
             ++index;
-            if (!imp.importedNamespace) continue; // nothing imported
+            const impNode = imp.self();
+            if (!impNode || !impNode.importedNamespace) continue; // nothing imported
 
             // link reference before accessing it
-            const imported = this.linkReference(imp.importedNamespace, document);
-            const reference = imp.importedNamespace.chain.at(-1) as SysMLReference | undefined;
+            const imported = this.linkReference(impNode.importedNamespace, document);
+            const reference = impNode.importedNamespace.chain.at(-1) as SysMLReference | undefined;
             if (!reference || !imported) continue;
             const importDescription = reference.$nodeDescription;
             if (!importDescription) continue; // could not resolve the reference
 
             // make sure that referenced element is visible for imports
-            if (!isImportable(imported)) {
+            if (!isVisibleWith(imported.visibility, Visibility.public)) {
                 this.setLinkerError(
                     reference as NonNullReference<Element>,
                     `Cannot import a hidden Namespace named ${reference?.$refText}`
@@ -190,27 +193,23 @@ export class SysMLLinker extends DefaultLinker {
                 continue;
             }
 
-            try {
-                const importedDoc = getDocument(imported);
-                if (importedDoc != document)
-                    this.importedDocs.add(path, getDocument(imported).uri.toString());
-            } catch (Error) {
-                // no document, maybe constructed in memory? doesn't affect us
-            }
+            imp.importDescription.set({
+                element: imported,
+                name: importDescription.name,
+                description: importDescription,
+            });
 
-            imp.$meta.importDescription.set(importDescription);
-
-            if (imp.$meta.kind !== "specific") {
+            if (imp.kind !== "specific") {
                 // check that wildcard imports are valid
-                const namespace = resolveAlias(imported, isElement);
+                const namespace = imported.is(Alias) ? imported.for.target?.element : imported;
                 if (!namespace) {
                     this.importErrors.add(document, {
                         // `namespace` is undefined only if `imported` has been
                         // successfully resolved to an alias
                         message: `Could not find Namespace referenced by ${
-                            imp.importedNamespace.$meta.text ?? reference?.$refText
+                            impNode.importedNamespace.$meta.text ?? reference?.$refText
                         }`,
-                        node: imp,
+                        node: impNode,
                         property: "importedNamespace",
                         index: index,
                     });
@@ -238,7 +237,7 @@ export class SysMLLinker extends DefaultLinker {
     /**
      * extra member to detect alias chains
      */
-    private readonly visitedAliases = new Set<Alias>();
+    private readonly visitedAliases = new Set<AliasMeta>();
 
     /**
      * Recursively link alias references, only useful when resolving imports and
@@ -250,14 +249,14 @@ export class SysMLLinker extends DefaultLinker {
      * @param node {@link Alias} node to link
      * @returns the final element of {@link Alias} chain or undefined
      */
-    linkAlias(node: Alias, document: LangiumDocument): Element | undefined {
+    linkAlias(node: Alias, document: LangiumDocument): ElementMeta | undefined {
         const meta = node.$meta;
 
         // TODO: surface alias cycles as diagnostics
-        if (meta.for.cached || this.visitedAliases.has(node)) return meta.for.target?.node;
+        if (meta.for.cached || this.visitedAliases.has(meta)) return meta.for.target?.element;
 
         const root = this.visitedAliases.size === 0;
-        this.visitedAliases.add(node);
+        this.visitedAliases.add(meta);
 
         this.linkReference(node.for, document);
 
@@ -265,12 +264,20 @@ export class SysMLLinker extends DefaultLinker {
         while (isAlias(description?.node)) {
             description = description?.node.for.chain.at(-1)?.$nodeDescription;
         }
-        node.$meta.for.set(description as SysMLNodeDescription);
+        node.$meta.for.set(
+            description?.node
+                ? {
+                      element: description.node.$meta as ElementMeta,
+                      name: description.name,
+                      description: description as SysMLNodeDescription,
+                  }
+                : undefined
+        );
         if (root) {
             this.visitedAliases.clear();
         }
 
-        return description?.node as Element | undefined;
+        return description?.node?.$meta as ElementMeta | undefined;
     }
 
     /**
@@ -279,10 +286,10 @@ export class SysMLLinker extends DefaultLinker {
      * @param document document that owns {@link ref}
      * @returns final reference of {@link ref} with aliases resolved or undefined
      */
-    linkReference(ref: ElementReference, document: LangiumDocument): Element | undefined {
+    linkReference(ref: ElementReference, document: LangiumDocument): ElementMeta | undefined {
         const to = ref.$meta.to;
         // check if already linked
-        if (to.cached) return to.target;
+        if (to.cached) return to.target?.element;
 
         let index = 0;
         for (const type of ref.chain) {
@@ -300,7 +307,7 @@ export class SysMLLinker extends DefaultLinker {
             if (!type.ref) return undefined;
         }
 
-        return to.target;
+        return to.target?.element;
     }
 
     /**
@@ -309,14 +316,14 @@ export class SysMLLinker extends DefaultLinker {
     protected linkFeatureChainExpression(
         expr: FeatureChainExpression,
         document: LangiumDocument
-    ): Element | undefined {
+    ): ElementMeta | undefined {
         const to = expr.$meta.right;
         if (to.cached) return to.target;
 
-        this.linkNode(expr.args[0], document);
-        const right = this.linkNode(expr.args[1], document);
-        to.set(right);
-        return right;
+        this.linkInvocationExpression(expr, document);
+        const target = expr.$meta.args.at(-1);
+        to.set(target?.is(Element) ? target : undefined);
+        return to.target;
     }
 
     /**
@@ -326,9 +333,19 @@ export class SysMLLinker extends DefaultLinker {
     protected linkInvocationExpression(
         expr: InvocationExpression,
         document: LangiumDocument
-    ): Element | undefined {
-        if (expr.type) return this.linkReference(expr.type, document);
-        for (const arg of expr.args) this.linkNode(arg, document);
+    ): ElementMeta | undefined {
+        if (expr.type) {
+            expr.$meta.type = this.linkReference(expr.type, document) as TypeMeta | undefined;
+        }
+
+        const meta = expr.$meta;
+        meta.args.length = expr.args.length;
+        expr.args.forEach((arg, i) => {
+            this.linkNode(arg, document);
+            const argMeta = arg.$meta;
+            meta.args[i] = argMeta.is(ElementReference) ? argMeta.to.target?.element : argMeta;
+        });
+
         return;
     }
 
@@ -339,15 +356,28 @@ export class SysMLLinker extends DefaultLinker {
     protected linkFeatureReferenceExpression(
         expr: FeatureReferenceExpression,
         document: LangiumDocument
-    ): Element | undefined {
+    ): ElementMeta | undefined {
         return this.linkNode(expr.expression, document);
+    }
+
+    protected linkMetadataAccessExpression(
+        expr: MetadataAccessExpression,
+        document: LangiumDocument
+    ): ElementMeta | undefined {
+        const target = this.linkReference(expr.reference, document);
+        expr.$meta.reference = target;
+        return target;
+    }
+
+    protected namedArgument(arg: NamedArgument, doc: LangiumDocument): ElementMeta | undefined {
+        return this.linkReference(arg.name, doc);
     }
 
     /**
      * @see {@link getCandidate}
      */
     getCandidateImp(refInfo: SysMLReferenceInfo): SysMLNodeDescription | LinkingError {
-        const container = refInfo.container;
+        const container = refInfo.container.$meta;
 
         // check parent scopes in the same document first
         const index = refInfo.index ?? 0;
@@ -378,17 +408,19 @@ export class SysMLLinker extends DefaultLinker {
             const alias = this.loadAstNode(description) as Alias | undefined;
             if (alias) {
                 const aliased = this.linkAlias(alias, getDocument(alias));
-                if (aliased) foundType = aliased.$type;
+                if (aliased) foundType = aliased.nodeType();
                 else foundType = referenceType; // alias failed to link, leave error on it
 
-                container.$meta.found[index] = aliased;
+                container.found[index] = aliased;
             } else {
                 foundType = Alias;
             }
         } else {
             // not an alias
             foundType = description.type;
-            container.$meta.found[index] = this.loadAstNode(description) as Element | undefined;
+            container.found[index] = this.loadAstNode(description)?.$meta as
+                | ElementMeta
+                | undefined;
         }
 
         if (this.reflection.isSubtype(foundType, referenceType)) return description;
@@ -441,7 +473,7 @@ export class SysMLLinker extends DefaultLinker {
         if (!this.config.get().debug.scopeInLinkingErrors) return error;
 
         const scope = this.scopeProvider.getElementReferenceScope(
-            refInfo.container,
+            refInfo.container.$meta,
             refInfo.index,
             this.getAliasResolver()
         );
@@ -463,15 +495,24 @@ export class SysMLLinker extends DefaultLinker {
 
         const ref = refInfo.container;
         const index = refInfo.index;
-        let resolved = refInfo.reference.ref;
+        let resolved = refInfo.reference.ref?.$meta;
 
         if (index === ref.chain.length - 1) {
             // last element in the chain
-            if (isAlias(resolved)) {
-                resolved = this.linkAlias(resolved, getDocument(resolved));
+            if (resolved?.is(Alias)) {
+                const ast = resolved.self();
+                resolved = ast ? this.linkAlias(ast, getDocument(ast)) : followAlias(resolved);
             }
 
-            ref.$meta.to.set(resolved);
+            ref.$meta.to.set(
+                resolved
+                    ? {
+                          element: resolved,
+                          name: refInfo.reference.$refText,
+                          description: refInfo.reference.$nodeDescription,
+                      }
+                    : undefined
+            );
             if (resolved) {
                 this.metamodelBuilder.onLinkedReference(
                     ref,
@@ -495,10 +536,11 @@ export class SysMLLinker extends DefaultLinker {
 
     protected getAliasResolver(): AliasResolver {
         return (n) => {
-            if (this.visitedAliases.has(n)) {
-                return n.for.$meta.to.target;
+            const node = n.self();
+            if (!node || this.visitedAliases.has(n)) {
+                return n.for.target?.element;
             }
-            return this.linkAlias(n, getDocument(n));
+            return this.linkAlias(node, getDocument(node));
         };
     }
 
@@ -597,7 +639,7 @@ export class SysMLLinker extends DefaultLinker {
         // also have to reset the resolved metamodels since they mostly depend
         // on the resolved references
         this.indexManager.stream(document).forEach((node) => {
-            node.$meta?.reset();
+            node.$meta?.resetToAst(node);
             if (!isElement(node)) return;
 
             // the computed children may have also been reset completely, add
@@ -605,8 +647,27 @@ export class SysMLLinker extends DefaultLinker {
             const children = document.precomputedScopes?.get(node) as
                 | MultiMap<AstNode, SysMLNodeDescription>
                 | undefined;
-            children?.forEach((child) => node.$meta.children.set(child.name, child));
+            children?.forEach((child) => {
+                const meta = child.node?.$meta;
+                if (!meta) return;
+                node.$meta.children.set(child.name, {
+                    element: meta,
+                    description: child,
+                    name: child.name,
+                });
+            });
         });
         super.unlink(document);
+    }
+
+    protected override loadAstNode(nodeDescription: AstNodeDescription): AstNode | undefined {
+        const node = super.loadAstNode(nodeDescription);
+        if (node && !nodeDescription.node)
+            this.metamodelBuilder.preLink(
+                node,
+                this.langiumDocuments().getOrCreateDocument(nodeDescription.documentUri),
+                CancellationToken.None
+            );
+        return node;
     }
 }

@@ -14,24 +14,29 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { InlineExpression, Type } from "../../generated/ast";
-import { BasicMetamodel, ElementID, metamodelOf } from "../metamodel";
+import { InlineExpression } from "../../generated/ast";
+import { BasicMetamodel, ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { TypeMeta } from "./_internal";
 
 @metamodelOf(InlineExpression)
 export class InlineExpressionMeta extends BasicMetamodel<InlineExpression> {
-    constructor(node: InlineExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<InlineExpression>) {
+        super(id, parent);
     }
 
-    override self(): InlineExpression {
+    override self(): InlineExpression | undefined {
         return super.deref() as InlineExpression;
+    }
+
+    override parent(): ModelContainer<InlineExpression> {
+        return this._parent;
     }
 
     /**
      * @returns fully qualified name or AST node of the return type of this
      * expression if one can be inferred, undefined otherwise
      */
-    returnType(): Type | string | undefined {
+    returnType(): TypeMeta | string | undefined {
         return;
     }
 }

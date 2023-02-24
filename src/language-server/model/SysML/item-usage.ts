@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { isItemDefinition, isItemUsage, ItemUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { ItemDefinition, ItemUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(ItemUsage, {
@@ -23,8 +23,8 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     subitem: "Items::Item::subitems",
 })
 export class ItemUsageMeta extends OccurrenceUsageMeta {
-    constructor(node: ItemUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ItemUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -38,11 +38,15 @@ export class ItemUsageMeta extends OccurrenceUsageMeta {
     protected isSubitem(): boolean {
         if (!this.isComposite) return false;
         const parent = this.parent();
-        return isItemDefinition(parent) || isItemUsage(parent);
+        return parent.isAny([ItemDefinition, ItemUsage]);
     }
 
-    override self(): ItemUsage {
+    override self(): ItemUsage | undefined {
         return super.self() as ItemUsage;
+    }
+
+    override parent(): ModelContainer<ItemUsage> {
+        return this._parent;
     }
 }
 

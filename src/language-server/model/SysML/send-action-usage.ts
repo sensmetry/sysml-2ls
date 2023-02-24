@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { SendActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(SendActionUsage, {
@@ -23,12 +23,16 @@ import { ActionUsageMeta } from "./action-usage";
     subaction: "Actions::Action::sendSubactions",
 })
 export class SendActionUsageMeta extends ActionUsageMeta {
-    constructor(node: SendActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SendActionUsage>) {
+        super(id, parent);
     }
 
-    override self(): SendActionUsage {
+    override self(): SendActionUsage | undefined {
         return super.self() as SendActionUsage;
+    }
+
+    override parent(): ModelContainer<SendActionUsage> {
+        return this._parent;
     }
 }
 

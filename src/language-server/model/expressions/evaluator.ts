@@ -22,55 +22,57 @@ import {
     ModelLevelExpressionEvaluator,
     builtinFunction,
 } from "./util";
-import {
-    Element,
-    ElementReference,
-    Feature,
-    FeatureReferenceExpression,
-    InvocationExpression,
-    MetadataAccessExpression,
-    Type,
-    isArgument,
-    isElementReference,
-    isFeatureReference,
-    isFeatureReferenceExpression,
-    isInlineExpression,
-    isInvocationExpression,
-    isLiteralBoolean,
-    isLiteralInfinity,
-    isLiteralNumber,
-    isLiteralString,
-    isMetadataAccessExpression,
-    isNullExpression,
-    isType,
-    isSelfReferenceExpression,
-    isTypeReference,
-} from "../../generated/ast";
 
 // import last
 import "./functions";
 import { SpecializationKind } from "../enums";
+import {
+    ElementMeta,
+    ElementReferenceMeta,
+    FeatureMeta,
+    FeatureReferenceExpressionMeta,
+    InvocationExpressionMeta,
+    MetadataAccessExpressionMeta,
+    TypeMeta,
+} from "../KerML";
+import {
+    Argument,
+    ElementReference,
+    FeatureReference,
+    FeatureReferenceExpression,
+    InlineExpression,
+    InvocationExpression,
+    LiteralBoolean,
+    LiteralInfinity,
+    LiteralNumber,
+    LiteralString,
+    MetadataAccessExpression,
+    NullExpression,
+    SelfReferenceExpression,
+    Type,
+    TypeReference,
+} from "../../generated/ast";
 
 export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
-    evaluate(expression: Evaluable, target: Element): ExpressionResult[] | undefined {
+    evaluate(expression: Evaluable, target: ElementMeta): ExpressionResult[] | undefined {
         // TODO: lookup table
-        if (isNullExpression(expression)) return [];
-        if (isLiteralBoolean(expression)) return [expression.value];
-        if (isLiteralNumber(expression)) return [expression.value];
-        if (isLiteralString(expression)) return [expression.$meta.value];
-        if (isLiteralInfinity(expression)) return [expression];
-        if (isSelfReferenceExpression(expression)) return [target];
+        if (expression.is(NullExpression)) return [];
+        if (expression.is(LiteralBoolean)) return [expression.value];
+        if (expression.is(LiteralNumber)) return [expression.value];
+        if (expression.is(LiteralString)) return [expression.value];
+        if (expression.is(LiteralInfinity)) return [expression];
+        if (expression.is(SelfReferenceExpression)) return [target];
 
-        if (isElementReference(expression)) {
+        if (expression.is(ElementReference)) {
             return this.evaluateReference(expression);
         }
-        if (isInvocationExpression(expression)) {
+        if (expression.is(InvocationExpression)) {
             return this.evaluateInvocation(expression, target);
         }
-        if (isFeatureReferenceExpression(expression)) {
+        if (expression.is(FeatureReferenceExpression)) {
             return this.evaluateFeatureReference(expression, target);
         }
-        if (isMetadataAccessExpression(expression)) {
+        if (expression.is(MetadataAccessExpression)) {
             return this.evaluateMetadataAccess(expression, target);
         }
 
@@ -78,39 +80,47 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     }
 
     evaluateArgument(
-        expression: InvocationExpression,
+        expression: InvocationExpressionMeta,
         index: number,
-        target: Element
+        target: ElementMeta
     ): ExpressionResult[] | undefined {
         const arg = expression.args.at(index);
         if (!arg) return undefined;
-        if (isArgument(arg)) return this.evaluate(arg.value, target);
+        if (arg.is(Argument)) return arg.value ? this.evaluate(arg.value, target) : undefined;
         return this.evaluate(arg, target);
     }
 
     asBoolean(
-        expression: InvocationExpression,
+        expression: InvocationExpressionMeta,
         index: number,
-        target: Element
+        target: ElementMeta
     ): boolean | undefined {
         const value = this.asArgument(expression, index, target);
         return typeof value === "boolean" ? value : undefined;
     }
 
-    asString(expression: InvocationExpression, index: number, target: Element): string | undefined {
+    asString(
+        expression: InvocationExpressionMeta,
+        index: number,
+        target: ElementMeta
+    ): string | undefined {
         const value = this.asArgument(expression, index, target);
         return typeof value === "string" ? value : undefined;
     }
 
-    asNumber(expression: InvocationExpression, index: number, target: Element): number | undefined {
+    asNumber(
+        expression: InvocationExpressionMeta,
+        index: number,
+        target: ElementMeta
+    ): number | undefined {
         const value = this.asArgument(expression, index, target);
         return typeof value === "number" ? value : undefined;
     }
 
     asArgument(
-        expression: InvocationExpression,
+        expression: InvocationExpressionMeta,
         index: number,
-        target: Element
+        target: ElementMeta
     ): ExpressionResult | undefined {
         const values = this.evaluateArgument(expression, index, target);
         if (values === undefined || values.length > 1) return undefined;
@@ -127,10 +137,10 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     }
 
     protected evaluateInvocation(
-        expression: InvocationExpression,
-        target: Element
+        expression: InvocationExpressionMeta,
+        target: ElementMeta
     ): ExpressionResult[] | undefined {
-        const fn = expression.$meta.getFunction();
+        const fn = expression.getFunction();
         if (!fn) return;
         const builtin = builtinFunction(fn);
         if (!builtin) return;
@@ -138,40 +148,42 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     }
 
     protected evaluateFeatureReference(
-        expression: FeatureReferenceExpression,
-        target: Element
+        expression: FeatureReferenceExpressionMeta,
+        target: ElementMeta
     ): ExpressionResult[] | undefined {
-        const referenced = expression.expression;
+        const referenced = expression.expression?.element;
         if (!referenced) return undefined;
-        const type = isType(target) ? target : undefined;
-        if (isFeatureReference(referenced)) {
-            const feature = referenced.$meta.to.target;
+        const type = target.is(Type) ? target : undefined;
+        if (referenced.is(FeatureReference)) {
+            const feature = referenced.to.target?.element;
             return type && feature ? this.evaluateFeature(feature, type) : undefined;
         }
-        if (isTypeReference(referenced)) return this.evaluateReference(referenced);
-        if (isInlineExpression(referenced)) return this.evaluate(referenced, target);
+        if (referenced.is(TypeReference)) return this.evaluateReference(referenced);
+        if (referenced.is(InlineExpression)) return this.evaluate(referenced, target);
         return type ? this.evaluateFeature(referenced, type) : undefined;
     }
 
     protected evaluateMetadataAccess(
-        expression: MetadataAccessExpression,
-        target: Element
+        expression: MetadataAccessExpressionMeta,
+        target: ElementMeta
     ): ExpressionResult[] | undefined {
-        const referenced = expression.reference.$meta.to.target;
+        const referenced = expression.reference;
         if (!referenced) return;
 
-        const meta = referenced.$meta;
-        const features = [...meta.allMetadata()];
-        if (meta.metaclass) features.push(meta.metaclass);
+        const features = [...referenced.allMetadata().map((c) => c.element)];
+        if (referenced.metaclass) features.push(referenced.metaclass);
 
         return features;
     }
 
-    protected evaluateFeature(feature: Feature, type: Type): ExpressionResult[] | undefined {
+    protected evaluateFeature(
+        feature: FeatureMeta,
+        type: TypeMeta
+    ): ExpressionResult[] | undefined {
         if (
-            feature.$meta
+            feature
                 .allTypes(SpecializationKind.None, true)
-                .some((s) => s.$meta.qualifiedName === "Base::Anything::self")
+                .some((s) => s.qualifiedName === "Base::Anything::self")
         ) {
             // TODO: pilot wraps type through feature typing if it is not a
             // feature
@@ -179,15 +191,15 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         }
         // TODO: implement feature chains
 
-        if (feature.value) {
-            return this.evaluate(feature.value.expression, type);
+        if (feature.value?.element) {
+            return this.evaluate(feature.value.element, type);
         }
 
         return [feature];
     }
 
-    protected evaluateReference(ref: ElementReference): Element[] | undefined {
-        const target = ref.$meta.to.target;
+    protected evaluateReference(ref: ElementReferenceMeta): ElementMeta[] | undefined {
+        const target = ref.to.target?.element;
         if (!target) return undefined;
         return [target];
     }

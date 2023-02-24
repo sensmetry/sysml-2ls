@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LibraryPackage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PackageMeta } from "./package";
 
 @metamodelOf(LibraryPackage)
@@ -25,16 +25,20 @@ export class LibraryPackageMeta extends PackageMeta {
      */
     isStandard = false;
 
-    constructor(node: LibraryPackage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<LibraryPackage>) {
+        super(id, parent);
     }
 
     override initialize(node: LibraryPackage): void {
         this.isStandard = node.isStandard;
     }
 
-    override self(): LibraryPackage {
+    override self(): LibraryPackage | undefined {
         return super.deref() as LibraryPackage;
+    }
+
+    override parent(): ModelContainer<LibraryPackage> {
+        return this._parent;
     }
 }
 

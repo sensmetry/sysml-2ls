@@ -14,17 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    Classifier,
-    isClass,
-    isStructure,
-    isDataType,
-    isAssociationStructure,
-    isAssociation,
-} from "../../generated/ast";
+import { Association, Class, Classifier, DataType, Structure } from "../../generated/ast";
 import { SpecializationKind, TypeClassifier } from "../enums";
 import { TypeMeta } from "./type";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 export const ImplicitClassifiers = {
     base: "Base::Anything",
@@ -32,37 +25,41 @@ export const ImplicitClassifiers = {
 
 @metamodelOf(Classifier, ImplicitClassifiers)
 export class ClassifierMeta extends TypeMeta {
-    constructor(node: Classifier, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<Classifier>) {
+        super(elementId, parent);
     }
 
-    override initialize(node: Classifier): void {
-        this.setupClassifiers(node);
+    override initialize(_node: Classifier): void {
+        this.setupClassifiers();
     }
 
-    protected setupClassifiers(node: Classifier): void {
+    protected setupClassifiers(): void {
         // if multiple of these can be true at once it means that the grammar is
         // incorrect
-        if (isStructure(node)) {
+        if (this.is(Structure)) {
             this.classifier = TypeClassifier.Structure | TypeClassifier.Class;
-            if (isAssociationStructure(node)) {
+            if (this.is(Association)) {
                 this.classifier |= TypeClassifier.Association;
             }
-        } else if (isClass(node)) {
+        } else if (this.is(Class)) {
             this.classifier = TypeClassifier.Class;
-        } else if (isDataType(node)) {
+            // @ts-expect-error broken type inference
+        } else if (this.is(DataType)) {
+            // @ts-expect-error broken type inference
             this.classifier = TypeClassifier.DataType;
-        } else if (isAssociation(node)) {
+            // @ts-expect-error broken type inference
+        } else if (this.is(Association)) {
+            // @ts-expect-error broken type inference
             this.classifier = TypeClassifier.Association;
         }
     }
 
-    override self(): Classifier {
+    override self(): Classifier | undefined {
         return super.deref() as Classifier;
     }
 
-    override reset(): void {
-        super.reset();
+    override parent(): ModelContainer<Classifier> {
+        return this._parent;
     }
 
     override specializationKind(): SpecializationKind {

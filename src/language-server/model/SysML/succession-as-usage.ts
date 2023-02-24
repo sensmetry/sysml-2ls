@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { SuccessionAsUsage } from "../../generated/ast";
 import { SuccessionMeta } from "../KerML/succession";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConnectorAsUsageMeta } from "./connector-as-usage";
 
 @metamodelOf(SuccessionAsUsage, {
@@ -25,12 +25,16 @@ import { ConnectorAsUsageMeta } from "./connector-as-usage";
     binary: "Occurrences::happensBeforeLinks",
 })
 export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, SuccessionMeta) {
-    constructor(node: SuccessionAsUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SuccessionAsUsage>) {
+        super(id, parent);
     }
 
-    override self(): SuccessionAsUsage {
+    override self(): SuccessionAsUsage | undefined {
         return super.self() as SuccessionAsUsage;
+    }
+
+    override parent(): ModelContainer<SuccessionAsUsage> {
+        return this._parent;
     }
 }
 

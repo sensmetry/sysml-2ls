@@ -17,7 +17,8 @@
 import { AstNode, AstNodeHoverProvider, getDocument, LangiumDocument, MaybePromise } from "langium";
 import { Hover, HoverParams } from "vscode-languageserver";
 import { Utils } from "vscode-uri";
-import { isAlias, isElement, isType } from "../../generated/ast";
+import { Alias, isElement, Type } from "../../generated/ast";
+import { ElementMeta } from "../../model";
 import { LanguageEvents } from "../events";
 import { SysMLDefaultServices } from "../services";
 
@@ -32,44 +33,7 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
 
     protected override getAstNodeHoverContent(node: AstNode): MaybePromise<Hover | undefined> {
         if (!isElement(node)) return;
-        let content = `#### \`${node.$meta.qualifiedName}\`
-\`${node.$type}\` in \`${Utils.basename(getDocument(node).uri)}\`  
-`;
-
-        // use docs from the first specialization that has them
-        let docs = node.$meta.docs;
-        if (docs.length === 0) {
-            if (isAlias(node)) {
-                const target = node.$meta.for.target?.node;
-                if (target) {
-                    content += `Alias for \`${target.$meta.qualifiedName}\`\n`;
-                    docs = target.$meta.docs;
-                    node = target;
-                }
-            }
-
-            if (isType(node)) {
-                for (const type of node.$meta.allTypes()) {
-                    docs = type.$meta.docs;
-                    if (docs.length > 0) break;
-                }
-            }
-        }
-
-        if (docs.length > 0) {
-            content += "\n";
-            content += docs.map((doc) => doc.$meta.body).join("\n\n");
-        }
-
-        if (content) {
-            return {
-                contents: {
-                    kind: "markdown",
-                    value: content,
-                },
-            };
-        }
-        return undefined;
+        return this.getHoverContents(node.$meta, getDocument(node));
     }
 
     override async getHoverContent(
@@ -101,5 +65,50 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
         }
 
         return hover;
+    }
+
+    protected getHoverContents(node: ElementMeta, document?: LangiumDocument): Hover | undefined {
+        let content = `#### \`${node.qualifiedName}\`
+\`${node.nodeType()}\``;
+
+        if (document) {
+            content += ` in \`${Utils.basename(document.uri)}\`  `;
+        }
+        content += "\n";
+
+        // use docs from the first specialization that has them
+        let docs = node.docs;
+        if (docs.length === 0) {
+            if (node.is(Alias)) {
+                const target = node.for.target?.element;
+                if (target) {
+                    content += `Alias for \`${target.qualifiedName}\`\n`;
+                    docs = target.docs;
+                    node = target;
+                }
+            }
+
+            if (node.is(Type)) {
+                for (const type of node.allTypes()) {
+                    docs = type.docs;
+                    if (docs.length > 0) break;
+                }
+            }
+        }
+
+        if (docs.length > 0) {
+            content += "\n";
+            content += docs.map((doc) => doc.element.body).join("\n\n");
+        }
+
+        if (content) {
+            return {
+                contents: {
+                    kind: "markdown",
+                    value: content,
+                },
+            };
+        }
+        return undefined;
     }
 }

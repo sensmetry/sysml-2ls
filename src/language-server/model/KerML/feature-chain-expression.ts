@@ -14,10 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Element, FeatureChainExpression, Type, isType } from "../../generated/ast";
+import { FeatureChainExpression, Type } from "../../generated/ast";
 import { Target } from "../../utils/containers";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OperatorExpressionMeta } from "./operator-expression";
+import { ElementMeta, TypeMeta } from "./_internal";
 
 export const ImplicitFeatureChainExpressions = {
     target: "ControlFunctions::'.'::source::target", // TODO
@@ -28,18 +29,21 @@ export class FeatureChainExpressionMeta extends OperatorExpressionMeta {
     /**
      * Resolved reference target of the right operand
      */
-    readonly right = new Target<Element>();
+    readonly right = new Target<ElementMeta>();
 
-    constructor(node: FeatureChainExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<FeatureChainExpression>) {
+        super(id, parent);
     }
 
-    override self(): FeatureChainExpression {
+    override self(): FeatureChainExpression | undefined {
         return super.deref() as FeatureChainExpression;
     }
 
-    override reset(): void {
-        super.reset();
+    override parent(): ModelContainer<FeatureChainExpression> {
+        return this._parent;
+    }
+
+    override reset(_: FeatureChainExpression): void {
         this.right.reset();
     }
 
@@ -47,9 +51,9 @@ export class FeatureChainExpressionMeta extends OperatorExpressionMeta {
         return "ControlFunctions::'.'";
     }
 
-    override returnType(): string | Type | undefined {
+    override returnType(): string | TypeMeta | undefined {
         const target = this.right.target;
-        if (isType(target)) return target;
+        if (target?.is(Type)) return target;
         return;
     }
 }

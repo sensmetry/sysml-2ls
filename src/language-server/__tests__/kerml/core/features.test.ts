@@ -25,7 +25,7 @@ import {
     sanitizeTree,
 } from "../../../../testing";
 import { Feature, MultiplicityRange, LiteralNumber, LiteralInfinity } from "../../../generated/ast";
-import { Visibility } from "../../../utils/ast-util";
+import { Visibility } from "../../../utils/scope-util";
 
 test.concurrent.each([
     "typed by A, B subsets f redefines g",

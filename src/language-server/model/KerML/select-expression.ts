@@ -15,17 +15,21 @@
  ********************************************************************************/
 
 import { SelectExpression } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OperatorExpressionMeta } from "./operator-expression";
 
 @metamodelOf(SelectExpression)
 export class SelectExpressionMeta extends OperatorExpressionMeta {
-    constructor(node: SelectExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SelectExpression>) {
+        super(id, parent);
     }
 
-    override self(): SelectExpression {
+    override self(): SelectExpression | undefined {
         return super.self() as SelectExpression;
+    }
+
+    override parent(): ModelContainer<SelectExpression> {
+        return this._parent;
     }
 
     override getFunction(): string | undefined {

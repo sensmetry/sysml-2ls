@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Succession } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConnectorMeta } from "./connector";
 
 export const ImplicitSuccessions = {
@@ -24,12 +24,16 @@ export const ImplicitSuccessions = {
 
 @metamodelOf(Succession, ImplicitSuccessions)
 export class SuccessionMeta extends ConnectorMeta {
-    constructor(node: Succession, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Succession>) {
+        super(id, parent);
     }
 
-    override self(): Succession {
+    override self(): Succession | undefined {
         return super.deref() as Succession;
+    }
+
+    override parent(): ModelContainer<Succession> {
+        return this._parent;
     }
 }
 

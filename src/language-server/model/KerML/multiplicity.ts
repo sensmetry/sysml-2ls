@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { isClassifier, isFeature, Multiplicity } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { Classifier, Feature, Multiplicity } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { FeatureMeta } from "./feature";
 
 export const ImplicitMultiplicities = {
@@ -26,18 +26,22 @@ export const ImplicitMultiplicities = {
 
 @metamodelOf(Multiplicity, ImplicitMultiplicities)
 export class MultiplicityMeta extends FeatureMeta {
-    constructor(node: Multiplicity, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Multiplicity>) {
+        super(id, parent);
     }
 
-    override self(): Multiplicity {
+    override self(): Multiplicity | undefined {
         return super.deref() as Multiplicity;
     }
 
+    override parent(): ModelContainer<Multiplicity> {
+        return this._parent;
+    }
+
     override defaultSupertype(): string {
-        const owner = this.self().$container;
-        if (isClassifier(owner)) return "classifier";
-        if (isFeature(owner)) return "feature";
+        const owner = this.parent();
+        if (owner.is(Classifier)) return "classifier";
+        if (owner.is(Feature)) return "feature";
         return "base";
     }
 }
