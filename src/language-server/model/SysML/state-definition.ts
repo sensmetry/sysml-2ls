@@ -14,9 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ActionUsage, StateDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { StateDefinition } from "../../generated/ast";
+import { Related } from "../KerML";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionDefinitionMeta } from "./action-definition";
+import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(StateDefinition, {
     base: "States::StateAction",
@@ -24,24 +26,27 @@ import { ActionDefinitionMeta } from "./action-definition";
 export class StateDefinitionMeta extends ActionDefinitionMeta {
     isParallel = false;
 
-    subactions: ActionUsage[] = [];
+    subactions: Related<ActionUsageMeta>[] = [];
 
-    constructor(node: StateDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<StateDefinition>) {
+        super(id, parent);
     }
 
     override initialize(node: StateDefinition): void {
         this.isParallel = node.isParallel;
-        this.subactions.push(...node.subactions);
+        this.subactions = node.subactions.map((a) => ({ element: a.$meta }));
     }
 
-    override self(): StateDefinition {
+    override self(): StateDefinition | undefined {
         return super.self() as StateDefinition;
     }
 
-    override reset(): void {
-        super.reset();
-        this.subactions = [...this.self().subactions];
+    override parent(): ModelContainer<StateDefinition> {
+        return this._parent;
+    }
+
+    override reset(node: StateDefinition): void {
+        this.initialize(node);
     }
 }
 

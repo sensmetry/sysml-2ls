@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { AllocationDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConnectionDefinitionMeta } from "./connection-definition";
 
 @metamodelOf(AllocationDefinition, {
@@ -23,12 +23,16 @@ import { ConnectionDefinitionMeta } from "./connection-definition";
     binary: "Allocations::Allocation",
 })
 export class AllocationDefinitionMeta extends ConnectionDefinitionMeta {
-    constructor(node: AllocationDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AllocationDefinition>) {
+        super(id, parent);
     }
 
-    override self(): AllocationDefinition {
+    override self(): AllocationDefinition | undefined {
         return super.self() as AllocationDefinition;
+    }
+
+    override parent(): ModelContainer<AllocationDefinition> {
+        return this._parent;
     }
 }
 

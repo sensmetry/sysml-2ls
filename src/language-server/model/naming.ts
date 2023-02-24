@@ -18,9 +18,9 @@
 // members that match SysML keywords
 // TODO: escape special characters as in spec?
 
-import { AstNode } from "langium";
-import { isElement, isTransparentElement } from "../generated/ast";
+import { Element, TransparentElement } from "../generated/ast";
 import { ElementMeta } from "./KerML/element";
+import { Metamodel } from "./metamodel";
 
 /**
  * Sanitize a name
@@ -57,20 +57,20 @@ export function getName(meta: ElementMeta): string {
  * @param parent parent node
  * @returns Fully qualified name
  */
-export function computeQualifiedName(meta: ElementMeta, parent: AstNode | undefined): string {
+export function computeQualifiedName(meta: ElementMeta, parent: Metamodel | undefined): string {
     let name = getName(meta);
     let parentName = "";
-    while (parent?.$container) {
-        if (!isTransparentElement(parent)) {
-            if (isElement(parent)) {
-                parentName = getName(parent.$meta);
+    while (parent?.parent()) {
+        if (!parent.is(TransparentElement)) {
+            if (parent.is(Element)) {
+                parentName = getName(parent);
             } else {
-                parentName = parent.$meta?.elementId.toString() ?? "<unnamed>";
+                parentName = parent.elementId.toString() ?? "<unnamed>";
             }
 
             name = concatNames(parentName, name);
         }
-        parent = parent.$container;
+        parent = parent.parent();
     }
     return name;
 }

@@ -24,26 +24,24 @@ import {
     ReferenceInfo,
 } from "langium";
 import {
-    Element,
+    Alias,
+    ConnectorEnd,
     ElementReference,
+    Expression,
     Feature,
-    isAlias,
-    isConnectorEnd,
-    isElementReference,
-    isExpression,
-    isFeature,
-    isInlineExpression,
+    InlineExpression,
     isNamedArgument,
-    isSysMLFunction,
-    isType,
+    Namespace,
+    SysMLFunction,
     Type,
     TypeReference,
 } from "../../generated/ast";
 import {
     CHILD_CONTENTS_OPTIONS,
     collectRedefinitions,
+    ContentsOptions,
     DEFAULT_ALIAS_RESOLVER,
-} from "../../utils/ast-util";
+} from "../../utils/scope-util";
 import {
     SysMLScope,
     makeScope,
@@ -57,6 +55,8 @@ import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { MetamodelBuilder } from "../shared/workspace/metamodel-builder";
 import { CancellationToken } from "vscode-languageserver";
 import { getPreviousNode } from "../../utils/cst-util";
+import { ElementMeta, ElementReferenceMeta, Metamodel } from "../../model";
+import { SysMLType } from "../sysml-ast-reflection";
 
 type SpecializationKeys = KeysMatching<Type & Feature, Array<TypeReference>>;
 
@@ -104,9 +104,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     override getScope(context: ReferenceInfo): SysMLScope {
         const unfiltered = this.getScopeUnfiltered(context);
         const referenceType = this.reflection.getReferenceType(context);
-        return new FilteredScope(unfiltered, (desc) =>
-            this.reflection.isSubtype(desc.type, referenceType)
-        );
+        return new FilteredScope(unfiltered, (desc) => desc.element.is(referenceType as SysMLType));
     }
 
     /**
@@ -115,7 +113,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @returns Scope with all named elements
      */
     getScopeUnfiltered(context: ReferenceInfo): ScopeStream {
-        return makeLinkingScope(context.container, {}, this.indexManager.getGlobalScope());
+        return makeLinkingScope(context.container.$meta, {}, this.indexManager.getGlobalScope());
     }
 
     /**
@@ -128,7 +126,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @returns scope that can be used to resolve the reference at {@link index}
      */
     getElementReferenceScope(
-        container: ElementReference,
+        container: ElementReferenceMeta,
         index: number,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
     ): SysMLScope | ScopeStream | undefined {
@@ -144,25 +142,26 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
                 parent = context;
             } else {
                 return this.initialScope(
-                    container.$container,
-                    container.$meta.document,
-                    container.$containerProperty,
+                    container.parent(),
+                    container.document,
+                    container.self()?.$containerProperty,
                     aliasResolver
                 );
             }
         } else {
             // even if the reference was discarded due to the wrong type,
             // construct the reference resolution scope for completion provider
-            parent = container.$meta.found.at(index - 1);
+            parent = container.found.at(index - 1);
         }
 
         if (!parent) return;
 
         // not a start of the reference so it has to be resolved in the scope of
         // `parent`
+        const ast = container.self();
         return this.localScope(
             parent,
-            container.$meta.document ?? getDocument(container),
+            container.document ?? (ast ? getDocument(ast) : undefined),
             aliasResolver
         );
     }
@@ -180,58 +179,62 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * {@link ElementReference}
      */
     initialScope(
-        owner: AstNode | undefined,
+        owner: Metamodel | undefined,
         document?: LangiumDocument,
         property?: string,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
     ): ScopeStream | undefined {
-        while (isInlineExpression(owner)) {
+        while (owner?.is(InlineExpression)) {
             // unwrap all the expressions to get the real parent
-            owner = owner.$container;
+            owner = owner.parent();
         }
 
-        let redefinitions: Set<AstNode> | undefined = undefined;
-        let parent: AstNode | undefined;
-        if (isType(owner)) {
+        let redefinitions: ContentsOptions["visited"] | undefined = undefined;
+        let parent: Metamodel | undefined;
+        if (owner?.is(Type)) {
             // also skip the first scoping node as references are always a part
             // of its declaration. However SysML adds more references that are
             // not used for scope resolution therefore we only skip if the
             // reference declares a specialization
             if (property && SpecializationProperties.has(property)) {
-                parent = owner.$container;
+                parent = owner.parent();
             } else {
                 parent = owner;
             }
 
-            if (isFeature(owner)) {
+            if (owner.is(Feature)) {
                 redefinitions = new Set();
                 // collect redefinitions for hiding redefined elements
                 collectRedefinitions(owner, redefinitions);
 
                 // connector ends cannot reference connector scope
-                if (isConnectorEnd(owner)) {
-                    parent = owner.$container.$container;
+                if (owner.is(ConnectorEnd)) {
+                    parent = owner.parent().parent();
                 }
             }
-        } else if (isAlias(owner)) {
+        } else if (owner?.is(Alias)) {
             // skip the alias scope since resolution tries to follow aliases to
             // their final destination
-            parent = owner.$container;
+            parent = owner.parent();
         } else {
             parent = owner;
         }
 
         if (!parent) return;
 
-        // skipping the the owning node to avoid name resolution bugs if the
-        // node has the same name as the reference
-        try {
-            document ??= getDocument(parent);
-        } catch {
-            // doesn't matter if no document was found
+        const ast = parent.self();
+        if (ast) {
+            // skipping the the owning node to avoid name resolution bugs if the
+            // node has the same name as the reference
+            try {
+                document ??= getDocument(ast);
+            } catch {
+                // doesn't matter if no document was found
+            }
+
+            if (document) this.initializeParents(ast, document);
         }
 
-        if (document) this.initializeParents(parent, document);
         return makeLinkingScope(
             parent,
             {
@@ -243,7 +246,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
                 skip: property === "subsets" || property === "inverseOf" ? undefined : owner,
                 visited: redefinitions,
             },
-            this.indexManager.getGlobalScope(document)
+            this.indexManager.getGlobalScope(document as LangiumDocument<Namespace> | undefined)
         );
     }
 
@@ -257,11 +260,12 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @returns scope of publicly visible elements from {@link node} scope
      */
     localScope(
-        node: AstNode,
-        document: LangiumDocument,
+        node: Metamodel,
+        document?: LangiumDocument,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
     ): SysMLScope {
-        this.metamodelBuilder.preLink(node, document, CancellationToken.None);
+        const ast = node.self();
+        if (ast && document) this.metamodelBuilder.preLink(ast, document, CancellationToken.None);
         return makeScope(node, {
             ...CHILD_CONTENTS_OPTIONS,
             aliasResolver: aliasResolver,
@@ -274,11 +278,11 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @returns Element referenced by `node` if linked, `"error"` if failed to link
      * and `undefined` for no reference
      */
-    protected getElementTarget(node: AstNode): Element | undefined | "error" {
-        if (isElementReference(node)) {
-            return node.$meta.to.target ?? "error";
-        } else if (isInlineExpression(node) || isExpression(node) || isSysMLFunction(node)) {
-            const target = node.$meta.returnType();
+    protected getElementTarget(node: Metamodel): ElementMeta | undefined | "error" {
+        if (node.is(ElementReference)) {
+            return node.to.target?.element ?? "error";
+        } else if (node.isAny([InlineExpression, Expression, SysMLFunction])) {
+            const target = node.returnType();
             return this.indexManager.findType(target) ?? "error";
         }
 
@@ -291,16 +295,18 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @returns `undefined` if implicit parent context, `"error"` if context failed to
      * be linked and {@link Element} for existing context
      */
-    protected getContext(ref: ElementReference): Element | undefined | "error" {
-        const cst = ref.$cstNode;
+    protected getContext(ref: ElementReferenceMeta): ElementMeta | undefined | "error" {
+        const ast = ref.self();
+        if (!ast) return;
+        const cst = ast.$cstNode;
         if (!cst) return;
 
         // check if the previous CST node is a scope token (`::` or `.`)
         const previous = getPreviousNode(cst, false);
         if (!previous || ![".", "::"].includes(previous.text)) {
-            const owner = ref.$container;
-            if (isNamedArgument(owner) && owner.$container.type) {
-                return owner.$container.type.$meta.to.target ?? "error";
+            const owner = ast.$container;
+            if (isNamedArgument(owner)) {
+                return owner.$container.type?.$meta.to.target?.element ?? "error";
             }
             return;
         }
@@ -314,8 +320,8 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             contextCst = findLeafNodeAtOffset(contextCst, contextCst.end);
         }
         const element = contextCst?.element;
-        if (!element) return;
-        return this.getElementTarget(element);
+        if (!element?.$meta) return;
+        return this.getElementTarget(element.$meta);
     }
 
     /**

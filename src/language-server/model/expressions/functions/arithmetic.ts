@@ -16,7 +16,7 @@
 
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Element, OperatorExpression } from "../../../generated/ast";
+import { ElementMeta, OperatorExpressionMeta } from "../..";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
@@ -38,8 +38,8 @@ abstract class ArithmeticFunction extends BuiltinFunction {
     }
 
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const x = evaluator.asArgument(expression, 0, target);

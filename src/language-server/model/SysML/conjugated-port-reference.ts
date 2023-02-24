@@ -14,21 +14,27 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ConjugatedPortReference, PortDefinition } from "../../generated/ast";
+import { ConjugatedPortReference } from "../../generated/ast";
 import { Target } from "../../utils/containers";
+import { Exported } from "../KerML";
 import { ClassifierReferenceMeta } from "../KerML/classifier-reference";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { PortDefinitionMeta } from "./port-definition";
 
 @metamodelOf(ConjugatedPortReference)
 export class ConjugatedPortReferenceMeta extends ClassifierReferenceMeta {
-    override readonly to = new Target<PortDefinition>();
+    override readonly to = new Target<Exported<PortDefinitionMeta>>();
 
-    constructor(node: ConjugatedPortReference, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ConjugatedPortReference>) {
+        super(id, parent);
     }
 
-    override self(): ConjugatedPortReference {
+    override self(): ConjugatedPortReference | undefined {
         return super.self() as ConjugatedPortReference;
+    }
+
+    override parent(): ModelContainer<ConjugatedPortReference> {
+        return this._parent;
     }
 }
 

@@ -15,16 +15,14 @@
  ********************************************************************************/
 
 import {
+    Association,
+    Behavior,
+    Class,
+    Connector,
     Feature,
-    Type,
-    isBehavior,
-    isStep,
-    isStructure,
-    isFeature,
-    isAssociation,
-    isConnector,
-    isClass,
-    isResult,
+    Result,
+    Step,
+    Structure,
 } from "../../generated/ast";
 import {
     FeatureDirectionKind,
@@ -33,7 +31,9 @@ import {
     TypeClassifier,
 } from "../enums";
 import { TypeMeta } from "./type";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { castToRelated, FeatureValueMeta, InlineExpressionMeta, Related } from "./_internal";
+import { SpecializationSource } from "../containers";
 
 export const ImplicitFeatures = {
     base: "Base::things",
@@ -56,7 +56,7 @@ export class FeatureMeta extends TypeMeta {
     /**
      * Featuring types
      */
-    readonly featuredBy = new Set<Type>();
+    readonly featuredBy = new Set<TypeMeta>();
 
     /**
      * Feature direction
@@ -88,11 +88,15 @@ export class FeatureMeta extends TypeMeta {
      */
     isEnd = false;
 
-    constructor(node: Feature, elementId: ElementID) {
-        super(node, elementId);
+    value?: Related<InlineExpressionMeta, FeatureValueMeta>;
+
+    constructor(elementId: ElementID, parent: ModelContainer<Feature>) {
+        super(elementId, parent);
     }
 
     override initialize(node: Feature): void {
+        this.value = undefined;
+        this.reset(node);
         if (!node.declaredName && node.redefines.length > 0) {
             const newName = node.redefines[0].chain.at(-1)?.$refText;
             if (newName) this.setName(newName);
@@ -104,12 +108,13 @@ export class FeatureMeta extends TypeMeta {
         this.isReadonly = !!node.isReadOnly;
         this.isDerived = !!node.isDerived;
         this.isEnd =
-            !!node.isEnd || (isConnector(node.$container) && node.$containerProperty === "ends");
+            !!node.isEnd ||
+            (node.$container.$meta.is(Connector) && node.$containerProperty === "ends");
     }
 
-    override reset(): void {
-        super.reset();
+    override reset(node: Feature): void {
         this.featuredBy.clear();
+        if (node.value) this.value = castToRelated(node.value.$meta);
     }
 
     override defaultGeneralTypes(): string[] {
@@ -126,8 +131,12 @@ export class FeatureMeta extends TypeMeta {
         return "base";
     }
 
-    override self(): Feature {
+    override self(): Feature | undefined {
         return super.deref() as Feature;
+    }
+
+    override parent(): ModelContainer<Feature> {
+        return this._parent;
     }
 
     /**
@@ -166,7 +175,7 @@ export class FeatureMeta extends TypeMeta {
      */
     protected isEnclosedPerformance(): boolean {
         const owner = this.parent();
-        return isBehavior(owner) || isStep(owner);
+        return owner.isAny([Behavior, Step]);
     }
 
     /**
@@ -184,7 +193,7 @@ export class FeatureMeta extends TypeMeta {
     protected isSubobject(): boolean {
         if (!this.isComposite) return false;
         const owner = this.parent();
-        return isStructure(owner) || (isFeature(owner) && owner.$meta.hasStructureType());
+        return owner.is(Structure) || (owner.is(Feature) && owner.hasStructureType());
     }
 
     /**
@@ -201,7 +210,7 @@ export class FeatureMeta extends TypeMeta {
     protected isSuboccurrence(): boolean {
         if (!this.isComposite) return false;
         const owner = this.parent();
-        return isClass(owner) || (isFeature(owner) && owner.$meta.hasClassType());
+        return owner.is(Class) || (owner.is(Feature) && owner.hasClassType());
     }
 
     /**
@@ -211,7 +220,7 @@ export class FeatureMeta extends TypeMeta {
     isAssociationEnd(): boolean {
         if (!this.isEnd) return false;
         const owner = this.parent();
-        return isAssociation(owner) || isConnector(owner);
+        return owner.isAny([Association, Connector]);
     }
 
     /**
@@ -220,11 +229,12 @@ export class FeatureMeta extends TypeMeta {
      */
     get namingFeature(): (Feature & { declaredName: string }) | undefined {
         const feature = this.self();
+        if (!feature) return;
         if (feature.declaredName) return feature as Feature & { declaredName: string };
         const redefinitions = this.specializations(SpecializationKind.Redefinition);
         if (redefinitions.length === 0) return undefined;
         // redefinitions are always features
-        return (redefinitions[0].type as Feature).$meta.namingFeature;
+        return (redefinitions[0].type as FeatureMeta).namingFeature;
     }
 
     isIgnoredParameter(): boolean {
@@ -234,15 +244,19 @@ export class FeatureMeta extends TypeMeta {
     get isParameter(): boolean {
         // parameter if direction was specified explicitly
         const parent = this.parent();
-        return (isBehavior(parent) || isStep(parent)) && this.direction !== "none";
+        return parent.isAny([Behavior, Step]) && this.direction !== "none";
     }
 
     get isResultParameter(): boolean {
-        return isResult(this.parent());
+        return this.parent().is(Result);
     }
 
-    override addSpecialization(type: Type, kind: SpecializationKind, isImplicit?: boolean): void {
-        super.addSpecialization(type, kind, isImplicit);
+    override addSpecialization(
+        type: TypeMeta,
+        kind: SpecializationKind,
+        source?: SpecializationSource
+    ): void {
+        super.addSpecialization(type, kind, source);
 
         if (kind !== SpecializationKind.Redefinition || this.name) return;
         const namingFeature = this.namingFeature;

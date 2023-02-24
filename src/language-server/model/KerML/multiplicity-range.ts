@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { MultiplicityRange } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { MultiplicityMeta } from "./multiplicity";
 
 export const ImplicitMultiplicityRanges = {
@@ -25,12 +25,16 @@ export const ImplicitMultiplicityRanges = {
 
 @metamodelOf(MultiplicityRange, ImplicitMultiplicityRanges)
 export class MultiplicityRangeMeta extends MultiplicityMeta {
-    constructor(node: MultiplicityRange, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<MultiplicityRange>) {
+        super(id, parent);
     }
 
-    override self(): MultiplicityRange {
+    override self(): MultiplicityRange | undefined {
         return super.deref() as MultiplicityRange;
+    }
+
+    override parent(): ModelContainer<MultiplicityRange> {
+        return this._parent;
     }
 }
 

@@ -18,11 +18,14 @@ import { stream } from "langium";
 import { Type, TypeReference, isFeature } from "../generated/ast";
 import { SpecializationKind } from "./enums";
 import { JSONConvertible } from "../utils/common";
+import { TypeMeta } from "./KerML";
 
-export type SpecializationType<T extends Type = Type> = {
+export type SpecializationSource = "explicit" | "implicit";
+
+export type SpecializationType<T extends TypeMeta = TypeMeta> = {
     type: T;
     kind: SpecializationKind;
-    isImplicit: boolean;
+    source: SpecializationSource;
 };
 
 /**
@@ -39,7 +42,7 @@ export class Specializations
         return this.types.values()[Symbol.iterator]();
     }
 
-    protected readonly types = new Map<Type, SpecializationType>();
+    protected readonly types = new Map<TypeMeta, SpecializationType>();
     protected caches: { [key in SpecializationKind]?: SpecializationType[] } = {};
 
     /**
@@ -54,13 +57,12 @@ export class Specializations
      * Add a new specialization
      * @param type specialized type
      * @param kind specialization kind
-     * @param isImplicit if true, the specialization is implicit, otherwise -
-     * explicit
+     * @param source specialization source
      */
-    add(type: Type, kind: SpecializationKind, isImplicit = false): void {
+    add(type: TypeMeta, kind: SpecializationKind, source: SpecializationSource = "explicit"): void {
         if (this.types.has(type)) return;
 
-        this.types.set(type, { type, kind, isImplicit });
+        this.types.set(type, { type, kind, source });
         this.caches = {};
     }
 

@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ForLoopActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { LoopActionUsageMeta } from "./loop-action-usage";
 
 @metamodelOf(ForLoopActionUsage, {
@@ -24,12 +24,16 @@ import { LoopActionUsageMeta } from "./loop-action-usage";
     loopVariable: "Actions::ForLoopAction::var", // TODO:
 })
 export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
-    constructor(node: ForLoopActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ForLoopActionUsage>) {
+        super(id, parent);
     }
 
-    override self(): ForLoopActionUsage {
+    override self(): ForLoopActionUsage | undefined {
         return super.self() as ForLoopActionUsage;
+    }
+
+    override parent(): ModelContainer<ForLoopActionUsage> {
+        return this._parent;
     }
 }
 

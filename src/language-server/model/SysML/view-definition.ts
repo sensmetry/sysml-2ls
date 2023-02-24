@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { ViewDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PartDefinitionMeta } from "./part-definition";
 
 @metamodelOf(ViewDefinition, {
     base: "Views::View",
 })
 export class ViewDefinitionMeta extends PartDefinitionMeta {
-    constructor(node: ViewDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ViewDefinition>) {
+        super(id, parent);
     }
 
-    override self(): ViewDefinition {
+    override self(): ViewDefinition | undefined {
         return super.self() as ViewDefinition;
+    }
+
+    override parent(): ModelContainer<ViewDefinition> {
+        return this._parent;
     }
 }
 

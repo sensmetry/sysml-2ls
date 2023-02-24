@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { VerificationCaseDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CaseDefinitionMeta } from "./case-definition";
 
 @metamodelOf(VerificationCaseDefinition, {
     base: "VerificationCases::VerificationCase",
 })
 export class VerificationCaseDefinitionMeta extends CaseDefinitionMeta {
-    constructor(node: VerificationCaseDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<VerificationCaseDefinition>) {
+        super(id, parent);
     }
 
-    override self(): VerificationCaseDefinition {
+    override self(): VerificationCaseDefinition | undefined {
         return super.self() as VerificationCaseDefinition;
+    }
+
+    override parent(): ModelContainer<VerificationCaseDefinition> {
+        return this._parent;
     }
 }
 

@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { AssignmentActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(AssignmentActionUsage, {
@@ -24,12 +24,16 @@ import { ActionUsageMeta } from "./action-usage";
     featureWrite: "Actions::AssignmentAction",
 })
 export class AssignmentActionUsageMeta extends ActionUsageMeta {
-    constructor(node: AssignmentActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AssignmentActionUsage>) {
+        super(id, parent);
     }
 
-    override self(): AssignmentActionUsage {
+    override self(): AssignmentActionUsage | undefined {
         return super.self() as AssignmentActionUsage;
+    }
+
+    override parent(): ModelContainer<AssignmentActionUsage> {
+        return this._parent;
     }
 }
 

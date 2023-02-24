@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Element, InvocationExpression } from "../../../generated/ast";
+import { ElementMeta, InvocationExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ExpressionResult,
@@ -27,8 +27,8 @@ const PACKAGE = "StringFunctions";
 @functionFor(PACKAGE, "Substring")
 export class SubstringFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const str = evaluator.asString(expression, 0, target);
@@ -45,8 +45,8 @@ export class SubstringFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "Length")
 export class StringLengthFunction extends BuiltinFunction {
     override call(
-        expression: InvocationExpression,
-        target: Element,
+        expression: InvocationExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const str = evaluator.asString(expression, 0, target);

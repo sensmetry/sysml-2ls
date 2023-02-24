@@ -36,10 +36,12 @@ const Header = `
 
 `.trimStart();
 
+const IgnoredNames = new Set(["index.ts", "__tests__", "_internal.ts"]);
+
 async function generateIndex(p: string): Promise<void> {
     let modules: string[] = [];
     for (const dirent of fs.readdirSync(p, { withFileTypes: true })) {
-        if (dirent.name === "index.ts" || dirent.name === "__tests__") continue;
+        if (IgnoredNames.has(dirent.name)) continue;
         if (dirent.isDirectory()) {
             generateIndex(path.join(p, dirent.name));
         }

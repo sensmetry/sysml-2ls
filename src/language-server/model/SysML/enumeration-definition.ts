@@ -15,13 +15,13 @@
  ********************************************************************************/
 
 import { EnumerationDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { AttributeDefinitionMeta } from "./attribute-definition";
 
 @metamodelOf(EnumerationDefinition)
 export class EnumerationDefinitionMeta extends AttributeDefinitionMeta {
-    constructor(node: EnumerationDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<EnumerationDefinition>) {
+        super(id, parent);
     }
 
     override initialize(_node: EnumerationDefinition): void {
@@ -29,8 +29,12 @@ export class EnumerationDefinitionMeta extends AttributeDefinitionMeta {
         this.isAbstract = true;
     }
 
-    override self(): EnumerationDefinition {
+    override self(): EnumerationDefinition | undefined {
         return super.self() as EnumerationDefinition;
+    }
+
+    override parent(): ModelContainer<EnumerationDefinition> {
+        return this._parent;
     }
 }
 

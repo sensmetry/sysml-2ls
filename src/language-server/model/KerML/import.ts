@@ -17,9 +17,9 @@
 import { Import } from "../../generated/ast";
 import { Target } from "../../utils/containers";
 import { getImportKind, ImportKind } from "../enums";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { RelationshipMeta } from "./relationship";
-import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
+import { ElementMeta, Exported } from "./_internal";
 
 @metamodelOf(Import)
 export class ImportMeta extends RelationshipMeta {
@@ -36,10 +36,10 @@ export class ImportMeta extends RelationshipMeta {
     /**
      * Imported description
      */
-    readonly importDescription = new Target<SysMLNodeDescription>();
+    readonly importDescription = new Target<Exported<ElementMeta>>();
 
-    constructor(node: Import, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Import>) {
+        super(id, parent);
     }
 
     override initialize(node: Import): void {
@@ -47,12 +47,15 @@ export class ImportMeta extends RelationshipMeta {
         this.importsAll = node.importsAll;
     }
 
-    override self(): Import {
+    override self(): Import | undefined {
         return super.deref() as Import;
     }
 
-    override reset(): void {
-        super.reset();
+    override parent(): ModelContainer<Import> {
+        return this._parent;
+    }
+
+    override reset(_: Import): void {
         this.importDescription.reset();
     }
 }

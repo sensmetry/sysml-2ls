@@ -17,19 +17,23 @@
 import { Mixin } from "ts-mixer";
 import { ActionDefinition } from "../../generated/ast";
 import { BehaviorMeta } from "../KerML/behavior";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceDefinitionMeta } from "./occurrence-definition";
 
 @metamodelOf(ActionDefinition, {
     base: "Actions::Action",
 })
 export class ActionDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, BehaviorMeta) {
-    constructor(node: ActionDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ActionDefinition>) {
+        super(id, parent);
     }
 
-    override self(): ActionDefinition {
+    override self(): ActionDefinition | undefined {
         return super.self() as ActionDefinition;
+    }
+
+    override parent(): ModelContainer<ActionDefinition> {
+        return this._parent;
     }
 }
 

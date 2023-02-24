@@ -15,17 +15,21 @@
  ********************************************************************************/
 
 import { Documentation } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CommentMeta } from "./comment";
 
 @metamodelOf(Documentation)
 export class DocumentationMeta extends CommentMeta {
-    constructor(node: Documentation, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Documentation>) {
+        super(id, parent);
     }
 
-    override self(): Documentation {
+    override self(): Documentation | undefined {
         return super.deref() as Documentation;
+    }
+
+    override parent(): ModelContainer<Documentation> {
+        return this._parent;
     }
 }
 

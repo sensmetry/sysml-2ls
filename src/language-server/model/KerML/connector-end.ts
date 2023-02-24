@@ -15,21 +15,25 @@
  ********************************************************************************/
 
 import { ConnectorEnd } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
-import { FeatureMeta } from "./feature";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { FeatureMeta } from "./_internal";
 
 @metamodelOf(ConnectorEnd)
 export class ConnectorEndMeta extends FeatureMeta {
-    constructor(node: ConnectorEnd, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ConnectorEnd>) {
+        super(id, parent);
     }
 
     override initialize(_node: ConnectorEnd): void {
         this.isEnd = true;
     }
 
-    override self(): ConnectorEnd {
+    override self(): ConnectorEnd | undefined {
         return super.deref() as ConnectorEnd;
+    }
+
+    override parent(): ModelContainer<ConnectorEnd> {
+        return this._parent;
     }
 }
 

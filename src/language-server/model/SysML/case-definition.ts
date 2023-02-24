@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { CaseDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CalculationDefinitionMeta } from "./calculation-definition";
 
 @metamodelOf(CaseDefinition, {
     base: "Cases::Case",
 })
 export class CaseDefinitionMeta extends CalculationDefinitionMeta {
-    constructor(node: CaseDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<CaseDefinition>) {
+        super(id, parent);
     }
 
-    override self(): CaseDefinition {
+    override self(): CaseDefinition | undefined {
         return super.self() as CaseDefinition;
+    }
+
+    override parent(): ModelContainer<CaseDefinition> {
+        return this._parent;
     }
 }
 

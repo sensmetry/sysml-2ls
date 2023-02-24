@@ -16,7 +16,7 @@
 
 import { Mixin } from "ts-mixer";
 import { PerformActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 import { EventOccurrenceUsageMeta } from "./event-occurrence-usage";
 
@@ -24,8 +24,8 @@ import { EventOccurrenceUsageMeta } from "./event-occurrence-usage";
     performedAction: "Parts::Part::performedActions",
 })
 export class PerformActionUsageMeta extends Mixin(ActionUsageMeta, EventOccurrenceUsageMeta) {
-    constructor(node: PerformActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<PerformActionUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: PerformActionUsage): void {
@@ -42,8 +42,12 @@ export class PerformActionUsageMeta extends Mixin(ActionUsageMeta, EventOccurren
         return supertypes;
     }
 
-    override self(): PerformActionUsage {
+    override self(): PerformActionUsage | undefined {
         return super.self() as PerformActionUsage;
+    }
+
+    override parent(): ModelContainer<PerformActionUsage> {
+        return this._parent;
     }
 }
 

@@ -16,7 +16,7 @@
 
 import { TriggerInvocationExpression } from "../../generated/ast";
 import { InvocationExpressionMeta } from "../KerML/invocation-expression";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(TriggerInvocationExpression, {
     when: "Triggers::TriggerWhen",
@@ -24,12 +24,16 @@ import { metamodelOf, ElementID } from "../metamodel";
     after: "Triggers::TriggerAfter",
 })
 export class TriggerInvocationExpressionMeta extends InvocationExpressionMeta {
-    constructor(node: TriggerInvocationExpression, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<TriggerInvocationExpression>) {
+        super(id, parent);
     }
 
-    override self(): TriggerInvocationExpression {
+    override self(): TriggerInvocationExpression | undefined {
         return super.self() as TriggerInvocationExpression;
+    }
+
+    override parent(): ModelContainer<TriggerInvocationExpression> {
+        return this._parent;
     }
 }
 

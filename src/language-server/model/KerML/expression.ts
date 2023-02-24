@@ -15,10 +15,12 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { Expression, Type } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { Expression } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
 import { StepMeta } from "./step";
+import { TypeMeta } from "./type";
+import { Related, FeatureMeta, castToRelated } from "./_internal";
 
 export const ImplicitExpressions = {
     base: "Performances::evaluations",
@@ -27,12 +29,20 @@ export const ImplicitExpressions = {
 
 @metamodelOf(Expression, ImplicitExpressions)
 export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
-    constructor(node: Expression, id: ElementID) {
-        super(node, id);
+    returns: Related<FeatureMeta>[] = [];
+
+    constructor(id: ElementID, parent: ModelContainer<Expression>) {
+        super(id, parent);
     }
 
     override initialize(node: Expression): void {
-        this.result = node.result;
+        if (node.result) this.result = castToRelated(node.result.$meta);
+
+        this.returns = node.return.map((f) => ({ element: f.$meta }));
+    }
+
+    override reset(node: Expression): void {
+        this.initialize(node);
     }
 
     override defaultGeneralTypes(): string[] {
@@ -47,16 +57,20 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
         return "base";
     }
 
-    override self(): Expression {
+    override self(): Expression | undefined {
         return super.deref() as Expression;
+    }
+
+    override parent(): ModelContainer<Expression> {
+        return this._parent;
     }
 
     /**
      * @returns fully qualified name or AST node of the return type of this
      * expression if one can be inferred, undefined otherwise
      */
-    returnType(): Type | string | undefined {
-        return this.getReturnType(this.self());
+    returnType(): TypeMeta | string | undefined {
+        return this.getReturnType(this);
     }
 }
 

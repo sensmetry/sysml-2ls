@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { CaseUsage, isCaseDefinition, isCaseUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { CaseDefinition, CaseUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CalculationUsageMeta } from "./calculation-usage";
 
 @metamodelOf(CaseUsage, {
@@ -23,12 +23,16 @@ import { CalculationUsageMeta } from "./calculation-usage";
     subcase: "Cases:subcases",
 })
 export class CaseUsageMeta extends CalculationUsageMeta {
-    constructor(node: CaseUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<CaseUsage>) {
+        super(id, parent);
     }
 
-    override self(): CaseUsage {
+    override self(): CaseUsage | undefined {
         return super.self() as CaseUsage;
+    }
+
+    override parent(): ModelContainer<CaseUsage> {
+        return this._parent;
     }
 
     override getSubactionType(): string | undefined {
@@ -37,7 +41,7 @@ export class CaseUsageMeta extends CalculationUsageMeta {
 
     isSubcase(): boolean {
         const parent = this.parent();
-        return isCaseDefinition(parent) || isCaseUsage(parent);
+        return parent.isAny([CaseDefinition, CaseUsage]);
     }
 }
 

@@ -16,7 +16,7 @@
 
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Element, OperatorExpression } from "../../../generated/ast";
+import { ElementMeta, OperatorExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
@@ -36,8 +36,8 @@ abstract class BooleanFunction extends BuiltinFunction {
     }
 
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const x = evaluator.asBoolean(expression, 0, target);

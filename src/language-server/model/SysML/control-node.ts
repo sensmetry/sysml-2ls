@@ -15,17 +15,21 @@
  ********************************************************************************/
 
 import { ControlNode } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(ControlNode)
 export class ControlNodeMeta extends ActionUsageMeta {
-    constructor(node: ControlNode, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ControlNode>) {
+        super(id, parent);
     }
 
-    override self(): ControlNode {
+    override self(): ControlNode | undefined {
         return super.self() as ControlNode;
+    }
+
+    override parent(): ModelContainer<ControlNode> {
+        return this._parent;
     }
 }
 

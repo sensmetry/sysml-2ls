@@ -14,9 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Association, AssociationStructure } from "../../generated/ast";
+import { AssociationStructure } from "../../generated/ast";
 import { AssociationMeta } from "./association";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { StructureMeta } from "./structure";
 import { Mixin } from "ts-mixer";
 import { TypeClassifier } from "../enums";
@@ -28,16 +28,20 @@ export const ImplicitAssociationStructures = {
 
 @metamodelOf(AssociationStructure, ImplicitAssociationStructures)
 export class AssociationStructMeta extends Mixin(AssociationMeta, StructureMeta) {
-    constructor(node: Association, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<AssociationStructure>) {
+        super(elementId, parent);
     }
 
-    protected override setupClassifiers(_node: AssociationStructure): void {
+    protected override setupClassifiers(): void {
         this.classifier = TypeClassifier.AssociationStruct;
     }
 
-    override self(): AssociationStructure {
+    override self(): AssociationStructure | undefined {
         return super.deref() as AssociationStructure;
+    }
+
+    override parent(): ModelContainer<AssociationStructure> {
+        return this._parent;
     }
 }
 

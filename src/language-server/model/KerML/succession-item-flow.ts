@@ -16,7 +16,7 @@
 
 import { Mixin } from "ts-mixer";
 import { SuccessionItemFlow } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ItemFlowMeta } from "./item-flow";
 import { SuccessionMeta } from "./succession";
 
@@ -31,12 +31,16 @@ export const ImplicitSuccessionItemFlows = {
 
 @metamodelOf(SuccessionItemFlow, ImplicitSuccessionItemFlows)
 export class SuccessionItemFlowMeta extends Mixin(ItemFlowMeta, SuccessionMeta) {
-    constructor(node: SuccessionItemFlow, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SuccessionItemFlow>) {
+        super(id, parent);
     }
 
-    override self(): SuccessionItemFlow {
+    override self(): SuccessionItemFlow | undefined {
         return super.deref() as SuccessionItemFlow;
+    }
+
+    override parent(): ModelContainer<SuccessionItemFlow> {
+        return this._parent;
     }
 }
 

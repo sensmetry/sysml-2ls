@@ -16,7 +16,7 @@
 
 import { Mixin } from "ts-mixer";
 import { ExhibitStateUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PerformActionUsageMeta } from "./perform-action-usage";
 import { StateUsageMeta } from "./state-usage";
 
@@ -24,8 +24,8 @@ import { StateUsageMeta } from "./state-usage";
     performedAction: "Parts::Part::exhibitedStates",
 })
 export class ExhibitStateUsageMeta extends Mixin(StateUsageMeta, PerformActionUsageMeta) {
-    constructor(node: ExhibitStateUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ExhibitStateUsage>) {
+        super(id, parent);
     }
 
     override defaultGeneralTypes(): string[] {
@@ -34,8 +34,12 @@ export class ExhibitStateUsageMeta extends Mixin(StateUsageMeta, PerformActionUs
         return supertypes;
     }
 
-    override self(): ExhibitStateUsage {
+    override self(): ExhibitStateUsage | undefined {
         return super.self() as ExhibitStateUsage;
+    }
+
+    override parent(): ModelContainer<ExhibitStateUsage> {
+        return this._parent;
     }
 }
 

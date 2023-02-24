@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { WhileLoopActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { LoopActionUsageMeta } from "./loop-action-usage";
 
 @metamodelOf(WhileLoopActionUsage, {
@@ -23,12 +23,16 @@ import { LoopActionUsageMeta } from "./loop-action-usage";
     subaction: "Actions::Action::whileLoops",
 })
 export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
-    constructor(node: WhileLoopActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<WhileLoopActionUsage>) {
+        super(id, parent);
     }
 
-    override self(): WhileLoopActionUsage {
+    override self(): WhileLoopActionUsage | undefined {
         return super.self() as WhileLoopActionUsage;
+    }
+
+    override parent(): ModelContainer<WhileLoopActionUsage> {
+        return this._parent;
     }
 }
 

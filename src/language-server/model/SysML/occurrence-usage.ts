@@ -15,15 +15,15 @@
  ********************************************************************************/
 
 import { OccurrenceUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { UsageMeta } from "./usage";
 
 @metamodelOf(OccurrenceUsage, {
     base: "Occurrences::occurrences",
 })
 export class OccurrenceUsageMeta extends UsageMeta {
-    constructor(node: OccurrenceUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<OccurrenceUsage>) {
+        super(id, parent);
     }
 
     override defaultGeneralTypes(): string[] {
@@ -36,8 +36,12 @@ export class OccurrenceUsageMeta extends UsageMeta {
         return "base";
     }
 
-    override self(): OccurrenceUsage {
+    override self(): OccurrenceUsage | undefined {
         return super.self() as OccurrenceUsage;
+    }
+
+    override parent(): ModelContainer<OccurrenceUsage> {
+        return this._parent;
     }
 }
 

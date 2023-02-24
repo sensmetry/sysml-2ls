@@ -14,23 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    services,
-    withQualifiedName,
-    parseKerML,
-    NO_ERRORS,
-    sanitizeTree,
-} from "../../../../testing";
-import { InlineExpression } from "../../../generated/ast";
+import { services, parseKerML, NO_ERRORS, sanitizeTree } from "../../../../testing";
 
 const Evaluator = services.shared.modelLevelExpressionEvaluator;
 
 test.concurrent.each([
-    ["Cast", "B as A", [withQualifiedName("B")]],
-    ["Cast", "C as A", [withQualifiedName("C")]],
+    ["Cast", "B as A", [{ qualifiedName: "B" }]],
+    ["Cast", "C as A", [{ qualifiedName: "C" }]],
     ["Cast", "A as B", []],
-    ["Metacast", "B meta M", [withQualifiedName("B::Meta"), withQualifiedName("B::Meta2")]],
-    ["Metacast", "C meta M", [withQualifiedName("B::Meta"), withQualifiedName("B::Meta2")]],
+    ["Metacast", "B meta M", [{ qualifiedName: "B::Meta" }, { qualifiedName: "B::Meta2" }]],
+    ["Metacast", "C meta M", [{ qualifiedName: "B::Meta" }, { qualifiedName: "B::Meta2" }]],
     ["Metacast", "A meta M", []],
     ["Classification test", "B @ A", [true]],
     ["Classification test", "C @ A", [true]],
@@ -52,20 +45,22 @@ test.concurrent.each([
     ["Is type", "C istype A", [true]],
     ["Is type", "A istype B", [false]],
     // Yay for 1-based indexing.............
-    ["Indexing", "(B meta M)[1]", [withQualifiedName("B::Meta")]],
-    ["Indexing", "(B meta M)[2]", [withQualifiedName("B::Meta2")]],
+    ["Indexing", "(B meta M)[1]", [{ qualifiedName: "B::Meta" }]],
+    ["Indexing", "(B meta M)[2]", [{ qualifiedName: "B::Meta2" }]],
     ["Sequence", "(1,2,3,4)", [1, 2, 3, 4]],
-    ["Sequence", "(1,2,3,A)", [1, 2, 3, withQualifiedName("A")]],
+    ["Sequence", "(1,2,3,A)", [1, 2, 3, { qualifiedName: "A" }]],
 ])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[] | undefined) => {
     const result = await parseKerML(
         `feature a = ${body}; feature A; feature B : A { @Meta: M; @Meta2: M; } feature C : B; metaclass M;`
     );
     expect(result).toMatchObject(NO_ERRORS);
 
-    const expression = result.value.features[0].value?.expression;
+    const feature = result.value.features[0].$meta;
+    const expression = feature.value?.element;
     expect(expression).not.toBeUndefined();
+    if (!expression) return;
 
-    const exprResult = Evaluator.evaluate(expression as InlineExpression, result.value.features[0]);
+    const exprResult = Evaluator.evaluate(expression, feature);
     if (expected) expect(sanitizeTree(exprResult)).toMatchObject(expected);
     else expect(sanitizeTree(exprResult)).toBeUndefined();
 });

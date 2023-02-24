@@ -15,7 +15,6 @@
  ********************************************************************************/
 
 import { services, parseKerML, NO_ERRORS } from "../../../../testing";
-import { InlineExpression } from "../../../generated/ast";
 
 const Evaluator = services.shared.modelLevelExpressionEvaluator;
 const PACKAGE = `
@@ -34,9 +33,9 @@ test.concurrent.each([
     const result = await parseKerML(`feature a = ${body};` + PACKAGE);
     expect(result).toMatchObject(NO_ERRORS);
 
-    const expression = result.value.features[0].value?.expression;
+    const feature = result.value.features[0].$meta;
+    const expression = feature.value?.element;
     expect(expression).not.toBeUndefined();
-    expect(
-        Evaluator.evaluate(expression as InlineExpression, result.value.features[0])
-    ).toMatchObject(expected);
+    if (!expression) return;
+    expect(Evaluator.evaluate(expression, feature)).toMatchObject(expected);
 });

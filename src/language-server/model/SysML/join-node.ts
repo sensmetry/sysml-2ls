@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { JoinNode } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ControlNodeMeta } from "./control-node";
 
 @metamodelOf(JoinNode, {
     subaction: "Actions::Action::joins",
 })
 export class JoinNodeMeta extends ControlNodeMeta {
-    constructor(node: JoinNode, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<JoinNode>) {
+        super(id, parent);
     }
 
-    override self(): JoinNode {
+    override self(): JoinNode | undefined {
         return super.self() as JoinNode;
+    }
+
+    override parent(): ModelContainer<JoinNode> {
+        return this._parent;
     }
 }
 

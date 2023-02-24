@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { AttributeUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { UsageMeta } from "./usage";
 
 @metamodelOf(AttributeUsage, {
     base: "Base::dataValues",
 })
 export class AttributeUsageMeta extends UsageMeta {
-    constructor(node: AttributeUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AttributeUsage>) {
+        super(id, parent);
     }
 
-    override self(): AttributeUsage {
+    override self(): AttributeUsage | undefined {
         return super.self() as AttributeUsage;
+    }
+
+    override parent(): ModelContainer<AttributeUsage> {
+        return this._parent;
     }
 }
 

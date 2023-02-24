@@ -14,21 +14,27 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { TypeReference, Type } from "../../generated/ast";
+import { TypeReference } from "../../generated/ast";
 import { Target } from "../../utils/containers";
 import { ElementReferenceMeta } from "./element-reference";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { Exported } from "./_internal";
+import { TypeMeta } from "./type";
 
 @metamodelOf(TypeReference)
 export class TypeReferenceMeta extends ElementReferenceMeta {
-    override readonly to = new Target<Type>();
+    override readonly to = new Target<Exported<TypeMeta>>();
 
-    constructor(node: TypeReference, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<TypeReference>) {
+        super(id, parent);
     }
 
-    override self(): TypeReference {
+    override self(): TypeReference | undefined {
         return super.deref() as TypeReference;
+    }
+
+    override parent(): ModelContainer<TypeReference> {
+        return this._parent;
     }
 }
 

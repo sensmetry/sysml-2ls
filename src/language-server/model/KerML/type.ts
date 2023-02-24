@@ -14,13 +14,22 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Feature, MetadataFeature, Result, Type } from "../../generated/ast";
+import { Type } from "../../generated/ast";
 import { Stream, stream, TreeStreamImpl } from "langium";
 import { getTypeClassifierString, SpecializationKind, TypeClassifier } from "../enums";
 import { NamespaceMeta } from "./namespace";
-import { metamodelOf, ElementID } from "../metamodel";
-import { SpecializationType, Specializations } from "../containers";
-import { collectRedefinitions } from "../../utils/ast-util";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { SpecializationType, Specializations, SpecializationSource } from "../containers";
+import { collectRedefinitions } from "../../utils/scope-util";
+import { KeysMatching } from "../../utils/common";
+import { SysMLTypeList } from "../../services/sysml-ast-reflection";
+import {
+    InlineExpressionMeta,
+    ResultMeta,
+    Related,
+    FeatureMeta,
+    MetadataFeatureMeta,
+} from "./_internal";
 
 export const ImplicitTypes = {
     base: "Base::Anything",
@@ -46,10 +55,10 @@ export class TypeMeta extends NamespaceMeta {
     /**
      * Result member
      */
-    result: Result | undefined;
+    result: Related<InlineExpressionMeta, ResultMeta> | undefined;
 
-    constructor(node: Type, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<Type>) {
+        super(elementId, parent);
     }
 
     override initialize(node: Type): void {
@@ -63,8 +72,12 @@ export class TypeMeta extends NamespaceMeta {
         return getTypeClassifierString(this.classifier);
     }
 
-    override self(): Type {
+    override self(): Type | undefined {
         return super.deref() as Type;
+    }
+
+    override parent(): ModelContainer<Type> {
+        return this._parent;
     }
 
     /**
@@ -79,7 +92,7 @@ export class TypeMeta extends NamespaceMeta {
      * Stream of direct specialized types matching {@link kind}
      * @param kind specialization kind filter
      */
-    types(kind = SpecializationKind.None): Stream<Type> {
+    types(kind = SpecializationKind.None): Stream<TypeMeta> {
         return stream(this.specializations(kind)).map((s) => s.type);
     }
 
@@ -92,17 +105,17 @@ export class TypeMeta extends NamespaceMeta {
         kind = SpecializationKind.None,
         includeSelf = false
     ): Stream<SpecializationType> {
-        const visited = new Set<Type>();
+        const visited = new Set<TypeMeta>();
         return new TreeStreamImpl<SpecializationType>(
             {
-                type: this.self(),
+                type: this,
                 kind: SpecializationKind.None,
-                isImplicit: false,
+                source: "explicit",
             },
             // avoid circular specializations, there probably should be a
             // warning
             (s) =>
-                s.type.$meta.specializations(kind).filter((s) => {
+                s.type.specializations(kind).filter((s) => {
                     if (visited.has(s.type)) return false;
                     visited.add(s.type);
                     return true;
@@ -118,7 +131,7 @@ export class TypeMeta extends NamespaceMeta {
      * @param kind specialization kind filter
      * @param includeSelf if true, also include itself
      */
-    allTypes(kind = SpecializationKind.None, includeSelf = false): Stream<Type> {
+    allTypes(kind = SpecializationKind.None, includeSelf = false): Stream<TypeMeta> {
         return stream(this.allSpecializations(kind, includeSelf)).map((s) => s.type);
     }
 
@@ -128,9 +141,9 @@ export class TypeMeta extends NamespaceMeta {
      * @returns true if this type specializes directly or indirectly
      * {@link type}, false otherwise
      */
-    is(type: string | Type, kind = SpecializationKind.None): boolean {
+    conforms(type: string | TypeMeta, kind = SpecializationKind.None): boolean {
         if (typeof type === "string")
-            return this.allTypes(kind, true).some((t) => t.$meta.qualifiedName === type);
+            return this.allTypes(kind, true).some((t) => t.qualifiedName === type);
         return this.allTypes(kind, true).some((t) => t === type);
     }
 
@@ -139,12 +152,17 @@ export class TypeMeta extends NamespaceMeta {
      * @param kind specialization kind filter
      * @returns Stream of direct specializations that satisfy {@link is}
      */
-    specializationsMatching<T extends Type>(
-        is: (item: unknown) => item is T,
+    specializationsMatching<K extends KeysMatching<SysMLTypeList, Type>>(
+        is: K | K[],
         kind = SpecializationKind.None
-    ): Stream<SpecializationType<T>> {
-        return stream(this.specializations(kind)).filter((s) => is(s.type)) as Stream<
-            SpecializationType<T>
+    ): Stream<SpecializationType<SysMLTypeList[K]["$meta"]>> {
+        if (Array.isArray(is))
+            return stream(this.specializations(kind)).filter((s) => s.type.isAny(is)) as Stream<
+                SpecializationType<SysMLTypeList[K]["$meta"]>
+            >;
+
+        return stream(this.specializations(kind)).filter((s) => s.type.is(is)) as Stream<
+            SpecializationType<SysMLTypeList[K]["$meta"]>
         >;
     }
 
@@ -153,10 +171,10 @@ export class TypeMeta extends NamespaceMeta {
      * @param kind specialization kind filter
      * @returns Stream of direct specialized types that satisfy {@link is}
      */
-    typesMatching<T extends Type>(
-        is: (item: unknown) => item is T,
+    typesMatching<K extends KeysMatching<SysMLTypeList, Type>>(
+        is: K | K[],
         kind = SpecializationKind.None
-    ): Stream<T> {
+    ): Stream<SysMLTypeList[K]["$meta"]> {
         return stream(this.specializationsMatching(is, kind)).map((s) => s.type);
     }
 
@@ -166,13 +184,17 @@ export class TypeMeta extends NamespaceMeta {
      * @param includeSelf if true, also include self
      * @returns Stream of all direct and indirect specializations that satisfy {@link is}
      */
-    allSpecializationsMatching<T extends Type>(
-        is: (item: unknown) => item is T,
+    allSpecializationsMatching<K extends KeysMatching<SysMLTypeList, Type>>(
+        is: K | K[],
         kind = SpecializationKind.None,
         includeSelf = false
-    ): Stream<SpecializationType<T>> {
-        return this.allSpecializations(kind, includeSelf).filter((s) => is(s.type)) as Stream<
-            SpecializationType<T>
+    ): Stream<SpecializationType<SysMLTypeList[K]["$meta"]>> {
+        if (Array.isArray(is))
+            return this.allSpecializations(kind, includeSelf).filter((s) =>
+                s.type.isAny(is)
+            ) as Stream<SpecializationType<SysMLTypeList[K]["$meta"]>>;
+        return this.allSpecializations(kind, includeSelf).filter((s) => s.type.is(is)) as Stream<
+            SpecializationType<SysMLTypeList[K]["$meta"]>
         >;
     }
 
@@ -180,19 +202,17 @@ export class TypeMeta extends NamespaceMeta {
      * @param is type assertion predicate
      * @param kind specialization kind filter
      * @param includeSelf if true, also include self
-     * @returns Stream of all direct and indirect specialized types that satisfy {@link is}
+     * @returns Stream of all direct and indirect specialized types that satisfy {@link conforms}
      */
-    allTypesMatching<T extends Type>(
-        fn: (item: unknown) => item is T,
+    allTypesMatching<K extends KeysMatching<SysMLTypeList, Type>>(
+        fn: K | K[],
         kind = SpecializationKind.None,
         includeSelf = false
-    ): Stream<T> {
+    ): Stream<SysMLTypeList[K]["$meta"]> {
         return this.allSpecializationsMatching(fn, kind, includeSelf).map((s) => s.type);
     }
 
-    override reset(): void {
-        super.reset();
-
+    override reset(_: Type): void {
         this._specializations.clear();
     }
 
@@ -204,11 +224,11 @@ export class TypeMeta extends NamespaceMeta {
      * satisfy both {@link predicate} and {@link typePredicate}
      */
     basePositionalFeatures(
-        predicate: (f: Feature) => boolean,
-        typePredicate?: (t: Type) => boolean
-    ): Stream<Feature> {
+        predicate: (f: Related<FeatureMeta>) => boolean,
+        typePredicate?: (t: TypeMeta) => boolean
+    ): Stream<Related<FeatureMeta>> {
         let count = 0;
-        const counted = (f: Feature): Feature => {
+        const counted = (f: Related<FeatureMeta>): Related<FeatureMeta> => {
             ++count;
             return f;
         };
@@ -219,17 +239,17 @@ export class TypeMeta extends NamespaceMeta {
 
         // TODO: filter by visibility?
         return allTypes.flatMap((s) =>
-            stream(s.type.$meta.features).filter(predicate).tail(count).map(counted)
+            stream(s.type.features).filter(predicate).tail(count).map(counted)
         );
     }
 
     /**
      * @returns owned or inherited result parameter if one exists, otherwise undefined
      */
-    resultParameter(): Result | undefined {
+    resultParameter(): Related<InlineExpressionMeta, ResultMeta> | undefined {
         if (this.result) return this.result;
         for (const specialization of this.allSpecializations()) {
-            const result = specialization.type.$meta.result;
+            const result = specialization.type.result;
             if (result) {
                 this.result = result;
                 return result;
@@ -242,25 +262,29 @@ export class TypeMeta extends NamespaceMeta {
     /**
      * @see {@link Specializations.add}
      */
-    addSpecialization(type: Type, kind: SpecializationKind, isImplicit = false): void {
-        if (type === this.self()) return;
-        this._specializations.add(type, kind, isImplicit);
+    addSpecialization(
+        type: TypeMeta,
+        kind: SpecializationKind,
+        source: SpecializationSource = "explicit"
+    ): void {
+        if (type === this) return;
+        this._specializations.add(type, kind, source);
     }
 
-    override allMetadata(): Stream<MetadataFeature> {
+    override allMetadata(): Stream<Related<MetadataFeatureMeta>> {
         // TODO: filter by visibility?
-        return this.allTypes(SpecializationKind.None, true).flatMap((t) => t.$meta.metadata);
+        return this.allTypes(SpecializationKind.None, true).flatMap((t) => t.metadata);
     }
 
-    override allFeatures(): Stream<Feature> {
+    override allFeatures(): Stream<Related<FeatureMeta>> {
         // TODO: filter by visibility?
-        const visited = new Set<Feature>();
+        const visited = new Set<object>();
         return this.allTypes(SpecializationKind.None, true)
-            .flatMap((t) => t.$meta.features)
+            .flatMap((t) => t.features)
             .filter((f) => {
                 if (visited.has(f)) return false;
                 visited.add(f);
-                collectRedefinitions(f, visited);
+                collectRedefinitions(f.element, visited);
                 return true;
             });
     }

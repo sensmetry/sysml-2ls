@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { FlowConnectionUsage } from "../../generated/ast";
 import { ItemFlowMeta } from "../KerML/item-flow";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 import { ConnectionUsageMeta } from "./connection-usage";
 
@@ -33,8 +33,8 @@ export class FlowConnectionUsageMeta extends Mixin(
     ActionUsageMeta,
     ItemFlowMeta
 ) {
-    constructor(node: FlowConnectionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<FlowConnectionUsage>) {
+        super(id, parent);
     }
 
     override defaultGeneralTypes(): string[] {
@@ -47,11 +47,15 @@ export class FlowConnectionUsageMeta extends Mixin(
     }
 
     override defaultSupertype(): string {
-        return !this.features.some((f) => f.$meta.isEnd) ? "message" : "base";
+        return !this.features.some((f) => f.element.isEnd) ? "message" : "base";
     }
 
-    override self(): FlowConnectionUsage {
+    override self(): FlowConnectionUsage | undefined {
         return super.self() as FlowConnectionUsage;
+    }
+
+    override parent(): ModelContainer<FlowConnectionUsage> {
+        return this._parent;
     }
 }
 

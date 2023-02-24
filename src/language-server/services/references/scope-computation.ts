@@ -133,8 +133,14 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
         if (isElement(container)) {
             // update scope lookup table with the exports
             const meta = container.$meta;
-            for (const description of localExports)
-                meta.children.set(description.name, description);
+            for (const description of localExports) {
+                if (!description.node) continue;
+                meta.children.set(description.name, {
+                    element: description.node.$meta,
+                    name: description.name,
+                    description,
+                });
+            }
         }
 
         return localExports;

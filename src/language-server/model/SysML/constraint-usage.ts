@@ -15,10 +15,10 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { ConstraintUsage, isItemDefinition, isItemUsage } from "../../generated/ast";
+import { ConstraintUsage, ItemDefinition, ItemUsage } from "../../generated/ast";
 import { getRequirementConstraintKind, RequirementConstraintKind } from "../enums";
 import { BooleanExpressionMeta } from "../KerML/boolean-expression";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(ConstraintUsage, {
@@ -33,8 +33,8 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
 export class ConstraintUsageMeta extends Mixin(OccurrenceUsageMeta, BooleanExpressionMeta) {
     constraintKind: RequirementConstraintKind = "none";
 
-    constructor(node: ConstraintUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ConstraintUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: ConstraintUsage): void {
@@ -61,14 +61,18 @@ export class ConstraintUsageMeta extends Mixin(OccurrenceUsageMeta, BooleanExpre
     }
 
     isCheckedConstraint(): boolean {
-        if (!this.self().$meta.isComposite) return false;
+        if (!this.isComposite) return false;
 
         const parent = this.parent();
-        return isItemDefinition(parent) || isItemUsage(parent);
+        return parent.isAny([ItemDefinition, ItemUsage]);
     }
 
-    override self(): ConstraintUsage {
+    override self(): ConstraintUsage | undefined {
         return super.self() as ConstraintUsage;
+    }
+
+    override parent(): ModelContainer<ConstraintUsage> {
+        return this._parent;
     }
 }
 

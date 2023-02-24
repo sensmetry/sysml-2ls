@@ -14,54 +14,106 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    Comment,
-    Documentation,
-    Element,
-    Feature,
-    MetadataFeature,
-    Relationship,
-    isElement,
-    isFeature,
-    isRelationship,
-} from "../../generated/ast";
+import { Element, isElement, isFeature, isRelationship } from "../../generated/ast";
 import { VisibilityMeta } from "./visibility-element";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer, BasicMetamodel } from "../metamodel";
 import { Stream, stream } from "langium";
 import { Name, computeQualifiedName } from "../naming";
 import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
+import {
+    CommentMeta,
+    DocumentationMeta,
+    FeatureMeta,
+    MetadataFeatureMeta,
+    RelationshipMeta,
+} from "./_internal";
+
+/**
+ * Constrained relationship type with non-optional `element` member
+ */
+// TODO: change BasicMetamodel to ElementMeta and remove never
+// TODO: infer T from R["element"]
+export type Related<
+    T extends BasicMetamodel = ElementMeta,
+    R extends RelationshipMeta | object = object
+> = R & {
+    // concrete type element held by R
+    element: T;
+};
+
+/**
+ * Convenience function to cast `relationship` to `Related` type with non-optional `element`
+ * @param relationship relationship to cast
+ * @returns `Related` if `element` exists in `relationship` and `undefined` otherwise
+ */
+// TODO: ElementMeta and RelationshipMeta constraints
+export function castToRelated<
+    T extends BasicMetamodel,
+    R extends BasicMetamodel & { element?: T | undefined | null }
+>(relationship: R): Related<T, R> | undefined {
+    if (relationship.element) return relationship as Related<T, R>;
+    return;
+}
+
+export type Exported<
+    T extends BasicMetamodel = ElementMeta,
+    R extends RelationshipMeta | undefined = undefined
+> = {
+    /**
+     * The exported element
+     */
+    element: T;
+
+    /**
+     * The name this element is exported with
+     */
+    name: string;
+
+    /**
+     * AST node description for parsed elements
+     */
+    description?: SysMLNodeDescription;
+} & (R extends undefined
+    ? object
+    : {
+          /**
+           * The relationship {@link element} is related by to the exporting element
+           */
+          relationship: Related<T, NonNullable<R>>;
+      });
 
 @metamodelOf(Element)
 export class ElementMeta extends VisibilityMeta {
     /**
-     * Owned elements (not relationships and features)
+     * Owned elements (not relationships and features), i.e. namespaces that are not features
      */
-    elements: Element[] = [];
+    // TODO: check if using NamespaceMeta works here
+    elements: Related<ElementMeta>[] = [];
 
     /**
-     * Owned relationships
+     * Owned relationships that don't fall into any other members
      */
-    relationships: Relationship[] = [];
+    relationships: RelationshipMeta[] = [];
 
     /**
      * Owned features
      */
-    features: Feature[] = [];
+    features: Related<FeatureMeta>[] = [];
 
     /**
      * Comments about this element
      */
-    comments: Comment[] = [];
+    comments: Related<CommentMeta>[] = [];
 
     /**
      * Metadata about this element
      */
-    metadata: MetadataFeature[] = [];
+    metadata: Related<MetadataFeatureMeta>[] = [];
 
     /**
      * Documentation about this element
      */
-    docs: Documentation[] = [];
+    docs: Related<DocumentationMeta>[] = [];
 
     /**
      * Regular name of this element
@@ -77,36 +129,50 @@ export class ElementMeta extends VisibilityMeta {
     /**
      * Cached descriptions for this element based on names only
      */
-    private regularDescription?: SysMLNodeDescription;
-    private shortDescription?: SysMLNodeDescription;
-    readonly descriptions: SysMLNodeDescription[] = [];
+    private regularDescription: Exported;
+    private shortDescription: Exported;
+    get descriptions(): SysMLNodeDescription[] {
+        return this.selfExports
+            .filter((ex) => ex.description && ex.name.length > 0)
+            .map((ex) => ex.description) as SysMLNodeDescription[];
+    }
+    readonly selfExports: Exported[] = [];
 
     /**
      * List of direct children
      */
-    readonly children = new Map<string, SysMLNodeDescription>();
+    readonly children = new Map<string, Exported>();
 
     /**
      * Library metaclass of this element
      */
-    metaclass: MetadataFeature | undefined;
+    metaclass: MetadataFeatureMeta | undefined;
 
-    constructor(node: Element, elementId: ElementID) {
-        super(node, elementId);
+    constructor(elementId: ElementID, parent: ModelContainer<Element>) {
+        super(elementId, parent);
+
+        this.regularDescription = {
+            element: this,
+            name: "",
+        };
+        this.shortDescription = {
+            element: this,
+            name: "",
+        };
     }
 
     override initialize(node: Element): void {
         this._name.set(node.declaredName);
+        this.regularDescription.name = this.name ?? "";
         this._shortName.set(node.declaredShortName);
+        this.shortDescription.name = this.shortName ?? "";
+        this.updateDescriptions();
 
-        // using raw names for easier disambiguation between
-        this.qualifiedName = computeQualifiedName(this, node.$container);
+        // namespaces can have no $container but the type system doesn't warn
+        // against it, probably an issue in langium
+        this.qualifiedName = computeQualifiedName(this, node.$container?.$meta);
 
-        this.comments.push(...node.comments);
-        this.docs.push(...node.docs);
-        this.metadata.push(...node.prefixes, ...node.metadata);
-
-        this.collectChildren();
+        this.collectChildren(node);
     }
 
     /**
@@ -116,67 +182,66 @@ export class ElementMeta extends VisibilityMeta {
         return "base";
     }
 
-    override self(): Element {
+    override self(): Element | undefined {
         return super.deref() as Element;
     }
 
-    override reset(): void {
-        super.reset();
-        this.collectChildren();
+    override parent(): ModelContainer<Element> {
+        return this._parent;
+    }
+
+    override reset(node: Element): void {
+        this.collectChildren(node);
         delete this.metaclass;
     }
 
-    protected collectChildren(): void {
+    protected collectChildren(node: Element): void {
         // features may be spread out over multiple member arrays so iterate
         // over all children
-        const node = this.self();
         this.relationships.length = 0;
         this.features.length = 0;
         this.elements.length = 0;
-        this.comments = [...node.comments];
-        this.docs = [...node.docs];
-        this.metadata = [...node.prefixes, ...node.metadata];
-        this.filterAbout();
+
+        // docs/reps cannot parse about so can be skipped
+        this.comments = node.comments
+            .filter((c) => c.about.length === 0)
+            .map((c) => ({ element: c.$meta }));
+        this.docs = node.docs.map((d) => ({ element: d.$meta }));
+        this.metadata = [...node.prefixes, ...node.metadata]
+            .filter((f) => f.about.length === 0)
+            .map((f) => ({ element: f.$meta }));
 
         for (const child of node.$children) {
             if (!isElement(child)) continue;
-            this.addChild(child);
+            this.addChild({ element: child.$meta });
 
-            if (isFeature(child)) this.features.push(child);
-            else if (isRelationship(child)) this.relationships.push(child);
-            else this.elements.push(child);
+            if (isFeature(child)) this.features.push({ element: child.$meta });
+            else if (isRelationship(child)) this.relationships.push(child.$meta);
+            else this.elements.push({ element: child.$meta });
         }
-    }
-
-    private filterAbout(): void {
-        this.comments.filter((c) => c.about.length === 0);
-        this.metadata.filter((m) => m.about.length === 0);
-        // docs/reps cannot parse about so can be skipped
     }
 
     /**
      * @returns stream of all owned and inherited metadata features
      */
-    allMetadata(): Stream<MetadataFeature> {
+    allMetadata(): Stream<Related<MetadataFeatureMeta>> {
         return stream(this.metadata);
     }
 
     /**
      * @returns stream of all owned and inherited features
      */
-    allFeatures(): Stream<Feature> {
+    allFeatures(): Stream<Related<FeatureMeta>> {
         return stream(this.features);
     }
 
     /**
      * Add a {@link child} to this element scope
      */
-    addChild(child: Element): void {
-        const meta = child.$meta;
-        if (meta.name && meta.regularDescription)
-            this.children.set(meta.name, meta.regularDescription);
-        if (meta.shortName && meta.shortDescription)
-            this.children.set(meta.shortName, meta.shortDescription);
+    addChild(child: Related<ElementMeta>): void {
+        const meta = child.element;
+        if (meta.name) this.children.set(meta.name, meta.regularDescription);
+        if (meta.shortName) this.children.set(meta.shortName, meta.shortDescription);
     }
 
     /**
@@ -223,24 +288,20 @@ export class ElementMeta extends VisibilityMeta {
     }
 
     private updateDescriptions(): void {
-        this.descriptions.length = 0;
+        this.selfExports.length = 0;
 
-        if (this.name && this.regularDescription) this.descriptions.push(this.regularDescription);
-        if (this.shortName && this.shortDescription) this.descriptions.push(this.shortDescription);
+        if (this.name) this.selfExports.push(this.regularDescription);
+        if (this.shortName) this.selfExports.push(this.shortDescription);
     }
 
     /**
      * @param name name to update
-     * @param description description corresponding to {@link name} (either full or short name)
+     * @param exported description corresponding to {@link name} (either full or short name)
      * @param value new name
      */
-    private updateName(
-        name: Name,
-        description: SysMLNodeDescription | undefined,
-        value: string
-    ): void {
+    private updateName(name: Name, exported: Exported, value: string): void {
         const parent = this.parent();
-        const basicParent = isElement(parent) ? parent.$meta : undefined;
+        const basicParent = parent.is(Element) ? parent : undefined;
         // remove this child
         if (name.sanitized && basicParent) basicParent.children.delete(name.sanitized);
 
@@ -248,10 +309,12 @@ export class ElementMeta extends VisibilityMeta {
         name.set(value);
         this.qualifiedName = computeQualifiedName(this, parent);
 
-        if (!description || !name.sanitized) return;
-        // add back this child if named
-        description.name = name.sanitized;
-        if (basicParent) basicParent.children.set(name.sanitized, description);
+        if (name.sanitized && name.sanitized.length > 0) {
+            // add back this child if named
+            exported.name = name.sanitized;
+            if (exported.description) exported.description.name = name.sanitized;
+            if (basicParent) basicParent.children.set(name.sanitized, exported);
+        }
         this.updateDescriptions();
     }
 
@@ -261,9 +324,8 @@ export class ElementMeta extends VisibilityMeta {
      * @param short Description for short name
      */
     addDescriptions(regular: SysMLNodeDescription, short: SysMLNodeDescription): void {
-        this.regularDescription = regular;
-        this.shortDescription = short;
-        this.updateDescriptions();
+        this.regularDescription.description = regular;
+        this.shortDescription.description = short;
     }
 }
 

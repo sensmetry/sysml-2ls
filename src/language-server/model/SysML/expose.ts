@@ -16,20 +16,24 @@
 
 import { Expose } from "../../generated/ast";
 import { ImportMeta } from "../KerML/import";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(Expose)
 export class ExposeMeta extends ImportMeta {
-    constructor(node: Expose, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Expose>) {
+        super(id, parent);
     }
 
     override initialize(_node: Expose): void {
         this.importsAll = true;
     }
 
-    override self(): Expose {
+    override self(): Expose | undefined {
         return super.self() as Expose;
+    }
+
+    override parent(): ModelContainer<Expose> {
+        return this._parent;
     }
 }
 

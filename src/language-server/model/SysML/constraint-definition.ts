@@ -17,19 +17,23 @@
 import { Mixin } from "ts-mixer";
 import { ConstraintDefinition } from "../../generated/ast";
 import { PredicateMeta } from "../KerML/predicate";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceDefinitionMeta } from "./occurrence-definition";
 
 @metamodelOf(ConstraintDefinition, {
     base: "Constraints::ConstraintCheck",
 })
 export class ConstraintDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, PredicateMeta) {
-    constructor(node: ConstraintDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ConstraintDefinition>) {
+        super(id, parent);
     }
 
-    override self(): ConstraintDefinition {
+    override self(): ConstraintDefinition | undefined {
         return super.self() as ConstraintDefinition;
+    }
+
+    override parent(): ModelContainer<ConstraintDefinition> {
+        return this._parent;
     }
 }
 

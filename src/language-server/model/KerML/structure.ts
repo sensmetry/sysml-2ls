@@ -14,9 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Classifier, Structure } from "../../generated/ast";
+import { Structure } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ClassMeta } from "./class";
 
 export const ImplicitStructures = {
@@ -25,17 +25,21 @@ export const ImplicitStructures = {
 
 @metamodelOf(Structure, ImplicitStructures)
 export class StructureMeta extends ClassMeta {
-    constructor(node: Structure, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<Structure>) {
+        super(id, parent);
     }
 
-    protected override setupClassifiers(node: Classifier): void {
-        super.setupClassifiers(node);
+    protected override setupClassifiers(): void {
+        super.setupClassifiers();
         this.classifier = TypeClassifier.Structure;
     }
 
-    override self(): Structure {
+    override self(): Structure | undefined {
         return super.deref() as Structure;
+    }
+
+    override parent(): ModelContainer<Structure> {
+        return this._parent;
     }
 }
 

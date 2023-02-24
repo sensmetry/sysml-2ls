@@ -16,7 +16,7 @@
 
 import { Mixin } from "ts-mixer";
 import { SatisfyRequirementUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { AssertConstraintUsageMeta } from "./assert-constraint-usage";
 import { RequirementUsageMeta } from "./requirement-usage";
 
@@ -28,16 +28,20 @@ export class SatisfyRequirementUsageMeta extends Mixin(
     RequirementUsageMeta,
     AssertConstraintUsageMeta
 ) {
-    constructor(node: SatisfyRequirementUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SatisfyRequirementUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
         return this.isNegated ? "negated" : "base";
     }
 
-    override self(): SatisfyRequirementUsage {
+    override self(): SatisfyRequirementUsage | undefined {
         return super.self() as SatisfyRequirementUsage;
+    }
+
+    override parent(): ModelContainer<SatisfyRequirementUsage> {
+        return this._parent;
     }
 }
 

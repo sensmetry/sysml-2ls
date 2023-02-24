@@ -14,20 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    EventOccurrenceUsage,
-    isOccurrenceDefinition,
-    isOccurrenceUsage,
-} from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { EventOccurrenceUsage, OccurrenceDefinition, OccurrenceUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(EventOccurrenceUsage, {
     suboccurrence: "Occurrences::Occurrence::timeEnclosedOccurrences",
 })
 export class EventOccurrenceUsageMeta extends OccurrenceUsageMeta {
-    constructor(node: EventOccurrenceUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<EventOccurrenceUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -36,11 +32,15 @@ export class EventOccurrenceUsageMeta extends OccurrenceUsageMeta {
 
     protected override isSuboccurrence(): boolean {
         const parent = this.parent();
-        return isOccurrenceDefinition(parent) || isOccurrenceUsage(parent);
+        return parent.isAny([OccurrenceUsage, OccurrenceDefinition]);
     }
 
-    override self(): EventOccurrenceUsage {
+    override self(): EventOccurrenceUsage | undefined {
         return super.self() as EventOccurrenceUsage;
+    }
+
+    override parent(): ModelContainer<EventOccurrenceUsage> {
+        return this._parent;
     }
 }
 

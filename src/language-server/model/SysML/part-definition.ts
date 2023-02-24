@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { PartDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ItemDefinitionMeta } from "./item-definition";
 
 @metamodelOf(PartDefinition, {
     base: "Parts::Part",
 })
 export class PartDefinitionMeta extends ItemDefinitionMeta {
-    constructor(node: PartDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<PartDefinition>) {
+        super(id, parent);
     }
 
-    override self(): PartDefinition {
+    override self(): PartDefinition | undefined {
         return super.self() as PartDefinition;
+    }
+
+    override parent(): ModelContainer<PartDefinition> {
+        return this._parent;
     }
 }
 

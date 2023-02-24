@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { AssertConstraintUsage, isActionDefinition, isActionUsage } from "../../generated/ast";
+import { ActionDefinition, ActionUsage, AssertConstraintUsage } from "../../generated/ast";
 import { InvariantMeta } from "../KerML/invariant";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConstraintUsageMeta } from "./constraint-usage";
 
 @metamodelOf(AssertConstraintUsage, {
@@ -25,8 +25,8 @@ import { ConstraintUsageMeta } from "./constraint-usage";
     negated: "Constraints::negatedConstraintChecks",
 })
 export class AssertConstraintUsageMeta extends Mixin(ConstraintUsageMeta, InvariantMeta) {
-    constructor(node: AssertConstraintUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AssertConstraintUsage>) {
+        super(id, parent);
     }
 
     override defaultSupertype(): string {
@@ -35,11 +35,15 @@ export class AssertConstraintUsageMeta extends Mixin(ConstraintUsageMeta, Invari
 
     protected override isEnclosedPerformance(): boolean {
         const parent = this.parent();
-        return isActionDefinition(parent) || isActionUsage(parent);
+        return parent.isAny([ActionDefinition, ActionUsage]);
     }
 
-    override self(): AssertConstraintUsage {
+    override self(): AssertConstraintUsage | undefined {
         return super.self() as AssertConstraintUsage;
+    }
+
+    override parent(): ModelContainer<AssertConstraintUsage> {
+        return this._parent;
     }
 }
 

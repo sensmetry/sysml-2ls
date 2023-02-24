@@ -15,19 +15,23 @@
  ********************************************************************************/
 
 import { AnalysisCaseDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { CaseDefinitionMeta } from "./case-definition";
 
 @metamodelOf(AnalysisCaseDefinition, {
     base: "AnalysisCases::AnalysisCase",
 })
 export class AnalysisCaseDefinitionMeta extends CaseDefinitionMeta {
-    constructor(node: AnalysisCaseDefinition, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AnalysisCaseDefinition>) {
+        super(id, parent);
     }
 
-    override self(): AnalysisCaseDefinition {
+    override self(): AnalysisCaseDefinition | undefined {
         return super.self() as AnalysisCaseDefinition;
+    }
+
+    override parent(): ModelContainer<AnalysisCaseDefinition> {
+        return this._parent;
     }
 }
 

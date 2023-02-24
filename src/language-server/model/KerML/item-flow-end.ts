@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ItemFlowEnd } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConnectorEndMeta } from "./connector-end";
 
 export const ImplicitItemFlowEnds = {
@@ -25,12 +25,16 @@ export const ImplicitItemFlowEnds = {
 
 @metamodelOf(ItemFlowEnd, ImplicitItemFlowEnds)
 export class ItemFlowEndMeta extends ConnectorEndMeta {
-    constructor(node: ItemFlowEnd, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<ItemFlowEnd>) {
+        super(id, parent);
     }
 
-    override self(): ItemFlowEnd {
+    override self(): ItemFlowEnd | undefined {
         return super.deref() as ItemFlowEnd;
+    }
+
+    override parent(): ModelContainer<ItemFlowEnd> {
+        return this._parent;
     }
 }
 

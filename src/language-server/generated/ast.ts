@@ -46,7 +46,7 @@ export function isImportKind(item: unknown): item is ImportKind {
     return reflection.isInstance(item, ImportKind);
 }
 
-export type InlineExpression = CollectExpression | ConditionalExpression | FeatureChainExpression | FeatureReferenceExpression | InvocationExpression | LiteralExpression | MetadataAccessExpression | NullExpression | OperatorExpression | SelectExpression | SelfReferenceExpression;
+export type InlineExpression = CollectExpression | FeatureChainExpression | FeatureReferenceExpression | InvocationExpression | LiteralExpression | MetadataAccessExpression | NullExpression | OperatorExpression | SelectExpression | SelfReferenceExpression;
 
 export const InlineExpression = 'InlineExpression';
 
@@ -454,17 +454,6 @@ export const CollectExpression = 'CollectExpression';
 
 export function isCollectExpression(item: unknown): item is CollectExpression {
     return reflection.isInstance(item, CollectExpression);
-}
-
-export interface ConditionalExpression extends OperatorExpression {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const ConditionalExpression = 'ConditionalExpression';
-
-export function isConditionalExpression(item: unknown): item is ConditionalExpression {
-    return reflection.isInstance(item, ConditionalExpression);
 }
 
 export interface FeatureChainExpression extends OperatorExpression {
@@ -2014,7 +2003,6 @@ export interface SysMlAstType {
     Comment: Comment
     ConcernDefinition: ConcernDefinition
     ConcernUsage: ConcernUsage
-    ConditionalExpression: ConditionalExpression
     ConjugatedPortReference: ConjugatedPortReference
     Conjugation: Conjugation
     ConnectionDefinition: ConnectionDefinition
@@ -2159,7 +2147,7 @@ export interface SysMlAstType {
 export class SysMlAstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return ['AcceptActionUsage', 'ActionDefinition', 'ActionUsage', 'Alias', 'AllocationDefinition', 'AllocationUsage', 'AnalysisCaseDefinition', 'AnalysisCaseUsage', 'Annotation', 'Argument', 'AssertConstraintUsage', 'AssignmentActionUsage', 'Association', 'AssociationStructure', 'AttributeDefinition', 'AttributeUsage', 'Behavior', 'BindingConnector', 'BindingConnectorAsUsage', 'BooleanExpression', 'CalculationDefinition', 'CalculationUsage', 'CaseDefinition', 'CaseUsage', 'Class', 'ClassificationTestOperator', 'Classifier', 'ClassifierReference', 'CollectExpression', 'Comment', 'ConcernDefinition', 'ConcernUsage', 'ConditionalExpression', 'ConjugatedPortReference', 'Conjugation', 'ConnectionDefinition', 'ConnectionUsage', 'Connector', 'ConnectorAsUsage', 'ConnectorEnd', 'ConstraintDefinition', 'ConstraintUsage', 'ControlNode', 'DataType', 'DecisionNode', 'Definition', 'Dependency', 'Disjoining', 'Documentation', 'Element', 'ElementFilter', 'ElementReference', 'EnumerationDefinition', 'EnumerationUsage', 'EqualityOperator', 'EventOccurrenceUsage', 'ExhibitStateUsage', 'Expose', 'Expression', 'Feature', 'FeatureChainExpression', 'FeatureDirectionKind', 'FeatureInverting', 'FeatureReference', 'FeatureReferenceExpression', 'FeatureTyping', 'FeatureValue', 'FlowConnectionDefinition', 'FlowConnectionUsage', 'ForLoopActionUsage', 'ForkNode', 'IfActionUsage', 'Import', 'ImportKind', 'IncludeUseCaseUsage', 'InitialNode', 'InlineExpression', 'Interaction', 'InterfaceDefinition', 'InterfaceUsage', 'Invariant', 'InvocationExpression', 'ItemDefinition', 'ItemFeature', 'ItemFlow', 'ItemFlowEnd', 'ItemUsage', 'JoinNode', 'LibraryPackage', 'LiteralBoolean', 'LiteralExpression', 'LiteralInfinity', 'LiteralNumber', 'LiteralString', 'LoopActionUsage', 'MergeNode', 'Metaclass', 'MetaclassReference', 'MetadataAccessExpression', 'MetadataDefinition', 'MetadataFeature', 'MetadataUsage', 'Multiplicity', 'MultiplicityRange', 'NamedArgument', 'Namespace', 'NullExpression', 'OccurrenceDefinition', 'OccurrenceUsage', 'OperatorExpression', 'Package', 'ParameterKind', 'PartDefinition', 'PartUsage', 'PerformActionUsage', 'PortDefinition', 'PortUsage', 'PortionKind', 'Predicate', 'Redefinition', 'ReferenceUsage', 'RelationalOperator', 'Relationship', 'RenderingDefinition', 'RenderingUsage', 'RequirementConstraintKind', 'RequirementDefinition', 'RequirementKind', 'RequirementUsage', 'Result', 'SatisfyRequirementUsage', 'SelectExpression', 'SelfReferenceExpression', 'SendActionUsage', 'Specialization', 'StateDefinition', 'StateSubactionKind', 'StateUsage', 'Step', 'Structure', 'Subclassification', 'Subsetting', 'Subtype', 'Succession', 'SuccessionAsUsage', 'SuccessionFlowConnectionUsage', 'SuccessionItemFlow', 'SysMLFunction', 'TextualAnnotatingElement', 'TextualRepresentation', 'TransitionFeatureKind', 'TransitionUsage', 'TransparentElement', 'TriggerInvocationExpression', 'TriggerKind', 'Type', 'TypeFeaturing', 'TypeOrFeatureReference', 'TypeReference', 'UnaryOperator', 'Usage', 'UseCaseDefinition', 'UseCaseUsage', 'VerificationCaseDefinition', 'VerificationCaseUsage', 'ViewDefinition', 'ViewUsage', 'ViewpointDefinition', 'ViewpointUsage', 'VisibilityElement', 'VisibilityKind', 'WhileLoopActionUsage'];
+        return ['AcceptActionUsage', 'ActionDefinition', 'ActionUsage', 'Alias', 'AllocationDefinition', 'AllocationUsage', 'AnalysisCaseDefinition', 'AnalysisCaseUsage', 'Annotation', 'Argument', 'AssertConstraintUsage', 'AssignmentActionUsage', 'Association', 'AssociationStructure', 'AttributeDefinition', 'AttributeUsage', 'Behavior', 'BindingConnector', 'BindingConnectorAsUsage', 'BooleanExpression', 'CalculationDefinition', 'CalculationUsage', 'CaseDefinition', 'CaseUsage', 'Class', 'ClassificationTestOperator', 'Classifier', 'ClassifierReference', 'CollectExpression', 'Comment', 'ConcernDefinition', 'ConcernUsage', 'ConjugatedPortReference', 'Conjugation', 'ConnectionDefinition', 'ConnectionUsage', 'Connector', 'ConnectorAsUsage', 'ConnectorEnd', 'ConstraintDefinition', 'ConstraintUsage', 'ControlNode', 'DataType', 'DecisionNode', 'Definition', 'Dependency', 'Disjoining', 'Documentation', 'Element', 'ElementFilter', 'ElementReference', 'EnumerationDefinition', 'EnumerationUsage', 'EqualityOperator', 'EventOccurrenceUsage', 'ExhibitStateUsage', 'Expose', 'Expression', 'Feature', 'FeatureChainExpression', 'FeatureDirectionKind', 'FeatureInverting', 'FeatureReference', 'FeatureReferenceExpression', 'FeatureTyping', 'FeatureValue', 'FlowConnectionDefinition', 'FlowConnectionUsage', 'ForLoopActionUsage', 'ForkNode', 'IfActionUsage', 'Import', 'ImportKind', 'IncludeUseCaseUsage', 'InitialNode', 'InlineExpression', 'Interaction', 'InterfaceDefinition', 'InterfaceUsage', 'Invariant', 'InvocationExpression', 'ItemDefinition', 'ItemFeature', 'ItemFlow', 'ItemFlowEnd', 'ItemUsage', 'JoinNode', 'LibraryPackage', 'LiteralBoolean', 'LiteralExpression', 'LiteralInfinity', 'LiteralNumber', 'LiteralString', 'LoopActionUsage', 'MergeNode', 'Metaclass', 'MetaclassReference', 'MetadataAccessExpression', 'MetadataDefinition', 'MetadataFeature', 'MetadataUsage', 'Multiplicity', 'MultiplicityRange', 'NamedArgument', 'Namespace', 'NullExpression', 'OccurrenceDefinition', 'OccurrenceUsage', 'OperatorExpression', 'Package', 'ParameterKind', 'PartDefinition', 'PartUsage', 'PerformActionUsage', 'PortDefinition', 'PortUsage', 'PortionKind', 'Predicate', 'Redefinition', 'ReferenceUsage', 'RelationalOperator', 'Relationship', 'RenderingDefinition', 'RenderingUsage', 'RequirementConstraintKind', 'RequirementDefinition', 'RequirementKind', 'RequirementUsage', 'Result', 'SatisfyRequirementUsage', 'SelectExpression', 'SelfReferenceExpression', 'SendActionUsage', 'Specialization', 'StateDefinition', 'StateSubactionKind', 'StateUsage', 'Step', 'Structure', 'Subclassification', 'Subsetting', 'Subtype', 'Succession', 'SuccessionAsUsage', 'SuccessionFlowConnectionUsage', 'SuccessionItemFlow', 'SysMLFunction', 'TextualAnnotatingElement', 'TextualRepresentation', 'TransitionFeatureKind', 'TransitionUsage', 'TransparentElement', 'TriggerInvocationExpression', 'TriggerKind', 'Type', 'TypeFeaturing', 'TypeOrFeatureReference', 'TypeReference', 'UnaryOperator', 'Usage', 'UseCaseDefinition', 'UseCaseUsage', 'VerificationCaseDefinition', 'VerificationCaseUsage', 'ViewDefinition', 'ViewUsage', 'ViewpointDefinition', 'ViewpointUsage', 'VisibilityElement', 'VisibilityKind', 'WhileLoopActionUsage'];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -2262,7 +2250,6 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return this.isSubtype(TypeReference, supertype);
             }
             case CollectExpression:
-            case ConditionalExpression:
             case FeatureChainExpression:
             case SelectExpression: {
                 return this.isSubtype(InlineExpression, supertype) || this.isSubtype(OperatorExpression, supertype);

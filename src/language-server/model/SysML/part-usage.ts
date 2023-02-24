@@ -15,14 +15,14 @@
  ********************************************************************************/
 
 import {
-    isCaseDefinition,
-    isCaseUsage,
-    isRequirementDefinition,
-    isRequirementUsage,
+    CaseDefinition,
+    CaseUsage,
     PartUsage,
+    RequirementDefinition,
+    RequirementUsage,
 } from "../../generated/ast";
 import { getParameterKind, ParameterKind } from "../enums";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ItemUsageMeta } from "./item-usage";
 
 @metamodelOf(PartUsage, {
@@ -35,8 +35,8 @@ import { ItemUsageMeta } from "./item-usage";
 export class PartUsageMeta extends ItemUsageMeta {
     parameterKind: ParameterKind = "none";
 
-    constructor(node: PartUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<PartUsage>) {
+        super(id, parent);
     }
 
     override initialize(node: PartUsage): void {
@@ -54,7 +54,7 @@ export class PartUsageMeta extends ItemUsageMeta {
         const parent = this.parent();
         return (
             this.parameterKind === "actor" &&
-            (isRequirementDefinition(parent) || isRequirementUsage(parent))
+            parent.isAny([RequirementDefinition, RequirementUsage])
         );
     }
 
@@ -62,21 +62,25 @@ export class PartUsageMeta extends ItemUsageMeta {
         const parent = this.parent();
         return (
             this.parameterKind === "stakeholder" &&
-            (isRequirementDefinition(parent) || isRequirementUsage(parent))
+            parent.isAny([RequirementDefinition, RequirementUsage])
         );
     }
 
     protected isCaseActor(): boolean {
         const parent = this.parent();
-        return this.parameterKind === "actor" && (isCaseDefinition(parent) || isCaseUsage(parent));
+        return this.parameterKind === "actor" && parent.isAny([CaseDefinition, CaseUsage]);
     }
 
     override isIgnoredParameter(): boolean {
         return super.isIgnoredParameter() || this.parameterKind !== "none";
     }
 
-    override self(): PartUsage {
+    override self(): PartUsage | undefined {
         return super.self() as PartUsage;
+    }
+
+    override parent(): ModelContainer<PartUsage> {
+        return this._parent;
     }
 }
 

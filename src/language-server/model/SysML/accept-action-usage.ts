@@ -14,8 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AcceptActionUsage, isTransitionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID } from "../metamodel";
+import { AcceptActionUsage, TransitionUsage } from "../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(AcceptActionUsage, {
@@ -24,12 +24,16 @@ import { ActionUsageMeta } from "./action-usage";
     subactions: "Actions::Action::acceptSubactions",
 })
 export class AcceptActionUsageMeta extends ActionUsageMeta {
-    constructor(node: AcceptActionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<AcceptActionUsage>) {
+        super(id, parent);
     }
 
-    override self(): AcceptActionUsage {
+    override self(): AcceptActionUsage | undefined {
         return super.self() as AcceptActionUsage;
+    }
+
+    override parent(): ModelContainer<AcceptActionUsage> {
+        return this._parent;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -38,7 +42,7 @@ export class AcceptActionUsageMeta extends ActionUsageMeta {
     }
 
     isTriggerAction(): boolean {
-        return isTransitionUsage(this.parent()) && this.self().$containerProperty === "trigger";
+        return this.parent().is(TransitionUsage) && this.self()?.$containerProperty === "trigger";
     }
 }
 

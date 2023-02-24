@@ -21,9 +21,9 @@ import { URI } from "vscode-uri";
 import { Element, Namespace } from "../../src/language-server/generated/ast";
 import { Diagnostic } from "vscode-languageserver";
 import { SysMLBuildOptions } from "../language-server/services/shared/workspace/document-builder";
-import { Visibility } from "../language-server/utils/ast-util";
 import { makeLinkingScope, makeScope } from "../language-server/utils/scopes";
 import { SysMLConfig } from "../language-server/services/config";
+import { Visibility } from "../language-server/utils/scope-util";
 
 export const TEST_SERVER_OPTIONS: DeepPartial<SysMLConfig> = {
     // don't parse the standard library
@@ -100,7 +100,7 @@ export function qualifiedReference(name: string): object {
 }
 
 export function qualifiedTypeReference(name: string): object {
-    return { $meta: { to: withQualifiedName(name) } };
+    return { $meta: { to: { element: { qualifiedName: name } } } };
 }
 
 export function defaultLinkingErrorTo(name: string): object {
@@ -118,7 +118,7 @@ export function childrenNames(
     imported = Visibility.public
 ): string[] {
     return Array.from(
-        makeScope(namespace, {
+        makeScope(namespace.$meta, {
             inherited: { visibility: inherited, depth: 100000 },
             imported: { visibility: imported, depth: 100000 },
         })
@@ -129,7 +129,7 @@ export function childrenNames(
 
 export function directScopeNames(namespace: Namespace): string[] {
     return Array.from(
-        makeLinkingScope(namespace, { skipParents: true })
+        makeLinkingScope(namespace.$meta, { skipParents: true })
             .getAllElements()
             .map((d) => (d.node as Element).$meta.qualifiedName)
     );

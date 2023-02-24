@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { SuccessionFlowConnectionUsage } from "../../generated/ast";
 import { SuccessionItemFlowMeta } from "../KerML/succession-item-flow";
-import { metamodelOf, ElementID } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { FlowConnectionUsageMeta } from "./flow-connection-usage";
 
 @metamodelOf(SuccessionFlowConnectionUsage, {
@@ -28,12 +28,16 @@ export class SuccessionFlowConnectionUsageMeta extends Mixin(
     FlowConnectionUsageMeta,
     SuccessionItemFlowMeta
 ) {
-    constructor(node: SuccessionFlowConnectionUsage, id: ElementID) {
-        super(node, id);
+    constructor(id: ElementID, parent: ModelContainer<SuccessionFlowConnectionUsage>) {
+        super(id, parent);
     }
 
-    override self(): SuccessionFlowConnectionUsage {
+    override self(): SuccessionFlowConnectionUsage | undefined {
         return super.self() as SuccessionFlowConnectionUsage;
+    }
+
+    override parent(): ModelContainer<SuccessionFlowConnectionUsage> {
+        return this._parent;
     }
 }
 

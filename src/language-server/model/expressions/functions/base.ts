@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Element, OperatorExpression } from "../../../generated/ast";
+import { ElementMeta, OperatorExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
@@ -30,8 +30,8 @@ const PACKAGE = "BaseFunctions";
 @functionFor(PACKAGE, ["'as'", "'meta'"])
 export class AsFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const type = typeArgument(expression);
@@ -46,8 +46,8 @@ export class AsFunction extends BuiltinFunction {
 @functionFor(PACKAGE, ["'@'", "'@@'"])
 export class AtFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const type = typeArgument(expression);
@@ -62,8 +62,8 @@ export class AtFunction extends BuiltinFunction {
 @functionFor(PACKAGE, ["'=='", "'==='"])
 export class EqualsFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const x = evaluator.asArgument(expression, 0, target);
@@ -77,8 +77,8 @@ export class EqualsFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "'hastype'")
 export class HasTypeFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const type = typeArgument(expression);
@@ -93,8 +93,8 @@ export class HasTypeFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "'['")
 export class IndexFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);
@@ -108,8 +108,8 @@ export class IndexFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "'istype'")
 export class IsTypeFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const type = typeArgument(expression);
@@ -124,8 +124,8 @@ export class IsTypeFunction extends BuiltinFunction {
 @functionFor(PACKAGE, "','")
 export class ListConcatFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const values = evaluator.evaluateArgument(expression, 0, target);
@@ -138,8 +138,8 @@ export class ListConcatFunction extends BuiltinFunction {
 @functionFor(PACKAGE, ["'!='", "'!=='"])
 export class NotEqualsFunction extends BuiltinFunction {
     override call(
-        expression: OperatorExpression,
-        target: Element,
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult[] | undefined {
         const x = evaluator.asArgument(expression, 0, target);
