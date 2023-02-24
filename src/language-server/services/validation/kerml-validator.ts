@@ -16,11 +16,13 @@
 
 import { stream, ValidationAcceptor } from "langium";
 import { Type, isAssociation, Subsetting, Feature } from "../../generated/ast";
+import { validateKerML } from "./kerml-validation-registry";
 
 /**
  * Implementation of custom validations.
  */
 export class KerMLValidator {
+    @validateKerML(Type, false)
     checkTypeRelationships(type: Type, accept: ValidationAcceptor): void {
         if (type.unions.length === 1) {
             accept("error", "A single unioning relationship is not allowed", {
@@ -83,6 +85,7 @@ export class KerMLValidator {
         }
     }
 
+    @validateKerML(Feature)
     checkSubsettedMultiplicities(feature: Feature, accept: ValidationAcceptor): void {
         this.validateSubsettingMultiplicities(
             feature,
@@ -93,6 +96,7 @@ export class KerMLValidator {
         );
     }
 
+    @validateKerML(Subsetting)
     checkSubsettingMultiplicities(subsetting: Subsetting, accept: ValidationAcceptor): void {
         const feature = subsetting.specific.$meta.to.target?.element.self();
         const subsetted = subsetting.general.$meta.to.target?.element.self();
@@ -101,6 +105,7 @@ export class KerMLValidator {
         this.validateSubsettingMultiplicities(feature as Feature, [subsetted as Feature], accept);
     }
 
+    @validateKerML(Feature)
     checkFeatureChainingLength(feature: Feature, accept: ValidationAcceptor): void {
         if (feature.chains.length === 0) return;
         const chains = feature.chains.reduce(

@@ -14,7 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { KerMLValidator } from "./kerml-validator";
+
 /**
  * Implementation of custom validations.
  */
-export class SysMLValidator {}
+export class SysMLValidator extends KerMLValidator {}

@@ -29,7 +29,7 @@ import {
 } from "langium";
 import { TextualAnnotatingMeta, typeIndex, TypeMap } from "../../model";
 import * as ast from "../../generated/ast";
-import { SysMLType } from "../sysml-ast-reflection";
+import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { KeysMatching } from "../../utils/common";
 import { isKeyword } from "langium/lib/grammar/generated/ast";
@@ -39,11 +39,25 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 
 type Format<T extends AstNode = AstNode> = (node: T, formatter: NodeFormatter<T>) => void;
 type FormatMap = {
-    [K in SysMLType]?: Format<ast.SysMlAstType[K]>;
+    [K in SysMLType]?: Format<SysMLTypeList[K]>;
 };
 
+const Formatters: FormatMap = {};
+
+function formatter<K extends SysMLType>(...type: K[]) {
+    return function <T, TK extends KeysMatching<T, Format<SysMLTypeList[K]>>>(
+        _: T,
+        __: TK,
+        descriptor: PropertyDescriptor
+    ): void {
+        type.forEach((t) => {
+            Formatters[t] = descriptor.value;
+        });
+    };
+}
+
 // This is more of an idiomatic typescript, but I agree that the type above this one is more readable.
-// type PFormatMap<K extends SysMLType> = Partial<Record<K, Format<ast.SysMlAstType[K]>>>;
+// type PFormatMap<K extends SysMLType> = Partial<Record<K, Format<SysMLTypeList[K]>>>;
 
 /**
  * Cached common formatting options
@@ -92,84 +106,8 @@ export class SysMLFormatter extends AbstractFormatter {
     constructor() {
         super();
 
-        const functions: FormatMap = {
-            Element: this.element,
-            ElementReference: this.reference,
-            FeatureReference: this.featureReference,
-            ConjugatedPortReference: this.conjugatePortReference,
-            MetadataFeature: this.metadataFeature,
-            MultiplicityRange: this.multiplicityRange,
-            NullExpression: this.nullExpression,
-            Comment: this.comment,
-            Documentation: this.doc,
-            TextualRepresentation: this.rep,
-            Definition: this.definition,
-            Dependency: this.dependency,
-            Alias: this.alias,
-            Type: this.type,
-            AssociationStructure: this.assocStruct,
-            Feature: this.feature,
-            FeatureValue: this.featureValue,
-            ElementFilter: this.elementFilter,
-            LibraryPackage: this.libraryPackage,
-            Multiplicity: this.multiplicity,
-            Import: this.import,
-            Specialization: this.specialization,
-            FeatureTyping: this.featureTyping,
-            Conjugation: this.conjugation,
-            Disjoining: this.disjoining,
-            MetadataUsage: this.metadataUsage,
-            FeatureInverting: this.featureInverting,
-            TypeFeaturing: this.typeFeaturing,
-            Connector: this.connector,
-            BindingConnector: this.bindingConnector,
-            Succession: this.succession,
-            ItemFlow: this.itemFlow,
-            SuccessionItemFlow: this.successionFlow,
-            Invariant: this.invariant,
-            OperatorExpression: this.operatorExpression,
-            MetadataAccessExpression: this.metadataAccessExpression,
-            InvocationExpression: this.invocationExpression,
-            NamedArgument: this.namedArgument,
-            FeatureChainExpression: this.featureChainExpression,
-            CollectExpression: this.collectExpression,
-            SelectExpression: this.selectExpression,
-            Expression: this.expression,
-            Usage: this.usage,
-            OccurrenceDefinition: this.occurrenceDefinition,
-            OccurrenceUsage: this.occurrenceUsage,
-            EventOccurrenceUsage: this.eventOccurrenceUsage,
-            BindingConnectorAsUsage: this.bindingConnectorAsUsage,
-            ConnectionUsage: this.connectionUsage,
-            FlowConnectionUsage: this.flowConnectionUsage,
-            SuccessionFlowConnectionUsage: this.successionFlowConnectionUsage,
-            InterfaceUsage: this.interfaceUsage,
-            AllocationUsage: this.allocationUsage,
-            PerformActionUsage: this.performActionUsage,
-            InitialNode: this.initialNode,
-            AcceptActionUsage: this.acceptActionUsage,
-            TriggerInvocationExpression: this.triggerInvocationExpression,
-            SendActionUsage: this.sendActionUsage,
-            AssignmentActionUsage: this.assignmentActionUsage,
-            IfActionUsage: this.ifActionUsage,
-            WhileLoopActionUsage: this.whileLoopActionUsage,
-            ForLoopActionUsage: this.forLoopActionUsage,
-            SuccessionAsUsage: this.successionAsUsage,
-            TransitionUsage: this.transitionUsage,
-            ActionUsage: this.actionUsage,
-            AssertConstraintUsage: this.assertConstraintUsage,
-            ReferenceUsage: this.referenceUsage,
-            ConstraintUsage: this.constraintUsage,
-            ConcernUsage: this.concernUsage,
-            PartUsage: this.partUsage,
-            SatisfyRequirementUsage: this.satisfyRequirementsUsage,
-            RequirementUsage: this.requirementUsage,
-            UseCaseUsage: this.useCaseUsage,
-            UseCaseDefinition: this.useCaseDefinition,
-            IncludeUseCaseUsage: this.includeUseCaseUsage,
-        };
         this.formattings = typeIndex.expandToDerivedTypes(
-            functions as Readonly<TypeMap<ast.SysMlAstType, Format>>
+            Formatters as Readonly<TypeMap<SysMLTypeList, Format>>
         );
     }
 
@@ -270,7 +208,7 @@ export class SysMLFormatter extends AbstractFormatter {
      * @param prepend if true, also call {@link formatPrepend}
      * @param prependNames if true, prepend a space action to declared names
      */
-    protected element(
+    @formatter(ast.Element) element(
         node: ast.Element,
         formatter: NodeFormatter<ast.Element>,
         prepend = true,
@@ -311,14 +249,14 @@ export class SysMLFormatter extends AbstractFormatter {
     /**
      * Format {@link ast.ElementReference ElementReference}
      */
-    protected reference(
+    @formatter(ast.ElementReference) reference(
         _: ast.ElementReference,
         formatter: NodeFormatter<ast.ElementReference>
     ): void {
         formatter.keywords("::").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
     }
 
-    protected featureReference(
+    @formatter(ast.FeatureReference) featureReference(
         node: ast.FeatureReference,
         formatter: NodeFormatter<ast.FeatureReference>
     ): void {
@@ -326,7 +264,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keywords(".").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
     }
 
-    protected conjugatePortReference(
+    @formatter(ast.ConjugatedPortReference) conjugatePortReference(
         node: ast.ConjugatedPortReference,
         formatter: NodeFormatter<ast.ConjugatedPortReference>
     ): void {
@@ -337,7 +275,7 @@ export class SysMLFormatter extends AbstractFormatter {
     /**
      * Format {@link ast.MetadataFeature MetadataFeature}
      */
-    protected metadataFeature(
+    @formatter(ast.MetadataFeature) metadataFeature(
         node: ast.MetadataFeature,
         formatter: NodeFormatter<ast.MetadataFeature>,
         typed = "typed" // is different in SysML
@@ -363,7 +301,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected metadataUsage(
+    @formatter(ast.MetadataUsage) metadataUsage(
         node: ast.MetadataUsage,
         formatter: NodeFormatter<ast.MetadataUsage>
     ): void {
@@ -373,7 +311,7 @@ export class SysMLFormatter extends AbstractFormatter {
     /**
      * Format {@link ast.MultiplicityRange MultiplicityRange}
      */
-    protected multiplicityRange(
+    @formatter(ast.MultiplicityRange) multiplicityRange(
         node: ast.MultiplicityRange,
         formatter: NodeFormatter<ast.MultiplicityRange>
     ): void {
@@ -382,14 +320,17 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("]").prepend(Options.noSpace);
     }
 
-    protected nullExpression(
+    @formatter(ast.NullExpression) nullExpression(
         node: ast.NullExpression,
         formatter: NodeFormatter<ast.NullExpression>
     ): void {
         formatter.keyword("(").append(Options.noSpace);
     }
 
-    protected comment(node: ast.Comment, formatter: NodeFormatter<ast.Comment>): void {
+    @formatter(ast.Comment) comment(
+        node: ast.Comment,
+        formatter: NodeFormatter<ast.Comment>
+    ): void {
         this.element(node, formatter);
 
         if (node.about.length > 0) {
@@ -405,14 +346,17 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.property("body").prepend(Options.oneSpace);
     }
 
-    protected doc(node: ast.Documentation, formatter: NodeFormatter<ast.Documentation>): void {
+    @formatter(ast.Documentation) doc(
+        node: ast.Documentation,
+        formatter: NodeFormatter<ast.Documentation>
+    ): void {
         this.element(node, formatter);
         if (node.declaredName || node.declaredShortName)
             formatter.property("body").prepend(Options.indent);
         else formatter.property("body").prepend(Options.oneSpace);
     }
 
-    protected rep(
+    @formatter(ast.TextualRepresentation) rep(
         node: ast.TextualRepresentation,
         formatter: NodeFormatter<ast.TextualRepresentation>
     ): void {
@@ -421,7 +365,10 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.property("body").prepend(Options.indent);
     }
 
-    protected definition(node: ast.Definition, formatter: NodeFormatter<ast.Definition>): void {
+    @formatter(ast.Definition) definition(
+        node: ast.Definition,
+        formatter: NodeFormatter<ast.Definition>
+    ): void {
         this.type(node, formatter);
         formatter.keyword("def").prepend(Options.oneSpace);
 
@@ -440,13 +387,16 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected usage(node: ast.Usage, formatter: NodeFormatter<ast.Usage>): void {
+    @formatter(ast.Usage) usage(node: ast.Usage, formatter: NodeFormatter<ast.Usage>): void {
         this.feature(node, formatter);
 
         this.usagePart(node, formatter);
     }
 
-    protected dependency(node: ast.Dependency, formatter: NodeFormatter<ast.Dependency>): void {
+    @formatter(ast.Dependency) dependency(
+        node: ast.Dependency,
+        formatter: NodeFormatter<ast.Dependency>
+    ): void {
         this.element(node, formatter);
 
         this.formatList(node, "client", formatter, {
@@ -460,7 +410,7 @@ export class SysMLFormatter extends AbstractFormatter {
         });
     }
 
-    protected alias(node: ast.Alias, formatter: NodeFormatter<ast.Alias>): void {
+    @formatter(ast.Alias) alias(node: ast.Alias, formatter: NodeFormatter<ast.Alias>): void {
         this.element(node, formatter);
 
         formatter
@@ -471,7 +421,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.property("for").prepend(Options.oneSpace);
     }
 
-    protected type(node: ast.Type, formatter: NodeFormatter<ast.Type>): void {
+    @formatter(ast.Type) type(node: ast.Type, formatter: NodeFormatter<ast.Type>): void {
         this.element(node, formatter);
 
         if (node.isAbstract) {
@@ -519,7 +469,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected assocStruct(
+    @formatter(ast.AssociationStructure) assocStruct(
         node: ast.AssociationStructure,
         formatter: NodeFormatter<ast.AssociationStructure>
     ): void {
@@ -528,7 +478,10 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("assoc").append(Options.oneSpace);
     }
 
-    protected feature(node: ast.Feature, formatter: NodeFormatter<ast.Feature>): void {
+    @formatter(ast.Feature) feature(
+        node: ast.Feature,
+        formatter: NodeFormatter<ast.Feature>
+    ): void {
         this.type(node, formatter);
 
         if (node.direction) {
@@ -628,7 +581,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected featureValue(
+    @formatter(ast.FeatureValue) featureValue(
         node: ast.FeatureValue,
         formatter: NodeFormatter<ast.FeatureValue>
     ): void {
@@ -641,7 +594,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.node(node.expression).prepend(addIndent(Options.spaceOrLine, 1));
     }
 
-    protected elementFilter(
+    @formatter(ast.ElementFilter) elementFilter(
         node: ast.ElementFilter,
         formatter: NodeFormatter<ast.ElementFilter>
     ): void {
@@ -651,7 +604,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword(";").prepend(Options.noSpace);
     }
 
-    protected libraryPackage(
+    @formatter(ast.LibraryPackage) libraryPackage(
         node: ast.LibraryPackage,
         formatter: NodeFormatter<ast.LibraryPackage>
     ): void {
@@ -661,7 +614,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("library").append(Options.oneSpace);
     }
 
-    protected multiplicity(
+    @formatter(ast.Multiplicity) multiplicity(
         node: ast.Multiplicity,
         formatter: NodeFormatter<ast.Multiplicity>
     ): void {
@@ -678,7 +631,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected import(node: ast.Import, formatter: NodeFormatter<ast.Import>): void {
+    @formatter(ast.Import) import(node: ast.Import, formatter: NodeFormatter<ast.Import>): void {
         this.formatPrepend(node, formatter);
         if (node.visibility) formatter.property("visibility").append(Options.oneSpace);
         if (node.importsAll) formatter.keyword("all").prepend(Options.oneSpace);
@@ -714,7 +667,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected specialization(
+    @formatter(ast.Specialization) specialization(
         node: ast.Specialization,
         formatter: NodeFormatter<ast.Specialization>,
         keyword = "specialization"
@@ -725,7 +678,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.property("general").prepend(Options.oneSpace);
     }
 
-    protected featureTyping(
+    @formatter(ast.FeatureTyping) featureTyping(
         node: ast.FeatureTyping,
         formatter: NodeFormatter<ast.FeatureTyping>
     ): void {
@@ -733,17 +686,23 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("typed").append(Options.oneSpace);
     }
 
-    protected conjugation(node: ast.Conjugation, formatter: NodeFormatter<ast.Conjugation>): void {
+    @formatter(ast.Conjugation) conjugation(
+        node: ast.Conjugation,
+        formatter: NodeFormatter<ast.Conjugation>
+    ): void {
         this.specialization(node, formatter, "conjugation");
     }
 
-    protected disjoining(node: ast.Disjoining, formatter: NodeFormatter<ast.Disjoining>): void {
+    @formatter(ast.Disjoining) disjoining(
+        node: ast.Disjoining,
+        formatter: NodeFormatter<ast.Disjoining>
+    ): void {
         this.explicitSpecialization(node, formatter, "disjoining");
         formatter.property("disjoined").prepend(Options.oneSpace).append(Options.spaceOrIndent);
         formatter.property("disjoining").prepend(Options.oneSpace);
     }
 
-    protected featureInverting(
+    @formatter(ast.FeatureInverting) featureInverting(
         node: ast.FeatureInverting,
         formatter: NodeFormatter<ast.FeatureInverting>
     ): void {
@@ -755,7 +714,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.property("invertingFeature").prepend(Options.oneSpace);
     }
 
-    protected typeFeaturing(
+    @formatter(ast.TypeFeaturing) typeFeaturing(
         node: ast.TypeFeaturing,
         formatter: NodeFormatter<ast.TypeFeaturing>
     ): void {
@@ -764,7 +723,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.property("featuringType").prepend(Options.oneSpace);
     }
 
-    protected connector(
+    @formatter(ast.Connector) connector(
         node: ast.Connector,
         formatter: NodeFormatter<ast.Connector>,
         keywords: [string, string] = ["from", "to"]
@@ -816,25 +775,28 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.nodes(...ends.slice(start)).prepend(highPriority(Options.oneSpace));
     }
 
-    protected bindingConnector(
+    @formatter(ast.BindingConnector) bindingConnector(
         node: ast.BindingConnector,
         formatter: NodeFormatter<ast.BindingConnector>
     ): void {
         this.formatBinding(node, formatter, node.ends, "of", "=");
     }
 
-    protected bindingConnectorAsUsage(
+    @formatter(ast.BindingConnectorAsUsage) bindingConnectorAsUsage(
         node: ast.BindingConnectorAsUsage,
         formatter: NodeFormatter<ast.BindingConnectorAsUsage>
     ): void {
         this.formatBinding(node, formatter, node.ends, "bind", "=");
     }
 
-    protected succession(node: ast.Succession, formatter: NodeFormatter<ast.Succession>): void {
+    @formatter(ast.Succession) succession(
+        node: ast.Succession,
+        formatter: NodeFormatter<ast.Succession>
+    ): void {
         this.formatBinding(node, formatter, node.ends, "first", "then");
     }
 
-    protected itemFlow(
+    @formatter(ast.ItemFlow) itemFlow(
         node: ast.ItemFlow,
         formatter: NodeFormatter<ast.ItemFlow>,
         keyword = /flow/
@@ -853,7 +815,7 @@ export class SysMLFormatter extends AbstractFormatter {
         of.append(Options.oneSpace);
     }
 
-    protected successionFlow(
+    @formatter(ast.SuccessionItemFlow) successionFlow(
         node: ast.SuccessionItemFlow,
         formatter: NodeFormatter<ast.SuccessionItemFlow>
     ): void {
@@ -862,13 +824,19 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("succession").append(Options.oneSpace);
     }
 
-    protected invariant(node: ast.Invariant, formatter: NodeFormatter<ast.Invariant>): void {
+    @formatter(ast.Invariant) invariant(
+        node: ast.Invariant,
+        formatter: NodeFormatter<ast.Invariant>
+    ): void {
         this.feature(node, formatter);
 
         formatter.keyword(node.isNegated ? "false" : "true").prepend(Options.oneSpace);
     }
 
-    protected expression(node: ast.Expression, formatter: NodeFormatter<ast.Expression>): void {
+    @formatter(ast.Expression) expression(
+        node: ast.Expression,
+        formatter: NodeFormatter<ast.Expression>
+    ): void {
         if (!node.$cstNode?.text.startsWith("{")) {
             this.feature(node, formatter);
         } else {
@@ -915,7 +883,7 @@ export class SysMLFormatter extends AbstractFormatter {
         return left;
     }
 
-    protected operatorExpression(
+    @formatter(ast.OperatorExpression) operatorExpression(
         node: ast.OperatorExpression,
         formatter: NodeFormatter<ast.OperatorExpression>
     ): void {
@@ -967,7 +935,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected metadataAccessExpression(
+    @formatter(ast.MetadataAccessExpression) metadataAccessExpression(
         node: ast.MetadataAccessExpression,
         formatter: NodeFormatter<ast.MetadataAccessExpression>
     ): void {
@@ -978,7 +946,7 @@ export class SysMLFormatter extends AbstractFormatter {
         dot.prepend(Options.noSpace).append(Options.noSpace);
     }
 
-    protected invocationExpression(
+    @formatter(ast.InvocationExpression) invocationExpression(
         node: ast.InvocationExpression,
         formatter: NodeFormatter<ast.InvocationExpression>
     ): void {
@@ -1028,14 +996,14 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected namedArgument(
+    @formatter(ast.NamedArgument) namedArgument(
         node: ast.NamedArgument,
         formatter: NodeFormatter<ast.NamedArgument>
     ): void {
         formatter.keyword("=").prepend(Options.noSpace).append(Options.noSpace);
     }
 
-    protected featureChainExpression(
+    @formatter(ast.FeatureChainExpression) featureChainExpression(
         node: ast.FeatureChainExpression,
         formatter: NodeFormatter<ast.FeatureChainExpression>
     ): void {
@@ -1044,7 +1012,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword(".").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
     }
 
-    protected collectExpression(
+    @formatter(ast.CollectExpression) collectExpression(
         node: ast.CollectExpression,
         formatter: NodeFormatter<ast.CollectExpression>
     ): void {
@@ -1053,7 +1021,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword(".").prepend(Options.noSpace).append(Options.noSpace);
     }
 
-    protected selectExpression(
+    @formatter(ast.SelectExpression) selectExpression(
         node: ast.SelectExpression,
         formatter: NodeFormatter<ast.SelectExpression>
     ): void {
@@ -1062,7 +1030,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword(".?").prepend(Options.noSpace).append(highPriority(Options.noSpace));
     }
 
-    protected occurrenceDefinition(
+    @formatter(ast.OccurrenceDefinition) occurrenceDefinition(
         node: ast.OccurrenceDefinition,
         formatter: NodeFormatter<ast.OccurrenceDefinition>
     ): void {
@@ -1088,7 +1056,7 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.node(node).prepend(Options.oneSpace);
     }
 
-    protected occurrenceUsage(
+    @formatter(ast.OccurrenceUsage) occurrenceUsage(
         node: ast.OccurrenceUsage,
         formatter: NodeFormatter<ast.OccurrenceUsage>
     ): void {
@@ -1096,7 +1064,7 @@ export class SysMLFormatter extends AbstractFormatter {
         this.occurrenceUsagePart(node, formatter);
     }
 
-    protected eventOccurrenceUsage(
+    @formatter(ast.EventOccurrenceUsage) eventOccurrenceUsage(
         node: ast.EventOccurrenceUsage,
         formatter: NodeFormatter<ast.EventOccurrenceUsage>
     ): void {
@@ -1110,7 +1078,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected connectionUsage(
+    @formatter(ast.ConnectionUsage) connectionUsage(
         node: ast.ConnectionUsage,
         formatter: NodeFormatter<ast.ConnectionUsage>
     ): void {
@@ -1122,7 +1090,7 @@ export class SysMLFormatter extends AbstractFormatter {
         else formatter.keyword("connect").prepend(Options.oneSpace);
     }
 
-    protected interfaceUsage(
+    @formatter(ast.InterfaceUsage) interfaceUsage(
         node: ast.InterfaceUsage,
         formatter: NodeFormatter<ast.InterfaceUsage>
     ): void {
@@ -1131,7 +1099,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("interface").append(Options.oneSpace);
     }
 
-    protected allocationUsage(
+    @formatter(ast.AllocationUsage) allocationUsage(
         node: ast.AllocationUsage,
         formatter: NodeFormatter<ast.AllocationUsage>
     ): void {
@@ -1140,7 +1108,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("allocation").append(Options.oneSpace);
     }
 
-    protected flowConnectionUsage(
+    @formatter(ast.FlowConnectionUsage) flowConnectionUsage(
         node: ast.FlowConnectionUsage,
         formatter: NodeFormatter<ast.FlowConnectionUsage>
     ): void {
@@ -1148,7 +1116,7 @@ export class SysMLFormatter extends AbstractFormatter {
         this.occurrenceUsagePart(node, formatter);
     }
 
-    protected successionFlowConnectionUsage(
+    @formatter(ast.SuccessionFlowConnectionUsage) successionFlowConnectionUsage(
         node: ast.SuccessionFlowConnectionUsage,
         formatter: NodeFormatter<ast.SuccessionFlowConnectionUsage>
     ): void {
@@ -1156,7 +1124,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("succession").append(Options.oneSpace);
     }
 
-    protected performActionUsage(
+    @formatter(ast.PerformActionUsage) performActionUsage(
         node: ast.PerformActionUsage,
         formatter: NodeFormatter<ast.PerformActionUsage>
     ): void {
@@ -1164,12 +1132,15 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("perform").append(Options.oneSpace);
     }
 
-    protected initialNode(node: ast.InitialNode, formatter: NodeFormatter<ast.InitialNode>): void {
+    @formatter(ast.InitialNode) initialNode(
+        node: ast.InitialNode,
+        formatter: NodeFormatter<ast.InitialNode>
+    ): void {
         this.element(node, formatter);
         formatter.keyword("first").append(Options.oneSpace);
     }
 
-    protected acceptActionUsage(
+    @formatter(ast.AcceptActionUsage) acceptActionUsage(
         node: ast.AcceptActionUsage,
         formatter: NodeFormatter<ast.AcceptActionUsage>
     ): void {
@@ -1178,14 +1149,14 @@ export class SysMLFormatter extends AbstractFormatter {
         if (node.via) formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
     }
 
-    protected triggerInvocationExpression(
+    @formatter(ast.TriggerInvocationExpression) triggerInvocationExpression(
         node: ast.TriggerInvocationExpression,
         formatter: NodeFormatter<ast.TriggerInvocationExpression>
     ): void {
         formatter.property("kind").prepend(Options.oneSpace).append(Options.oneSpace);
     }
 
-    protected sendActionUsage(
+    @formatter(ast.SendActionUsage) sendActionUsage(
         node: ast.SendActionUsage,
         formatter: NodeFormatter<ast.SendActionUsage>
     ): void {
@@ -1195,7 +1166,7 @@ export class SysMLFormatter extends AbstractFormatter {
         if (node.to) formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
     }
 
-    protected assignmentActionUsage(
+    @formatter(ast.AssignmentActionUsage) assignmentActionUsage(
         node: ast.AssignmentActionUsage,
         formatter: NodeFormatter<ast.AssignmentActionUsage>
     ): void {
@@ -1203,7 +1174,7 @@ export class SysMLFormatter extends AbstractFormatter {
         this.formatBinding(node, formatter, [node.left, node.right], "assign", ":=");
     }
 
-    protected ifActionUsage(
+    @formatter(ast.IfActionUsage) ifActionUsage(
         node: ast.IfActionUsage,
         formatter: NodeFormatter<ast.IfActionUsage>
     ): void {
@@ -1216,7 +1187,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected whileLoopActionUsage(
+    @formatter(ast.WhileLoopActionUsage) whileLoopActionUsage(
         node: ast.WhileLoopActionUsage,
         formatter: NodeFormatter<ast.WhileLoopActionUsage>
     ): void {
@@ -1235,7 +1206,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected forLoopActionUsage(
+    @formatter(ast.ForLoopActionUsage) forLoopActionUsage(
         node: ast.ForLoopActionUsage,
         formatter: NodeFormatter<ast.ForLoopActionUsage>
     ): void {
@@ -1248,7 +1219,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.node(node.body).prepend(highPriority(addIndent(Options.indent, 1)));
     }
 
-    protected successionAsUsage(
+    @formatter(ast.SuccessionAsUsage) successionAsUsage(
         node: ast.SuccessionAsUsage,
         formatter: NodeFormatter<ast.SuccessionAsUsage>
     ): void {
@@ -1256,7 +1227,7 @@ export class SysMLFormatter extends AbstractFormatter {
         this.succession(node, formatter);
     }
 
-    protected transitionUsage(
+    @formatter(ast.TransitionUsage) transitionUsage(
         node: ast.TransitionUsage,
         formatter: NodeFormatter<ast.TransitionUsage>
     ): void {
@@ -1290,7 +1261,10 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected actionUsage(node: ast.ActionUsage, formatter: NodeFormatter<ast.ActionUsage>): void {
+    @formatter(ast.ActionUsage) actionUsage(
+        node: ast.ActionUsage,
+        formatter: NodeFormatter<ast.ActionUsage>
+    ): void {
         this.occurrenceUsage(node, formatter);
 
         if (node.actionKind) {
@@ -1298,7 +1272,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected assertConstraintUsage(
+    @formatter(ast.AssertConstraintUsage) assertConstraintUsage(
         node: ast.AssertConstraintUsage,
         formatter: NodeFormatter<ast.AssertConstraintUsage>
     ): void {
@@ -1308,7 +1282,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("not").append(Options.oneSpace);
     }
 
-    protected referenceUsage(
+    @formatter(ast.ReferenceUsage) referenceUsage(
         node: ast.ReferenceUsage,
         formatter: NodeFormatter<ast.ReferenceUsage>
     ): void {
@@ -1316,7 +1290,7 @@ export class SysMLFormatter extends AbstractFormatter {
         if (node.isSubject) formatter.keyword("subject").append(Options.oneSpace);
     }
 
-    protected constraintUsage(
+    @formatter(ast.ConstraintUsage) constraintUsage(
         node: ast.ConstraintUsage,
         formatter: NodeFormatter<ast.ConstraintUsage>
     ): void {
@@ -1324,7 +1298,7 @@ export class SysMLFormatter extends AbstractFormatter {
         if (node.constraintKind) formatter.property("constraintKind").append(Options.oneSpace);
     }
 
-    protected concernUsage(
+    @formatter(ast.ConcernUsage) concernUsage(
         node: ast.ConcernUsage,
         formatter: NodeFormatter<ast.ConcernUsage>
     ): void {
@@ -1332,12 +1306,15 @@ export class SysMLFormatter extends AbstractFormatter {
         if (node.isFramed) formatter.keyword("frame").append(Options.oneSpace);
     }
 
-    protected partUsage(node: ast.PartUsage, formatter: NodeFormatter<ast.PartUsage>): void {
+    @formatter(ast.PartUsage) partUsage(
+        node: ast.PartUsage,
+        formatter: NodeFormatter<ast.PartUsage>
+    ): void {
         this.occurrenceUsage(node, formatter);
         if (node.parameterKind) formatter.property("parameterKind").append(Options.oneSpace);
     }
 
-    protected satisfyRequirementsUsage(
+    @formatter(ast.SatisfyRequirementUsage) satisfyRequirementsUsage(
         node: ast.SatisfyRequirementUsage,
         formatter: NodeFormatter<ast.SatisfyRequirementUsage>
     ): void {
@@ -1348,7 +1325,7 @@ export class SysMLFormatter extends AbstractFormatter {
         }
     }
 
-    protected requirementUsage(
+    @formatter(ast.RequirementUsage) requirementUsage(
         node: ast.RequirementUsage,
         formatter: NodeFormatter<ast.RequirementUsage>
     ): void {
@@ -1356,7 +1333,7 @@ export class SysMLFormatter extends AbstractFormatter {
         if (node.requirementKind) formatter.property("requirementKind").append(Options.oneSpace);
     }
 
-    protected useCaseUsage(
+    @formatter(ast.UseCaseUsage) useCaseUsage(
         node: ast.UseCaseUsage,
         formatter: NodeFormatter<ast.UseCaseUsage>
     ): void {
@@ -1365,7 +1342,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("use").append(Options.oneSpace);
     }
 
-    protected useCaseDefinition(
+    @formatter(ast.UseCaseDefinition) useCaseDefinition(
         node: ast.UseCaseDefinition,
         formatter: NodeFormatter<ast.UseCaseDefinition>
     ): void {
@@ -1374,7 +1351,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("use").append(Options.oneSpace);
     }
 
-    protected includeUseCaseUsage(
+    @formatter(ast.IncludeUseCaseUsage) includeUseCaseUsage(
         node: ast.IncludeUseCaseUsage,
         formatter: NodeFormatter<ast.IncludeUseCaseUsage>
     ): void {

@@ -25,18 +25,13 @@ import {
 } from "langium";
 import { createParser } from "langium/lib/parser/parser-builder-base";
 import { CstNodeBuilder } from "langium/lib/parser/cst-node-builder";
-import {
-    ActionUsage,
-    OperatorExpression,
-    SelfReferenceExpression,
-    SysMlAstType,
-} from "../../generated/ast";
+import { ActionUsage, OperatorExpression, SelfReferenceExpression } from "../../generated/ast";
 import { typeIndex, TypeMap } from "../../model/types";
 import { SysMLDefaultServices } from "../services";
 import { cstNodeRuleName } from "../../utils/common";
 import { compareRanges } from "../../utils/ast-util";
 import { isRuleCall } from "langium/lib/grammar/generated/ast";
-import { SysMLType } from "../sysml-ast-reflection";
+import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -94,7 +89,7 @@ type ProcessingFunction<T extends AstNode = AstNode> = (
     node: T,
     services: SysMLDefaultServices
 ) => void;
-type ProcessingMap = { [K in SysMLType]?: ProcessingFunction<SysMlAstType[K]> };
+type ProcessingMap = { [K in SysMLType]?: ProcessingFunction<SysMLTypeList[K]> };
 
 /**
  * Extension of Langium CST node builder that performs some postprocessing on
@@ -116,7 +111,7 @@ export class SysMLCstNodeBuilder extends CstNodeBuilder {
         };
 
         this.postprocessingMap = typeIndex.expandToDerivedTypes(
-            map as TypeMap<SysMlAstType, ProcessingFunction>
+            map as TypeMap<SysMLTypeList, ProcessingFunction>
         );
     }
 

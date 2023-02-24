@@ -44,7 +44,6 @@ import {
     MetadataAccessExpression,
     NamedArgument,
     Namespace,
-    SysMlAstType,
 } from "../../generated/ast";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLScopeProvider } from "./scope-provider";
@@ -58,6 +57,8 @@ import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
 import { AliasMeta, ElementMeta, TypeMeta } from "../../model";
 import { AliasResolver, isVisibleWith, Visibility } from "../../utils/scope-util";
 import { followAlias } from "../../utils/ast-util";
+import { KeysMatching } from "../../utils/common";
+import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 
 /**
  * Reference used by SysML services that makes use of knowing that only Elements can be referenced
@@ -91,7 +92,19 @@ export interface SysMLReferenceInfo extends ReferenceInfo {
 }
 
 type LinkFunction<T = AstNode> = (node: T, document: LangiumDocument) => ElementMeta | undefined;
-type LinkMap = { [K in keyof SysMlAstType]?: LinkFunction<SysMlAstType[K]> };
+type LinkMap = { [K in SysMLType]?: LinkFunction<SysMLTypeList[K]> };
+
+const Linkers: LinkMap = {};
+
+function linker<K extends SysMLType>(type: K) {
+    return function <T, TK extends KeysMatching<T, LinkFunction<SysMLTypeList[K]>>>(
+        _: T,
+        __: TK,
+        descriptor: PropertyDescriptor
+    ): void {
+        Linkers[type] = descriptor.value;
+    };
+}
 
 /**
  * Extension of Langium linker to provide SysML specific functionality
@@ -122,16 +135,8 @@ export class SysMLLinker extends DefaultLinker {
         this.metamodelBuilder = services.shared.workspace.MetamodelBuilder;
         this.config = services.shared.workspace.ConfigurationProvider;
 
-        const linkers: LinkMap = {
-            ElementReference: this.linkReference,
-            FeatureChainExpression: this.linkFeatureChainExpression,
-            InvocationExpression: this.linkInvocationExpression,
-            FeatureReferenceExpression: this.linkFeatureReferenceExpression,
-            MetadataAccessExpression: this.linkMetadataAccessExpression,
-            NamedArgument: this.namedArgument,
-        };
         this.linkFunctions = typeIndex.expandToDerivedTypes(
-            linkers as TypeMap<SysMlAstType, LinkFunction>
+            Linkers as TypeMap<SysMLTypeList, LinkFunction>
         );
     }
 
@@ -249,6 +254,7 @@ export class SysMLLinker extends DefaultLinker {
      * @param node {@link Alias} node to link
      * @returns the final element of {@link Alias} chain or undefined
      */
+    @linker(Alias)
     linkAlias(node: Alias, document: LangiumDocument): ElementMeta | undefined {
         const meta = node.$meta;
 
@@ -286,6 +292,7 @@ export class SysMLLinker extends DefaultLinker {
      * @param document document that owns {@link ref}
      * @returns final reference of {@link ref} with aliases resolved or undefined
      */
+    @linker(ElementReference)
     linkReference(ref: ElementReference, document: LangiumDocument): ElementMeta | undefined {
         const to = ref.$meta.to;
         // check if already linked
@@ -313,7 +320,8 @@ export class SysMLLinker extends DefaultLinker {
     /**
      * Link a {@link FeatureChainExpression}
      */
-    protected linkFeatureChainExpression(
+    @linker(FeatureChainExpression)
+    linkFeatureChainExpression(
         expr: FeatureChainExpression,
         document: LangiumDocument
     ): ElementMeta | undefined {
@@ -330,7 +338,8 @@ export class SysMLLinker extends DefaultLinker {
      * Link an {@link InvocationExpression}
      * @returns the linked invoked type or undefined
      */
-    protected linkInvocationExpression(
+    @linker(InvocationExpression)
+    linkInvocationExpression(
         expr: InvocationExpression,
         document: LangiumDocument
     ): ElementMeta | undefined {
@@ -353,14 +362,16 @@ export class SysMLLinker extends DefaultLinker {
      * Link a {@link FeatureReferenceExpression}
      * @returns the linked expression target or undefined
      */
-    protected linkFeatureReferenceExpression(
+    @linker(FeatureReferenceExpression)
+    linkFeatureReferenceExpression(
         expr: FeatureReferenceExpression,
         document: LangiumDocument
     ): ElementMeta | undefined {
         return this.linkNode(expr.expression, document);
     }
 
-    protected linkMetadataAccessExpression(
+    @linker(MetadataAccessExpression)
+    linkMetadataAccessExpression(
         expr: MetadataAccessExpression,
         document: LangiumDocument
     ): ElementMeta | undefined {
@@ -369,7 +380,8 @@ export class SysMLLinker extends DefaultLinker {
         return target;
     }
 
-    protected namedArgument(arg: NamedArgument, doc: LangiumDocument): ElementMeta | undefined {
+    @linker(NamedArgument)
+    namedArgument(arg: NamedArgument, doc: LangiumDocument): ElementMeta | undefined {
         return this.linkReference(arg.name, doc);
     }
 

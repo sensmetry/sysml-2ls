@@ -32,18 +32,18 @@ type ImplicitGeneralizations = {
     [key: string]: string;
 };
 
-type Property<T extends object | undefined, K extends keyof NonNullable<T>> = undefined extends T
-    ? NonNullable<T>[K] | undefined
-    : NonNullable<T>[K];
+export type Property<T extends object | undefined, K extends keyof NonNullable<T>> =
+    | NonNullable<T>[K]
+    | (undefined extends T ? undefined : never);
 
 // cannot use $meta since base classes may have subclasses as their owners
 // leading to circular dependencies
 type Meta<T extends AstNode> = Metamodel<T>;
 type Container<T extends AstNode> = T["$container"];
 
-export type ModelContainer<T extends AstNode> = undefined extends Container<T>
-    ? Meta<NonNullable<Container<T>>> | undefined
-    : Meta<NonNullable<Container<T>>>;
+export type ModelContainer<T extends AstNode> =
+    | Meta<NonNullable<Container<T>>>
+    | (undefined extends Container<T> ? undefined : never);
 
 export type ParentModel<T extends AstNode> = Property<Container<T>, "$meta">;
 

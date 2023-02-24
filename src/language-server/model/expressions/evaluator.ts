@@ -17,25 +17,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-    Evaluable,
-    ExpressionResult,
-    ModelLevelExpressionEvaluator,
-    builtinFunction,
-} from "./util";
-
-// import last
-import "./functions";
-import { SpecializationKind } from "../enums";
-import {
-    ElementMeta,
-    ElementReferenceMeta,
-    FeatureMeta,
-    FeatureReferenceExpressionMeta,
-    InvocationExpressionMeta,
-    MetadataAccessExpressionMeta,
-    TypeMeta,
-} from "../KerML";
-import {
     Argument,
     ElementReference,
     FeatureReference,
@@ -52,31 +33,89 @@ import {
     Type,
     TypeReference,
 } from "../../generated/ast";
+import { SysMLType, SysMLTypeList } from "../../services/sysml-ast-reflection";
+import { KeysMatching } from "../../utils/common";
+import { SpecializationKind } from "../enums";
+import {
+    ElementMeta,
+    ElementReferenceMeta,
+    FeatureMeta,
+    FeatureReferenceExpressionMeta,
+    InvocationExpressionMeta,
+    LiteralBooleanMeta,
+    LiteralInfinityMeta,
+    LiteralNumberMeta,
+    LiteralStringMeta,
+    MetadataAccessExpressionMeta,
+    SelfReferenceExpressionMeta,
+    TypeMeta,
+} from "../KerML";
+import { Metamodel, Property } from "../metamodel";
+import { typeIndex, TypeMap } from "../types";
+import {
+    builtinFunction,
+    Evaluable,
+    ExpressionResult,
+    ModelLevelExpressionEvaluator,
+} from "./util";
+
+// import last
+import "./functions";
+
+type EvaluatorFunction<T = Metamodel> = (
+    expression: T,
+    target: ElementMeta
+) => ExpressionResult[] | undefined;
+type EvaluatorMap = {
+    [K in SysMLType]?: EvaluatorFunction<Property<SysMLTypeList[K], "$meta">>;
+};
+
+const Evaluators: EvaluatorMap = {};
+
+function evaluates<K extends SysMLType>(...type: K[]) {
+    return function <T, TK extends KeysMatching<T, EvaluatorFunction<SysMLTypeList[K]["$meta"]>>>(
+        _: T,
+        __: TK,
+        descriptor: PropertyDescriptor
+    ): void {
+        type.forEach((t) => (Evaluators[t] = descriptor.value));
+    };
+}
 
 export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
+    protected readonly evaluators: Map<string, EvaluatorFunction>;
+
+    constructor() {
+        this.evaluators = typeIndex.expandToDerivedTypes(
+            Evaluators as TypeMap<SysMLType, EvaluatorFunction>
+        );
+    }
+
     evaluate(expression: Evaluable, target: ElementMeta): ExpressionResult[] | undefined {
-        // TODO: lookup table
-        if (expression.is(NullExpression)) return [];
-        if (expression.is(LiteralBoolean)) return [expression.value];
-        if (expression.is(LiteralNumber)) return [expression.value];
-        if (expression.is(LiteralString)) return [expression.value];
-        if (expression.is(LiteralInfinity)) return [expression];
-        if (expression.is(SelfReferenceExpression)) return [target];
+        const evaluator = this.evaluators.get(expression.nodeType());
+        return evaluator ? evaluator.call(this, expression, target) : [];
+    }
 
-        if (expression.is(ElementReference)) {
-            return this.evaluateReference(expression);
-        }
-        if (expression.is(InvocationExpression)) {
-            return this.evaluateInvocation(expression, target);
-        }
-        if (expression.is(FeatureReferenceExpression)) {
-            return this.evaluateFeatureReference(expression, target);
-        }
-        if (expression.is(MetadataAccessExpression)) {
-            return this.evaluateMetadataAccess(expression, target);
-        }
-
+    @evaluates(NullExpression)
+    evaluateNull(): ExpressionResult[] {
         return [];
+    }
+
+    @evaluates(LiteralInfinity)
+    evaluateInfinity(expression: LiteralInfinityMeta): [LiteralInfinityMeta] {
+        return [expression];
+    }
+
+    @evaluates(SelfReferenceExpression)
+    evaluateSelfReference(_: SelfReferenceExpressionMeta, target: ElementMeta): [ElementMeta] {
+        return [target];
+    }
+
+    @evaluates(LiteralBoolean, LiteralNumber, LiteralString)
+    evaluateLiteral(
+        expression: LiteralNumberMeta | LiteralBooleanMeta | LiteralStringMeta
+    ): [number | boolean | string] {
+        return [expression.value];
     }
 
     evaluateArgument(
@@ -136,7 +175,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         return left === right;
     }
 
-    protected evaluateInvocation(
+    @evaluates(InvocationExpression)
+    evaluateInvocation(
         expression: InvocationExpressionMeta,
         target: ElementMeta
     ): ExpressionResult[] | undefined {
@@ -147,7 +187,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         return builtin.call(expression, target, this);
     }
 
-    protected evaluateFeatureReference(
+    @evaluates(FeatureReferenceExpression)
+    evaluateFeatureReference(
         expression: FeatureReferenceExpressionMeta,
         target: ElementMeta
     ): ExpressionResult[] | undefined {
@@ -163,7 +204,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         return type ? this.evaluateFeature(referenced, type) : undefined;
     }
 
-    protected evaluateMetadataAccess(
+    @evaluates(MetadataAccessExpression)
+    evaluateMetadataAccess(
         expression: MetadataAccessExpressionMeta,
         target: ElementMeta
     ): ExpressionResult[] | undefined {
@@ -198,7 +240,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         return [feature];
     }
 
-    protected evaluateReference(ref: ElementReferenceMeta): ElementMeta[] | undefined {
+    @evaluates(ElementReference)
+    evaluateReference(ref: ElementReferenceMeta): ElementMeta[] | undefined {
         const target = ref.to.target?.element;
         if (!target) return undefined;
         return [target];

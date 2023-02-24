@@ -42,7 +42,6 @@ import {
     Definition,
     isClassifier,
     Classifier,
-    SysMlAstType,
     CaseDefinition,
     CaseUsage,
     RequirementUsage,
@@ -108,7 +107,7 @@ const MetaclassPackages = [
     "SysML::Systems::",
     // "SysML::",
 ] as const;
-const MetaclassOverrides: { readonly [K in keyof SysMlAstType]?: string } = {
+const MetaclassOverrides: { readonly [K in SysMLType]?: string } = {
     ConnectorEnd: Feature,
     InitialNode: Feature,
     SysMLFunction: "Function", // Function is reserved in TS
@@ -187,8 +186,22 @@ class ElementIdProvider {
 
 type PreLinkFunction<T = AstNode> = (node: T, document: LangiumDocument) => void;
 type PreLinkFunctionMap = {
-    [K in keyof SysMlAstType]?: PreLinkFunction<SysMlAstType[K]>[];
+    [K in SysMLType]?: PreLinkFunction<SysMLTypeList[K]>[];
 };
+
+const Builders: PreLinkFunctionMap = {};
+
+function builder<K extends SysMLType>(...type: K[]) {
+    return function <T, TK extends KeysMatching<T, PreLinkFunction<SysMLTypeList[K]>>>(
+        _: T,
+        __: TK,
+        descriptor: PropertyDescriptor
+    ): void {
+        type.forEach((t) => {
+            (Builders[t] ??= [] as NonNullable<typeof Builders[K]>).push(descriptor.value);
+        });
+    };
+}
 
 // TODO: maybe should split this into KerML and SysML builders with SysML
 // inheriting from KerML builder
@@ -227,32 +240,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         // a lot of types that specialize multiple supertypes and declaring
         // functions for each of them separately is tedious, arrays will
         // automatically include all base classes setup functions
-        this.preLinkFunctions = this.registerLinkFunctions({
-            Element: [this.assignMetaclass],
-            Type: [this.addSemanticMetadata, this.linkTypeRelationships],
-            Classifier: [this.addClassifierImplicits],
-            Feature: [
-                this.linkFeatureRelationships,
-                this.addFeatureImplicits,
-                this.addFeatureValueTypings,
-            ],
-            Association: [this.redefineEnds],
-            Connector: [this.redefineEnds],
-            Namespace: [this.resolveNamespaceImports],
-            Definition: [this.addDefinitionImplicits],
-            Usage: [this.addUsageImplicits],
-            CaseDefinition: [this.redefineObjective, this.redefineSubject],
-            CaseUsage: [this.redefineObjective, this.redefineSubject],
-            RequirementDefinition: [this.redefineSubject],
-            RequirementUsage: [this.redefineSubject],
-            ActionUsage: [this.redefineActionParameters],
-            ActionDefinition: [this.redefineActionParameters],
-            StateDefinition: [this.redefineStateSubactions],
-            StateUsage: [this.redefineStateSubactions],
-            TransitionUsage: [this.redefineTransitionUsageFeatures],
-            MetadataFeature: [this.linkMetadata],
-            Comment: [this.linkComment],
-        });
+        this.preLinkFunctions = this.registerLinkFunctions(Builders);
     }
 
     protected registerLinkFunctions(
@@ -409,7 +397,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Assign a standard library metaclass based on the AST type
      */
-    protected assignMetaclass(node: Element, document: LangiumDocument): void {
+    @builder(Element)
+    assignMetaclass(node: Element, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
         const cache = {
@@ -477,13 +466,13 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      */
     construct<
         V extends SysMLType,
-        T extends AstParent<SysMlAstType[V]>,
-        P extends AstPropertiesFor<SysMlAstType[V], T>
+        T extends AstParent<SysMLTypeList[V]>,
+        P extends AstPropertiesFor<SysMLTypeList[V], T>
     >(
         type: V,
-        properties: ConstructParams<SysMlAstType[V], T, P>,
+        properties: ConstructParams<SysMLTypeList[V], T, P>,
         document: LangiumDocument
-    ): SysMlAstType[V] {
+    ): SysMLTypeList[V] {
         const node = this.astReflection.createNode(type, properties);
         this.addMeta(node, document);
         // valid document implies that parsed nodes have had $meta assigned so
@@ -497,7 +486,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      * Resolve imports of {@link node} and its parents since they are implicitly
      * imported
      */
-    protected resolveNamespaceImports(node: Namespace, document: LangiumDocument): void {
+    @builder(Namespace)
+    resolveNamespaceImports(node: Namespace, document: LangiumDocument): void {
         const meta = node.$meta;
         // again check for circular dependencies TODO: surface circular
         // dependencies as warnings?
@@ -534,7 +524,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup explicit feature relationships
      */
-    protected linkFeatureRelationships(node: Feature, document: LangiumDocument): void {
+    @builder(Feature)
+    linkFeatureRelationships(node: Feature, document: LangiumDocument): void {
         const linker = this.linker(document.uri);
         node.chains.forEach((ref) => {
             const element = linker.linkReference(ref, document);
@@ -573,9 +564,43 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     }
 
     /**
+     * Setup implicit specializations from Metaobjects::SemanticMetadata
+     */
+    @builder(Type)
+    addSemanticMetadata(node: Type, document: LangiumDocument): void {
+        for (const metadata of node.$meta.metadata) {
+            const metaNode = metadata.element.self();
+            if (metaNode) this.buildNode(metaNode, document);
+            const baseTypes = metadata.element
+                .allFeatures()
+                .filter((f) => f.element.conforms("Metaobjects::SemanticMetadata::baseType"));
+
+            for (const baseType of baseTypes) {
+                const value = baseType.element.value?.element;
+                if (!value) continue;
+
+                const expr = value.self();
+                if (expr) this.buildNode(expr, document);
+                const result = this.evaluator.evaluate(value, baseType.element)?.at(0);
+                if (!result || !isMetamodel(result) || !result.is(MetadataFeature)) continue;
+
+                for (const annotated of result.annotates) {
+                    if (!annotated.is(Type)) continue;
+                    node.$meta.addSpecialization(
+                        annotated,
+                        node.$meta.specializationKind(),
+                        "implicit"
+                    );
+                }
+            }
+        }
+    }
+
+    /**
      * Setup explicit type relationships
      */
-    protected linkTypeRelationships(node: Type, document: LangiumDocument): void {
+    @builder(Type)
+    linkTypeRelationships(node: Type, document: LangiumDocument): void {
         // explicit
         const linker = this.linker(document.uri);
         getExplicitSpecializations(node).forEach((ref) => {
@@ -592,7 +617,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit classifier relationships
      */
-    protected addClassifierImplicits(node: Classifier, document: LangiumDocument): void {
+    @builder(Classifier)
+    addClassifierImplicits(node: Classifier, document: LangiumDocument): void {
         // implicit
         if (node.specializes.length !== 0) return;
         this.addImplicits(node, document, isType);
@@ -601,7 +627,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit feature relationships
      */
-    protected addFeatureImplicits(node: Feature, document: LangiumDocument): void {
+    @builder(Feature)
+    addFeatureImplicits(node: Feature, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
         // implicit
@@ -634,7 +661,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      * Setup implicit Association and Connector end feature redefinitions
      * @param node
      */
-    protected redefineEnds(node: Association | Connector): void {
+    @builder(Association, Connector)
+    redefineEnds(node: Association | Connector): void {
         const baseEndIterator = node.$meta
             .basePositionalFeatures(
                 (f) => f.element.isEnd,
@@ -669,7 +697,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit definition relationships
      */
-    protected addDefinitionImplicits(node: Definition, document: LangiumDocument): void {
+    @builder(Definition)
+    addDefinitionImplicits(node: Definition, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
         const base = this.findLibraryElement(
@@ -688,7 +717,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit usage relationships
      */
-    protected addUsageImplicits(node: Usage, document: LangiumDocument): void {
+    @builder(Usage)
+    addUsageImplicits(node: Usage, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
         const base = this.findLibraryElement(
@@ -707,7 +737,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit action parameter redefinitions
      */
-    protected redefineActionParameters(
+    @builder(ActionUsage, ActionDefinition)
+    redefineActionParameters(
         action: ActionUsage | ActionDefinition,
         document: LangiumDocument
     ): void {
@@ -754,7 +785,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit subject parameter redefinition
      */
-    protected redefineSubject(
+    @builder(CaseUsage, CaseDefinition, RequirementDefinition, RequirementUsage)
+    redefineSubject(
         node: CaseUsage | CaseDefinition | RequirementDefinition | RequirementUsage,
         document: LangiumDocument
     ): void {
@@ -769,7 +801,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit objective parameter redefinition
      */
-    protected redefineObjective(node: CaseUsage | CaseDefinition, document: LangiumDocument): void {
+    @builder(CaseUsage, CaseDefinition)
+    redefineObjective(node: CaseUsage | CaseDefinition, document: LangiumDocument): void {
         this.redefineFirstIf({
             node,
             key: "features",
@@ -782,10 +815,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit state subactions redefinitions
      */
-    protected redefineStateSubactions(
-        node: StateUsage | StateDefinition,
-        document: LangiumDocument
-    ): void {
+    @builder(StateUsage, StateDefinition)
+    redefineStateSubactions(node: StateUsage | StateDefinition, document: LangiumDocument): void {
         const redefine = (kind: StateSubactionKind): void => {
             this.redefineFirstIf({
                 node,
@@ -804,10 +835,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit transition usage feature redefinitions
      */
-    protected redefineTransitionUsageFeatures(
-        node: TransitionUsage,
-        document: LangiumDocument
-    ): void {
+    @builder(TransitionUsage)
+    redefineTransitionUsageFeatures(node: TransitionUsage, document: LangiumDocument): void {
         type K = KeysMatching<TransitionUsage, Feature | undefined>;
         const findBase = (node: TransitionUsageMeta, k: K): Feature | undefined => {
             for (const specialization of node.typesMatching(TransitionUsage)) {
@@ -854,7 +883,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup explicit comment references
      */
-    protected linkComment(node: Comment, document: LangiumDocument): void {
+    @builder(Comment)
+    linkComment(node: Comment, document: LangiumDocument): void {
         const linker = this.linker(document.uri);
         node.about.forEach((ref) => {
             const element = linker.linkReference(ref, document);
@@ -868,7 +898,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup explicit metadata references
      */
-    protected linkMetadata(node: MetadataFeature, document: LangiumDocument): void {
+    @builder(MetadataFeature)
+    linkMetadata(node: MetadataFeature, document: LangiumDocument): void {
         const linker = this.linker(document.uri);
         node.about.forEach((ref) => {
             const element = linker.linkReference(ref, document);
@@ -880,41 +911,10 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     }
 
     /**
-     * Setup implicit specializations from Metaobjects::SemanticMetadata
-     */
-    protected addSemanticMetadata(node: Type, document: LangiumDocument): void {
-        for (const metadata of node.$meta.metadata) {
-            const metaNode = metadata.element.self();
-            if (metaNode) this.buildNode(metaNode, document);
-            const baseTypes = metadata.element
-                .allFeatures()
-                .filter((f) => f.element.conforms("Metaobjects::SemanticMetadata::baseType"));
-
-            for (const baseType of baseTypes) {
-                const value = baseType.element.value?.element;
-                if (!value) continue;
-
-                const expr = value.self();
-                if (expr) this.buildNode(expr, document);
-                const result = this.evaluator.evaluate(value, baseType.element)?.at(0);
-                if (!result || !isMetamodel(result) || !result.is(MetadataFeature)) continue;
-
-                for (const annotated of result.annotates) {
-                    if (!annotated.is(Type)) continue;
-                    node.$meta.addSpecialization(
-                        annotated,
-                        node.$meta.specializationKind(),
-                        "implicit"
-                    );
-                }
-            }
-        }
-    }
-
-    /**
      * Setup implicit feature typings from assigned values
      */
-    protected addFeatureValueTypings(node: Feature, document: LangiumDocument): void {
+    @builder(Feature)
+    addFeatureValueTypings(node: Feature, document: LangiumDocument): void {
         if (
             !node.value ||
             node.$meta.direction !== "none" ||
