@@ -60,7 +60,6 @@
                 "path": "./syntaxes/sysml.tmLanguage.json"
             },
             {
-                "language": "sysml",
                 "path": "./syntaxes/sysml.md.tmLanguage.json",
                 "scopeName": "markdown.sysml.codeblock",
                 "injectTo": [
@@ -71,7 +70,6 @@
                 }
             },
             {
-                "language": "kerml",
                 "path": "./syntaxes/kerml.md.tmLanguage.json",
                 "scopeName": "markdown.kerml.codeblock",
                 "injectTo": [
