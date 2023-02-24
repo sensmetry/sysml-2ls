@@ -25,12 +25,12 @@ import {
     Type,
 } from "../../generated/ast";
 import * as meta from "../KerML";
-import { isMetamodel } from "../metamodel";
+import { BasicMetamodel, isMetamodel } from "../metamodel";
 import { concatNames } from "../naming";
 
 // TODO: we may need to add a range generator type as well for extent
 // expressions, generating a large extent upfront may crash the server otherwise
-export type ExpressionResult = meta.ElementMeta | number | boolean | string;
+export type ExpressionResult = BasicMetamodel | number | boolean | string;
 export type ExpressionLike = meta.InvocationExpressionMeta["args"][0];
 export type Evaluable = meta.InlineExpressionMeta | meta.ElementMeta;
 

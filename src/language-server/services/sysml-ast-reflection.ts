@@ -23,8 +23,8 @@ import { SysMLReferenceInfo } from "./references/linker";
 export type SysMLType = {
     [K in keyof ast.SysMlAstType]: ast.SysMlAstType[K] extends string ? never : K;
 }[keyof ast.SysMlAstType];
-export type SysMLInterface<K extends SysMLType> = ast.SysMlAstType[K];
 export type SysMLTypeList = { [K in SysMLType]: ast.SysMlAstType[K] };
+export type SysMLInterface<K extends SysMLType> = SysMLTypeList[K];
 
 /**
  * Get the owning expression of an AST node that determines the reference type

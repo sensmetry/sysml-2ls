@@ -26,7 +26,6 @@ import {
 } from "langium";
 import {
     Element,
-    SysMlAstType,
     ElementReference,
     LiteralString,
     LiteralNumber,
@@ -54,6 +53,7 @@ import {
 import { SysMLDefaultServices } from "../services";
 import { TypeMap, typeIndex, ElementMeta } from "../../model";
 import { SysMLDocumentBuilder } from "../shared/workspace/document-builder";
+import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 
 type ReturnType = void | "prune" | undefined;
 
@@ -137,7 +137,7 @@ export const DefaultSysMLSemanticTokenOptions: SemanticTokensOptions = {
 /**
  * Basic types to semantic tokens map for name and reference highlighting
  */
-const TYPE_TOKENS: { readonly [K in keyof SysMlAstType]?: string } = {
+const TYPE_TOKENS: { readonly [K in SysMLType]?: string } = {
     Namespace: SysMLSemanticTokenTypes.namespace,
     Type: SysMLSemanticTokenTypes.type,
     Feature: SysMLSemanticTokenTypes.variable,
@@ -156,7 +156,7 @@ const TYPE_TOKENS: { readonly [K in keyof SysMlAstType]?: string } = {
     Metaclass: SysMLSemanticTokenTypes.metaclass,
 };
 type HighlightFunction<T = AstNode> = (node: T, acceptor: SemanticTokenAcceptor) => ReturnType;
-type HighlightMap = { [K in keyof SysMlAstType]?: HighlightFunction<SysMlAstType[K]>[] };
+type HighlightMap = { [K in SysMLType]?: HighlightFunction<SysMLTypeList[K]>[] };
 
 export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
     protected readonly tokenMap;
@@ -197,7 +197,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
             Comment: [this.comment],
             TextualRepresentation: [this.comment, this.textualRep],
             OperatorExpression: [this.operatorExpression],
-        } as HighlightMap as TypeMap<SysMlAstType, HighlightFunction[]>);
+        } as HighlightMap as TypeMap<SysMLTypeList, HighlightFunction[]>);
 
         // first, clearing out stale caches due to doc updates
         this.builder.onUpdate(async (changed, deleted) => {
