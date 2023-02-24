@@ -37,11 +37,22 @@ interface TestFormattingOptions extends FormattingOptions {
     langId?: "kerml" | "sysml";
 }
 
+const formatter = new SysMLFormatter();
+
+async function formatDocument(
+    document: LangiumDocument,
+    options: Partial<FormattingOptions>
+): Promise<TextEdit[]> {
+    return formatter.formatDocument(document, {
+        options: { ...DefaultFormattingOptions, ...options },
+        textDocument: TextDocumentIdentifier.create(document.uriString),
+    });
+}
+
 const formatOriginalDocument = async (
     text: string,
     options: DeepPartial<TestFormattingOptions>
 ): Promise<FormatOriginalDocumentReturnType> => {
-    const formatter = new SysMLFormatter();
     const documentToFormat = await (options.langId === "kerml" ? parseKerML : parseSysML)(text, {
         validationChecks: "none",
     });
@@ -52,10 +63,7 @@ const formatOriginalDocument = async (
 
     if (!$document) throw new Error("Check line above. Document should be defined.");
 
-    const formatChanges = await formatter.formatDocument($document, {
-        options: { ...DefaultFormattingOptions, ...options },
-        textDocument: TextDocumentIdentifier.create($document.uri.toString()),
-    });
+    const formatChanges = await formatDocument($document, options);
 
     return { $document, formatChanges };
 };
@@ -65,27 +73,40 @@ const DefaultFormattingOptions: FormattingOptions = {
     insertSpaces: true,
 };
 
-async function testFormatting(
+function testFormatting(
     text: string,
     expected: string | undefined,
     options: DeepPartial<TestFormattingOptions> = DefaultFormattingOptions
-): Promise<void> {
-    const { $document, formatChanges } = await formatOriginalDocument(text, options);
-
+): void {
     if (expected) {
-        expect($document.parseResult.parserErrors).toHaveLength(0);
-        expect($document.parseResult.lexerErrors).toHaveLength(0);
-        const formatted = TextDocument.applyEdits($document.textDocument, formatChanges);
-        expect(formatted).toEqual(expected.trimStart());
+        expected = expected.trimStart();
+        const expectFormatted = async (text: string): Promise<void> => {
+            const { $document, formatChanges } = await formatOriginalDocument(text, options);
+
+            expect($document.parseResult.parserErrors).toHaveLength(0);
+            expect($document.parseResult.lexerErrors).toHaveLength(0);
+            const formatted = TextDocument.applyEdits($document.textDocument, formatChanges);
+            expect(formatted).toEqual(expected);
+        };
+
+        it("should format the document as expected", async () => {
+            await expectFormatted(text);
+        });
+        test("formatting should be stable", async () => {
+            await expectFormatted(expected as string);
+        });
     } else {
-        expect(formatChanges).toEqual([]);
+        it("should not format the document", async () => {
+            const { formatChanges } = await formatOriginalDocument(text, options);
+            expect(formatChanges).toEqual([]);
+        });
     }
 }
 
 describe("SysMLFormatter", () => {
     describe("document formatting", () => {
-        it("should format whole document correctly with 4 tabsize, with spaces", async () => {
-            await testFormatting(
+        describe("should format whole document correctly with 4 tabsize, with spaces", () => {
+            testFormatting(
                 unformattedSysMLExample,
                 `
 part def Camera {
@@ -102,8 +123,8 @@ part def Camera {
             );
         });
 
-        it("should format whole document correctly with 2 tabsize, with spaces", async () => {
-            await testFormatting(
+        describe("should format whole document correctly with 2 tabsize, with spaces", () => {
+            testFormatting(
                 unformattedSysMLExample,
                 `
 part def Camera {
@@ -124,8 +145,8 @@ part def Camera {
             );
         });
 
-        it("should format whole document correctly with 2 tabsize, with tabs", async () => {
-            await testFormatting(
+        describe("should format whole document correctly with 2 tabsize, with tabs", () => {
+            testFormatting(
                 unformattedSysMLExample,
                 `
 part def Camera {
@@ -146,8 +167,8 @@ part def Camera {
             );
         });
 
-        it("should format multiple elements in the root namespace", async () => {
-            await testFormatting(
+        describe("should format multiple elements in the root namespace", () => {
+            testFormatting(
                 `
     
             // comment
@@ -165,8 +186,8 @@ part def C;`
             );
         });
 
-        it("should not format documents with parser errors", async () => {
-            await testFormatting(
+        describe("should not format documents with parser errors", () => {
+            testFormatting(
                 `
             
             
@@ -175,8 +196,8 @@ part def C;`
             );
         });
 
-        it("should indent package children in KerML", async () => {
-            await testFormatting(
+        describe("should indent package children in KerML", () => {
+            testFormatting(
                 `
         library package Pack {
             abstract class <klass> Klass;
@@ -205,8 +226,8 @@ library package Pack {
             );
         });
 
-        it("should remove any extraneous empty lines to the first child element", async () => {
-            await testFormatting(
+        describe("should remove any extraneous empty lines to the first child element", () => {
+            testFormatting(
                 `part def A{
             
             
@@ -222,8 +243,8 @@ part def A {
             );
         });
 
-        it("should leave a single empty line between children element", async () => {
-            await testFormatting(
+        describe("should leave a single empty line between children element", () => {
+            testFormatting(
                 `part def A{
     part a: A;
 
@@ -242,8 +263,8 @@ part def A {
             );
         });
 
-        it("should a new line to the first child element", async () => {
-            await testFormatting(
+        describe("should a new line to the first child element", () => {
+            testFormatting(
                 "part def A{part a: A;}",
                 `
 part def A {
@@ -252,8 +273,8 @@ part def A {
             );
         });
 
-        it("should remove any whitespace in-between braces if there are no children", async () => {
-            await testFormatting(
+        describe("should remove any whitespace in-between braces if there are no children", () => {
+            testFormatting(
                 `part P {     
     
             }`,
@@ -263,8 +284,8 @@ part def A {
     });
 
     describe("hidden comment formatting", () => {
-        it("should remove extraneous lines to single line comments when the comment is the first child element", async () => {
-            await testFormatting(
+        describe("should remove extraneous lines to single line comments when the comment is the first child element", () => {
+            testFormatting(
                 `part A{
             
             
@@ -278,8 +299,8 @@ part A {
             );
         });
 
-        it("should remove extraneous lines to multiline comments when the comment is the first child element", async () => {
-            await testFormatting(
+        describe("should remove extraneous lines to multiline comments when the comment is the first child element", () => {
+            testFormatting(
                 `part A{
             
             
@@ -295,8 +316,8 @@ part A {
             );
         });
 
-        it("should remove extraneous lines to single line comments when the comment is not the first child element", async () => {
-            await testFormatting(
+        describe("should remove extraneous lines to single line comments when the comment is not the first child element", () => {
+            testFormatting(
                 `part A{part a: A;
             
             
@@ -312,8 +333,8 @@ part A {
             );
         });
 
-        it("should remove extraneous lines to multiline comments when the comment is not the first child element", async () => {
-            await testFormatting(
+        describe("should remove extraneous lines to multiline comments when the comment is not the first child element", () => {
+            testFormatting(
                 `part A{part a: A;
             
             
@@ -331,8 +352,8 @@ part A {
             );
         });
 
-        it("should remove any whitespace to the root comment if it's the first element", async () => {
-            await testFormatting(
+        describe("should remove any whitespace to the root comment if it's the first element", () => {
+            testFormatting(
                 `
         
         
@@ -342,8 +363,8 @@ part A {
             );
         });
 
-        it("should respect and indent AST continuations intersected by comments", async () => {
-            await testFormatting(
+        describe("should respect and indent AST continuations intersected by comments", () => {
+            testFormatting(
                 `
             #   // a comment
     
@@ -357,8 +378,8 @@ part A {
             );
         });
 
-        it("should respect and indent AST continuations intersected by comments and indented by tabs", async () => {
-            await testFormatting(
+        describe("should respect and indent AST continuations intersected by comments and indented by tabs", () => {
+            testFormatting(
                 `
             #   // a comment
     
@@ -373,20 +394,20 @@ part A {
             );
         });
 
-        it("should leave a single leading space to end of line comment", async () => {
-            await testFormatting("part P {}     // comment", "part P {} // comment");
-            await testFormatting("part P {} // comment", "part P {} // comment");
+        describe("should leave a single leading space to end of line comment", () => {
+            testFormatting("part P {}     // comment", "part P {} // comment");
+            testFormatting("part P {} // comment", "part P {} // comment");
         });
 
-        it("should format comments in the root namespace", async () => {
-            await testFormatting(
+        describe("should format comments in the root namespace", () => {
+            testFormatting(
                 `part P {}
             // comment`,
                 `
 part P {}
 // comment`
             );
-            await testFormatting(
+            testFormatting(
                 `part P {}
     
     
@@ -398,19 +419,19 @@ part P {}
             );
         });
 
-        it("should leave a single leading space to end of line multiline comment", async () => {
-            await testFormatting("part P {}     //* comment */", "part P {} //* comment */");
+        describe("should leave a single leading space to end of line multiline comment", () => {
+            testFormatting("part P {}     //* comment */", "part P {} //* comment */");
         });
 
-        it("should format comments inside a reference", async () => {
-            await testFormatting(
+        describe("should format comments inside a reference", () => {
+            testFormatting(
                 "part P: A::       //* comment */   B {}",
                 "part P : A:: //* comment */ B {}"
             );
         });
 
-        it("should format comments inside a multiline reference", async () => {
-            await testFormatting(
+        describe("should format comments inside a multiline reference", () => {
+            testFormatting(
                 `
             part P: A::       // comment
             
@@ -423,8 +444,8 @@ part P : A:: // comment
     });
 
     describe(`${ast.MetadataFeature} formatting`, () => {
-        it("should remove any whitespace to metadata declarators", async () => {
-            await testFormatting(
+        describe("should remove any whitespace to metadata declarators", () => {
+            testFormatting(
                 `#     Meta part P {
                 @
                 
@@ -437,8 +458,8 @@ part P : A:: // comment
             );
         });
 
-        it.each([":", "defined   \nby"])("should format typed by keywords", async (kw) => {
-            await testFormatting(
+        describe.each([":", "defined   \nby"])("should format typed by keywords", (kw) => {
+            testFormatting(
                 `part def P { @ M   ${kw}   Meta { }}`,
                 `
 part def P {
@@ -447,8 +468,8 @@ part def P {
             );
         });
 
-        it("should format 'about' on an indented line", async () => {
-            await testFormatting(
+        describe("should format 'about' on an indented line", () => {
+            testFormatting(
                 "  @   M :  Meta about A,   B  , C;",
                 `
 @M : Meta
@@ -457,13 +478,13 @@ part def P {
         });
     });
 
-    it("should leave no spaces inside of short name", async () => {
-        await testFormatting("part <    a       >;", "part <a>;");
+    describe("should leave no spaces inside of short name", () => {
+        testFormatting("part <    a       >;", "part <a>;");
     });
 
-    it("should leave a single space after type keywords", async () => {
-        await testFormatting("part    def    a;", "part def a;");
-        await testFormatting(
+    describe("should leave a single space after type keywords", () => {
+        testFormatting("part    def    a;", "part def a;");
+        testFormatting(
             `part    
         def    a;`,
             "part def a;"
@@ -471,8 +492,8 @@ part def P {
     });
 
     describe(`${ast.Comment} formatting`, () => {
-        it.each(["C", "<C>"])("should preserve `about` on new lines", async (id) => {
-            await testFormatting(
+        describe.each(["C", "<C>"])("should preserve `about` on new lines", (id) => {
+            testFormatting(
                 `comment ${id}
         
         about A, B /* comment */`,
@@ -483,35 +504,35 @@ comment ${id}
             );
         });
 
-        it("should format a single space to `about` on the same line", async () => {
-            await testFormatting(
+        describe("should format a single space to `about` on the same line", () => {
+            testFormatting(
                 "comment C   about A, B /* comment */",
                 "comment C\n    about A, B\n    /* comment */"
             );
         });
 
-        it("should leave a single space between references or indent them in `about`", async () => {
-            await testFormatting(
+        describe("should leave a single space between references or indent them in `about`", () => {
+            testFormatting(
                 "comment C about   A  ,      \tB /* comment */",
                 "comment C\n    about A, B\n    /* comment */"
             );
 
-            await testFormatting(
+            testFormatting(
                 "comment C about   A  ,      \n\n\tB /* comment */",
                 "comment C\n    about A,\n        B\n    /* comment */"
             );
         });
 
-        it("should format 'about' on the same line without identifiers", async () => {
-            await testFormatting(
+        describe("should format 'about' on the same line without identifiers", () => {
+            testFormatting(
                 " comment   \n about  A  /* comment */",
                 "comment about A\n    /* comment */"
             );
         });
 
         describe("multiline comment bodies are formatted and aligned", () => {
-            it("should format plain comments", async () => {
-                await testFormatting(
+            describe("should format plain comments", () => {
+                testFormatting(
                     `
             /* comment
             */`,
@@ -522,8 +543,8 @@ comment ${id}
                 );
             });
 
-            it("should format comment bodies", async () => {
-                await testFormatting(
+            describe("should format comment bodies", () => {
+                testFormatting(
                     `
         comment /*
                  * a comment
@@ -534,7 +555,7 @@ comment /*
          */`
                 );
 
-                await testFormatting(
+                testFormatting(
                     `
         comment Comment /*
                  * a comment
@@ -547,8 +568,8 @@ comment Comment
                 );
             });
 
-            it("should format doc bodies", async () => {
-                await testFormatting(
+            describe("should format doc bodies", () => {
+                testFormatting(
                     `
         doc /*
                  * a comment
@@ -559,7 +580,7 @@ doc /*
      */`
                 );
 
-                await testFormatting(
+                testFormatting(
                     `
         doc Doc /*
                  * a comment
@@ -572,8 +593,8 @@ doc Doc
                 );
             });
 
-            it("should insert tabs into indented comment bodies", async () => {
-                await testFormatting(
+            describe("should insert tabs into indented comment bodies", () => {
+                testFormatting(
                     `
             part def P {
                 comment 
@@ -592,8 +613,8 @@ part def P {
                 );
             });
 
-            it("should not add trailing spaces to empty lines", async () => {
-                await testFormatting(
+            describe("should not add trailing spaces to empty lines", () => {
+                testFormatting(
                     `
             /* 1
             *
@@ -610,8 +631,8 @@ part def P {
         });
     });
 
-    it("should format textual representations", async () => {
-        await testFormatting(
+    describe("should format textual representations", () => {
+        testFormatting(
             `
         rep     Rep language    "lang"  /*
         statement;
@@ -624,12 +645,12 @@ rep Rep language "lang"
         );
     });
 
-    it("should leave one space after visibility", async () => {
-        await testFormatting("private       part    def P  ;", "private part def P;");
+    describe("should leave one space after visibility", () => {
+        testFormatting("private       part    def P  ;", "private part def P;");
     });
 
-    it("should format Dependency clients and suppliers with an indent", async () => {
-        await testFormatting(
+    describe("should format Dependency clients and suppliers with an indent", () => {
+        testFormatting(
             "       protected    #Meta       dependency    Dep  from A,   B to C  ,   D;",
             `
 protected #Meta dependency Dep
@@ -637,7 +658,7 @@ protected #Meta dependency Dep
     to C, D;`
         );
 
-        await testFormatting(
+        testFormatting(
             "       protected    #Meta       dependency    Dep  from A,\n   B to C\n  ,   D;",
             `
 protected #Meta dependency Dep
@@ -647,53 +668,51 @@ protected #Meta dependency Dep
         );
     });
 
-    it("should format Alias 'for' on a new line with an identifier present", async () => {
-        await testFormatting("  alias Alias   for A  ;", "alias Alias\n    for A;");
+    describe("should format Alias 'for' on a new line with an identifier present", () => {
+        testFormatting("  alias Alias   for A  ;", "alias Alias\n    for A;");
     });
 
-    it("should format Alias 'for' on the same line without an identifier present", async () => {
-        await testFormatting("  alias   for A  ;", "alias for A;");
+    describe("should format Alias 'for' on the same line without an identifier present", () => {
+        testFormatting("  alias   for A  ;", "alias for A;");
     });
 
     describe("KerML type is formatted", () => {
-        it("should format 'abstract' on the initial line", async () => {
-            await testFormatting(
-                "  private       \n abstract  type   T;",
-                "private abstract type T;",
-                { langId: "kerml" }
-            );
+        describe("should format 'abstract' on the initial line", () => {
+            testFormatting("  private       \n abstract  type   T;", "private abstract type T;", {
+                langId: "kerml",
+            });
         });
 
-        it("should preserve type keyword new line", async () => {
-            await testFormatting(
+        describe("should preserve type keyword new line", () => {
+            testFormatting(
                 "  private       \n abstract  \n\ntype   T;",
                 "private abstract type T;",
                 { langId: "kerml" }
             );
 
-            await testFormatting(
+            testFormatting(
                 "  private       \n abstract   #Meta\n type   T;",
                 "private abstract #Meta\n    type T;",
                 { langId: "kerml" }
             );
         });
 
-        it.concurrent.each([
+        describe.each([
             "specializes",
             ":>",
             "disjoint from",
             "unions",
             "intersects",
             "differences",
-        ])("should format relationship lists with %s", async (token) => {
-            await testFormatting(
+        ])("should format relationship lists with %s", (token) => {
+            testFormatting(
                 `
         private    type    ${token} A,  B  , C  ${token} D;`,
                 `private type ${token} A, B, C ${token} D;`,
                 { langId: "kerml" }
             );
 
-            await testFormatting(
+            testFormatting(
                 `
         private    type    ${token} A,  B  ,\n C \n${token} D;`,
                 `
@@ -704,20 +723,20 @@ private type ${token} A, B,
             );
         });
 
-        it("should format one space between 'disjoint' and 'from'", async () => {
-            await testFormatting("type  disjoint   from    B,C;", "type disjoint from B, C;", {
+        describe("should format one space between 'disjoint' and 'from'", () => {
+            testFormatting("type  disjoint   from    B,C;", "type disjoint from B, C;", {
                 langId: "kerml",
             });
         });
 
-        it("should format 'all' surrounded by spaces", async () => {
-            await testFormatting("abstract    type all T;", "abstract type all T;", {
+        describe("should format 'all' surrounded by spaces", () => {
+            testFormatting("abstract    type all T;", "abstract type all T;", {
                 langId: "kerml",
             });
         });
 
-        it.each(["conjugates", "~"])("should format conjugates relationships", async (token) => {
-            await testFormatting(
+        describe.each(["conjugates", "~"])("should format conjugates relationships", (token) => {
+            testFormatting(
                 `private  type   T  ${token}  A \n${token}  B;`,
                 `
 private type T ${token} A
@@ -725,7 +744,7 @@ private type T ${token} A
                 { langId: "kerml" }
             );
 
-            await testFormatting(
+            testFormatting(
                 `private  type   T  ${token}  A \n${token}
                 
                 B;`,
@@ -737,8 +756,8 @@ private type T ${token} A
         });
     });
 
-    it("should leave one space between 'assoc' and 'struct'", async () => {
-        await testFormatting("  assoc   struct   A;", "assoc struct A;", { langId: "kerml" });
+    describe("should leave one space between 'assoc' and 'struct'", () => {
+        testFormatting("  assoc   struct   A;", "assoc struct A;", { langId: "kerml" });
     });
 
     describe(`${ast.Feature} formatting`, () => {
@@ -765,10 +784,10 @@ private type T ${token} A
                 items.push(items[2].replaceAll(/\s+/g, " "));
             }
 
-            it.each(table)(
+            describe.each(table)(
                 "should format single line %s '%s' with '%s'",
-                async (kw, id, token, safeToken) => {
-                    await testFormatting(
+                (kw, id, token, safeToken) => {
+                    testFormatting(
                         `  public   ${kw}   \n${id}  A  ${token}   B { }`,
                         `public ${kw} ${id} A ${safeToken} B {}`,
                         { langId: "kerml" }
@@ -777,10 +796,10 @@ private type T ${token} A
             );
 
             describe.each(["<S>", "S"])("line breaks are preserved with name '%s'", (name) => {
-                it.each(table)(
+                describe.each(table)(
                     "%s %s should preserve related types line breaks '%s'",
-                    async (kw, id, token, safeToken) => {
-                        await testFormatting(
+                    (kw, id, token, safeToken) => {
+                        testFormatting(
                             `  public ${kw}   ${name}  \n ${id}    A\n${token} B;`,
                             `
 public ${kw} ${name}
@@ -793,8 +812,8 @@ public ${kw} ${name}
             });
         });
 
-        it.each(["return", "member"])("should format '%s' keyword", async (kw) => {
-            await testFormatting(
+        describe.each(["return", "member"])("should format '%s' keyword", (kw) => {
+            testFormatting(
                 `function F { public   ${kw}    a : Real; }`,
                 `
 function F {
@@ -804,8 +823,8 @@ function F {
             );
         });
 
-        it("should format 'nonunique' and 'ordered", async () => {
-            await testFormatting(
+        describe("should format 'nonunique' and 'ordered", () => {
+            testFormatting(
                 "part  P [ 0 ]    nonunique \n   ordered;",
                 "part P [0] nonunique ordered;"
             );
@@ -814,10 +833,10 @@ function F {
         describe.each(["in", "out", "inout", ""])(
             "feature modifiers formatting with direction '%s'",
             (direction) => {
-                it.each(["composite", "portion"])(
+                describe.each(["composite", "portion"])(
                     "should format feature modifiers onto a single line with '%s'",
-                    async (token) => {
-                        await testFormatting(
+                    (token) => {
+                        testFormatting(
                             `  public  \n${direction}\t\n\t  abstract ${token}\treadonly   derived     end   feature   a  ;`,
                             `public${
                                 direction.length === 0 ? "" : " " + direction
@@ -829,10 +848,10 @@ function F {
             }
         );
 
-        it.each(["composite", "portion", "readonly", "derived", "end"])(
+        describe.each(["composite", "portion", "readonly", "derived", "end"])(
             "should preserve line breaks to prefixes with modifier '%s' present",
-            async (modifier) => {
-                await testFormatting(
+            (modifier) => {
+                testFormatting(
                     `  public ${modifier} \n #Meta  feature   a ;`,
                     `
 public ${modifier}
@@ -842,7 +861,7 @@ public ${modifier}
             }
         );
 
-        it.concurrent.each([
+        describe.each([
             "subsets",
             ":>",
             "typed by",
@@ -852,15 +871,15 @@ public ${modifier}
             "references",
             "::>",
             "featured by",
-        ])("should format relationship lists with %s", async (token) => {
-            await testFormatting(
+        ])("should format relationship lists with %s", (token) => {
+            testFormatting(
                 `
         private    feature :  X   ${token} A,  B  , C  ${token} D;`,
                 `private feature : X ${token} A, B, C ${token} D;`,
                 { langId: "kerml" }
             );
 
-            await testFormatting(
+            testFormatting(
                 `
         private    feature:X    ${token} A,  B  ,\n C \n${token} D;`,
                 `
@@ -871,8 +890,8 @@ private feature : X ${token} A, B,
             );
         });
 
-        it.each(["chains", "inverse of"])("should format '%s' relationships", async (token) => {
-            await testFormatting(
+        describe.each(["chains", "inverse of"])("should format '%s' relationships", (token) => {
+            testFormatting(
                 `private  feature   T:X  ${token}  A \n${token}  B;`,
                 `
 private feature T : X ${token} A
@@ -880,7 +899,7 @@ private feature T : X ${token} A
                 { langId: "kerml" }
             );
 
-            await testFormatting(
+            testFormatting(
                 `private  feature   T   :  X  ${token}  A \n${token}
                 
                 B;`,
@@ -891,8 +910,8 @@ private feature T : X ${token} A
             );
         });
 
-        it("should not do additional format on the relationship keyword if the feature starts with it", async () => {
-            await testFormatting(
+        describe("should not do additional format on the relationship keyword if the feature starts with it", () => {
+            testFormatting(
                 "part def P { :>> a = 0;}",
                 `
 part def P {
@@ -901,8 +920,8 @@ part def P {
             );
         });
 
-        it("should format 'expr' as a feature", async () => {
-            await testFormatting(
+        describe("should format 'expr' as a feature", () => {
+            testFormatting(
                 "  abstract   expr  E  {  in x: A; x }",
                 `
 abstract expr E {
@@ -915,25 +934,22 @@ abstract expr E {
     });
 
     describe(`${ast.FeatureValue} formatting`, () => {
-        it.each(["default", "=", ":="])(
+        describe.each(["default", "=", ":="])(
             "should format feature values on the same line with '%s'",
-            async (token) => {
-                await testFormatting(
-                    `attribute a   ${token}   1 + 2;`,
-                    `attribute a ${token} 1 + 2;`
-                );
+            (token) => {
+                testFormatting(`attribute a   ${token}   1 + 2;`, `attribute a ${token} 1 + 2;`);
             }
         );
 
-        it.each(["=", ":="])("should leave one space between 'default' and '%s'", async (token) => {
-            await testFormatting(
+        describe.each(["=", ":="])("should leave one space between 'default' and '%s'", (token) => {
+            testFormatting(
                 `attribute a   default   ${token}   1 + 2;`,
                 `attribute a default ${token} 1 + 2;`
             );
         });
 
-        it("should preserve line break to the expression", async () => {
-            await testFormatting(
+        describe("should preserve line break to the expression", () => {
+            testFormatting(
                 "attribute a \n= \n 1 + 2;",
                 `
 attribute a =
@@ -942,22 +958,22 @@ attribute a =
         });
     });
 
-    it("should format filters on the same line", async () => {
-        await testFormatting("private    filter   \n1 + 2  ;", "private filter 1 + 2;");
+    describe("should format filters on the same line", () => {
+        testFormatting("private    filter   \n1 + 2  ;", "private filter 1 + 2;");
     });
 
     describe(`${ast.LibraryPackage} formatting`, () => {
-        it.each([" standard", ""])("should format%s library package ", async (token) => {
-            await testFormatting(
+        describe.each([" standard", ""])("should format%s library package ", (token) => {
+            testFormatting(
                 `  public    \n${token}\n  library\n   package P {\n}`,
                 `public${token} library package P {}`
             );
         });
 
-        it.each([" standard", ""])(
+        describe.each([" standard", ""])(
             "should preserve line break before%s library 'package' with prefixes",
-            async (token) => {
-                await testFormatting(
+            (token) => {
+                testFormatting(
                     `  public    \n${token}\n  library   #Meta\npackage P {\n}`,
                     `public${token} library #Meta\n    package P {}`
                 );
@@ -966,24 +982,24 @@ attribute a =
     });
 
     describe(`${ast.Multiplicity} formatting`, () => {
-        it("should format multiplicity bounds", async () => {
-            await testFormatting(
+        describe("should format multiplicity bounds", () => {
+            testFormatting(
                 "  public\n multiplicity M \t[  1  ] { }",
                 "public multiplicity M [1] {}",
                 { langId: "kerml" }
             );
         });
 
-        it.each([":>", "subsets"])(
+        describe.each([":>", "subsets"])(
             "should format multiplicity subsettings with '%s'",
-            async (token) => {
-                await testFormatting(
+            (token) => {
+                testFormatting(
                     `  public\n multiplicity M \t${token} A ,   B{ }`,
                     `public multiplicity M ${token} A, B {}`,
                     { langId: "kerml" }
                 );
 
-                await testFormatting(
+                testFormatting(
                     `  public\n multiplicity M \t${token} A ,\n   B{ }`,
                     `public multiplicity M ${token} A,\n        B {}`,
                     { langId: "kerml" }
@@ -993,28 +1009,28 @@ attribute a =
     });
 
     describe(`${ast.Import} formatting`, () => {
-        it.each(["", "::*", "::**", "::*::**"])(
+        describe.each(["", "::*", "::**", "::*::**"])(
             "should format simple import statements on one line with '%s'",
-            async (suffix) => {
-                await testFormatting(
+            (suffix) => {
+                testFormatting(
                     `  public   import   A::B  ${suffix} ;`,
                     `public import A::B${suffix};`
                 );
-                await testFormatting(
+                testFormatting(
                     `  public   import   all   A::B  ${suffix} ;`,
                     `public import all A::B${suffix};`
                 );
             }
         );
 
-        it("should format filter conditions", async () => {
-            await testFormatting(" import  A::B   [()] [  0 ];", "import A::B[()][0];");
-            await testFormatting(" import  A::B   [()]\n[  0 ];", "import A::B[()]\n    [0];");
+        describe("should format filter conditions", () => {
+            testFormatting(" import  A::B   [()] [  0 ];", "import A::B[()][0];");
+            testFormatting(" import  A::B   [()]\n[  0 ];", "import A::B[()]\n    [0];");
         });
     });
 
-    it("should add an extra indent to line broken references", async () => {
-        await testFormatting(
+    describe("should add an extra indent to line broken references", () => {
+        testFormatting(
             "part p : X  ::  \n X {}",
             `
 part p : X::
@@ -1023,8 +1039,8 @@ part p : X::
     });
 
     describe(`${ast.Connector} formatting`, () => {
-        it("should format binary connectors", async () => {
-            await testFormatting(
+        describe("should format binary connectors", () => {
+            testFormatting(
                 " connector  all  from A to B;",
                 `
 connector all
@@ -1034,8 +1050,8 @@ connector all
             );
         });
 
-        it("should format nary connectors", async () => {
-            await testFormatting(
+        describe("should format nary connectors", () => {
+            testFormatting(
                 " connector   (A, B,   C  ,  \nD  );",
                 `
 connector (
@@ -1051,16 +1067,16 @@ connector (
         [ast.BindingConnector, "binding", "of", "="],
         [ast.Succession, "succession", "first", "then"],
     ])("%s formatting", (_, type, prefix, binder) => {
-        it("should format single line nodes", async () => {
-            await testFormatting(
+        describe("should format single line nodes", () => {
+            testFormatting(
                 `  private  ${type}  all a   ${binder}   x ;`,
                 `private ${type} all a ${binder} x;`,
                 { langId: "kerml" }
             );
         });
 
-        it("should preserve line breaks between ends", async () => {
-            await testFormatting(
+        describe("should preserve line breaks between ends", () => {
+            testFormatting(
                 `  private  ${type}  all \n${prefix}   a   ${binder} \n  x ;`,
                 `
 private ${type} all
@@ -1068,7 +1084,7 @@ private ${type} all
                 { langId: "kerml" }
             );
 
-            await testFormatting(
+            testFormatting(
                 `  private  ${type}  all \n   a   ${binder} \n  x ;`,
                 `
 private ${type} all
@@ -1088,22 +1104,22 @@ private ${type} all
         const safeType = type.replace(/\s+/, " ");
         const options: DeepPartial<TestFormattingOptions> = { langId: kerml ? "kerml" : "sysml" };
 
-        it("should format single line nodes", async () => {
-            await testFormatting(
+        describe("should format single line nodes", () => {
+            testFormatting(
                 `  private  ${type}   a   ${binder}   x ;`,
                 `private ${safeType} a ${binder} x;`,
                 options
             );
 
-            await testFormatting(
+            testFormatting(
                 `  private  ${type}      of  K ${prefix} a   ${binder}   x ;`,
                 `private ${safeType} of K ${prefix} a ${binder} x;`,
                 options
             );
         });
 
-        it("should preserve line breaks between ends", async () => {
-            await testFormatting(
+        describe("should preserve line breaks between ends", () => {
+            testFormatting(
                 `  private  ${type}   \n   a   ${binder} \n  x ;`,
                 `
 private ${safeType}
@@ -1111,7 +1127,7 @@ private ${safeType}
                 options
             );
 
-            await testFormatting(
+            testFormatting(
                 `  private  ${type}  \nof K \n${prefix}   a   ${binder} \n  x ;`,
                 `
 private ${safeType} of K
@@ -1119,7 +1135,7 @@ private ${safeType} of K
                 options
             );
 
-            await testFormatting(
+            testFormatting(
                 `  private  ${type}  : X\nof K \n${prefix}   a   ${binder} \n  x ;`,
                 `
 private ${safeType} : X
@@ -1131,21 +1147,21 @@ private ${safeType} : X
     });
 
     describe(`${ast.Invariant} formatting`, () => {
-        it.each(["true", "false"])("should format '%s' next to the keyword", async (token) => {
-            await testFormatting(`  private   inv \n ${token} { }`, `private inv ${token} {}`, {
+        describe.each(["true", "false"])("should format '%s' next to the keyword", (token) => {
+            testFormatting(`  private   inv \n ${token} { }`, `private inv ${token} {}`, {
                 langId: "kerml",
             });
         });
     });
 
     describe(`${ast.Expression} formatting`, () => {
-        it("should format null expressions", async () => {
-            await testFormatting("attribute a = (   );", "attribute a = ();");
+        describe("should format null expressions", () => {
+            testFormatting("attribute a = (   );", "attribute a = ();");
         });
 
-        it("should leave no spaces between empty brackets in expressions", async () => {
-            await testFormatting("part a = (    );", "part a = ();");
-            await testFormatting(
+        describe("should leave no spaces between empty brackets in expressions", () => {
+            testFormatting("part a = (    );", "part a = ();");
+            testFormatting(
                 `part a = (    
     
             );`,
@@ -1153,11 +1169,11 @@ private ${safeType} : X
             );
         });
 
-        it.each([
+        describe.each([
             ["select", ".?"],
             ["collect", "."],
-        ])("should format %s expression", async (_, operator) => {
-            await testFormatting(
+        ])("should format %s expression", (_, operator) => {
+            testFormatting(
                 `part  x =  A  ${operator}   {   in v ;  v  !=  null } ;`,
                 `
 part x = A${operator}{
@@ -1167,8 +1183,8 @@ part x = A${operator}{
             );
         });
 
-        it("should format body expression", async () => {
-            await testFormatting(
+        describe("should format body expression", () => {
+            testFormatting(
                 " item  x =   \n{ in v;  v  !=  null  } ;",
                 `
 item x = {
@@ -1179,12 +1195,12 @@ item x = {
         });
 
         describe("feature chain expressions", () => {
-            it("should format single line expressions", async () => {
-                await testFormatting(" part  x  =  A  .  x  ;", "part x = A.x;");
+            describe("should format single line expressions", () => {
+                testFormatting(" part  x  =  A  .  x  ;", "part x = A.x;");
             });
 
-            it("should format preserve line breaks", async () => {
-                await testFormatting(
+            describe("should format preserve line breaks", () => {
+                testFormatting(
                     " part  x  =  A  .\n  x  ;",
                     `
 part x = A.
@@ -1193,8 +1209,8 @@ part x = A.
             });
         });
 
-        it("should format named arguments", async () => {
-            await testFormatting(
+        describe("should format named arguments", () => {
+            testFormatting(
                 " part  x  =  A  ( x   =   0,  y =  1  ) ;",
                 `
 part x = A(
@@ -1205,12 +1221,12 @@ part x = A(
         });
 
         describe("positional arguments", () => {
-            it("should format arguments on the same line", async () => {
-                await testFormatting("part x =  A ( 0 ,   1,2    );", "part x = A(0, 1, 2);");
+            describe("should format arguments on the same line", () => {
+                testFormatting("part x =  A ( 0 ,   1,2    );", "part x = A(0, 1, 2);");
             });
 
-            it("should handle line breaks", async () => {
-                await testFormatting(
+            describe("should handle line breaks", () => {
+                testFormatting(
                     "part x =  A ( 0 ,\n   1,2    );",
                     `
 part x = A(
@@ -1220,12 +1236,12 @@ part x = A(
                 );
             });
 
-            it("should format empty lists", async () => {
-                await testFormatting("part x =   A  (    \n) ;", "part x = A();");
+            describe("should format empty lists", () => {
+                testFormatting("part x =   A  (    \n) ;", "part x = A();");
             });
 
-            it("should handle outer braces", async () => {
-                await testFormatting(
+            describe("should handle outer braces", () => {
+                testFormatting(
                     "part x =  (  A ( 0 ,\n   1,2    )  );",
                     `
 part x = (
@@ -1238,13 +1254,13 @@ part x = (
             });
         });
 
-        it("should format metadata access expression", async () => {
-            await testFormatting("part x =  A   .   metadata;", "part x = A.metadata;");
+        describe("should format metadata access expression", () => {
+            testFormatting("part x =  A   .   metadata;", "part x = A.metadata;");
         });
 
         describe("arrow invocation expression", () => {
-            it("should format body expressions", async () => {
-                await testFormatting(
+            describe("should format body expressions", () => {
+                testFormatting(
                     "part x = A   ->  sum { in v; v };",
                     `
 part x = A->sum{
@@ -1254,15 +1270,12 @@ part x = A->sum{
                 );
             });
 
-            it("should format function reference arg", async () => {
-                await testFormatting("part x = A  -> sum  AddOne ;", "part x = A->sum AddOne;");
+            describe("should format function reference arg", () => {
+                testFormatting("part x = A  -> sum  AddOne ;", "part x = A->sum AddOne;");
             });
 
-            it("should format argument lists", async () => {
-                await testFormatting(
-                    "part x = A   ->  sum ( 0,  2 , 3);",
-                    "part x = A->sum(0, 2, 3);"
-                );
+            describe("should format argument lists", () => {
+                testFormatting("part x = A   ->  sum ( 0,  2 , 3);", "part x = A->sum(0, 2, 3);");
             });
         });
 
@@ -1272,12 +1285,12 @@ part x = A->sum{
                 ["exponentiation", "**"],
                 ["exponentiation", "^"],
             ])("%s expressions", (_, op) => {
-                it("should format single line expressions", async () => {
-                    await testFormatting(`item x = 2   ${op}   4 ;`, `item x = 2${op}4;`);
+                describe("should format single line expressions", () => {
+                    testFormatting(`item x = 2   ${op}   4 ;`, `item x = 2${op}4;`);
                 });
 
-                it("should format multi-line expressions", async () => {
-                    await testFormatting(
+                describe("should format multi-line expressions", () => {
+                    testFormatting(
                         `item x = 2   ${op} \n  4 ;`,
                         `
 item x = 2${op}
@@ -1287,12 +1300,12 @@ item x = 2${op}
             });
 
             describe("sequence expressions", () => {
-                it("should format single line expressions", async () => {
-                    await testFormatting("item x =  (  0,  1,  2  , 3);", "item x = (0, 1, 2, 3);");
+                describe("should format single line expressions", () => {
+                    testFormatting("item x =  (  0,  1,  2  , 3);", "item x = (0, 1, 2, 3);");
                 });
 
-                it("should format multi-line expressions", async () => {
-                    await testFormatting(
+                describe("should format multi-line expressions", () => {
+                    testFormatting(
                         "item x =  (  0,  1,  \n2  , 3);",
                         `
 item x = (
@@ -1303,8 +1316,8 @@ item x = (
                 });
             });
 
-            it("should format conditional expressions", async () => {
-                await testFormatting(
+            describe("should format conditional expressions", () => {
+                testFormatting(
                     "part x = if   1  ?  0 else   \n\n1 ;",
                     `
 part x = if 1
@@ -1314,12 +1327,12 @@ part x = if 1
             });
 
             describe("indexing expressions", () => {
-                it("should format single line expressions", async () => {
-                    await testFormatting("part x  =  A  [  0  ] ;", "part x = A[0];");
+                describe("should format single line expressions", () => {
+                    testFormatting("part x  =  A  [  0  ] ;", "part x = A[0];");
                 });
 
-                it("should format multi-line expressions", async () => {
-                    await testFormatting(
+                describe("should format multi-line expressions", () => {
+                    testFormatting(
                         "part x  =  A  [  A.\nx  ] ;",
                         `
 part x = A[
@@ -1350,12 +1363,12 @@ part x = A[
                 "/",
                 "%",
             ])("binary '%s' expressions", (op) => {
-                it("should format single line expressions", async () => {
-                    await testFormatting(`part x =  A  ${op}  B ;`, `part x = A ${op} B;`);
+                describe("should format single line expressions", () => {
+                    testFormatting(`part x =  A  ${op}  B ;`, `part x = A ${op} B;`);
                 });
 
-                it("should format multi-line expressions", async () => {
-                    await testFormatting(
+                describe("should format multi-line expressions", () => {
+                    testFormatting(
                         `part x =  A  \n ${op} B ;`,
                         `
 part x = A
@@ -1371,38 +1384,35 @@ part x = A
                 ["-", ""],
                 ["~", ""],
             ])("'%s' expressions", (op, space) => {
-                it("should format single line expressions", async () => {
-                    await testFormatting(`part x =  ${op}  A ;`, `part x = ${op}${space}A;`);
+                describe("should format single line expressions", () => {
+                    testFormatting(`part x =  ${op}  A ;`, `part x = ${op}${space}A;`);
                 });
             });
         });
     });
 
     describe("SysML keywords", () => {
-        it("should format conjugated port references", async () => {
-            await testFormatting("part a defined   by  ~  \nPort {}", "part a defined by ~Port {}");
-            await testFormatting("part a    :  ~  \nPort {}", "part a : ~Port {}");
+        describe("should format conjugated port references", () => {
+            testFormatting("part a defined   by  ~  \nPort {}", "part a defined by ~Port {}");
+            testFormatting("part a    :  ~  \nPort {}", "part a : ~Port {}");
         });
 
-        it("should format 'defined by' in usages", async () => {
-            await testFormatting("part a  defined   by  A ;", "part a defined by A;");
+        describe("should format 'defined by' in usages", () => {
+            testFormatting("part a  defined   by  A ;", "part a defined by A;");
         });
 
-        it("should format 'variation'", async () => {
-            await testFormatting("  variation  part  def A;", "variation part def A;");
-            await testFormatting("  variation  part   A;", "variation part A;");
+        describe("should format 'variation'", () => {
+            testFormatting("  variation  part  def A;", "variation part def A;");
+            testFormatting("  variation  part   A;", "variation part A;");
         });
 
-        it("should format 'individual'", async () => {
-            await testFormatting(
-                "  individual  occurrence  def A;",
-                "individual occurrence def A;"
-            );
-            await testFormatting("  individual  occurrence   A;", "individual occurrence A;");
+        describe("should format 'individual'", () => {
+            testFormatting("  individual  occurrence  def A;", "individual occurrence def A;");
+            testFormatting("  individual  occurrence   A;", "individual occurrence A;");
         });
 
-        it("should format 'variant'", async () => {
-            await testFormatting(
+        describe("should format 'variant'", () => {
+            testFormatting(
                 " part def P {  variant  part   A; }",
                 `
 part def P {
@@ -1411,12 +1421,12 @@ part def P {
             );
         });
 
-        it.each(["timeslice", "snapshot"])("should format portion kind '%s'", async (tok) => {
-            await testFormatting(`  ${tok}  occurrence   A;`, `${tok} occurrence A;`);
+        describe.each(["timeslice", "snapshot"])("should format portion kind '%s'", (tok) => {
+            testFormatting(`  ${tok}  occurrence   A;`, `${tok} occurrence A;`);
         });
 
-        it("should format metadata body usage", async () => {
-            await testFormatting(
+        describe("should format metadata body usage", () => {
+            testFormatting(
                 `  metadata  Meta  :  M{
             Ref;
         }`,
@@ -1427,16 +1437,16 @@ metadata Meta : M {
             );
         });
 
-        it("should format 'ref'", async () => {
-            await testFormatting("  ref  part   A;", "ref part A;");
+        describe("should format 'ref'", () => {
+            testFormatting("  ref  part   A;", "ref part A;");
         });
 
-        it("should format reference usages", async () => {
-            await testFormatting("  ref A :   B;", "ref A : B;");
+        describe("should format reference usages", () => {
+            testFormatting("  ref A :   B;", "ref A : B;");
         });
 
-        it("should format enumeration definition", async () => {
-            await testFormatting(
+        describe("should format enumeration definition", () => {
+            testFormatting(
                 "enum def Color {R;G;B;}",
                 `
 enum def Color {
@@ -1447,21 +1457,21 @@ enum def Color {
             );
         });
 
-        it("should format extended definition", async () => {
-            await testFormatting("  #Meta   def  P { }", "#Meta def P {}");
+        describe("should format extended definition", () => {
+            testFormatting("  #Meta   def  P { }", "#Meta def P {}");
         });
 
-        it("should format extended usage", async () => {
-            await testFormatting("  #Meta     P { }", "#Meta P {}");
+        describe("should format extended usage", () => {
+            testFormatting("  #Meta     P { }", "#Meta P {}");
         });
 
-        it("should format event occurrence usage", async () => {
-            await testFormatting("  event\noccurrence \nA :  B {}", "event occurrence A : B {}");
-            await testFormatting("  event\nA :  B {}", "event A : B {}");
+        describe("should format event occurrence usage", () => {
+            testFormatting("  event\noccurrence \nA :  B {}", "event occurrence A : B {}");
+            testFormatting("  event\nA :  B {}", "event A : B {}");
         });
 
-        it("should format empty succession usage", async () => {
-            await testFormatting(
+        describe("should format empty succession usage", () => {
+            testFormatting(
                 "part def P  { then    [ * ]    occurrence O : A {} }",
                 `
 part def P {
@@ -1470,8 +1480,8 @@ part def P {
             );
         });
 
-        it("should format 'subject'", async () => {
-            await testFormatting(
+        describe("should format 'subject'", () => {
+            testFormatting(
                 "  requirement  def  R { public   subject   S:X   ; }",
                 `
 requirement def R {
@@ -1480,8 +1490,8 @@ requirement def R {
             );
         });
 
-        it("should format 'frame'", async () => {
-            await testFormatting(
+        describe("should format 'frame'", () => {
+            testFormatting(
                 "  requirement  def  R { public   frame  concern   C:X   ; }",
                 `
 requirement def R {
@@ -1495,15 +1505,15 @@ requirement def R {
         [ast.BindingConnectorAsUsage, "binding", "bind", "="],
         [ast.SuccessionAsUsage, "succession", "first", "then"],
     ])("%s formatting", (_, type, prefix, binder) => {
-        it("should format single line nodes", async () => {
-            await testFormatting(
+        describe("should format single line nodes", () => {
+            testFormatting(
                 `  private  ${type}  ${prefix} a   ${binder}   x ;`,
                 `private ${type} ${prefix} a ${binder} x;`
             );
         });
 
-        it("should preserve line breaks between ends", async () => {
-            await testFormatting(
+        describe("should preserve line breaks between ends", () => {
+            testFormatting(
                 `  private  ${type}   \n${prefix}   a   ${binder} \n  x ;`,
                 `
 private ${type}
@@ -1513,8 +1523,8 @@ private ${type}
     });
 
     describe(`${ast.ConnectionUsage} formatting`, () => {
-        it("should format single line nodes", async () => {
-            await testFormatting(
+        describe("should format single line nodes", () => {
+            testFormatting(
                 "  private  connection   connect a   to   x ;",
                 `
 private connection
@@ -1523,8 +1533,8 @@ private connection
             );
         });
 
-        it("should format 'connect' on the same line if there is no 'connection'", async () => {
-            await testFormatting(
+        describe("should format 'connect' on the same line if there is no 'connection'", () => {
+            testFormatting(
                 "  private     connect a   to   x ;",
                 `
 private connect a
@@ -1532,8 +1542,8 @@ private connect a
             );
         });
 
-        it("should format end lists", async () => {
-            await testFormatting(
+        describe("should format end lists", () => {
+            testFormatting(
                 "  private connect (  a ,  b , \n  d )  {  }",
                 `
 private connect (
@@ -1543,8 +1553,8 @@ private connect (
             );
         });
 
-        it("should preserve line breaks between ends", async () => {
-            await testFormatting(
+        describe("should preserve line breaks between ends", () => {
+            testFormatting(
                 "  private  connection   \nconnect   a   to \n  x ;",
                 `
 private connection
@@ -1558,8 +1568,8 @@ private connection
         [ast.InterfaceUsage, "interface", "connect"],
         [ast.AllocationUsage, "allocation", "allocate"],
     ])("%s formatting", (_, kw, connect) => {
-        it("should format single line nodes", async () => {
-            await testFormatting(
+        describe("should format single line nodes", () => {
+            testFormatting(
                 `  private  ${kw}   ${connect} a   to   x ;`,
                 `
 private ${kw}
@@ -1568,8 +1578,8 @@ private ${kw}
             );
         });
 
-        it("should format end lists", async () => {
-            await testFormatting(
+        describe("should format end lists", () => {
+            testFormatting(
                 `  private  ${kw}  ${connect} (  a ,  b , \n  d )  {  }`,
                 `
 private ${kw} ${connect} (
@@ -1579,8 +1589,8 @@ private ${kw} ${connect} (
             );
         });
 
-        it("should preserve line breaks between ends", async () => {
-            await testFormatting(
+        describe("should preserve line breaks between ends", () => {
+            testFormatting(
                 `  private  ${kw}   \n${connect}   a   to \n  x ;`,
                 `
 private ${kw}
@@ -1591,15 +1601,15 @@ private ${kw}
     });
 
     describe(`${ast.PerformActionUsage} formatting`, () => {
-        it("should leave one space after 'perform'", async () => {
-            await testFormatting("  perform   \t action  A ;", "perform action A;");
-            await testFormatting("  perform   \t  A ;", "perform A;");
+        describe("should leave one space after 'perform'", () => {
+            testFormatting("  perform   \t action  A ;", "perform action A;");
+            testFormatting("  perform   \t  A ;", "perform A;");
         });
     });
 
     describe("Action nodes formatting", () => {
-        it(`should format ${ast.InitialNode}`, async () => {
-            await testFormatting(
+        describe(`should format ${ast.InitialNode}`, () => {
+            testFormatting(
                 " action  A {  private   first   B  {}}",
                 `
 action A {
@@ -1608,8 +1618,8 @@ action A {
             );
         });
 
-        it(`should format ${ast.AcceptActionUsage}`, async () => {
-            await testFormatting(
+        describe(`should format ${ast.AcceptActionUsage}`, () => {
+            testFormatting(
                 " action  A {  private   action  AA:X accept   B   at  0  via C{}}",
                 `
 action A {
@@ -1620,8 +1630,8 @@ action A {
             );
         });
 
-        it(`should format ${ast.SendActionUsage}`, async () => {
-            await testFormatting(
+        describe(`should format ${ast.SendActionUsage}`, () => {
+            testFormatting(
                 " action  A {  private   action  AA:X send   B     via C  to \nD{}}",
                 `
 action A {
@@ -1636,8 +1646,8 @@ action A {
         describe.each([[ast.AssignmentActionUsage, "action", "assign", ":="]])(
             "%s formatting",
             (_, type, prefix, binder) => {
-                it("should format single line nodes", async () => {
-                    await testFormatting(
+                describe("should format single line nodes", () => {
+                    testFormatting(
                         ` action A { private  ${type}  ${prefix} a   ${binder}   x ; }`,
                         `
 action A {
@@ -1646,8 +1656,8 @@ action A {
                     );
                 });
 
-                it("should preserve line breaks between ends", async () => {
-                    await testFormatting(
+                describe("should preserve line breaks between ends", () => {
+                    testFormatting(
                         `  action A{private  ${type}   \n${prefix}   a   ${binder} \n  x ;}`,
                         `
 action A {
@@ -1659,8 +1669,8 @@ action A {
             }
         );
 
-        it(`should format ${ast.IfActionUsage}`, async () => {
-            await testFormatting(
+        describe(`should format ${ast.IfActionUsage}`, () => {
+            testFormatting(
                 " action   A { public  action  if  true  action   { action Sub;}   else  action  { action Sub;}  }",
                 `
 action A {
@@ -1677,8 +1687,8 @@ action A {
         });
 
         describe(`${ast.WhileLoopActionUsage} formatting`, () => {
-            it("should format 'while'", async () => {
-                await testFormatting(
+            describe("should format 'while'", () => {
+                testFormatting(
                     "  action A  { private  action  W  while   ( 1  +  1  \n >  0)   action { action Sub;}   until   false ;}",
                     `
 action A {
@@ -1695,8 +1705,8 @@ action A {
                 );
             });
 
-            it("should format 'loop'", async () => {
-                await testFormatting(
+            describe("should format 'loop'", () => {
+                testFormatting(
                     "  action A  { private  action  W  loop   action { action Sub;}   until   false ;}",
                     `
 action A {
@@ -1712,8 +1722,8 @@ action A {
         });
 
         describe(`${ast.ForLoopActionUsage} formatting`, () => {
-            it("should format for loop", async () => {
-                await testFormatting(
+            describe("should format for loop", () => {
+                testFormatting(
                     "  action A  { private  action  L  for   i:Integer   in   List    action { action Sub;} }",
                     `
 action A {
@@ -1730,8 +1740,8 @@ action A {
         describe.each(["merge", "decide", "join", "fork"])(
             `${ast.ControlNode} '%s' formatting`,
             (kw) => {
-                it("should format control node", async () => {
-                    await testFormatting(
+                describe("should format control node", () => {
+                    testFormatting(
                         ` action A  {  private   individual  ${kw}   Node:N {   }  }`,
                         `
 action A {
@@ -1744,8 +1754,8 @@ action A {
     });
 
     describe(`${ast.TransitionUsage} formatting`, () => {
-        it("should format guarded target succession", async () => {
-            await testFormatting(
+        describe("should format guarded target succession", () => {
+            testFormatting(
                 "action A { private    if  true   then   A ; }",
                 `
 action A {
@@ -1756,8 +1766,8 @@ action A {
             );
         });
 
-        it("should format default target succession", async () => {
-            await testFormatting(
+        describe("should format default target succession", () => {
+            testFormatting(
                 "action A { private    else    A   ; }",
                 `
 action A {
@@ -1767,8 +1777,8 @@ action A {
             );
         });
 
-        it("should format transition usage", async () => {
-            await testFormatting(
+        describe("should format transition usage", () => {
+            testFormatting(
                 `
             state     def   S{ public   transition  T:X   first  A   
                 accept  B    if   false   do    action AA{}  then    C{}}`,
@@ -1786,8 +1796,8 @@ state def S {
     });
 
     describe(`${ast.StateUsage} formatting`, () => {
-        it.each([["entry", "do", "exit"]])("should format '%s' subaction", async (kw) => {
-            await testFormatting(
+        describe.each([["entry", "do", "exit"]])("should format '%s' subaction", (kw) => {
+            testFormatting(
                 `state def S { public    \n${kw}    action{}}`,
                 `
 state def S {
@@ -1798,26 +1808,23 @@ state def S {
     });
 
     describe(`${ast.AssertConstraintUsage} formatting`, () => {
-        it("should format 'assert' statements", async () => {
-            await testFormatting("  public   assert   A  ;", "public assert A;");
+        describe("should format 'assert' statements", () => {
+            testFormatting("  public   assert   A  ;", "public assert A;");
         });
 
-        it("should format 'assert not' statements", async () => {
-            await testFormatting(
+        describe("should format 'assert not' statements", () => {
+            testFormatting(
                 "  public   assert   not     constraint   A  ;",
                 "public assert not constraint A;"
             );
         });
 
-        it("should format 'assert' constraint statements", async () => {
-            await testFormatting(
-                "  public   assert   constraint   A  ;",
-                "public assert constraint A;"
-            );
+        describe("should format 'assert' constraint statements", () => {
+            testFormatting("  public   assert   constraint   A  ;", "public assert constraint A;");
         });
 
-        it("should format 'assert not' constraint statements", async () => {
-            await testFormatting(
+        describe("should format 'assert not' constraint statements", () => {
+            testFormatting(
                 "  public   assert   not     constraint   A  ;",
                 "public assert not constraint A;"
             );
@@ -1825,8 +1832,8 @@ state def S {
     });
 
     describe(`${ast.ConstraintUsage} formatting`, () => {
-        it.each(["assume", "require"])("should format constraint kind '%s'", async (kind) => {
-            await testFormatting(
+        describe.each(["assume", "require"])("should format constraint kind '%s'", (kind) => {
+            testFormatting(
                 `  requirement R {public   ${kind}\n   constraint;}`,
                 `
 requirement R {
@@ -1837,8 +1844,8 @@ requirement R {
     });
 
     describe(`${ast.PartUsage} formatting`, () => {
-        it.each(["actor", "stakeholder"])("should format parameter kind '%s'", async (kind) => {
-            await testFormatting(
+        describe.each(["actor", "stakeholder"])("should format parameter kind '%s'", (kind) => {
+            testFormatting(
                 `  requirement R {public   ${kind}\n   P;}`,
                 `
 requirement R {
@@ -1849,8 +1856,8 @@ requirement R {
     });
 
     describe(`${ast.SatisfyRequirementUsage} formatting`, () => {
-        it("should format 'satisfy'", async () => {
-            await testFormatting(
+        describe("should format 'satisfy'", () => {
+            testFormatting(
                 "  requirement R {public   assert   not  \nsatisfy  requirement R;}",
                 `
 requirement R {
@@ -1859,8 +1866,8 @@ requirement R {
             );
         });
 
-        it("should format 'by'", async () => {
-            await testFormatting(
+        describe("should format 'by'", () => {
+            testFormatting(
                 "  requirement R {public   assert     \nsatisfy  requirement R\n\nby     X   ;}",
                 `
 requirement R {
@@ -1872,11 +1879,11 @@ requirement R {
     });
 
     describe(`${ast.RequirementUsage} formatting`, () => {
-        it.each([
+        describe.each([
             ["objective", "case"],
             ["verify", "requirement"],
-        ])("should format requirement kind '%s'", async (kind, type) => {
-            await testFormatting(
+        ])("should format requirement kind '%s'", (kind, type) => {
+            testFormatting(
                 `  ${type} def R {public   ${kind}\n    #  Meta;}`,
                 `
 ${type} def R {
@@ -1887,10 +1894,10 @@ ${type} def R {
     });
 
     describe("Use case formatting", () => {
-        it("should format 'use case'", async () => {
-            await testFormatting("  use   case   def   U;", "use case def U;");
-            await testFormatting("  use   case   U;", "use case U;");
-            await testFormatting("  include   use   case   U;", "include use case U;");
+        describe("should format 'use case'", () => {
+            testFormatting("  use   case   def   U;", "use case def U;");
+            testFormatting("  use   case   U;", "use case U;");
+            testFormatting("  include   use   case   U;", "include use case U;");
         });
     });
 });
