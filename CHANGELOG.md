@@ -3,7 +3,7 @@
 # Changelog
 
 <!-- Include links to comparison to the previous version -->
-## Unreleased
+## 0.3.0
 
 ### Changed
 
