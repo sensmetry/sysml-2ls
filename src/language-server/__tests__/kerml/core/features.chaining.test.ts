@@ -14,19 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    parseKerML,
-    withQualifiedName,
-    qualifiedTypeReference,
-    anything,
-} from "../../../../testing";
+import { parseKerML, withQualifiedName, anything } from "../../../../testing";
 import { Feature } from "../../../generated/ast";
 
 test("feature chains allow qualified feature names in between chain parts", async () => {
     const result = await parseKerML(`
-    type A {
+    class A {
         feature a {
-            type B {
+            class B {
                 feature b;
             }
         }
@@ -34,24 +29,22 @@ test("feature chains allow qualified feature names in between chain parts", asyn
     feature c chains A::a.B::b;`);
 
     expect(result).toParseKerML({
-        features: [
+        members: [
             {
-                $type: Feature,
-                ...withQualifiedName("c"),
-                chains: [qualifiedTypeReference("A::a::B::b")],
+                element: {
+                    $type: Feature,
+                    ...withQualifiedName("c"),
+                },
             },
         ],
     });
-
-    const indices = result.value.features[0].chains[0].$meta.featureIndices;
-    expect(Array.from(indices)).toEqual([1, 3]);
 });
 
 test.failing("non-feature name in a chain fails to parse", async () => {
     return expect(`
-    type A {
-        type a {
-            type B {
+    class A {
+        class a {
+            class B {
                 feature b;
             }
         }

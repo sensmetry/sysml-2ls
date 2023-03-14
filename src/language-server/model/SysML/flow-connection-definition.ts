@@ -33,8 +33,8 @@ export class FlowConnectionDefinitionMeta extends Mixin(
         super(id, parent);
     }
 
-    override self(): FlowConnectionDefinition | undefined {
-        return super.self() as FlowConnectionDefinition;
+    override ast(): FlowConnectionDefinition | undefined {
+        return this._ast as FlowConnectionDefinition;
     }
 
     override parent(): ModelContainer<FlowConnectionDefinition> {

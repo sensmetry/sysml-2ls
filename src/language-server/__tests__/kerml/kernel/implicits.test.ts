@@ -16,9 +16,8 @@
 
 import { formatString } from "typescript-string-operations";
 import { parseKerML, NO_ERRORS, sanitizeTree, anything } from "../../../../testing";
-import { SpecializationKind } from "../../../model";
 import { SysMLBuildOptions } from "../../../services/shared/workspace/document-builder";
-import { Type } from "../../../generated/ast";
+import { Feature, Subclassification, Subsetting, Type } from "../../../generated/ast";
 
 const Base = `
 package {0} {
@@ -28,7 +27,7 @@ package {0} {
 `;
 
 const BinaryAssocBody = `
-    type X;
+    class X;
     end feature x : X;
     end feature y : X;
 `;
@@ -79,12 +78,12 @@ test.concurrent.each(TABLE)(
         const result = await parseKerML(str, BUILD_OPTIONS);
         expect(result).toMatchObject(NO_ERRORS);
 
-        const type = result.value.elements[1] as Type;
+        const type = result.value.namespaceMembers[1].element as Type;
         expect(sanitizeTree(type.$meta.specializations())).toMatchObject([
             {
-                type: { qualifiedName: `${pack}::${klass}` },
-                kind: SpecializationKind.Subclassification,
-                source: "implicit",
+                element: { qualifiedName: `${pack}::${klass}` },
+                $type: Subclassification,
+                isImplied: true,
             },
         ]);
     }
@@ -110,12 +109,12 @@ test.concurrent.each(TABLE)(
 
         expect(result).toMatchObject(NO_ERRORS);
         expect(
-            sanitizeTree((result.value.elements[2] as Type).$meta.specializations())
+            sanitizeTree((result.value.namespaceMembers[2].element as Type).$meta.specializations())
         ).toMatchObject([
             {
-                type: { qualifiedName: "B" },
-                kind: SpecializationKind.Subclassification,
-                source: "explicit",
+                element: { qualifiedName: "B" },
+                $type: Subclassification,
+                isImplied: false,
             },
         ]);
     }
@@ -139,12 +138,14 @@ test.concurrent.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
         const result = await parseKerML(str, BUILD_OPTIONS);
 
         expect(result).toMatchObject(NO_ERRORS);
-        expect(sanitizeTree(result.value.features[0].$meta.specializations())).toMatchObject([
+        expect(
+            sanitizeTree((result.value.members[0].element as Feature).$meta.specializations())
+        ).toMatchObject([
             ...anything(1),
             {
-                type: { qualifiedName: `${pack}::${feature}` },
-                kind: SpecializationKind.Subsetting,
-                source: "implicit",
+                element: { qualifiedName: `${pack}::${feature}` },
+                $type: Subsetting,
+                isImplied: true,
             },
         ]);
     }

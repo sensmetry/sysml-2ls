@@ -23,6 +23,7 @@ import {
     findDeclarationNodeAtOffset,
     LangiumDocuments,
     ServiceRegistry,
+    stream,
 } from "langium";
 import { CancellationToken, Connection } from "vscode-languageserver";
 import { URI } from "vscode-uri";
@@ -37,12 +38,7 @@ import {
 } from "../../generated/ast";
 import { JSONMetaReplacer, JSONreplacer, toJSON } from "../../utils/common";
 import { SysMLSharedServices } from "../services";
-import {
-    FeatureMeta,
-    getSpecializationKindString,
-    Metamodel,
-    SpecializationKind,
-} from "../../model";
+import { FeatureMeta, Metamodel } from "../../model";
 import { RegisterTextEditorCommandsRequest } from "../../../common/protocol-extensions";
 import { makeLinkingScope } from "../../utils/scopes";
 
@@ -247,12 +243,17 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     ): string[] {
         const node = this.findCursorNode(editor)?.$meta;
         if (!node?.is(Type)) return [];
-        return node
-            .allSpecializations(SpecializationKind.None, true)
-            .map(
-                (s) =>
-                    `${s.type.qualifiedName} (${getSpecializationKindString(s.kind)}, ${s.source})`
+        return stream([[node.qualifiedName, node.nodeType(), "self"]])
+            .concat(
+                node
+                    .allSpecializations()
+                    .map((s) => [
+                        s.element()?.qualifiedName,
+                        s.nodeType(),
+                        s.isImplied ? "implicit" : "explicit",
+                    ])
             )
+            .map(([name, type, kind]) => `${name} (${type}, ${kind})`)
             .toArray();
     }
 
@@ -288,7 +289,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         // also return private children
         return makeLinkingScope(node)
             .getAllExportedElements()
-            .map((d) => `${d.name} [${d.element.qualifiedName}]`)
+            .map((d) => `${d.name} [${d.element()?.qualifiedName}]`)
             .toArray();
     }
 
@@ -305,19 +306,22 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         const node = this.findCursorNode(editor)?.$meta;
         if (!node) return;
         const evaluator = this.shared.modelLevelExpressionEvaluator;
-        if (node.is(Feature)) {
-            if (node.value)
-                return toJSON(evaluator.evaluate(node.value.element, node), JSONreplacer);
+        if (node.is(InlineExpression)) {
+            let parent: Metamodel | undefined = node.owner();
+            while (parent && !parent.is(Element)) parent = parent.owner();
+            if (parent) return toJSON(evaluator.evaluate(node, parent), JSONreplacer);
+        } else if (node.is(Feature)) {
+            if (!node.value) return;
+            const expression = node.value.element();
+            if (!expression) return;
+            return toJSON(evaluator.evaluate(expression, node), JSONreplacer);
         } else if (node.is(FeatureValue)) {
-            if (!node.element) return;
+            const expression = node.element();
+            if (!expression) return;
             return toJSON(
-                evaluator.evaluate(node.element, node.parent() as FeatureMeta),
+                evaluator.evaluate(expression, node.parent() as FeatureMeta),
                 JSONreplacer
             );
-        } else if (node.is(InlineExpression)) {
-            let parent: Metamodel | undefined = node.parent();
-            while (parent && !parent.is(Element)) parent = parent.parent();
-            if (parent) return toJSON(evaluator.evaluate(node, parent), JSONreplacer);
         }
         return;
     }

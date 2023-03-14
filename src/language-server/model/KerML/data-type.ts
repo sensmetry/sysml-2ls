@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { DataType } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ClassifierMeta } from "./classifier";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ClassifierMeta } from "./_internal";
 
 export const ImplicitDataTypes = {
     base: "Base::DataValue",
@@ -28,8 +28,8 @@ export class DataTypeMeta extends ClassifierMeta {
         super(id, parent);
     }
 
-    override self(): DataType | undefined {
-        return super.deref() as DataType;
+    override ast(): DataType | undefined {
+        return this._ast as DataType;
     }
 
     override parent(): ModelContainer<DataType> {

@@ -20,20 +20,18 @@ import {
     Class,
     Connector,
     Feature,
-    Result,
+    Redefinition,
+    ReferenceSubsetting,
+    ResultExpressionMembership,
     Step,
     Structure,
+    Subsetting,
 } from "../../generated/ast";
-import {
-    FeatureDirectionKind,
-    getFeatureDirectionKind,
-    SpecializationKind,
-    TypeClassifier,
-} from "../enums";
-import { TypeMeta } from "./type";
+import { FeatureDirectionKind, getFeatureDirectionKind, TypeClassifier } from "../enums";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { castToRelated, FeatureValueMeta, InlineExpressionMeta, Related } from "./_internal";
-import { SpecializationSource } from "../containers";
+import { FeatureChainingMeta, FeatureValueMeta, TypeMeta } from "./_internal";
+import { SpecializationType } from "../containers";
+import { SysMLType } from "../../services/sysml-ast-reflection";
 
 export const ImplicitFeatures = {
     base: "Base::things",
@@ -88,7 +86,9 @@ export class FeatureMeta extends TypeMeta {
      */
     isEnd = false;
 
-    value?: Related<InlineExpressionMeta, FeatureValueMeta>;
+    chainings: FeatureChainingMeta[] = [];
+
+    value?: FeatureValueMeta;
 
     constructor(elementId: ElementID, parent: ModelContainer<Feature>) {
         super(elementId, parent);
@@ -97,10 +97,6 @@ export class FeatureMeta extends TypeMeta {
     override initialize(node: Feature): void {
         this.value = undefined;
         this.reset(node);
-        if (!node.declaredName && node.redefines.length > 0) {
-            const newName = node.redefines[0].chain.at(-1)?.$refText;
-            if (newName) this.setName(newName);
-        }
 
         this.direction = getFeatureDirectionKind(node.direction);
         this.isComposite = !!node.isComposite;
@@ -114,7 +110,7 @@ export class FeatureMeta extends TypeMeta {
 
     override reset(node: Feature): void {
         this.featuredBy.clear();
-        if (node.value) this.value = castToRelated(node.value.$meta);
+        if (node.value) this.value = node.value.$meta;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -131,8 +127,8 @@ export class FeatureMeta extends TypeMeta {
         return "base";
     }
 
-    override self(): Feature | undefined {
-        return super.deref() as Feature;
+    override ast(): Feature | undefined {
+        return this._ast as Feature;
     }
 
     override parent(): ModelContainer<Feature> {
@@ -174,7 +170,7 @@ export class FeatureMeta extends TypeMeta {
      * otherwise
      */
     protected isEnclosedPerformance(): boolean {
-        const owner = this.parent();
+        const owner = this.owner();
         return owner.isAny([Behavior, Step]);
     }
 
@@ -192,7 +188,7 @@ export class FeatureMeta extends TypeMeta {
      */
     protected isSubobject(): boolean {
         if (!this.isComposite) return false;
-        const owner = this.parent();
+        const owner = this.owner();
         return owner.is(Structure) || (owner.is(Feature) && owner.hasStructureType());
     }
 
@@ -209,7 +205,7 @@ export class FeatureMeta extends TypeMeta {
      */
     protected isSuboccurrence(): boolean {
         if (!this.isComposite) return false;
-        const owner = this.parent();
+        const owner = this.owner();
         return owner.is(Class) || (owner.is(Feature) && owner.hasClassType());
     }
 
@@ -219,7 +215,7 @@ export class FeatureMeta extends TypeMeta {
      */
     isAssociationEnd(): boolean {
         if (!this.isEnd) return false;
-        const owner = this.parent();
+        const owner = this.owner();
         return owner.isAny([Association, Connector]);
     }
 
@@ -227,14 +223,18 @@ export class FeatureMeta extends TypeMeta {
      * Feature that provides the name for this feature. Itself if it was named,
      * otherwise the naming feature of the first redefinition
      */
-    get namingFeature(): (Feature & { declaredName: string }) | undefined {
-        const feature = this.self();
-        if (!feature) return;
-        if (feature.declaredName) return feature as Feature & { declaredName: string };
-        const redefinitions = this.specializations(SpecializationKind.Redefinition);
-        if (redefinitions.length === 0) return undefined;
-        // redefinitions are always features
-        return (redefinitions[0].type as FeatureMeta).namingFeature;
+    namingFeature(): FeatureMeta | undefined {
+        return this.types(Redefinition).head() as FeatureMeta | undefined;
+    }
+
+    referencedFeature<K extends SysMLType>(kind?: K): FeatureMeta | undefined {
+        const feature = this.types(ReferenceSubsetting).head() as FeatureMeta | undefined;
+        if (kind) return feature?.is(kind) ? feature : this;
+        return feature;
+    }
+
+    basicFeature(): FeatureMeta {
+        return this.chainings.at(0)?.element() ?? this;
     }
 
     isIgnoredParameter(): boolean {
@@ -243,28 +243,27 @@ export class FeatureMeta extends TypeMeta {
 
     get isParameter(): boolean {
         // parameter if direction was specified explicitly
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([Behavior, Step]) && this.direction !== "none";
     }
 
     get isResultParameter(): boolean {
-        return this.parent().is(Result);
+        return this.parent().is(ResultExpressionMembership);
     }
 
-    override addSpecialization(
-        type: TypeMeta,
-        kind: SpecializationKind,
-        source?: SpecializationSource
-    ): void {
-        super.addSpecialization(type, kind, source);
+    override addSpecialization<T extends SpecializationType>(specialization: T): void {
+        super.addSpecialization(specialization);
 
-        if (kind !== SpecializationKind.Redefinition || this.name) return;
-        const namingFeature = this.namingFeature;
-        if (namingFeature) this.setName(namingFeature.declaredName);
+        if (this.name || this.shortName) return;
+        const namingFeature = this.namingFeature();
+        if (namingFeature) {
+            if (namingFeature.name) this.setName(namingFeature.name);
+            if (namingFeature.shortName) this.setShortName(namingFeature.shortName);
+        }
     }
 
-    override specializationKind(): SpecializationKind {
-        return SpecializationKind.Subsetting;
+    override specializationKind(): SysMLType {
+        return Subsetting;
     }
 }
 

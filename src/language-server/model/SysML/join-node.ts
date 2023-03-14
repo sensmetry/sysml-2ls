@@ -26,8 +26,8 @@ export class JoinNodeMeta extends ControlNodeMeta {
         super(id, parent);
     }
 
-    override self(): JoinNode | undefined {
-        return super.self() as JoinNode;
+    override ast(): JoinNode | undefined {
+        return this._ast as JoinNode;
     }
 
     override parent(): ModelContainer<JoinNode> {

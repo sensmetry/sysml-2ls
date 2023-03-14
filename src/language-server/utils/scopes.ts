@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { EMPTY_STREAM, Scope, stream, Stream, StreamImpl, TreeStreamImpl } from "langium";
-import { Element } from "../generated/ast";
+import { Element, Membership, MembershipImport } from "../generated/ast";
 import {
     ElementMeta,
     NamespaceMeta,
@@ -23,8 +23,10 @@ import {
     TypeMap,
     TypeMeta,
     ImportMeta,
-    Exported,
     Metamodel,
+    MembershipMeta,
+    MembershipImportMeta,
+    NamespaceImportMeta,
 } from "../model";
 import { SysMLNodeDescription } from "../services/shared/workspace/ast-descriptions";
 import { SysMLType, SysMLTypeList } from "../services/sysml-ast-reflection";
@@ -46,7 +48,7 @@ import {
  * An abstract class used to lazily construct scope for SysML name resolution
  */
 export abstract class SysMLScope implements Scope {
-    getAllExportedElements(): Stream<Exported> {
+    getAllExportedElements(): Stream<MembershipMeta> {
         return this.getAllScopes()
             .flatMap((scope) => scope.getAllLocalElements())
             .distinct((e) => e.name);
@@ -58,7 +60,7 @@ export abstract class SysMLScope implements Scope {
             .nonNullable();
     }
 
-    getExportedElement(name: string): Exported | undefined {
+    getExportedElement(name: string): MembershipMeta | undefined {
         for (const scope of this.getAllScopes(true)) {
             const candidate = scope.getLocalElement(name);
             if (candidate && this.isValidCandidate(candidate)) return candidate;
@@ -92,12 +94,12 @@ export abstract class SysMLScope implements Scope {
      * Find an element by {@link name} in this scope only
      * @param name element name
      */
-    protected abstract getLocalElement(name: string): Exported | undefined;
+    protected abstract getLocalElement(name: string): MembershipMeta | undefined;
 
     /**
      * Stream all owned elements in this scope only after applying filtering
      */
-    protected abstract getAllLocalElements(): Stream<Exported>;
+    protected abstract getAllLocalElements(): Stream<MembershipMeta>;
 
     /**
      * Check if an AST node can be returned by {@link getElement} (e.g. it is not hidden by redefinitions)
@@ -105,16 +107,16 @@ export abstract class SysMLScope implements Scope {
      * @returns true if {@link candidate} is visible to {@link getElement}, false otherwise
      */
     // eslint-disable-next-line unused-imports/no-unused-vars
-    protected isValidCandidate(candidate: Exported): boolean {
+    protected isValidCandidate(candidate: MembershipMeta): boolean {
         return true;
     }
 }
 
 class EmptySysMLScope extends SysMLScope {
-    protected override getLocalElement(_: string): Exported | undefined {
+    protected override getLocalElement(_: string): MembershipMeta | undefined {
         return;
     }
-    protected override getAllLocalElements(): Stream<Exported> {
+    protected override getAllLocalElements(): Stream<MembershipMeta> {
         return EMPTY_STREAM;
     }
     protected override getChildScopes(): Stream<SysMLScope> {
@@ -125,36 +127,35 @@ class EmptySysMLScope extends SysMLScope {
 export const EMPTY_SYSML_SCOPE = new EmptySysMLScope();
 
 /**
- * A scope wrapper for an iterable of {@link Exported}
+ * A scope wrapper for an iterable of {@link MembershipMeta}
  */
 export class SimpleScope extends SysMLScope {
     /**
      * Descriptions in this scope
      */
-    exported: Stream<Exported>;
+    exported: MembershipMeta[];
 
-    constructor(exported: Iterable<Exported>) {
+    constructor(exported: MembershipMeta[]) {
         super();
-        this.exported =
-            exported instanceof StreamImpl ? (exported as Stream<Exported>) : stream(exported);
+        this.exported = exported;
     }
 
     protected override getChildScopes(): Stream<SysMLScope> {
         return EMPTY_STREAM;
     }
-    protected override getLocalElement(name: string): Exported | undefined {
-        return this.exported.find((d) => d.name === name);
+    protected override getLocalElement(name: string): MembershipMeta | undefined {
+        return this.exported.find((m) => m.name === name || m.shortName === name);
     }
-    protected override getAllLocalElements(): Stream<Exported> {
-        return this.exported;
+    protected override getAllLocalElements(): Stream<MembershipMeta> {
+        return stream(this.exported);
     }
     override getAllScopes(): Stream<SysMLScope> {
         return stream([this]);
     }
-    override getExportedElement(name: string): Exported | undefined {
+    override getExportedElement(name: string): MembershipMeta | undefined {
         return this.getLocalElement(name);
     }
-    override getAllExportedElements(): Stream<Exported> {
+    override getAllExportedElements(): Stream<MembershipMeta> {
         return this.getAllLocalElements();
     }
 }
@@ -177,26 +178,34 @@ export class ElementScope extends SysMLScope {
 
         // collect all redefinitions now to hide elements in nested scopes
         const features = this.element.features;
-        for (const feature of features) collectRedefinitions(feature.element, options.visited);
+        for (const member of features) {
+            const feature = member.element();
+            if (feature) collectRedefinitions(feature, options.visited);
+        }
     }
 
     protected override getChildScopes(): Stream<SysMLScope> {
         return EMPTY_STREAM;
     }
 
-    protected override getLocalElement(name: string): Exported | undefined {
+    protected override getLocalElement(name: string): MembershipMeta | undefined {
         const candidate = this.element.children.get(name);
 
         if (candidate && this.isVisible(candidate)) return candidate;
         if (this.options.inherited.visibility < Visibility.private) return;
-        return this.element.selfExports.find((d) => d.name === name);
+
+        const parent = this.element.parent();
+        if (!parent?.is(Membership)) return undefined;
+        if (name === this.element.name || name === this.element.shortName) return parent;
+        return undefined;
     }
 
-    protected override getAllLocalElements(): Stream<Exported> {
+    protected override getAllLocalElements(): Stream<MembershipMeta> {
         const elements = stream(this.element.children.values()).filter((d) => this.isVisible(d));
 
         if (this.options.inherited.visibility >= Visibility.private) {
-            return elements.concat(this.element.selfExports);
+            const parent = this.element.parent();
+            if (parent?.is(Membership)) return elements.concat([parent]);
         }
         return elements;
     }
@@ -206,19 +215,19 @@ export class ElementScope extends SysMLScope {
      * @param exported element description
      * @returns true if {@link exported} is visible outside of this scope, false otherwise
      */
-    protected isVisible(exported: Exported): boolean {
+    protected isVisible(exported: MembershipMeta): boolean {
         return (
-            isVisibleWith(exported.element.visibility, this.options.inherited.visibility) &&
-            !this.options.visited.has(exported.element)
+            isVisibleWith(exported.visibility, this.options.inherited.visibility) &&
+            !this.options.visited.has(exported.element())
         );
     }
 
-    protected override isValidCandidate(candidate: Exported): boolean {
-        return !this.options.visited.has(candidate.element);
+    protected override isValidCandidate(candidate: MembershipMeta): boolean {
+        return !this.options.visited.has(candidate.element());
     }
 }
 
-export class ImportScope extends ElementScope {
+export abstract class ImportScope extends ElementScope {
     override readonly element: ImportMeta;
 
     constructor(element: ImportMeta, options: ContentsOptions) {
@@ -231,67 +240,38 @@ export class ImportScope extends ElementScope {
         }
     }
 
-    protected override getLocalElement(_name: string): Exported | undefined {
+    protected override getLocalElement(_name: string): MembershipMeta | undefined {
         // cannot reference import owned elements
         return;
     }
 
-    protected override getAllLocalElements(): Stream<Exported> {
+    protected override getAllLocalElements(): Stream<MembershipMeta> {
         // children not visible to outside
         return EMPTY_STREAM;
     }
 
-    protected override getChildScopes(): Stream<SysMLScope> {
-        const description = this.element.importDescription.target;
-        if (!description) return EMPTY_STREAM;
-
-        switch (this.element.kind) {
-            case "specific": {
-                if (!this.options.visited.has(description.name))
-                    return stream([new SimpleScope([description])]);
-                return EMPTY_STREAM;
-            }
-            case "wildcard": {
-                if (!this.options.visited.has(description.name))
-                    return stream([
-                        new SimpleScope([description]),
-                        makeScope(description.element, this.options),
-                    ]);
-                return stream([makeScope(description.element, this.options)]);
-            }
-            case "recursiveExclusive": {
-                return this.makeRecursiveScope(description);
-            }
-            case "recursive": {
-                if (!this.options.visited.has(description.name))
-                    return stream([new SimpleScope([description])]).concat(
-                        this.makeRecursiveScope(description)
-                    );
-                return this.makeRecursiveScope(description);
-            }
-        }
-    }
+    protected abstract override getChildScopes(): Stream<SysMLScope>;
 
     /**
      * Construct a stream of scopes for recursive imports
      * @param description
      * @returns Recursive stream of scopes starting at {@link description}
      */
-    protected makeRecursiveScope(description: Exported): Stream<SysMLScope> {
+    protected makeRecursiveScope(description: ElementMeta): Stream<SysMLScope> {
         // make sure this doesn't end up in an infinite loop by discarding
         // already visited elements
         const visited = new Set(this.options.visited);
         return new TreeStreamImpl(
-            makeScope(description.element, this.options),
+            makeScope(description, this.options),
             (scope) =>
                 scope
                     .getAllExportedElements()
                     .filter((d) => {
-                        if (visited.has(d.element)) return false;
-                        visited.add(d.element);
+                        if (visited.has(d)) return false;
+                        visited.add(d);
                         return true;
                     })
-                    .map((d) => makeScope(d.element, this.options)),
+                    .map((d) => makeScope(d.element(), this.options)),
             { includeRoot: true }
         );
     }
@@ -302,9 +282,46 @@ export class ImportScope extends ElementScope {
      * @returns Scope of a single element {@link d} if it is not hidden,
      * undefined otherwise
      */
-    protected makeDescriptionScope(d: Exported): SysMLScope | undefined {
+    protected makeDescriptionScope(d: MembershipMeta): SysMLScope | undefined {
         if (!this.options.visited.has(d.name)) return new SimpleScope([d]);
         return;
+    }
+}
+
+export class MembershipImportScope extends ImportScope {
+    override readonly element: MembershipImportMeta;
+
+    constructor(element: MembershipImportMeta, options: ContentsOptions) {
+        super(element, { ...options });
+        this.element = element;
+    }
+
+    protected override getChildScopes(): Stream<SysMLScope> {
+        let s = EMPTY_STREAM;
+        const description = this.element.element();
+        if (!description) return s;
+
+        if (!this.options.visited.has(description)) s = stream([new SimpleScope([description])]);
+        if (!this.element.isRecursive) return s;
+
+        return s.concat(this.makeRecursiveScope(description));
+    }
+}
+
+export class NamespaceImportScope extends ImportScope {
+    override readonly element: NamespaceImportMeta;
+
+    constructor(element: NamespaceImportMeta, options: ContentsOptions) {
+        super(element, { ...options });
+        this.element = element;
+    }
+
+    protected override getChildScopes(): Stream<SysMLScope> {
+        const element = this.element.element();
+        if (!element) return EMPTY_STREAM;
+        if (this.element.isRecursive) return this.makeRecursiveScope(element);
+
+        return stream([makeScope(this.element.element(), this.options)]);
     }
 }
 
@@ -324,14 +341,16 @@ export class NamespaceScope extends ElementScope {
         return this.getInheritedScopes().concat(
             stream(this.element.imports).map((imp) => {
                 if (
-                    imp.visibility > this.options.imported.visibility ||
+                    (!imp.importsAll && imp.visibility > this.options.imported.visibility) ||
                     this.options.visited.has(imp)
                 )
                     return EMPTY_SYSML_SCOPE; // hidden import or already imported
                 // imported with the import visibility
                 // prevent infinite loops
                 this.options.visited.add(imp);
-                return new ImportScope(imp, this.options);
+                return imp.is(MembershipImport)
+                    ? new MembershipImportScope(imp, this.options)
+                    : new NamespaceImportScope(imp as NamespaceImportMeta, this.options);
             })
         );
     }
@@ -365,19 +384,19 @@ export class TypeScope extends NamespaceScope {
             // unless the cache was not empty on the initial call, it will contain
             // only the general classes use a suffixed name for duplicate resolution
             // so that it doesn't clash with parent and imported scopes
-            const specialized = specialization.type;
-            const generalDescription = specialized.descriptions.at(0);
-            if (!generalDescription || specializations.has(specialized)) continue;
+            const specialized = specialization.element();
+            if (!specialized || specializations.has(specialized)) continue;
             specializations.add(specialized);
 
             if (
                 this.options.inherited.visibility >= Visibility.private &&
-                specialization.source === "explicit"
+                !specialization.isImplied
             ) {
                 // seems to be needed as removing this results in linking errors
                 // TODO: pull in both names or just the one used when specifying
                 // specialization?
-                scopes.push(new SimpleScope(specialized.selfExports));
+                const parent = specialized.parent();
+                if (parent.is(Membership)) scopes.push(new SimpleScope([parent]));
             }
 
             // TODO: add mapped object caches of elements in scope and skip this
@@ -414,10 +433,10 @@ export class ScopeStream extends SysMLScope {
         if (this.scopes instanceof StreamImpl) return this.scopes as Stream<SysMLScope>;
         return stream(this.scopes);
     }
-    protected override getLocalElement(_name: string): Exported | undefined {
+    protected override getLocalElement(_name: string): MembershipMeta | undefined {
         return;
     }
-    protected override getAllLocalElements(): Stream<Exported> {
+    protected override getAllLocalElements(): Stream<MembershipMeta> {
         return EMPTY_STREAM;
     }
 }
@@ -432,9 +451,9 @@ export class FilteredScope extends SysMLScope {
      * Filter predicate that returns true if an element is propagated from
      * {@link scope}
      */
-    predicate: (d: Exported) => boolean;
+    predicate: (d: MembershipMeta) => boolean;
 
-    constructor(scope: SysMLScope, predicate: (d: Exported) => boolean) {
+    constructor(scope: SysMLScope, predicate: (d: MembershipMeta) => boolean) {
         super();
         this.scope = scope;
         this.predicate = predicate;
@@ -442,21 +461,21 @@ export class FilteredScope extends SysMLScope {
     override getAllScopes(includeSelf?: boolean | undefined): Stream<SysMLScope> {
         return this.scope.getAllScopes(includeSelf);
     }
-    override getAllExportedElements(): Stream<Exported> {
+    override getAllExportedElements(): Stream<MembershipMeta> {
         return this.scope.getAllExportedElements().filter(this.predicate);
     }
     protected override getChildScopes(): Stream<SysMLScope> {
         return this.scope["getChildScopes"]();
     }
-    protected override getLocalElement(name: string): Exported | undefined {
+    protected override getLocalElement(name: string): MembershipMeta | undefined {
         const candidate = this.scope["getLocalElement"](name);
         if (candidate && this.predicate(candidate)) return candidate;
         return;
     }
-    protected override getAllLocalElements(): Stream<Exported> {
+    protected override getAllLocalElements(): Stream<MembershipMeta> {
         return this.scope["getAllLocalElements"]().filter(this.predicate);
     }
-    protected override isValidCandidate(candidate: Exported): boolean {
+    protected override isValidCandidate(candidate: MembershipMeta): boolean {
         return this.predicate(candidate);
     }
 }
@@ -473,7 +492,8 @@ const SCOPE_CONSTRUCTORS: {
 } = {
     Element: ElementScope,
     Namespace: NamespaceScope,
-    Import: ImportScope,
+    NamespaceImport: NamespaceImportScope,
+    MembershipImport: MembershipImportScope,
     Type: TypeScope,
 };
 
@@ -497,8 +517,11 @@ export function makeScope(
         );
     }
 
-    const ctor = SCOPE_MAP.get(element.nodeType());
-    if (ctor) return new ctor(element, options);
+    let target = element.is(Membership) ? element.element() : element;
+    target ??= element;
+
+    const ctor = SCOPE_MAP.get(target.nodeType());
+    if (ctor) return new ctor(target, options);
     return EMPTY_SYSML_SCOPE;
 }
 
@@ -522,7 +545,7 @@ export function makeLinkingScope(
     options.visited ??= new Set();
 
     let parentScopes: Stream<SysMLScope> = EMPTY_STREAM;
-    const parent = root.parent();
+    const parent = root.owner();
     if (parent && !options.skipParents) {
         const parents = streamParents(parent);
         const scopeOptions = fillContentOptions({
@@ -569,7 +592,7 @@ export function makeLinkingScope(
     }
 
     return new ScopeStream(
-        stream([new FilteredScope(rootScope, (d) => d.element !== options.skip)]).concat(
+        stream([new FilteredScope(rootScope, (d) => d.element() !== options.skip)]).concat(
             parentScopes
         )
     );

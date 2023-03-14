@@ -15,7 +15,6 @@
  ********************************************************************************/
 
 import { StateDefinition, StateUsage } from "../../generated/ast";
-import { Related } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
@@ -26,17 +25,8 @@ import { ActionUsageMeta } from "./action-usage";
     ownedAction: "Parts::Part::ownedStates",
 })
 export class StateUsageMeta extends ActionUsageMeta {
-    isParallel = false;
-
-    subactions: Related<ActionUsageMeta>[] = [];
-
     constructor(id: ElementID, parent: ModelContainer<StateUsage>) {
         super(id, parent);
-    }
-
-    override initialize(node: StateUsage): void {
-        this.isParallel = node.isParallel;
-        this.subactions = node.subactions.map((a) => ({ element: a.$meta }));
     }
 
     override getSubactionType(): string | undefined {
@@ -46,16 +36,16 @@ export class StateUsageMeta extends ActionUsageMeta {
     }
 
     isExclusiveState(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([StateDefinition, StateUsage]) && !parent.isParallel;
     }
 
     isSubstate(): boolean {
-        return this.parent().isAny([StateDefinition, StateUsage]);
+        return this.owner().isAny([StateDefinition, StateUsage]);
     }
 
-    override self(): StateUsage | undefined {
-        return super.self() as StateUsage;
+    override ast(): StateUsage | undefined {
+        return this._ast as StateUsage;
     }
 
     override parent(): ModelContainer<StateUsage> {

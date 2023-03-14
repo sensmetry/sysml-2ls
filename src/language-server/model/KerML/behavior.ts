@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Behavior } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ClassMeta } from "./class";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ClassMeta } from "./_internal";
 
 export const ImplicitBehaviors = {
     base: "Performances::Performance",
@@ -28,8 +28,8 @@ export class BehaviorMeta extends ClassMeta {
         super(id, parent);
     }
 
-    override self(): Behavior | undefined {
-        return super.deref() as Behavior;
+    override ast(): Behavior | undefined {
+        return this._ast as Behavior;
     }
 
     override parent(): ModelContainer<Behavior> {

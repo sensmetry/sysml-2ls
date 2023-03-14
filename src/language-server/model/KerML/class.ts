@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Class } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ClassifierMeta } from "./classifier";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ClassifierMeta } from "./_internal";
 
 export const ImplicitClasses = {
     base: "Occurrences::Occurrence",
@@ -28,8 +28,8 @@ export class ClassMeta extends ClassifierMeta {
         super(id, parent);
     }
 
-    override self(): Class | undefined {
-        return super.deref() as Class;
+    override ast(): Class | undefined {
+        return this._ast as Class;
     }
 
     override parent(): ModelContainer<Class> {

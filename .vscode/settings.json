@@ -42,4 +42,6 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "debug.onTaskErrors": "debugAnyway",
+    "jest.monitorLongRun": 30000,
+    "jest.jestCommandLine": "pnpm run test --verbose=false",
 }

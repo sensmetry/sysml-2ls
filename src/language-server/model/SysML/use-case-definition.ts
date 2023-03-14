@@ -26,8 +26,8 @@ export class UseCaseDefinitionMeta extends CaseDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): UseCaseDefinition | undefined {
-        return super.self() as UseCaseDefinition;
+    override ast(): UseCaseDefinition | undefined {
+        return this._ast as UseCaseDefinition;
     }
 
     override parent(): ModelContainer<UseCaseDefinition> {

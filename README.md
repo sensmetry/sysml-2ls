@@ -81,6 +81,10 @@ The extension provides basic features to support SysMLv2 document editing:
 
 <!-- markdownlint-restore -->
 
+## Known Limitations
+
+See [docs/known_limitations.md](docs/known_limitations.md).
+
 ## Developer instructions
 
 ### Building from source code

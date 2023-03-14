@@ -14,9 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Type } from "langium/lib/grammar/generated/ast";
 import { withQualifiedName, qualifiedTypeReference } from "../../../../testing";
-import { MultiplicityRange, LiteralNumber, Namespace, Feature } from "../../../generated/ast";
+import {
+    MultiplicityRange,
+    LiteralNumber,
+    Feature,
+    Disjoining,
+    Subclassification,
+    Conjugation,
+    Namespace,
+    Class,
+} from "../../../generated/ast";
 
 const Common = `
 abstract datatype Anything;
@@ -26,16 +34,20 @@ test("types can be disjoint", async () => {
     return expect(
         Common +
             `
-    type B;
-    type A specializes Anything disjoint from B;`
+    class B;
+    class A specializes Anything disjoint from B;`
     ).toParseKerML({
-        elements: [
-            withQualifiedName("Anything"),
-            withQualifiedName("B"),
+        namespaceMembers: [
+            { element: withQualifiedName("Anything") },
+            { element: withQualifiedName("B") },
             {
-                ...withQualifiedName("A"),
-                specializes: [qualifiedTypeReference("Anything")],
-                disjoins: [qualifiedTypeReference("B")],
+                element: {
+                    ...withQualifiedName("A"),
+                    typeRelationships: [
+                        { $type: Subclassification, reference: qualifiedTypeReference("Anything") },
+                        { $type: Disjoining, reference: qualifiedTypeReference("B") },
+                    ],
+                },
             },
         ],
     });
@@ -43,13 +55,17 @@ test("types can be disjoint", async () => {
 
 test("types can conjugate", async () => {
     return expect(`
-    type A;
-    type C conjugates A;`).toParseKerML({
-        elements: [
-            withQualifiedName("A"),
+    class A;
+    class C conjugates A;`).toParseKerML({
+        namespaceMembers: [
+            { element: withQualifiedName("A") },
             {
-                ...withQualifiedName("C"),
-                conjugates: [qualifiedTypeReference("A")],
+                element: {
+                    ...withQualifiedName("C"),
+                    typeRelationships: [
+                        { $type: Conjugation, reference: qualifiedTypeReference("A") },
+                    ],
+                },
             },
         ],
     });
@@ -59,14 +75,16 @@ test("types can be abstract", async () => {
     return expect(
         Common +
             `
-    abstract type A specializes Anything;`
+    abstract class A specializes Anything;`
     ).toParseKerML({
-        elements: [
-            withQualifiedName("Anything"),
+        namespaceMembers: [
+            { element: withQualifiedName("Anything") },
             {
-                ...withQualifiedName("A"),
-                specializes: [qualifiedTypeReference("Anything")],
-                isAbstract: "abstract",
+                element: {
+                    ...withQualifiedName("A"),
+                    typeRelationships: [{ reference: qualifiedTypeReference("Anything") }],
+                    isAbstract: "abstract",
+                },
             },
         ],
     });
@@ -78,16 +96,22 @@ test("types can have multiplicity", async () => {
             `
     type Singleton[1] specializes Anything;`
     ).toParseKerML({
-        elements: [
-            withQualifiedName("Anything"),
+        namespaceMembers: [
+            { element: withQualifiedName("Anything") },
             {
-                ...withQualifiedName("Singleton"),
-                specializes: [qualifiedTypeReference("Anything")],
-                multiplicity: {
-                    $type: MultiplicityRange,
-                    range: {
-                        $type: LiteralNumber,
-                        value: 1,
+                element: {
+                    ...withQualifiedName("Singleton"),
+                    typeRelationships: [{ reference: qualifiedTypeReference("Anything") }],
+                    multiplicity: {
+                        element: {
+                            $type: MultiplicityRange,
+                            range: {
+                                element: {
+                                    $type: LiteralNumber,
+                                    literal: 1,
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -99,53 +123,73 @@ test("type children can reference private child members", async () => {
     return expect(
         Common +
             `
-    type Super specializes Anything {
+    class Super specializes Anything {
         private namespace N {
-            type Sub specializes Super;
+            class Sub specializes Super;
         }
         protected feature f : N::Sub;
         member feature f1 : Super featured by N::Sub;
         member feature f2 : Super featured by N::Sub;
     }`
     ).toParseKerML({
-        elements: [
-            withQualifiedName("Anything"),
+        namespaceMembers: [
+            { element: withQualifiedName("Anything") },
             {
-                ...withQualifiedName("Super"),
-                specializes: [qualifiedTypeReference("Anything")],
-                elements: [
-                    {
-                        $type: Namespace,
-                        ...withQualifiedName("Super::N"),
-                        visibility: "private",
-                        elements: [
-                            {
-                                ...withQualifiedName("Super::N::Sub"),
-                                specializes: [qualifiedTypeReference("Super")],
+                element: {
+                    ...withQualifiedName("Super"),
+                    typeRelationships: [{ reference: qualifiedTypeReference("Anything") }],
+                    namespaceMembers: [
+                        {
+                            visibility: "private",
+                            element: {
+                                $type: Namespace,
+                                ...withQualifiedName("Super::N"),
+                                namespaceMembers: [
+                                    {
+                                        element: {
+                                            ...withQualifiedName("Super::N::Sub"),
+                                            typeRelationships: [
+                                                { reference: qualifiedTypeReference("Super") },
+                                            ],
+                                        },
+                                    },
+                                ],
                             },
-                        ],
-                    },
-                ],
-                features: [
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Super::f"),
-                        visibility: "protected",
-                        typedBy: [qualifiedTypeReference("Super::N::Sub")],
-                    },
-                ],
-                members: [
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Super::f1"),
-                        featuredBy: [qualifiedTypeReference("Super::N::Sub")],
-                    },
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Super::f2"),
-                        featuredBy: [qualifiedTypeReference("Super::N::Sub")],
-                    },
-                ],
+                        },
+                    ],
+                    members: [
+                        {
+                            visibility: "protected",
+                            element: {
+                                $type: Feature,
+                                ...withQualifiedName("Super::f"),
+                                typeRelationships: [
+                                    { reference: qualifiedTypeReference("Super::N::Sub") },
+                                ],
+                            },
+                        },
+                        {
+                            element: {
+                                $type: Feature,
+                                ...withQualifiedName("Super::f1"),
+                                typeRelationships: [
+                                    { reference: qualifiedTypeReference("Super") },
+                                    { reference: qualifiedTypeReference("Super::N::Sub") },
+                                ],
+                            },
+                        },
+                        {
+                            element: {
+                                $type: Feature,
+                                ...withQualifiedName("Super::f2"),
+                                typeRelationships: [
+                                    { reference: qualifiedTypeReference("Super") },
+                                    { reference: qualifiedTypeReference("Super::N::Sub") },
+                                ],
+                            },
+                        },
+                    ],
+                },
             },
         ],
     });
@@ -153,40 +197,52 @@ test("type children can reference private child members", async () => {
 
 test("types can be sufficient", async () => {
     return expect(`
-    abstract type MaterialThing;
-    type Wheel;
-    type all Car specializes MaterialThing {
+    abstract class MaterialThing;
+    class Wheel;
+    class all Car specializes MaterialThing {
         feature wheels[4] : Wheel;
     }`).toParseKerML({
-        elements: [
+        namespaceMembers: [
             {
-                $type: Type,
-                ...withQualifiedName("MaterialThing"),
-                isAbstract: "abstract",
+                element: {
+                    $type: Class,
+                    ...withQualifiedName("MaterialThing"),
+                    isAbstract: "abstract",
+                },
             },
             {
-                $type: Type,
-                ...withQualifiedName("Wheel"),
+                element: {
+                    $type: Class,
+                    ...withQualifiedName("Wheel"),
+                },
             },
             {
-                $type: Type,
-                ...withQualifiedName("Car"),
-                isSufficient: true,
-                specializes: [qualifiedTypeReference("MaterialThing")],
-                features: [
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Car::wheels"),
-                        multiplicity: {
-                            $type: MultiplicityRange,
-                            range: {
-                                $type: LiteralNumber,
-                                value: 4,
+                element: {
+                    $type: Class,
+                    ...withQualifiedName("Car"),
+                    isSufficient: true,
+                    typeRelationships: [{ reference: qualifiedTypeReference("MaterialThing") }],
+                    members: [
+                        {
+                            element: {
+                                $type: Feature,
+                                ...withQualifiedName("Car::wheels"),
+                                multiplicity: {
+                                    element: {
+                                        $type: MultiplicityRange,
+                                        range: {
+                                            element: {
+                                                $type: LiteralNumber,
+                                                literal: 4,
+                                            },
+                                        },
+                                    },
+                                },
+                                typeRelationships: [{ reference: qualifiedTypeReference("Wheel") }],
                             },
                         },
-                        typedBy: [qualifiedTypeReference("Wheel")],
-                    },
-                ],
+                    ],
+                },
             },
         ],
     });

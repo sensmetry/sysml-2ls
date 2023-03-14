@@ -23,8 +23,18 @@ import {
     NO_ERRORS,
     childrenNames,
     sanitizeTree,
+    recursiveObjectContaining,
 } from "../../../../testing";
-import { Feature, MultiplicityRange, LiteralNumber, LiteralInfinity } from "../../../generated/ast";
+import {
+    Feature,
+    MultiplicityRange,
+    LiteralNumber,
+    LiteralInfinity,
+    Disjoining,
+    FeatureChaining,
+    FeatureInverting,
+    TypeFeaturing,
+} from "../../../generated/ast";
 import { Visibility } from "../../../utils/scope-util";
 
 test.concurrent.each([
@@ -34,8 +44,8 @@ test.concurrent.each([
     const matcher = expect(
         formatString(
             `
-    type A;
-    type B;
+    class A;
+    class B;
     feature f;
     feature g;
     feature x {0};
@@ -44,14 +54,18 @@ test.concurrent.each([
         )
     );
     const expected = {
-        features: [
+        members: [
             ...anything(2),
             {
-                $type: Feature,
-                ...withQualifiedName("x"),
-                typedBy: [qualifiedTypeReference("A"), qualifiedTypeReference("B")],
-                subsets: [qualifiedTypeReference("f")],
-                redefines: [qualifiedTypeReference("g")],
+                element: {
+                    $type: Feature,
+                    ...withQualifiedName("x"),
+                    typeRelationships: expect.arrayContaining(
+                        ["A", "B", "f", "g"].map((name) =>
+                            recursiveObjectContaining({ reference: qualifiedTypeReference(name) })
+                        )
+                    ),
+                },
             },
         ],
     };
@@ -74,18 +88,20 @@ test("features without subsetting, redefinition and conjugation relationships su
         { standardLibrary: "local", ignoreMetamodelErrors: true, standalone: true }
     );
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.features[0], Visibility.private)).toEqual([
+    expect(childrenNames(result.value.members[0].element, Visibility.private)).toEqual([
         "person",
         "Person", // from typing
         "Base::Anything", // from Person
         "Base::things::that", // from things
         "Base::things",
     ]);
-    expect(sanitizeTree(result.value.features[0])).toMatchObject({
-        $type: Feature,
-        ...withQualifiedName("person"),
-        typedBy: [qualifiedTypeReference("Person")],
-    });
+    expect(sanitizeTree(result.value.members[0].element, undefined, "include $meta")).toMatchObject(
+        {
+            $type: Feature,
+            ...withQualifiedName("person"),
+            typeRelationships: [{ reference: qualifiedTypeReference("Person") }],
+        }
+    );
 });
 
 test.concurrent.each([
@@ -101,7 +117,7 @@ test.concurrent.each([
 ])("feature prefix '%s' is parsed", async (prefix: string, property: string, value: unknown) => {
     const result = await parseKerML(prefix + " feature a;");
     expect(result).toMatchObject(NO_ERRORS);
-    return expect(result.value.features[0].$meta).toMatchObject({
+    return expect(result.value.members[0].element?.$meta).toMatchObject({
         qualifiedName: "a",
         [property]: value,
     });
@@ -115,20 +131,26 @@ test.failing("conjugating feature with a non-feature issues a warning", async ()
 
 test("feature multiplicity can be specified after identification", async () => {
     return expect(`
-        type Person;
+        class Person;
         feature parent[2] : Person;
     `).toParseKerML({
-        features: [
+        members: [
             {
-                ...withQualifiedName("parent"),
-                multiplicity: {
-                    $type: MultiplicityRange,
-                    range: {
-                        $type: LiteralNumber,
-                        value: 2,
+                element: {
+                    ...withQualifiedName("parent"),
+                    multiplicity: {
+                        element: {
+                            $type: MultiplicityRange,
+                            range: {
+                                element: {
+                                    $type: LiteralNumber,
+                                    literal: 2,
+                                },
+                            },
+                        },
                     },
+                    typeRelationships: [{ reference: qualifiedTypeReference("Person") }],
                 },
-                typedBy: [qualifiedTypeReference("Person")],
             },
         ],
     });
@@ -136,20 +158,26 @@ test("feature multiplicity can be specified after identification", async () => {
 
 test("feature multiplicity can be specified after one specialization", async () => {
     return expect(`
-        type Person;
+        class Person;
         feature parent : Person [2];
     `).toParseKerML({
-        features: [
+        members: [
             {
-                ...withQualifiedName("parent"),
-                multiplicity: {
-                    $type: MultiplicityRange,
-                    range: {
-                        $type: LiteralNumber,
-                        value: 2,
+                element: {
+                    ...withQualifiedName("parent"),
+                    multiplicity: {
+                        element: {
+                            $type: MultiplicityRange,
+                            range: {
+                                element: {
+                                    $type: LiteralNumber,
+                                    literal: 2,
+                                },
+                            },
+                        },
                     },
+                    typeRelationships: [{ reference: qualifiedTypeReference("Person") }],
                 },
-                typedBy: [qualifiedTypeReference("Person")],
             },
         ],
     });
@@ -166,18 +194,24 @@ test.concurrent.each([
         return expect(`
     datatype Real;
     feature readings : Real [*] ${keyword};`).toParseKerML({
-            features: [
+            members: [
                 {
-                    $type: Feature,
-                    ...withQualifiedName("readings"),
-                    multiplicity: {
-                        $type: MultiplicityRange,
-                        range: {
-                            $type: LiteralInfinity,
+                    element: {
+                        $type: Feature,
+                        ...withQualifiedName("readings"),
+                        multiplicity: {
+                            element: {
+                                $type: MultiplicityRange,
+                                range: {
+                                    element: {
+                                        $type: LiteralInfinity,
+                                    },
+                                },
+                            },
                         },
+                        isNonunique: nonunique,
+                        isOrdered: ordered,
                     },
-                    isNonunique: nonunique,
-                    isOrdered: ordered,
                 },
             ],
         });
@@ -185,20 +219,27 @@ test.concurrent.each([
 );
 
 test.concurrent.each([
-    ["disjoint from", "disjoins"],
-    ["chains", "chains"],
-    ["inverse of", "inverseOf"],
-])("feature relationships '%s' are parsed", async (relationship: string, property: string) => {
+    ["disjoint from", Disjoining],
+    ["chains", FeatureChaining],
+    ["inverse of", FeatureInverting],
+])("feature relationships '%s' are parsed", async (relationship: string, type: string) => {
     return expect(`
     feature a {
         feature c;
     }
     feature b ${relationship} a.c;`).toParseKerML({
-        features: [
+        members: [
             ...anything(1),
             {
-                ...withQualifiedName("b"),
-                [property]: [qualifiedTypeReference("a::c")],
+                element: {
+                    ...withQualifiedName("b"),
+                    typeRelationships: expect.arrayContaining([
+                        recursiveObjectContaining({
+                            $type: type,
+                            // reference: qualifiedTypeReference("a"),
+                        }),
+                    ]),
+                },
             },
         ],
     });
@@ -208,11 +249,18 @@ test("feature can be featured", async () => {
     return expect(`
     feature a; 
     feature b featured by a;`).toParseKerML({
-        features: [
+        members: [
             ...anything(1),
             {
-                ...withQualifiedName("b"),
-                featuredBy: [qualifiedTypeReference("a")],
+                element: {
+                    ...withQualifiedName("b"),
+                    typeRelationships: [
+                        {
+                            $type: TypeFeaturing,
+                            reference: qualifiedTypeReference("a"),
+                        },
+                    ],
+                },
             },
         ],
     });

@@ -29,8 +29,8 @@ export class CalculationUsageMeta extends Mixin(ActionUsageMeta, ExpressionMeta)
         super(id, parent);
     }
 
-    override self(): CalculationUsage | undefined {
-        return super.self() as CalculationUsage;
+    override ast(): CalculationUsage | undefined {
+        return this._ast as CalculationUsage;
     }
 
     override parent(): ModelContainer<CalculationUsage> {
@@ -42,7 +42,7 @@ export class CalculationUsageMeta extends Mixin(ActionUsageMeta, ExpressionMeta)
     }
 
     isSubcalculation(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([CalculationUsage, CalculationDefinition]);
     }
 }

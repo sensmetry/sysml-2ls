@@ -25,8 +25,8 @@ import {
 } from "langium";
 import { CancellationToken } from "vscode-languageserver";
 import { URI, Utils } from "vscode-uri";
-import { Type, isElement, Namespace } from "../../../generated/ast";
-import { ElementMeta, Exported, TypeMeta } from "../../../model";
+import { Type, isElement, Namespace, Membership } from "../../../generated/ast";
+import { ElementMeta, MembershipMeta, TypeMeta } from "../../../model";
 import { streamAst } from "../../../utils/ast-util";
 import { makeScope, ScopeStream } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
@@ -212,7 +212,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         if (description !== undefined) return description ?? undefined;
 
         let parts = qualifiedName.split("::");
-        let children: Map<string, Exported<ElementMeta>> | undefined;
+        let children: Map<string, MembershipMeta<ElementMeta>> | undefined;
         const root = parts[0];
         parts = parts.slice(1);
         let candidate = cache.get(root)?.node;
@@ -221,10 +221,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
 
             // the first exported element is the root node itself
             if (local && uri) scope = stream(document.exports).tail(1);
-            else
-                scope = stream(this.simpleIndex.values())
-                    .map((ds) => stream(ds).tail(1))
-                    .flat();
+            else scope = stream(this.simpleIndex.values()).flatMap((ds) => stream(ds).tail(1));
             description = scope.find((d) => d.name === root);
             cache.set(root, description ?? null);
             candidate = description?.node;
@@ -236,8 +233,10 @@ export class SysMLIndexManager extends DefaultIndexManager {
 
         // traverse the name chain
         for (const part of parts) {
-            description = children?.get(part)?.description;
-            if (!description || !isElement(description.node)) break;
+            let child: ElementMeta | undefined = children?.get(part);
+            if (child?.is(Membership)) child = child.element();
+            description = child?.description;
+            if (!description || !description.node) break;
             children = description.node.$meta.children;
         }
 

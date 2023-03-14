@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Element, ItemFeature, Step } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { FeatureMeta } from "./feature";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { FeatureMeta } from "./_internal";
 
 export const ImplicitSteps = {
     base: "Performances::performances",
@@ -33,8 +33,8 @@ export class StepMeta extends FeatureMeta {
         super(id, parent);
     }
 
-    override self(): Step | undefined {
-        return super.deref() as Step;
+    override ast(): Step | undefined {
+        return this._ast as Step;
     }
 
     override parent(): ModelContainer<Step> {
@@ -50,9 +50,9 @@ export class StepMeta extends FeatureMeta {
     }
 
     protected isIncomingTransfer(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         if (!parent.is(Element)) return false;
-        return parent.features.some((f) => f.element.is(ItemFeature));
+        return parent.features.some((f) => f.element()?.is(ItemFeature));
     }
 }
 

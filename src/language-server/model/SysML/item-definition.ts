@@ -28,8 +28,8 @@ export class ItemDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, Structur
         super(id, parent);
     }
 
-    override self(): ItemDefinition | undefined {
-        return super.self() as ItemDefinition;
+    override ast(): ItemDefinition | undefined {
+        return this._ast as ItemDefinition;
     }
 
     override parent(): ModelContainer<ItemDefinition> {

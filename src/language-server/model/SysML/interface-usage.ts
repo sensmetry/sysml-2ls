@@ -27,8 +27,8 @@ export class InterfaceUsageMeta extends ConnectionUsageMeta {
         super(id, parent);
     }
 
-    override self(): InterfaceUsage | undefined {
-        return super.self() as InterfaceUsage;
+    override ast(): InterfaceUsage | undefined {
+        return this._ast as InterfaceUsage;
     }
 
     override parent(): ModelContainer<InterfaceUsage> {

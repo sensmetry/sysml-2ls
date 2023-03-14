@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { assertUnreachable } from "langium";
 import * as ast from "../generated/ast";
 import { stringifyFlags } from "../utils/common";
 import { Visibility } from "../utils/scope-util";
@@ -76,133 +77,35 @@ export function getTypeClassifierString(v: number): string {
     return stringifyFlags(v, TypeClassifierNames);
 }
 
-/**
- * only the qualified element is imported
- */
-type SpecificImport = "specific";
-
-/**
- * import elements contained in the imported namespace
- */
-type WildcardImport = "wildcard";
-
-/**
- * recursively import all elements including itself
- */
-type RecursiveImport = "recursive";
-
-/**
- * recursively import all elements excluding itself
- */
-type RecursiveExclusiveImport = "recursiveExclusive";
-
-export type ImportKind =
-    | SpecificImport
-    | WildcardImport
-    | RecursiveImport
-    | RecursiveExclusiveImport;
-
-export function getImportKind(kind?: ast.ImportKind): ImportKind {
-    switch (kind) {
-        case "::*":
-            return "wildcard";
-        case "::**":
-            return "recursive";
-        case "::*::**":
-            return "recursiveExclusive";
-        case undefined:
-            return "specific";
-    }
-}
-
-export type RequirementConstraintKind = "none" | "assumption" | "requirement";
+export type RequirementConstraintKind = "assumption" | "requirement";
 
 export function getRequirementConstraintKind(
-    kind?: ast.RequirementConstraintKind
+    node: ast.RequirementConstraintMembership
 ): RequirementConstraintKind {
-    switch (kind) {
+    switch (node.kind) {
         case "assume":
             return "assumption";
         case "require":
+        case undefined:
             return "requirement";
-        case undefined:
-            return "none";
     }
 }
 
-export type ParameterKind = "none" | "actor" | "stakeholder";
+export type StateSubactionKind = ast.StateSubactionMembership["kind"];
 
-export function getParameterKind(part: ast.PartUsage): ParameterKind {
-    return part.parameterKind ?? "none";
-}
+export type TransitionFeatureKind = ast.TransitionFeatureKind;
 
-export type RequirementKind = "none" | "verification" | "objective";
-
-export function getRequirementKind(requirement: ast.RequirementUsage): RequirementKind {
-    switch (requirement.requirementKind) {
-        case "objective":
-            return "objective";
-        case "verify":
-            return "verification";
-        case undefined:
-            return "none";
-    }
-}
-
-export const enum SpecializationKind {
-    None = 0,
-    Specialization = 1,
-    Subclassification = (1 << 1) | Specialization,
-    Typing = (1 << 2) | Specialization,
-    ConjugatedPortTyping = (1 << 3) | Typing,
-    Conjugation = 1 << 4,
-    Subsetting = (1 << 5) | Specialization,
-    Redefinition = (1 << 6) | Subsetting,
-    Reference = (1 << 7) | Subsetting,
-}
-
-const SpecializationNames = new Map<SpecializationKind, string>([
-    [SpecializationKind.None, "None"],
-    [SpecializationKind.Specialization, "Specialization"],
-    [SpecializationKind.Subclassification, "Subclassification"],
-    [SpecializationKind.Typing, "Typing"],
-    [SpecializationKind.ConjugatedPortTyping, "ConjugatedPortTyping"],
-    [SpecializationKind.Conjugation, "Conjugation"],
-    [SpecializationKind.Subsetting, "Subsetting"],
-    [SpecializationKind.Redefinition, "Redefinition"],
-    [SpecializationKind.Reference, "Reference"],
-]);
-
-export function getSpecializationKind(ref: ast.ElementReference): SpecializationKind {
-    switch (ref.$containerProperty) {
-        case "subsets":
-            return SpecializationKind.Subsetting;
-        case "redefines":
-            return SpecializationKind.Redefinition;
-        case "typedBy":
-            return SpecializationKind.Typing;
-        case "references":
-            return SpecializationKind.Reference;
-        case "conjugates": {
-            if (ast.isUsage(ref.$container)) return SpecializationKind.ConjugatedPortTyping;
-            return SpecializationKind.Conjugation;
-        }
-        case "specializes": {
-            const owner = ref.$container;
-            if (ast.isClassifier(owner)) return SpecializationKind.Subclassification;
-            return SpecializationKind.Specialization;
-        }
+export function getTransitionFeatureKind(
+    node: ast.TransitionFeatureMembership
+): TransitionFeatureKind {
+    switch (node.kind) {
+        case "accept":
+            return "trigger";
+        case "do":
+            return "effect";
+        case "if":
+            return "trigger";
         default:
-            return SpecializationKind.None;
+            assertUnreachable(node.kind);
     }
-}
-
-export function getSpecializationKindString(kind: SpecializationKind): string {
-    return SpecializationNames.get(kind) ?? "<unknown>";
-}
-
-export type StateSubactionKind = "do" | "entry" | "exit" | "none";
-
-export function getStateSubactionKind(ref: ast.ActionUsage): StateSubactionKind {
-    return ref.actionKind ?? "none";
 }

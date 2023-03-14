@@ -28,6 +28,7 @@ import chalk from "chalk";
 import { Diagnostic } from "vscode";
 import { SysMLBuildOptions } from "../language-server/services/shared/workspace/document-builder";
 import { isJSONConvertible, JSONType, stringify } from "../language-server/utils/common";
+import { toMatchSnapshot, Context } from "jest-snapshot";
 
 // Omit colon and one or more spaces, so can call getLabelPrinter.
 const EXPECTED_LABEL = "Expected";
@@ -73,12 +74,13 @@ export const NO_ERRORS: ErrorParameters = {
 
 export function sanitizeTree(
     node?: object | [] | null,
-    cache?: Map<object, object>
+    cache?: Map<object, object>,
+    includeMeta?: "include $meta"
 ): SanitizedObject | JSONType {
     if (node === undefined) return undefined;
     if (node === null) return null;
     if ((node as Record<symbol, string>)[Symbol.toStringTag] === "WeakRef") {
-        return sanitizeTree((node as any).deref(), cache);
+        return sanitizeTree((node as any).ast(), cache, includeMeta);
     }
     if (isLinkingError(node)) {
         return {
@@ -87,12 +89,12 @@ export function sanitizeTree(
         };
     }
     if (node instanceof Set) {
-        return Array.from(stream(node).map((v) => sanitizeTree(v, cache)));
+        return Array.from(stream(node).map((v) => sanitizeTree(v, cache, includeMeta)));
     }
 
     if (isJSONConvertible(node)) {
         const json = node.toJSON();
-        if (typeof json === "object") return sanitizeTree(json, cache);
+        if (typeof json === "object") return sanitizeTree(json, cache, includeMeta);
         return json;
     }
 
@@ -105,15 +107,17 @@ export function sanitizeTree(
     cache.set(node, o);
 
     if ((node as any).$type !== undefined) o.$type = (node as any).$type;
+    if ("nodeType" in node && node.nodeType instanceof Function) o.$type = String(node.nodeType());
 
-    if ((node as any).$meta !== undefined) {
+    if ((node as any).$meta !== undefined && includeMeta) {
         const meta = (node as any).$meta;
         // TODO: add more relevant properties used by tests
         const cleanMeta: Record<string, any> = {
             language: meta.language, // textual representations
             qualifiedName: meta.qualifiedName, // named elements
             visibility: meta.visibility, // visible elements
-            to: sanitizeTree(meta.to, cache), // references
+            to: sanitizeTree(meta.to, cache, includeMeta), // references
+            $type: meta.nodeType(),
         };
         Object.keys(cleanMeta).forEach(
             (key) => cleanMeta[key] === undefined && delete cleanMeta[key]
@@ -122,12 +126,17 @@ export function sanitizeTree(
     }
 
     for (const [key, value] of Object.entries(node)) {
+        if (key === "_element") {
+            // for relationships
+            o["element"] = sanitizeTree(value, cache, includeMeta);
+            continue;
+        }
         // skip over any Langium specific entries
         if (key.startsWith("$") || key.startsWith("_")) continue;
 
         if (Array.isArray(value)) {
             o[key] = value.map((element) => {
-                if (typeof element === "object") return sanitizeTree(element, cache);
+                if (typeof element === "object") return sanitizeTree(element, cache, includeMeta);
                 return element;
             });
             continue;
@@ -135,7 +144,7 @@ export function sanitizeTree(
 
         if (typeof value === "object") {
             let cached: SanitizedObject | JSONType = cache.get(value);
-            if (cached === undefined) cached = sanitizeTree(value, cache);
+            if (cached === undefined) cached = sanitizeTree(value, cache, includeMeta);
             o[key] = cached;
             continue;
         }
@@ -151,11 +160,12 @@ export function sanitizeTree(
 }
 
 async function parses(
+    this: Context,
     suffix: string,
     fn: (text: string, options?: SysMLBuildOptions) => Promise<ParseResult>,
     context: MatcherContext,
     received: any,
-    value: object | Namespace,
+    value: DeepPartial<Namespace> | "snapshot",
     { parserErrors, lexerErrors, diagnostics, buildOptions }: MatchOptions
 ): Promise<CustomMatchResult> {
     // the body is modified from https://github.com/facebook/jest/blob/a20bd2c31e126fc998c2407cfc6c1ecf39ead709/packages/expect/src/matchers.ts#L872-L923
@@ -167,11 +177,16 @@ async function parses(
         promise: context.promise,
     };
 
-    if (typeof value !== "object" || value === null) {
+    if (
+        (typeof value === "object" && value === null) ||
+        (typeof value === "string" && value !== "snapshot")
+    ) {
         throw new Error(
             context.utils.matcherErrorMessage(
                 context.utils.matcherHint(matcherName, undefined, undefined, options),
-                `${context.utils.EXPECTED_COLOR("expected")} value must be a non-null object`,
+                `${context.utils.EXPECTED_COLOR(
+                    "expected"
+                )} value must be a non-null object or 'snapshot'`,
                 printWithType("Expected", value, printExpected)
             )
         );
@@ -209,8 +224,16 @@ async function parses(
         parserErrors: parseResult.parserErrors,
         lexerErrors: parseResult.lexerErrors,
         diagnostics: parseResult.diagnostics,
-        value: sanitizeTree(parseResult.value), // sanitize most cyclic references to avoid jest hanging on failure
+        value: sanitizeTree(
+            parseResult.value,
+            undefined,
+            value === "snapshot" ? undefined : "include $meta"
+        ), // sanitize most cyclic references to avoid jest hanging on failure
     };
+
+    if (value === "snapshot") {
+        return toMatchSnapshot.call(this, result, matcherName);
+    }
     const expected = {
         parserErrors: parserErrors,
         lexerErrors: lexerErrors,
@@ -251,7 +274,7 @@ async function parses(
 expect.extend({
     async toParseKerML(
         received: any,
-        value: object | Namespace,
+        value: DeepPartial<Namespace> | object | "snapshot",
         {
             parserErrors = [],
             lexerErrors = [],
@@ -259,7 +282,9 @@ expect.extend({
             buildOptions = TEST_BUILD_OPTIONS,
         }: MatchOptions = {}
     ): Promise<CustomMatchResult> {
-        return parses("KerML", parseKerML, this, received, value, {
+        // @ts-expect-error simply following the example but this is incompatible
+        // https://jestjs.io/docs/expect#custom-snapshot-matchers
+        return parses.call(this, "KerML", parseKerML, this, received, value, {
             parserErrors,
             lexerErrors,
             diagnostics,
@@ -269,7 +294,7 @@ expect.extend({
 
     async toParseSysML(
         received: any,
-        value: object | Namespace,
+        value: DeepPartial<Namespace> | object | "snapshot",
         {
             parserErrors = [],
             lexerErrors = [],
@@ -277,7 +302,8 @@ expect.extend({
             buildOptions = TEST_BUILD_OPTIONS,
         }: MatchOptions = {}
     ): Promise<CustomMatchResult> {
-        return parses("SysML", parseSysML, this, received, value, {
+        // @ts-expect-error same as above
+        return parses.call(this, "SysML", parseSysML, this, received, value, {
             parserErrors,
             lexerErrors,
             diagnostics,
@@ -291,9 +317,15 @@ interface CustomMatchResult {
     message(): string;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type DeepPartial<T> = T[keyof T] extends Function
+    ? T
+    : {
+          -readonly [P in keyof T]?: DeepPartial<T[P]>;
+      };
 interface CustomMatchers<R = unknown> {
-    toParseKerML(ast: object | Namespace, options?: MatchOptions): R;
-    toParseSysML(ast: object | Namespace, options?: MatchOptions): R;
+    toParseKerML(ast: DeepPartial<Namespace> | object | "snapshot", options?: MatchOptions): R;
+    toParseSysML(ast: DeepPartial<Namespace> | object | "snapshot", options?: MatchOptions): R;
 }
 
 declare global {

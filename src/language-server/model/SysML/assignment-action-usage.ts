@@ -28,8 +28,8 @@ export class AssignmentActionUsageMeta extends ActionUsageMeta {
         super(id, parent);
     }
 
-    override self(): AssignmentActionUsage | undefined {
-        return super.self() as AssignmentActionUsage;
+    override ast(): AssignmentActionUsage | undefined {
+        return this._ast as AssignmentActionUsage;
     }
 
     override parent(): ModelContainer<AssignmentActionUsage> {

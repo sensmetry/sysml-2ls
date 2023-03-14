@@ -26,23 +26,6 @@ export type SysMLType = {
 export type SysMLTypeList = { [K in SysMLType]: ast.SysMlAstType[K] };
 export type SysMLInterface<K extends SysMLType> = SysMLTypeList[K];
 
-/**
- * Get the owning expression of an AST node that determines the reference type
- * @param ref AST node
- * @returns
- */
-function findOwningExpression(ref: AstNode): AstNode | undefined {
-    const parent = ref.$container;
-    if (!parent) return parent;
-    switch (parent.$type) {
-        case ast.FeatureChainExpression:
-            if (ref.$containerIndex === 0) return parent;
-            return undefined;
-        default:
-            return undefined;
-    }
-}
-
 export class SysMLAstReflection extends ast.SysMlAstReflection {
     protected readonly metadata = new Map<string, TypeMetaData>();
 
@@ -52,13 +35,7 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
 
         const container = refInfo.container;
 
-        const index = refInfo.index;
-        if (container.$type === ast.FeatureReference) {
-            const ref = container as ast.FeatureReference;
-            return ref.$meta.featureIndices.indexOf(index) != -1 ? ast.Feature : ast.Element;
-        }
-
-        if (refInfo.index === container.chain.length - 1) {
+        if (refInfo.index === container.parts.length - 1) {
             // last element
             switch (container.$type) {
                 case ast.TypeReference:
@@ -67,16 +44,14 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
                     return ast.Classifier;
                 case ast.MetaclassReference:
                     return ast.Metaclass;
-                case ast.ConjugatedPortReference:
-                    return ast.PortDefinition;
-            }
-
-            // ElementReference
-            switch (findOwningExpression(container)?.$type) {
-                case ast.FeatureChainExpression:
+                case ast.MembershipReference:
+                    return ast.Membership;
+                case ast.NamespaceReference:
+                    return ast.Namespace;
+                case ast.FeatureReference:
                     return ast.Feature;
-                case ast.InvocationExpression:
-                    return ast.Type;
+                case ast.ConjugatedPortReference:
+                    return ast.ConjugatedPortDefinition;
             }
         }
 
@@ -169,7 +144,7 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
         const member = (parent as NonNullable<T>)[property];
         const index = info.$containerIndex;
         if (Array.isArray(member)) {
-            if (index) {
+            if (index !== undefined) {
                 member.forEach((v, i) => {
                     if (i >= index) (v as Mutable<AstNode>).$containerIndex = i + 1;
                 });
@@ -180,7 +155,8 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
                 (child as Mutable<AstNode>).$containerIndex = member.length - 1;
             }
         } else {
-            if (index) throw new Error("Cannot assign with an index to a non-array property");
+            if (index !== undefined)
+                throw new Error("Cannot assign with an index to a non-array property");
             (parent as unknown as Record<string, V>)[property as string] = child;
         }
 
@@ -190,6 +166,19 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
         // if this was called during parsing, it may be possible that $children
         // has not been created yet
         if (parent.$children) {
+            const cst = child.$cstNode;
+            if (cst) {
+                const index = parent.$children.findIndex((node) => {
+                    if (!node.$cstNode) return;
+                    return node.$cstNode.offset > cst.end;
+                });
+                if (index >= 0) {
+                    parent.$children
+                        .slice(index)
+                        .forEach((node) => (node as Mutable<AstNode>).$childIndex++);
+                    parent.$children.splice(index, 0, child);
+                }
+            }
             parent.$children.push(child);
             (child as Mutable<AstNode>).$childIndex = parent.$children.length - 1;
         }

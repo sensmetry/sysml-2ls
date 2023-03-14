@@ -26,23 +26,19 @@ export class ReferenceUsageMeta extends UsageMeta {
         super(id, parent);
     }
 
-    override initialize(node: ReferenceUsage): void {
-        this.isSubjectParameter = node.isSubject;
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
 
         // TODO: https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/blob/8e5896300809dd1bcc039e213f88210570909d51/org.omg.sysml/src/org/omg/sysml/adapter/ReferenceUsageAdapter.java#LL52C74-L52C74
-        // const self = this.self();
-        // const parent = this.parent();
+        // const self = this.ast();
+        // const parent = this.owner();
         // if (isTransitionUsage(parent) && )
 
         return supertypes;
     }
 
-    override self(): ReferenceUsage | undefined {
-        return super.self() as ReferenceUsage;
+    override ast(): ReferenceUsage | undefined {
+        return this._ast as ReferenceUsage;
     }
 
     override parent(): ModelContainer<ReferenceUsage> {

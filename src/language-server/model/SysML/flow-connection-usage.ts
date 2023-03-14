@@ -47,11 +47,11 @@ export class FlowConnectionUsageMeta extends Mixin(
     }
 
     override defaultSupertype(): string {
-        return !this.features.some((f) => f.element.isEnd) ? "message" : "base";
+        return !this.features.some((f) => f.element()?.isEnd) ? "message" : "base";
     }
 
-    override self(): FlowConnectionUsage | undefined {
-        return super.self() as FlowConnectionUsage;
+    override ast(): FlowConnectionUsage | undefined {
+        return this._ast as FlowConnectionUsage;
     }
 
     override parent(): ModelContainer<FlowConnectionUsage> {

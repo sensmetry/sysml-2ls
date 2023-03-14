@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Predicate } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { FunctionMeta } from "./function";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { FunctionMeta } from "./_internal";
 
 export const ImplicitPredicates = {
     base: "Performances::BooleanEvaluation",
@@ -28,8 +28,8 @@ export class PredicateMeta extends FunctionMeta {
         super(id, parent);
     }
 
-    override self(): Predicate | undefined {
-        return super.deref() as Predicate;
+    override ast(): Predicate | undefined {
+        return this._ast as Predicate;
     }
 
     override parent(): ModelContainer<Predicate> {

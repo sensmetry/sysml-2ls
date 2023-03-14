@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Documentation } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { CommentMeta } from "./comment";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { CommentMeta } from "./_internal";
 
 @metamodelOf(Documentation)
 export class DocumentationMeta extends CommentMeta {
@@ -24,8 +24,8 @@ export class DocumentationMeta extends CommentMeta {
         super(id, parent);
     }
 
-    override self(): Documentation | undefined {
-        return super.deref() as Documentation;
+    override ast(): Documentation | undefined {
+        return this._ast as Documentation;
     }
 
     override parent(): ModelContainer<Documentation> {

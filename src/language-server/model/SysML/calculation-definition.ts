@@ -28,8 +28,8 @@ export class CalculationDefinitionMeta extends Mixin(ActionDefinitionMeta, Funct
         super(id, parent);
     }
 
-    override self(): CalculationDefinition | undefined {
-        return super.self() as CalculationDefinition;
+    override ast(): CalculationDefinition | undefined {
+        return this._ast as CalculationDefinition;
     }
 
     override parent(): ModelContainer<CalculationDefinition> {

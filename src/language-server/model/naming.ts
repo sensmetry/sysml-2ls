@@ -60,7 +60,7 @@ export function getName(meta: ElementMeta): string {
 export function computeQualifiedName(meta: ElementMeta, parent: Metamodel | undefined): string {
     let name = getName(meta);
     let parentName = "";
-    while (parent?.parent()) {
+    while (parent?.owner()) {
         if (!parent.is(TransparentElement)) {
             if (parent.is(Element)) {
                 parentName = getName(parent);
@@ -70,7 +70,7 @@ export function computeQualifiedName(meta: ElementMeta, parent: Metamodel | unde
 
             name = concatNames(parentName, name);
         }
-        parent = parent.parent();
+        parent = parent.owner();
     }
     return name;
 }

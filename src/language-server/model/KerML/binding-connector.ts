@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { BindingConnector } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ConnectorMeta } from "./connector";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ConnectorMeta } from "./_internal";
 
 export const ImplicitBindingConnectors = {
     binary: "Links::selfLinks",
@@ -28,8 +28,8 @@ export class BindingConnectorMeta extends ConnectorMeta {
         super(id, parent);
     }
 
-    override self(): BindingConnector | undefined {
-        return super.deref() as BindingConnector;
+    override ast(): BindingConnector | undefined {
+        return this._ast as BindingConnector;
     }
 
     override parent(): ModelContainer<BindingConnector> {

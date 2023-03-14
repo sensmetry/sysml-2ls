@@ -16,63 +16,33 @@
 
 describe("elements are parseable without bodies", () => {
     test("with no names", async () => {
-        return expect("type;").toParseKerML({
-            elements: [{}],
-        });
+        return expect("class;").toParseKerML("snapshot");
     });
 
     test("with name", async () => {
-        return expect("type Any_;").toParseKerML({
-            elements: [{ declaredName: "Any_" }],
-        });
+        return expect("class Any_;").toParseKerML("snapshot");
     });
 
     test("with short name", async () => {
-        return expect("type <any>;").toParseKerML({
-            elements: [{ declaredShortName: "any" }],
-        });
+        return expect("class <any>;").toParseKerML("snapshot");
     });
 
     test("with both names", async () => {
-        return expect("type <'1.1'> Any;").toParseKerML({
-            elements: [
-                {
-                    declaredName: "Any",
-                    declaredShortName: "'1.1'",
-                },
-            ],
-        });
+        return expect("class <'1.1'> Any;").toParseKerML("snapshot");
     });
 
     // might be best to keep '' around unrestricted names, names could then be written as is when generating code from AST
     test("with unrestricted name", async () => {
-        return expect("type 'arbitrary/ name+';").toParseKerML({
-            elements: [{ declaredName: "'arbitrary/ name+'" }],
-        });
+        return expect("class 'arbitrary/ name+';").toParseKerML("snapshot");
     });
 });
 
 test("elements can be nested", async () => {
-    return expect(`type A {
-    type B {
-        type C;
+    return expect(`class A {
+    class B {
+        class C;
     }
 
-    type D;
-}`).toParseKerML({
-        elements: [
-            {
-                declaredName: "A",
-                elements: [
-                    {
-                        declaredName: "B",
-                        elements: [{ declaredName: "C" }],
-                    },
-                    {
-                        declaredName: "D",
-                    },
-                ],
-            },
-        ],
-    });
+    class D;
+}`).toParseKerML("snapshot");
 });

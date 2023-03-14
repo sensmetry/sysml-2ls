@@ -32,12 +32,12 @@ export class VerificationCaseUsageMeta extends CaseUsageMeta {
     }
 
     isSubVerificationCase(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([VerificationCaseUsage, VerificationCaseDefinition]);
     }
 
-    override self(): VerificationCaseUsage | undefined {
-        return super.self() as VerificationCaseUsage;
+    override ast(): VerificationCaseUsage | undefined {
+        return this._ast as VerificationCaseUsage;
     }
 
     override parent(): ModelContainer<VerificationCaseUsage> {

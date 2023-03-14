@@ -26,8 +26,8 @@ export class ViewDefinitionMeta extends PartDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): ViewDefinition | undefined {
-        return super.self() as ViewDefinition;
+    override ast(): ViewDefinition | undefined {
+        return this._ast as ViewDefinition;
     }
 
     override parent(): ModelContainer<ViewDefinition> {

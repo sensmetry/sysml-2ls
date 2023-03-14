@@ -27,8 +27,8 @@ export class SendActionUsageMeta extends ActionUsageMeta {
         super(id, parent);
     }
 
-    override self(): SendActionUsage | undefined {
-        return super.self() as SendActionUsage;
+    override ast(): SendActionUsage | undefined {
+        return this._ast as SendActionUsage;
     }
 
     override parent(): ModelContainer<SendActionUsage> {

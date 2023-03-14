@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { EnumerationUsage, Usage, isEnumerationDefinition } from "../../generated/ast";
+import { EnumerationUsage, EnumerationDefinition } from "../../generated/ast";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { AttributeUsageMeta } from "./attribute-usage";
 
@@ -24,16 +24,16 @@ export class EnumerationUsageMeta extends AttributeUsageMeta {
         super(id, parent);
     }
 
-    override self(): EnumerationUsage | undefined {
-        return super.self() as EnumerationUsage;
+    override ast(): EnumerationUsage | undefined {
+        return this._ast as EnumerationUsage;
     }
 
     override parent(): ModelContainer<EnumerationUsage> {
         return this._parent;
     }
 
-    protected override isVariantNode(node: Usage): boolean {
-        return isEnumerationDefinition(node.$container);
+    protected override isVariantNode(): boolean {
+        return this.owner().is(EnumerationDefinition);
     }
 }
 

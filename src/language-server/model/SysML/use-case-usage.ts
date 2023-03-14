@@ -32,12 +32,12 @@ export class UseCaseUsageMeta extends CaseUsageMeta {
     }
 
     isSubUseCase(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([UseCaseUsage, UseCaseDefinition]);
     }
 
-    override self(): UseCaseUsage | undefined {
-        return super.self() as UseCaseUsage;
+    override ast(): UseCaseUsage | undefined {
+        return this._ast as UseCaseUsage;
     }
 
     override parent(): ModelContainer<UseCaseUsage> {

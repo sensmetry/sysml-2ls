@@ -24,8 +24,8 @@ export class ControlNodeMeta extends ActionUsageMeta {
         super(id, parent);
     }
 
-    override self(): ControlNode | undefined {
-        return super.self() as ControlNode;
+    override ast(): ControlNode | undefined {
+        return this._ast as ControlNode;
     }
 
     override parent(): ModelContainer<ControlNode> {

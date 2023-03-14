@@ -29,7 +29,11 @@ import {
     isAcceptActionUsage,
     isElement,
     Element,
+    ParameterMembership,
+    Membership,
+    isMembership,
 } from "../../generated/ast";
+import { MembershipMeta } from "../../model";
 import { SysMLDefaultServices } from "../services";
 import {
     SysMLNodeDescription,
@@ -63,8 +67,8 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
         // elements
         for (const node of document.parseResult.value.$children) {
             await interruptAndCheck(cancelToken);
-            if (isElement(node)) {
-                exports.push(...this.createDescriptions(node, document));
+            if (isMembership(node)) {
+                exports.push(this.createDescription(node.element ?? node, document));
             }
         }
 
@@ -103,8 +107,8 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
         document: LangiumDocument,
         isStandardElement: boolean,
         cancelToken: CancellationToken
-    ): Promise<SysMLNodeDescription[]> {
-        const localExports: SysMLNodeDescription[] = [];
+    ): Promise<MembershipMeta[]> {
+        const localExports: MembershipMeta[] = [];
 
         // since this is called recursively, propagate isStandardElement
         isStandardElement ||= isLibraryPackage(container) && container.isStandard;
@@ -125,21 +129,22 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
             if (extra) localExports.push(...extra);
 
             if (!isElement(element)) continue;
-            const descriptions = this.createDescriptions(element, document);
-            localExports.push(...descriptions);
+            this.createDescription(element, document);
+
+            if (element.$meta.is(Membership)) localExports.push(element.$meta);
         }
-        scopes.addAll(container, localExports);
+        scopes.addAll(
+            container,
+            stream(localExports)
+                .map((m) => m.element()?.description)
+                .nonNullable()
+        );
 
         if (isElement(container)) {
             // update scope lookup table with the exports
             const meta = container.$meta;
-            for (const description of localExports) {
-                if (!description.node) continue;
-                meta.children.set(description.name, {
-                    element: description.node.$meta,
-                    name: description.name,
-                    description,
-                });
+            for (const member of localExports) {
+                meta.addChild(member);
             }
         }
 
@@ -149,20 +154,15 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
     /**
      * Construct export descriptions for {@link node}
      */
-    protected createDescriptions(node: Element, document: LangiumDocument): SysMLNodeDescription[] {
+    protected createDescription(node: Element, document: LangiumDocument): SysMLNodeDescription {
         const regular = this.descriptions.createDescription(
             node,
-            node.$meta.name ?? `${node.$meta.elementId}`,
+            node.$meta.name ?? node.$meta.shortName ?? `${node.$meta.elementId}`,
             document
         );
-        const short = this.descriptions.createDescription(
-            node,
-            node.$meta.shortName ?? `${node.$meta.elementId}`,
-            document
-        );
-        node.$meta.addDescriptions(regular, short);
+        node.$meta.description = regular;
 
-        return node.$meta.descriptions;
+        return regular;
     }
 
     /**
@@ -174,15 +174,17 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
      */
     protected additionalExports(
         element: AstNode,
-        exports: SysMLNodeDescription[]
-    ): Iterable<SysMLNodeDescription> | undefined {
+        exports: MembershipMeta[]
+    ): Iterable<MembershipMeta> | undefined {
         // transparent elements export their scopes to parents
         if (isTransparentElement(element)) return exports;
 
         // accept action usages export their parameters, needed to resolve a
         // linking error in some SysML examples
         if (isAcceptActionUsage(element))
-            return stream(element.parameters).flatMap((v) => v.$meta.descriptions);
+            return stream(element.members)
+                .map((m) => m.$meta)
+                .filter((m) => m.is(ParameterMembership));
         return;
     }
 }

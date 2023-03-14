@@ -14,46 +14,55 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Usage } from "../../generated/ast";
+import { SubjectMembership, Usage, VariantMembership } from "../../generated/ast";
 import { FeatureMeta } from "../KerML/feature";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
 @metamodelOf(Usage)
 export class UsageMeta extends FeatureMeta {
-    isSubjectParameter = false;
     isVariant = false;
+    isVariation = false;
+    isIndividual = false;
+    isReference = false;
 
     constructor(id: ElementID, parent: ModelContainer<Usage>) {
         super(id, parent);
+        this.isVariant = this.isVariantNode();
     }
 
     override initialize(node: Usage): void {
         // https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/blob/8e5896300809dd1bcc039e213f88210570909d51/org.omg.sysml/src/org/omg/sysml/util/UsageUtil.java#LL84C29-L84C29
         // TODO: OwningFeatureMembership
         this.isComposite = this.direction !== "none" && !this.isEnd;
+        this.isVariation = node.isVariation;
         this.isAbstract ||= node.isVariation;
-        this.isVariant = this.isVariantNode(node);
-
-        if (this.isVariant && !this.name && node.references.length > 0) {
-            const newName = node.references[0].chain.at(-1)?.$refText;
-            if (newName) this.setName(newName);
-        }
+        this.isIndividual = node.isIndividual;
+        this.isReference = node.isReference;
     }
 
     override isIgnoredParameter(): boolean {
-        return super.isIgnoredParameter() || this.isSubjectParameter;
+        return super.isIgnoredParameter() || this.parent().is(SubjectMembership);
     }
 
-    override self(): Usage | undefined {
-        return super.self() as Usage;
+    override ast(): Usage | undefined {
+        return this._ast as Usage;
     }
 
     override parent(): ModelContainer<Usage> {
         return this._parent;
     }
 
-    protected isVariantNode(node: Usage): boolean {
-        return node.$containerProperty === "variants";
+    protected isVariantNode(): boolean {
+        return this.parent().is(VariantMembership);
+    }
+
+    override namingFeature(): FeatureMeta | undefined {
+        const parent = this.parent();
+        if (parent.is(VariantMembership)) {
+            const referenced = this.referencedFeature();
+            if (referenced) return referenced;
+        }
+        return super.namingFeature();
     }
 }
 

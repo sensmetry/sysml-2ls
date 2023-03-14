@@ -3,7 +3,7 @@ import 'KerML.interfaces'
 // Langium only generated `is...` function if the type is a union and not an alias
 type TransparentElement = 
     LoopActionUsage |
-    LoopActionUsage
+    NonOwnerType
 ;
 
 type RequirementKind = "objective" | "verify";
@@ -16,13 +16,11 @@ type TransitionFeatureKind = 'trigger' | 'guard' | 'effect';
 
 interface Definition extends Classifier {
     isVariation: boolean;
-    variants: Feature[];
     isIndividual: boolean;
 }
 
 interface Usage extends Feature {
     isVariation: boolean;
-    variants: Feature[];
     isReference: boolean;
     portionKind?: PortionKind;
     isIndividual: boolean;
@@ -35,8 +33,6 @@ interface MetadataUsage extends MetadataFeature, ItemUsage {
 }
 
 interface ReferenceUsage extends Usage {
-    isSubject: boolean;
-    trigger?: TriggerInvocationExpression;
 }
 
 interface OccurrenceDefinition extends Definition, Class {}
@@ -54,7 +50,6 @@ interface ItemUsage extends OccurrenceUsage {}
 interface PartDefinition extends ItemDefinition {}
 
 interface PartUsage extends ItemUsage {
-    parameterKind?: ParameterKind;
 }
 
 interface PortDefinition extends OccurrenceDefinition, Structure {}
@@ -64,27 +59,17 @@ interface PortUsage extends OccurrenceUsage {}
 interface ActionDefinition extends OccurrenceDefinition, Behavior {}
 
 interface ActionUsage extends OccurrenceUsage, Step {
-    actionKind?: StateSubactionKind;
     isParallel: boolean;
-    parameters: ReferenceUsage[];
-    via?: InlineExpression;
-    send?: InlineExpression;
-    to?: InlineExpression;
 }
 
 interface IfActionUsage extends ActionUsage {
-    condition: InlineExpression;
-    body: ActionUsage;
-    else?: ActionUsage;
 }
 
 interface StateDefinition extends ActionDefinition {
-    subactions: ActionUsage[];
     isParallel: boolean;
 }
 
 interface StateUsage extends ActionUsage {
-    subactions: ActionUsage[];
 }
 
 interface ExhibitStateUsage extends StateUsage, PerformActionUsage {}
@@ -92,19 +77,12 @@ interface ExhibitStateUsage extends StateUsage, PerformActionUsage {}
 interface ConstraintDefinition extends OccurrenceDefinition, Predicate {}
 
 interface ConstraintUsage extends OccurrenceUsage, BooleanExpression {
-    constraintKind?: RequirementConstraintKind;
 }
 
 interface AssertConstraintUsage extends ConstraintUsage, Invariant {
 }
 
 interface TransitionUsage extends ActionUsage {
-    source?: FeatureReference;
-    trigger?: AcceptActionUsage;
-    guard?: InlineExpression;
-    effect?: ActionUsage;
-    then?: SuccessionAsUsage;
-    else?: SuccessionAsUsage;
 }
 
 interface AcceptActionUsage extends ActionUsage {}
@@ -112,17 +90,14 @@ interface AcceptActionUsage extends ActionUsage {}
 interface RequirementDefinition extends ConstraintDefinition {}
 
 interface RequirementUsage extends ConstraintUsage {
-    requirementKind?: RequirementKind;
 }
 
 interface SatisfyRequirementUsage extends RequirementUsage, AssertConstraintUsage {
-    by?: FeatureReference;
 }
 
 interface ConcernDefinition extends RequirementDefinition {}
 
 interface ConcernUsage extends RequirementUsage {
-    isFramed: boolean;
 }
 
 interface CalculationDefinition extends ActionDefinition, SysMLFunction {
@@ -170,7 +145,6 @@ interface VerificationCaseDefinition extends CaseDefinition {}
 interface VerificationCaseUsage extends CaseUsage {}
 
 interface EnumerationDefinition extends AttributeDefinition {
-    values: EnumerationUsage[];
 }
 
 interface EnumerationUsage extends AttributeUsage {}
@@ -192,13 +166,10 @@ interface FlowConnectionUsage extends ConnectionUsage, ActionUsage, ItemFlow {}
 interface SuccessionFlowConnectionUsage extends FlowConnectionUsage, SuccessionItemFlow {}
 
 interface AssignmentActionUsage extends ActionUsage {
-    left: InlineExpression;
-    right: InlineExpression;
 }
 
 interface TriggerInvocationExpression extends InvocationExpression {
-    kind: TriggerKind;
-    expression: InlineExpression;
+    kind: 'at' | 'after' | 'when';
 }
 
 interface PerformActionUsage extends ActionUsage, EventOccurrenceUsage {}
@@ -206,16 +177,12 @@ interface PerformActionUsage extends ActionUsage, EventOccurrenceUsage {}
 interface EventOccurrenceUsage extends OccurrenceUsage {}
 
 interface LoopActionUsage extends ActionUsage {
-    expression: InlineExpression;
-    body: ActionUsage;
 }
 
 interface WhileLoopActionUsage extends LoopActionUsage {
-    until?: InlineExpression;
 }
 
 interface ForLoopActionUsage extends LoopActionUsage {
-    for: ReferenceUsage;
 }
 
 interface SendActionUsage extends ActionUsage {}
@@ -231,7 +198,34 @@ interface JoinNode extends ControlNode {}
 interface DecisionNode extends ControlNode {}
 
 interface SuccessionAsUsage extends ConnectorAsUsage, Succession {
-    then: SuccessionAsUsage[];
 }
 
 interface Expose extends Import {}
+
+interface ConjugatedPortReference extends ClassifierReference {}
+
+interface VariantMembership extends OwningMembership {}
+interface LifeClass extends Class {}
+interface ConjugatedPortDefinition extends PortDefinition {}
+interface ConjugatedPortTyping extends FeatureTyping {
+}
+interface PortConjugation extends Conjugation {}
+interface StateSubactionMembership extends FeatureMembership {
+    kind: 'entry' | 'exit' | 'do';
+}
+interface TransitionFeatureMembership extends FeatureMembership {
+    kind: 'accept' | 'if' | 'do';
+}
+
+interface SubjectMembership extends ParameterMembership {}
+interface ActorMembership extends ParameterMembership {}
+interface StakeholderMembership extends ParameterMembership {}
+interface RequirementConstraintMembership extends FeatureMembership {
+    kind?: RequirementConstraintKind;
+}
+interface FramedConcernMembership extends RequirementConstraintMembership {}
+interface RequirementVerificationMembership extends RequirementConstraintMembership {}
+interface ObjectiveMembership extends FeatureMembership {}
+interface ViewRenderingMembership extends FeatureMembership {}
+interface MembershipExpose extends Expose, MembershipImport {}
+interface NamespaceExpose extends Expose, NamespaceImport {}

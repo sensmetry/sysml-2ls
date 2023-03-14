@@ -100,7 +100,7 @@ export function qualifiedReference(name: string): object {
 }
 
 export function qualifiedTypeReference(name: string): object {
-    return { $meta: { to: { element: { qualifiedName: name } } } };
+    return { $meta: { to: { qualifiedName: name } } };
 }
 
 export function defaultLinkingErrorTo(name: string): object {
@@ -113,26 +113,27 @@ export function defaultLinkingErrorTo(name: string): object {
 }
 
 export function childrenNames(
-    namespace: Namespace,
+    namespace: Element | undefined,
     inherited = Visibility.public,
     imported = Visibility.public
 ): string[] {
-    return Array.from(
-        makeScope(namespace.$meta, {
-            inherited: { visibility: inherited, depth: 100000 },
-            imported: { visibility: imported, depth: 100000 },
-        })
-            .getAllElements()
-            .map((d) => (d.node as Element).$meta.qualifiedName)
-    );
+    if (!namespace) return [];
+    return makeScope(namespace.$meta, {
+        inherited: { visibility: inherited, depth: 100000 },
+        imported: { visibility: imported, depth: 100000 },
+    })
+        .getAllExportedElements()
+        .map((member) => member.element()?.qualifiedName)
+        .nonNullable()
+        .toArray();
 }
 
 export function directScopeNames(namespace: Namespace): string[] {
-    return Array.from(
-        makeLinkingScope(namespace.$meta, { skipParents: true })
-            .getAllElements()
-            .map((d) => (d.node as Element).$meta.qualifiedName)
-    );
+    return makeLinkingScope(namespace.$meta, { skipParents: true })
+        .getAllExportedElements()
+        .map((member) => member.element()?.qualifiedName)
+        .nonNullable()
+        .toArray();
 }
 
 /**

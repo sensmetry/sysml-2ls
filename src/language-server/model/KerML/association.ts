@@ -14,11 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Association } from "../../generated/ast";
-import { TypeClassifier } from "../enums";
-import { ClassifierMeta } from "./classifier";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { stream } from "langium";
+import { Mixin } from "ts-mixer";
+import { Association, EndFeatureMembership } from "../../generated/ast";
+import { TypeClassifier } from "../enums";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ClassifierMeta, RelationshipMeta } from "./_internal";
 
 export const ImplicitAssociations = {
     base: "Links::Link",
@@ -26,7 +27,8 @@ export const ImplicitAssociations = {
 };
 
 @metamodelOf(Association, ImplicitAssociations)
-export class AssociationMeta extends ClassifierMeta {
+// Note: inherited methods are override by the last class inside `Mixin`
+export class AssociationMeta extends Mixin(RelationshipMeta, ClassifierMeta) {
     // cached end counts
     private localEnds: number | undefined = undefined;
     private baseEnds: number | undefined = undefined;
@@ -43,8 +45,8 @@ export class AssociationMeta extends ClassifierMeta {
         return this.isBinary() ? "binary" : "base";
     }
 
-    override self(): Association | undefined {
-        return super.deref() as Association;
+    override ast(): Association | undefined {
+        return this._ast as Association;
     }
 
     override parent(): ModelContainer<Association> {
@@ -75,7 +77,9 @@ export class AssociationMeta extends ClassifierMeta {
     ownedEnds(): number {
         if (this.localEnds === undefined) {
             this.localEnds = stream(this.features)
-                .filter((f) => f.element.isEnd)
+                .map((m) => m.element())
+                .nonNullable()
+                .filter((f) => f.isEnd || f.parent().is(EndFeatureMembership))
                 .count();
         }
 

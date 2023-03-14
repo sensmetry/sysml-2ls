@@ -28,8 +28,8 @@ export class AttributeDefinitionMeta extends Mixin(DefinitionMeta, DataTypeMeta)
         super(id, parent);
     }
 
-    override self(): AttributeDefinition | undefined {
-        return super.self() as AttributeDefinition;
+    override ast(): AttributeDefinition | undefined {
+        return this._ast as AttributeDefinition;
     }
 
     override parent(): ModelContainer<AttributeDefinition> {

@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { AstReflection } from "langium";
-import { reflection, SysMlAstReflection } from "../generated/ast";
+import * as ast from "../generated/ast";
 import { SysMLTypeList } from "../services/sysml-ast-reflection";
 
 export type TypeMap<TKey, T> = {
@@ -28,22 +28,25 @@ type Keys<T> = keyof T;
 
 // non-AST types, i.e. operators and enums
 const NON_TYPES = new Set<string>([
-    "ClassificationTestOperator",
-    "EqualityOperator",
-    "FeatureDirectionKind",
-    "ImportKind",
-    "ParameterKind",
-    "PortionKind",
-    "RelationalOperator",
-    "RequirementConstraintKind",
-    "RequirementKind",
-    "StateSubactionKind",
-    "TransitionFeatureKind",
-    "TransparentElement",
-    "TriggerKind",
-    "TypeOrFeatureReference",
-    "UnaryOperator",
-    "VisibilityKind",
+    ast.ClassificationTestOperator,
+    ast.EqualityOperator,
+    ast.FeatureDirectionKind,
+    ast.ImportKind,
+    ast.ParameterKind,
+    ast.PortionKind,
+    ast.RelationalOperator,
+    ast.RequirementConstraintKind,
+    ast.RequirementKind,
+    ast.StateSubactionKind,
+    ast.TransitionFeatureKind,
+    ast.TransparentElement,
+    ast.TriggerKind,
+    ast.UnaryOperator,
+    ast.VisibilityKind,
+    ast.FeatureRelationship,
+    ast.InlineExpression,
+    ast.NonOwnerType,
+    ast.TypeRelationship,
 ]);
 
 /**
@@ -55,20 +58,54 @@ class TypesIndex<S = SysMLTypeList> {
     protected readonly types: Keys<S>[];
 
     constructor() {
-        this.base = new SysMlAstReflection();
+        this.base = new ast.SysMlAstReflection();
         for (const type of this.base.getAllTypes()) {
-            const supertypes: string[] = [];
+            // have to split to real interfaces and unions to have a proper
+            // supertype chain
+            const unions: string[] = [];
+            const types: string[] = [];
+            const relationships: string[] = [];
             for (const subtype of this.base.getAllTypes()) {
                 if (subtype === type) continue;
-                if (this.base.isSubtype(type, subtype)) supertypes.push(subtype);
+                if (this.base.isSubtype(type, subtype)) {
+                    (NON_TYPES.has(subtype)
+                        ? unions
+                        : this.base.isSubtype(subtype, ast.Namespace)
+                        ? types
+                        : relationships
+                    ).push(subtype);
+                }
             }
-            supertypes.sort((a, b) =>
-                this.base.isSubtype(a, b) ? -1 : this.base.isSubtype(b, a) ? 1 : 0
-            );
-            this.supertypes.set(type, new Set(supertypes));
+
+            this.sortTypes(types);
+
+            // need to merge relationships afterwards to handle mixed types and
+            // relationships, simple sorting doesn't work on such mixed types
+            this.mergeTypes(types, this.sortTypes(relationships));
+            // insert union types immediately after the last matching subtype
+            this.mergeTypes(types, this.sortTypes(unions));
+            this.supertypes.set(type, new Set(types));
         }
 
         this.types = this.base.getAllTypes().filter((s) => !NON_TYPES.has(s)) as Keys<S>[];
+    }
+
+    private sortTypes(types: string[]): string[] {
+        return types.sort((a, b) =>
+            this.base.isSubtype(a, b) ? -1 : this.base.isSubtype(b, a) ? 1 : 0
+        );
+    }
+
+    private mergeTypes(types: string[], other: string[]): string[] {
+        const pos = other
+            .map((u) => {
+                let index = types.findIndex((i) => !this.base.isSubtype(i, u));
+                if (index === -1) index = types.length;
+                return [index, u] as [number, string];
+            })
+            .sort(([a, _], [b, __]) => a - b);
+        pos.forEach(([pos, union], i) => types.splice(pos + i, 0, union));
+        return types;
     }
 
     /**
@@ -171,6 +208,6 @@ class TypesIndex<S = SysMLTypeList> {
 export const typeIndex = new TypesIndex();
 
 // replace the recursive function with precomputed lookup tables
-reflection.isSubtype = function (subtype, supertype): boolean {
+ast.reflection.isSubtype = function (subtype, supertype): boolean {
     return typeIndex.isSubtype(subtype, supertype);
 };

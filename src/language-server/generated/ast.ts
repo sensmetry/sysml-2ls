@@ -6,14 +6,6 @@
 /* eslint-disable */
 import { AstNode, AbstractAstReflection, Reference, ReferenceInfo, TypeMetaData } from 'langium';
 
-export type Annotation = Comment | Documentation | MetadataFeature | TextualRepresentation;
-
-export const Annotation = 'Annotation';
-
-export function isAnnotation(item: unknown): item is Annotation {
-    return reflection.isInstance(item, Annotation);
-}
-
 export type ClassificationTestOperator = '@' | 'hastype' | 'istype';
 
 export const ClassificationTestOperator = 'ClassificationTestOperator';
@@ -38,6 +30,14 @@ export function isFeatureDirectionKind(item: unknown): item is FeatureDirectionK
     return reflection.isInstance(item, FeatureDirectionKind);
 }
 
+export type FeatureRelationship = FeatureChaining | FeatureInverting | FeatureTyping | Redefinition | ReferenceSubsetting | Subsetting | TypeFeaturing | TypeRelationship;
+
+export const FeatureRelationship = 'FeatureRelationship';
+
+export function isFeatureRelationship(item: unknown): item is FeatureRelationship {
+    return reflection.isInstance(item, FeatureRelationship);
+}
+
 export type ImportKind = '::*' | '::**' | '::*::**';
 
 export const ImportKind = 'ImportKind';
@@ -46,7 +46,7 @@ export function isImportKind(item: unknown): item is ImportKind {
     return reflection.isInstance(item, ImportKind);
 }
 
-export type InlineExpression = CollectExpression | FeatureChainExpression | FeatureReferenceExpression | InvocationExpression | LiteralExpression | MetadataAccessExpression | NullExpression | OperatorExpression | SelectExpression | SelfReferenceExpression;
+export type InlineExpression = CollectExpression | FeatureChainExpression | FeatureReferenceExpression | InvocationExpression | LiteralExpression | MetadataAccessExpression | NullExpression | OperatorExpression | SelectExpression;
 
 export const InlineExpression = 'InlineExpression';
 
@@ -54,15 +54,15 @@ export function isInlineExpression(item: unknown): item is InlineExpression {
     return reflection.isInstance(item, InlineExpression);
 }
 
-export type LiteralExpression = LiteralBoolean | LiteralInfinity | LiteralNumber | LiteralString;
-
-export const LiteralExpression = 'LiteralExpression';
-
-export function isLiteralExpression(item: unknown): item is LiteralExpression {
-    return reflection.isInstance(item, LiteralExpression);
-}
-
 export type Name = string;
+
+export type NonOwnerType = Annotation | Membership;
+
+export const NonOwnerType = 'NonOwnerType';
+
+export function isNonOwnerType(item: unknown): item is NonOwnerType {
+    return reflection.isInstance(item, NonOwnerType);
+}
 
 export type ParameterKind = 'actor' | 'stakeholder';
 
@@ -120,7 +120,7 @@ export function isTransitionFeatureKind(item: unknown): item is TransitionFeatur
     return reflection.isInstance(item, TransitionFeatureKind);
 }
 
-export type TransparentElement = LoopActionUsage;
+export type TransparentElement = LoopActionUsage | NonOwnerType;
 
 export const TransparentElement = 'TransparentElement';
 
@@ -136,12 +136,12 @@ export function isTriggerKind(item: unknown): item is TriggerKind {
     return reflection.isInstance(item, TriggerKind);
 }
 
-export type TypeOrFeatureReference = FeatureReference | TypeReference;
+export type TypeRelationship = Conjugation | Differencing | Disjoining | Intersecting | Specialization | Subclassification | Unioning;
 
-export const TypeOrFeatureReference = 'TypeOrFeatureReference';
+export const TypeRelationship = 'TypeRelationship';
 
-export function isTypeOrFeatureReference(item: unknown): item is TypeOrFeatureReference {
-    return reflection.isInstance(item, TypeOrFeatureReference);
+export function isTypeRelationship(item: unknown): item is TypeRelationship {
+    return reflection.isInstance(item, TypeRelationship);
 }
 
 export type UnaryOperator = '+' | '-' | 'not' | '~';
@@ -160,226 +160,12 @@ export function isVisibilityKind(item: unknown): item is VisibilityKind {
     return reflection.isInstance(item, VisibilityKind);
 }
 
-export interface Argument extends AstNode {
-    readonly $container: InvocationExpression;
-    readonly $type: string;
-    value: InlineExpression
-}
-
-export const Argument = 'Argument';
-
-export function isArgument(item: unknown): item is Argument {
-    return reflection.isInstance(item, Argument);
-}
-
-export interface ElementReference extends AstNode {
-    readonly $container: Alias | Comment | Conjugation | Dependency | Disjoining | Feature | FeatureInverting | Import | InitialNode | InvocationExpression | MetadataAccessExpression | MetadataFeature | NamedArgument | Relationship | SatisfyRequirementUsage | Specialization | TransitionUsage | Type | TypeFeaturing;
-    readonly $type: string;
-    chain: Array<Reference<Element>>
-}
-
-export const ElementReference = 'ElementReference';
-
-export function isElementReference(item: unknown): item is ElementReference {
-    return reflection.isInstance(item, ElementReference);
-}
-
-export interface FeatureReferenceExpression extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    expression: InlineExpression
-}
-
-export const FeatureReferenceExpression = 'FeatureReferenceExpression';
-
-export function isFeatureReferenceExpression(item: unknown): item is FeatureReferenceExpression {
-    return reflection.isInstance(item, FeatureReferenceExpression);
-}
-
-export interface FeatureValue extends AstNode {
-    readonly $container: Feature;
-    readonly $type: string;
-    expression: InlineExpression
-    isDefault: boolean
-    isInitial: boolean
-}
-
-export const FeatureValue = 'FeatureValue';
-
-export function isFeatureValue(item: unknown): item is FeatureValue {
-    return reflection.isInstance(item, FeatureValue);
-}
-
-export interface InvocationExpression extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    args: Array<Argument> | Array<InlineExpression> | Array<TypeReference>
-    type?: TypeReference
-}
-
-export const InvocationExpression = 'InvocationExpression';
-
-export function isInvocationExpression(item: unknown): item is InvocationExpression {
-    return reflection.isInstance(item, InvocationExpression);
-}
-
-export interface LiteralBoolean extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    value: boolean
-}
-
-export const LiteralBoolean = 'LiteralBoolean';
-
-export function isLiteralBoolean(item: unknown): item is LiteralBoolean {
-    return reflection.isInstance(item, LiteralBoolean);
-}
-
-export interface LiteralInfinity extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const LiteralInfinity = 'LiteralInfinity';
-
-export function isLiteralInfinity(item: unknown): item is LiteralInfinity {
-    return reflection.isInstance(item, LiteralInfinity);
-}
-
-export interface LiteralNumber extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    value: number
-}
-
-export const LiteralNumber = 'LiteralNumber';
-
-export function isLiteralNumber(item: unknown): item is LiteralNumber {
-    return reflection.isInstance(item, LiteralNumber);
-}
-
-export interface LiteralString extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    value: string
-}
-
-export const LiteralString = 'LiteralString';
-
-export function isLiteralString(item: unknown): item is LiteralString {
-    return reflection.isInstance(item, LiteralString);
-}
-
-export interface MetadataAccessExpression extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    reference: ElementReference
-}
-
-export const MetadataAccessExpression = 'MetadataAccessExpression';
-
-export function isMetadataAccessExpression(item: unknown): item is MetadataAccessExpression {
-    return reflection.isInstance(item, MetadataAccessExpression);
-}
-
-export interface NullExpression extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const NullExpression = 'NullExpression';
-
-export function isNullExpression(item: unknown): item is NullExpression {
-    return reflection.isInstance(item, NullExpression);
-}
-
-export interface SelfReferenceExpression extends AstNode {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const SelfReferenceExpression = 'SelfReferenceExpression';
-
-export function isSelfReferenceExpression(item: unknown): item is SelfReferenceExpression {
-    return reflection.isInstance(item, SelfReferenceExpression);
-}
-
-export interface VisibilityElement extends AstNode {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    visibility?: VisibilityKind
-}
-
-export const VisibilityElement = 'VisibilityElement';
-
-export function isVisibilityElement(item: unknown): item is VisibilityElement {
-    return reflection.isInstance(item, VisibilityElement);
-}
-
-export interface NamedArgument extends Argument {
-    readonly $container: InvocationExpression;
-    readonly $type: string;
-    name: FeatureReference
-}
-
-export const NamedArgument = 'NamedArgument';
-
-export function isNamedArgument(item: unknown): item is NamedArgument {
-    return reflection.isInstance(item, NamedArgument);
-}
-
-export interface TypeReference extends ElementReference {
-    readonly $container: Alias | Comment | Conjugation | Dependency | Disjoining | Feature | FeatureInverting | Import | InitialNode | InvocationExpression | MetadataAccessExpression | MetadataFeature | NamedArgument | Relationship | SatisfyRequirementUsage | Specialization | TransitionUsage | Type | TypeFeaturing;
-    readonly $type: string;
-}
-
-export const TypeReference = 'TypeReference';
-
-export function isTypeReference(item: unknown): item is TypeReference {
-    return reflection.isInstance(item, TypeReference);
-}
-
-export interface OperatorExpression extends InvocationExpression {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    operator?: string
-}
-
-export const OperatorExpression = 'OperatorExpression';
-
-export function isOperatorExpression(item: unknown): item is OperatorExpression {
-    return reflection.isInstance(item, OperatorExpression);
-}
-
-export interface TriggerInvocationExpression extends InvocationExpression {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-    expression: InlineExpression
-    kind: TriggerKind
-}
-
-export const TriggerInvocationExpression = 'TriggerInvocationExpression';
-
-export function isTriggerInvocationExpression(item: unknown): item is TriggerInvocationExpression {
-    return reflection.isInstance(item, TriggerInvocationExpression);
-}
-
-export interface Element extends VisibilityElement {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    aliases: Array<Alias>
-    comments: Array<Comment>
+export interface Element extends AstNode {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'ActorMembership' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AnnotatingElement' | 'Annotation' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'Comment' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConjugatedPortTyping' | 'Conjugation' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'Dependency' | 'Differencing' | 'Disjoining' | 'Documentation' | 'Element' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expose' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureChaining' | 'FeatureInverting' | 'FeatureMembership' | 'FeatureReferenceExpression' | 'FeatureTyping' | 'FeatureValue' | 'Featuring' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'FramedConcernMembership' | 'IfActionUsage' | 'Import' | 'IncludeUseCaseUsage' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Intersecting' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LibraryPackage' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'Membership' | 'MembershipExpose' | 'MembershipImport' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'Namespace' | 'NamespaceExpose' | 'NamespaceImport' | 'NullExpression' | 'ObjectiveMembership' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'OwningMembership' | 'Package' | 'ParameterMembership' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortConjugation' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'Redefinition' | 'ReferenceSubsetting' | 'ReferenceUsage' | 'Relationship' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementConstraintMembership' | 'RequirementDefinition' | 'RequirementUsage' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'Specialization' | 'StakeholderMembership' | 'StateDefinition' | 'StateSubactionMembership' | 'StateUsage' | 'Step' | 'Structure' | 'Subclassification' | 'SubjectMembership' | 'Subsetting' | 'Subtype' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TextualAnnotatingElement' | 'TextualRepresentation' | 'TransitionFeatureMembership' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'TypeFeaturing' | 'Unioning' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VariantMembership' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewRenderingMembership' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
     declaredName?: string
     declaredShortName?: string
-    docs: Array<Documentation>
-    elements: Array<Element>
-    features: Array<Feature>
-    imports: Array<Import>
-    members: Array<Feature>
-    metadata: Array<MetadataFeature>
-    prefixes: Array<MetadataFeature>
-    relationships: Array<Relationship>
-    reps: Array<TextualRepresentation>
+    prefixes: Array<OwningMembership>
 }
 
 export const Element = 'Element';
@@ -388,100 +174,40 @@ export function isElement(item: unknown): item is Element {
     return reflection.isInstance(item, Element);
 }
 
-export interface ElementFilter extends VisibilityElement {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    expression: InlineExpression
+export interface ElementReference extends AstNode {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'ElementReference' | 'FeatureReference' | 'MembershipReference' | 'MetaclassReference' | 'NamespaceReference' | 'TypeReference';
+    parts: Array<Reference<Element>>
 }
 
-export const ElementFilter = 'ElementFilter';
+export const ElementReference = 'ElementReference';
 
-export function isElementFilter(item: unknown): item is ElementFilter {
-    return reflection.isInstance(item, ElementFilter);
+export function isElementReference(item: unknown): item is ElementReference {
+    return reflection.isInstance(item, ElementReference);
 }
 
-export interface Result extends VisibilityElement {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    expression: InlineExpression
+export interface AnnotatingElement extends Element {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnnotatingElement' | 'Comment' | 'Documentation' | 'MetadataFeature' | 'MetadataUsage' | 'TextualAnnotatingElement' | 'TextualRepresentation';
+    about: Array<Annotation>
 }
 
-export const Result = 'Result';
+export const AnnotatingElement = 'AnnotatingElement';
 
-export function isResult(item: unknown): item is Result {
-    return reflection.isInstance(item, Result);
-}
-
-export interface ClassifierReference extends TypeReference {
-    readonly $container: Alias | Comment | Conjugation | Dependency | Disjoining | Feature | FeatureInverting | Import | InitialNode | InvocationExpression | MetadataAccessExpression | MetadataFeature | NamedArgument | Relationship | SatisfyRequirementUsage | Specialization | TransitionUsage | Type | TypeFeaturing;
-    readonly $type: string;
-}
-
-export const ClassifierReference = 'ClassifierReference';
-
-export function isClassifierReference(item: unknown): item is ClassifierReference {
-    return reflection.isInstance(item, ClassifierReference);
-}
-
-export interface FeatureReference extends TypeReference {
-    readonly $container: Alias | Comment | Conjugation | Dependency | Disjoining | Feature | FeatureInverting | Import | InitialNode | InvocationExpression | MetadataAccessExpression | MetadataFeature | NamedArgument | Relationship | SatisfyRequirementUsage | Specialization | TransitionUsage | Type | TypeFeaturing;
-    readonly $type: string;
-}
-
-export const FeatureReference = 'FeatureReference';
-
-export function isFeatureReference(item: unknown): item is FeatureReference {
-    return reflection.isInstance(item, FeatureReference);
-}
-
-export interface MetaclassReference extends TypeReference {
-    readonly $container: Alias | Comment | Conjugation | Dependency | Disjoining | Feature | FeatureInverting | Import | InitialNode | InvocationExpression | MetadataAccessExpression | MetadataFeature | NamedArgument | Relationship | SatisfyRequirementUsage | Specialization | TransitionUsage | Type | TypeFeaturing;
-    readonly $type: string;
-}
-
-export const MetaclassReference = 'MetaclassReference';
-
-export function isMetaclassReference(item: unknown): item is MetaclassReference {
-    return reflection.isInstance(item, MetaclassReference);
-}
-
-export interface CollectExpression extends OperatorExpression {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const CollectExpression = 'CollectExpression';
-
-export function isCollectExpression(item: unknown): item is CollectExpression {
-    return reflection.isInstance(item, CollectExpression);
-}
-
-export interface FeatureChainExpression extends OperatorExpression {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const FeatureChainExpression = 'FeatureChainExpression';
-
-export function isFeatureChainExpression(item: unknown): item is FeatureChainExpression {
-    return reflection.isInstance(item, FeatureChainExpression);
-}
-
-export interface SelectExpression extends OperatorExpression {
-    readonly $container: ActionUsage | Argument | AssignmentActionUsage | ElementFilter | FeatureReferenceExpression | FeatureValue | IfActionUsage | Import | InvocationExpression | LoopActionUsage | Multiplicity | ReferenceUsage | Result | TransitionUsage | TriggerInvocationExpression | WhileLoopActionUsage;
-    readonly $type: string;
-}
-
-export const SelectExpression = 'SelectExpression';
-
-export function isSelectExpression(item: unknown): item is SelectExpression {
-    return reflection.isInstance(item, SelectExpression);
+export function isAnnotatingElement(item: unknown): item is AnnotatingElement {
+    return reflection.isInstance(item, AnnotatingElement);
 }
 
 export interface Namespace extends Element {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    filters: Array<ElementFilter>
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LibraryPackage' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'Namespace' | 'NullExpression' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'Package' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'ReferenceUsage' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementDefinition' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateDefinition' | 'StateUsage' | 'Step' | 'Structure' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    aliases: Array<Membership>
+    annotatingMembers: Array<OwningMembership>
+    filters: Array<ElementFilterMembership>
+    imports: Array<Import>
+    members: Array<Membership>
+    namespaceMembers: Array<OwningMembership>
+    relationshipMembers: Array<OwningMembership>
 }
 
 export const Namespace = 'Namespace';
@@ -491,10 +217,15 @@ export function isNamespace(item: unknown): item is Namespace {
 }
 
 export interface Relationship extends Element {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    source: Array<ElementReference>
-    target: Array<ElementReference>
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership' | 'AllocationDefinition' | 'AllocationUsage' | 'Annotation' | 'Association' | 'AssociationStructure' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'ConjugatedPortTyping' | 'Conjugation' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'Dependency' | 'Differencing' | 'Disjoining' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'Expose' | 'FeatureChaining' | 'FeatureInverting' | 'FeatureMembership' | 'FeatureTyping' | 'FeatureValue' | 'Featuring' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'FramedConcernMembership' | 'Import' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Intersecting' | 'ItemFlow' | 'Membership' | 'MembershipExpose' | 'MembershipImport' | 'NamespaceExpose' | 'NamespaceImport' | 'ObjectiveMembership' | 'OwningMembership' | 'ParameterMembership' | 'PortConjugation' | 'Redefinition' | 'ReferenceSubsetting' | 'Relationship' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'Specialization' | 'StakeholderMembership' | 'StateSubactionMembership' | 'Subclassification' | 'SubjectMembership' | 'Subsetting' | 'Subtype' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TransitionFeatureMembership' | 'TypeFeaturing' | 'Unioning' | 'VariantMembership' | 'ViewRenderingMembership';
+    annotations: Array<Annotation>
+    chains: Array<Feature>
+    element?: Element
+    elements: Array<Feature | Namespace | Relationship>
+    reference?: ElementReference
+    source?: ElementReference
+    visibility?: VisibilityKind
 }
 
 export const Relationship = 'Relationship';
@@ -503,9 +234,42 @@ export function isRelationship(item: unknown): item is Relationship {
     return reflection.isInstance(item, Relationship);
 }
 
-export interface TextualAnnotatingElement extends Element {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface MembershipReference extends ElementReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'MembershipReference';
+}
+
+export const MembershipReference = 'MembershipReference';
+
+export function isMembershipReference(item: unknown): item is MembershipReference {
+    return reflection.isInstance(item, MembershipReference);
+}
+
+export interface NamespaceReference extends ElementReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'FeatureReference' | 'MetaclassReference' | 'NamespaceReference' | 'TypeReference';
+}
+
+export const NamespaceReference = 'NamespaceReference';
+
+export function isNamespaceReference(item: unknown): item is NamespaceReference {
+    return reflection.isInstance(item, NamespaceReference);
+}
+
+export interface MetadataFeature extends AnnotatingElement, Feature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MetadataFeature' | 'MetadataUsage';
+}
+
+export const MetadataFeature = 'MetadataFeature';
+
+export function isMetadataFeature(item: unknown): item is MetadataFeature {
+    return reflection.isInstance(item, MetadataFeature);
+}
+
+export interface TextualAnnotatingElement extends AnnotatingElement {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Comment' | 'Documentation' | 'TextualAnnotatingElement' | 'TextualRepresentation';
     body: string
 }
 
@@ -515,20 +279,9 @@ export function isTextualAnnotatingElement(item: unknown): item is TextualAnnota
     return reflection.isInstance(item, TextualAnnotatingElement);
 }
 
-export interface ConjugatedPortReference extends ClassifierReference {
-    readonly $container: Alias | Comment | Conjugation | Dependency | Disjoining | Feature | FeatureInverting | Import | InitialNode | InvocationExpression | MetadataAccessExpression | MetadataFeature | NamedArgument | Relationship | SatisfyRequirementUsage | Specialization | TransitionUsage | Type | TypeFeaturing;
-    readonly $type: string;
-}
-
-export const ConjugatedPortReference = 'ConjugatedPortReference';
-
-export function isConjugatedPortReference(item: unknown): item is ConjugatedPortReference {
-    return reflection.isInstance(item, ConjugatedPortReference);
-}
-
 export interface Package extends Namespace {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LibraryPackage' | 'Package';
 }
 
 export const Package = 'Package';
@@ -538,17 +291,12 @@ export function isPackage(item: unknown): item is Package {
 }
 
 export interface Type extends Namespace {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    conjugates: Array<TypeReference>
-    differences: Array<TypeReference>
-    disjoins: Array<TypeReference>
-    intersects: Array<TypeReference>
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'NullExpression' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'ReferenceUsage' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementDefinition' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateDefinition' | 'StateUsage' | 'Step' | 'Structure' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
     isAbstract?: 'abstract'
     isSufficient: boolean
-    multiplicity?: MultiplicityRange
-    specializes: Array<TypeReference>
-    unions: Array<TypeReference>
+    multiplicity?: OwningMembership
+    typeRelationships: Array<FeatureRelationship | TypeRelationship>
 }
 
 export const Type = 'Type';
@@ -557,23 +305,32 @@ export function isType(item: unknown): item is Type {
     return reflection.isInstance(item, Type);
 }
 
-export interface Alias extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    for: ElementReference
+export interface Annotation extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Annotation';
+    annotatedElement?: ElementReference
 }
 
-export const Alias = 'Alias';
+export const Annotation = 'Annotation';
 
-export function isAlias(item: unknown): item is Alias {
-    return reflection.isInstance(item, Alias);
+export function isAnnotation(item: unknown): item is Annotation {
+    return reflection.isInstance(item, Annotation);
+}
+
+export interface Association extends Classifier, Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition' | 'Association' | 'AssociationStructure' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'Interaction' | 'InterfaceDefinition';
+}
+
+export const Association = 'Association';
+
+export function isAssociation(item: unknown): item is Association {
+    return reflection.isInstance(item, Association);
 }
 
 export interface Conjugation extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    general: TypeReference
-    specific: TypeReference
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Conjugation' | 'PortConjugation';
 }
 
 export const Conjugation = 'Conjugation';
@@ -582,9 +339,20 @@ export function isConjugation(item: unknown): item is Conjugation {
     return reflection.isInstance(item, Conjugation);
 }
 
+export interface Connector extends Feature, Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationUsage' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'ItemFlow' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow';
+}
+
+export const Connector = 'Connector';
+
+export function isConnector(item: unknown): item is Connector {
+    return reflection.isInstance(item, Connector);
+}
+
 export interface Dependency extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Dependency';
     client: Array<ElementReference>
     supplier: Array<ElementReference>
 }
@@ -595,11 +363,20 @@ export function isDependency(item: unknown): item is Dependency {
     return reflection.isInstance(item, Dependency);
 }
 
+export interface Differencing extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Differencing';
+}
+
+export const Differencing = 'Differencing';
+
+export function isDifferencing(item: unknown): item is Differencing {
+    return reflection.isInstance(item, Differencing);
+}
+
 export interface Disjoining extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    disjoined: TypeReference
-    disjoining: TypeReference
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Disjoining';
 }
 
 export const Disjoining = 'Disjoining';
@@ -608,11 +385,20 @@ export function isDisjoining(item: unknown): item is Disjoining {
     return reflection.isInstance(item, Disjoining);
 }
 
+export interface FeatureChaining extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FeatureChaining';
+}
+
+export const FeatureChaining = 'FeatureChaining';
+
+export function isFeatureChaining(item: unknown): item is FeatureChaining {
+    return reflection.isInstance(item, FeatureChaining);
+}
+
 export interface FeatureInverting extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    featureInverted: FeatureReference
-    invertingFeature: FeatureReference
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FeatureInverting';
 }
 
 export const FeatureInverting = 'FeatureInverting';
@@ -621,13 +407,23 @@ export function isFeatureInverting(item: unknown): item is FeatureInverting {
     return reflection.isInstance(item, FeatureInverting);
 }
 
+export interface Featuring extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership' | 'EndFeatureMembership' | 'FeatureMembership' | 'Featuring' | 'FramedConcernMembership' | 'ObjectiveMembership' | 'ParameterMembership' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'StakeholderMembership' | 'StateSubactionMembership' | 'SubjectMembership' | 'TransitionFeatureMembership' | 'TypeFeaturing' | 'ViewRenderingMembership';
+}
+
+export const Featuring = 'Featuring';
+
+export function isFeaturing(item: unknown): item is Featuring {
+    return reflection.isInstance(item, Featuring);
+}
+
 export interface Import extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    conditions: Array<InlineExpression>
-    importedNamespace?: ElementReference
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Expose' | 'Import' | 'MembershipExpose' | 'MembershipImport' | 'NamespaceExpose' | 'NamespaceImport';
     importsAll: boolean
-    kind?: ImportKind
+    isNamespace?: '::*'
+    isRecursive: boolean
 }
 
 export const Import = 'Import';
@@ -636,11 +432,31 @@ export function isImport(item: unknown): item is Import {
     return reflection.isInstance(item, Import);
 }
 
+export interface Intersecting extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Intersecting';
+}
+
+export const Intersecting = 'Intersecting';
+
+export function isIntersecting(item: unknown): item is Intersecting {
+    return reflection.isInstance(item, Intersecting);
+}
+
+export interface Membership extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'FeatureMembership' | 'FeatureValue' | 'FramedConcernMembership' | 'Membership' | 'ObjectiveMembership' | 'OwningMembership' | 'ParameterMembership' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'StakeholderMembership' | 'StateSubactionMembership' | 'SubjectMembership' | 'TransitionFeatureMembership' | 'VariantMembership' | 'ViewRenderingMembership';
+}
+
+export const Membership = 'Membership';
+
+export function isMembership(item: unknown): item is Membership {
+    return reflection.isInstance(item, Membership);
+}
+
 export interface Specialization extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    general: TypeReference
-    specific: TypeReference
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConjugatedPortTyping' | 'FeatureTyping' | 'Redefinition' | 'ReferenceSubsetting' | 'Specialization' | 'Subclassification' | 'Subsetting' | 'Subtype';
 }
 
 export const Specialization = 'Specialization';
@@ -649,23 +465,42 @@ export function isSpecialization(item: unknown): item is Specialization {
     return reflection.isInstance(item, Specialization);
 }
 
-export interface TypeFeaturing extends Relationship {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    feature: FeatureReference
-    featuringType: TypeReference
+export interface Unioning extends Relationship {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Unioning';
 }
 
-export const TypeFeaturing = 'TypeFeaturing';
+export const Unioning = 'Unioning';
 
-export function isTypeFeaturing(item: unknown): item is TypeFeaturing {
-    return reflection.isInstance(item, TypeFeaturing);
+export function isUnioning(item: unknown): item is Unioning {
+    return reflection.isInstance(item, Unioning);
+}
+
+export interface TypeReference extends NamespaceReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'FeatureReference' | 'MetaclassReference' | 'TypeReference';
+}
+
+export const TypeReference = 'TypeReference';
+
+export function isTypeReference(item: unknown): item is TypeReference {
+    return reflection.isInstance(item, TypeReference);
+}
+
+export interface MetadataUsage extends ItemUsage, MetadataFeature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MetadataUsage';
+}
+
+export const MetadataUsage = 'MetadataUsage';
+
+export function isMetadataUsage(item: unknown): item is MetadataUsage {
+    return reflection.isInstance(item, MetadataUsage);
 }
 
 export interface Comment extends TextualAnnotatingElement {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    about: Array<ElementReference>
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Comment' | 'Documentation';
 }
 
 export const Comment = 'Comment';
@@ -675,8 +510,8 @@ export function isComment(item: unknown): item is Comment {
 }
 
 export interface TextualRepresentation extends TextualAnnotatingElement {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'TextualRepresentation';
     language: string
 }
 
@@ -687,8 +522,8 @@ export function isTextualRepresentation(item: unknown): item is TextualRepresent
 }
 
 export interface LibraryPackage extends Package {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LibraryPackage';
     isStandard: boolean
 }
 
@@ -699,8 +534,8 @@ export function isLibraryPackage(item: unknown): item is LibraryPackage {
 }
 
 export interface Classifier extends Type {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActionDefinition' | 'AllocationDefinition' | 'AnalysisCaseDefinition' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'Behavior' | 'CalculationDefinition' | 'CaseDefinition' | 'Class' | 'Classifier' | 'ConcernDefinition' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConstraintDefinition' | 'DataType' | 'Definition' | 'EnumerationDefinition' | 'FlowConnectionDefinition' | 'Interaction' | 'InterfaceDefinition' | 'ItemDefinition' | 'LifeClass' | 'Metaclass' | 'MetadataDefinition' | 'OccurrenceDefinition' | 'PartDefinition' | 'PortDefinition' | 'Predicate' | 'RenderingDefinition' | 'RequirementDefinition' | 'StateDefinition' | 'Structure' | 'SysMLFunction' | 'UseCaseDefinition' | 'VerificationCaseDefinition' | 'ViewDefinition' | 'ViewpointDefinition';
 }
 
 export const Classifier = 'Classifier';
@@ -710,12 +545,9 @@ export function isClassifier(item: unknown): item is Classifier {
 }
 
 export interface Feature extends Type {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    chains: Array<FeatureReference>
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AllocationUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'AttributeUsage' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'MetadataAccessExpression' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'NullExpression' | 'OccurrenceUsage' | 'OperatorExpression' | 'PartUsage' | 'PerformActionUsage' | 'PortUsage' | 'ReferenceUsage' | 'RenderingUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateUsage' | 'Step' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Usage' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
     direction?: FeatureDirectionKind
-    featuredBy: Array<TypeReference>
-    inverseOf: Array<FeatureReference>
     isComposite?: 'composite'
     isDerived?: 'derived'
     isEnd?: 'end'
@@ -723,11 +555,8 @@ export interface Feature extends Type {
     isOrdered: boolean
     isPortion?: 'portion'
     isReadOnly?: 'readonly'
-    redefines: Array<FeatureReference>
-    references: Array<FeatureReference>
-    subsets: Array<FeatureReference>
-    typedBy: Array<TypeReference>
     value?: FeatureValue
+    write?: Membership
 }
 
 export const Feature = 'Feature';
@@ -736,235 +565,9 @@ export function isFeature(item: unknown): item is Feature {
     return reflection.isInstance(item, Feature);
 }
 
-export interface Expose extends Import {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Expose = 'Expose';
-
-export function isExpose(item: unknown): item is Expose {
-    return reflection.isInstance(item, Expose);
-}
-
-export interface FeatureTyping extends Specialization {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const FeatureTyping = 'FeatureTyping';
-
-export function isFeatureTyping(item: unknown): item is FeatureTyping {
-    return reflection.isInstance(item, FeatureTyping);
-}
-
-export interface Subclassification extends Specialization {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Subclassification = 'Subclassification';
-
-export function isSubclassification(item: unknown): item is Subclassification {
-    return reflection.isInstance(item, Subclassification);
-}
-
-export interface Subsetting extends Specialization {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Subsetting = 'Subsetting';
-
-export function isSubsetting(item: unknown): item is Subsetting {
-    return reflection.isInstance(item, Subsetting);
-}
-
-export interface Subtype extends Specialization {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Subtype = 'Subtype';
-
-export function isSubtype(item: unknown): item is Subtype {
-    return reflection.isInstance(item, Subtype);
-}
-
-export interface Documentation extends Comment {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Documentation = 'Documentation';
-
-export function isDocumentation(item: unknown): item is Documentation {
-    return reflection.isInstance(item, Documentation);
-}
-
-export interface Association extends Classifier {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Association = 'Association';
-
-export function isAssociation(item: unknown): item is Association {
-    return reflection.isInstance(item, Association);
-}
-
-export interface Class extends Classifier {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Class = 'Class';
-
-export function isClass(item: unknown): item is Class {
-    return reflection.isInstance(item, Class);
-}
-
-export interface DataType extends Classifier {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const DataType = 'DataType';
-
-export function isDataType(item: unknown): item is DataType {
-    return reflection.isInstance(item, DataType);
-}
-
-export interface Definition extends Classifier {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    isIndividual: boolean
-    isVariation: boolean
-    variants: Array<Feature>
-}
-
-export const Definition = 'Definition';
-
-export function isDefinition(item: unknown): item is Definition {
-    return reflection.isInstance(item, Definition);
-}
-
-export interface Connector extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    ends: Array<ConnectorEnd>
-}
-
-export const Connector = 'Connector';
-
-export function isConnector(item: unknown): item is Connector {
-    return reflection.isInstance(item, Connector);
-}
-
-export interface ConnectorEnd extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const ConnectorEnd = 'ConnectorEnd';
-
-export function isConnectorEnd(item: unknown): item is ConnectorEnd {
-    return reflection.isInstance(item, ConnectorEnd);
-}
-
-export interface InitialNode extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    comments: Array<Comment>
-    docs: Array<Documentation>
-    element: FeatureReference
-    metadata: Array<MetadataUsage>
-    reps: Array<TextualRepresentation>
-    visibility?: VisibilityKind
-}
-
-export const InitialNode = 'InitialNode';
-
-export function isInitialNode(item: unknown): item is InitialNode {
-    return reflection.isInstance(item, InitialNode);
-}
-
-export interface ItemFeature extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const ItemFeature = 'ItemFeature';
-
-export function isItemFeature(item: unknown): item is ItemFeature {
-    return reflection.isInstance(item, ItemFeature);
-}
-
-export interface MetadataFeature extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    about: Array<ElementReference>
-}
-
-export const MetadataFeature = 'MetadataFeature';
-
-export function isMetadataFeature(item: unknown): item is MetadataFeature {
-    return reflection.isInstance(item, MetadataFeature);
-}
-
-export interface Multiplicity extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    range?: InlineExpression
-}
-
-export const Multiplicity = 'Multiplicity';
-
-export function isMultiplicity(item: unknown): item is Multiplicity {
-    return reflection.isInstance(item, Multiplicity);
-}
-
-export interface Step extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Step = 'Step';
-
-export function isStep(item: unknown): item is Step {
-    return reflection.isInstance(item, Step);
-}
-
-export interface Usage extends Feature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    isIndividual: boolean
-    isReference: boolean
-    isVariation: boolean
-    portionKind?: PortionKind
-    variants: Array<Feature>
-}
-
-export const Usage = 'Usage';
-
-export function isUsage(item: unknown): item is Usage {
-    return reflection.isInstance(item, Usage);
-}
-
-export interface Redefinition extends Subsetting {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Redefinition = 'Redefinition';
-
-export function isRedefinition(item: unknown): item is Redefinition {
-    return reflection.isInstance(item, Redefinition);
-}
-
 export interface AssociationStructure extends Association, Structure {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition' | 'AssociationStructure' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition';
 }
 
 export const AssociationStructure = 'AssociationStructure';
@@ -974,8 +577,8 @@ export function isAssociationStructure(item: unknown): item is AssociationStruct
 }
 
 export interface Interaction extends Association, Behavior {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FlowConnectionDefinition' | 'Interaction';
 }
 
 export const Interaction = 'Interaction';
@@ -984,53 +587,20 @@ export function isInteraction(item: unknown): item is Interaction {
     return reflection.isInstance(item, Interaction);
 }
 
-export interface Behavior extends Class {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface PortConjugation extends Conjugation {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'PortConjugation';
 }
 
-export const Behavior = 'Behavior';
+export const PortConjugation = 'PortConjugation';
 
-export function isBehavior(item: unknown): item is Behavior {
-    return reflection.isInstance(item, Behavior);
-}
-
-export interface OccurrenceDefinition extends Class, Definition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const OccurrenceDefinition = 'OccurrenceDefinition';
-
-export function isOccurrenceDefinition(item: unknown): item is OccurrenceDefinition {
-    return reflection.isInstance(item, OccurrenceDefinition);
-}
-
-export interface Structure extends Class {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Structure = 'Structure';
-
-export function isStructure(item: unknown): item is Structure {
-    return reflection.isInstance(item, Structure);
-}
-
-export interface AttributeDefinition extends DataType, Definition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const AttributeDefinition = 'AttributeDefinition';
-
-export function isAttributeDefinition(item: unknown): item is AttributeDefinition {
-    return reflection.isInstance(item, AttributeDefinition);
+export function isPortConjugation(item: unknown): item is PortConjugation {
+    return reflection.isInstance(item, PortConjugation);
 }
 
 export interface BindingConnector extends Connector {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'BindingConnector' | 'BindingConnectorAsUsage';
 }
 
 export const BindingConnector = 'BindingConnector';
@@ -1040,8 +610,8 @@ export function isBindingConnector(item: unknown): item is BindingConnector {
 }
 
 export interface ConnectorAsUsage extends Connector, Usage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationUsage' | 'BindingConnectorAsUsage' | 'ConnectionUsage' | 'ConnectorAsUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage';
 }
 
 export const ConnectorAsUsage = 'ConnectorAsUsage';
@@ -1051,9 +621,8 @@ export function isConnectorAsUsage(item: unknown): item is ConnectorAsUsage {
 }
 
 export interface ItemFlow extends Connector, Step {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    of?: ItemFeature
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FlowConnectionUsage' | 'ItemFlow' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow';
 }
 
 export const ItemFlow = 'ItemFlow';
@@ -1063,8 +632,8 @@ export function isItemFlow(item: unknown): item is ItemFlow {
 }
 
 export interface Succession extends Connector {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow';
 }
 
 export const Succession = 'Succession';
@@ -1073,9 +642,198 @@ export function isSuccession(item: unknown): item is Succession {
     return reflection.isInstance(item, Succession);
 }
 
-export interface ItemFlowEnd extends ConnectorEnd {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface FeatureMembership extends Featuring, OwningMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership' | 'EndFeatureMembership' | 'FeatureMembership' | 'FramedConcernMembership' | 'ObjectiveMembership' | 'ParameterMembership' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'StakeholderMembership' | 'StateSubactionMembership' | 'SubjectMembership' | 'TransitionFeatureMembership' | 'ViewRenderingMembership';
+}
+
+export const FeatureMembership = 'FeatureMembership';
+
+export function isFeatureMembership(item: unknown): item is FeatureMembership {
+    return reflection.isInstance(item, FeatureMembership);
+}
+
+export interface TypeFeaturing extends Featuring {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'TypeFeaturing';
+}
+
+export const TypeFeaturing = 'TypeFeaturing';
+
+export function isTypeFeaturing(item: unknown): item is TypeFeaturing {
+    return reflection.isInstance(item, TypeFeaturing);
+}
+
+export interface Expose extends Import {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Expose' | 'MembershipExpose' | 'NamespaceExpose';
+}
+
+export const Expose = 'Expose';
+
+export function isExpose(item: unknown): item is Expose {
+    return reflection.isInstance(item, Expose);
+}
+
+export interface MembershipImport extends Import {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MembershipExpose' | 'MembershipImport';
+}
+
+export const MembershipImport = 'MembershipImport';
+
+export function isMembershipImport(item: unknown): item is MembershipImport {
+    return reflection.isInstance(item, MembershipImport);
+}
+
+export interface NamespaceImport extends Import {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'NamespaceExpose' | 'NamespaceImport';
+}
+
+export const NamespaceImport = 'NamespaceImport';
+
+export function isNamespaceImport(item: unknown): item is NamespaceImport {
+    return reflection.isInstance(item, NamespaceImport);
+}
+
+export interface OwningMembership extends Membership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'FeatureMembership' | 'FeatureValue' | 'FramedConcernMembership' | 'ObjectiveMembership' | 'OwningMembership' | 'ParameterMembership' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'StakeholderMembership' | 'StateSubactionMembership' | 'SubjectMembership' | 'TransitionFeatureMembership' | 'VariantMembership' | 'ViewRenderingMembership';
+}
+
+export const OwningMembership = 'OwningMembership';
+
+export function isOwningMembership(item: unknown): item is OwningMembership {
+    return reflection.isInstance(item, OwningMembership);
+}
+
+export interface FeatureTyping extends Specialization {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConjugatedPortTyping' | 'FeatureTyping';
+}
+
+export const FeatureTyping = 'FeatureTyping';
+
+export function isFeatureTyping(item: unknown): item is FeatureTyping {
+    return reflection.isInstance(item, FeatureTyping);
+}
+
+export interface Subclassification extends Specialization {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Subclassification';
+}
+
+export const Subclassification = 'Subclassification';
+
+export function isSubclassification(item: unknown): item is Subclassification {
+    return reflection.isInstance(item, Subclassification);
+}
+
+export interface Subsetting extends Specialization {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Redefinition' | 'ReferenceSubsetting' | 'Subsetting';
+}
+
+export const Subsetting = 'Subsetting';
+
+export function isSubsetting(item: unknown): item is Subsetting {
+    return reflection.isInstance(item, Subsetting);
+}
+
+export interface Subtype extends Specialization {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Subtype';
+}
+
+export const Subtype = 'Subtype';
+
+export function isSubtype(item: unknown): item is Subtype {
+    return reflection.isInstance(item, Subtype);
+}
+
+export interface ClassifierReference extends TypeReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'MetaclassReference';
+}
+
+export const ClassifierReference = 'ClassifierReference';
+
+export function isClassifierReference(item: unknown): item is ClassifierReference {
+    return reflection.isInstance(item, ClassifierReference);
+}
+
+export interface FeatureReference extends TypeReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'FeatureReference';
+}
+
+export const FeatureReference = 'FeatureReference';
+
+export function isFeatureReference(item: unknown): item is FeatureReference {
+    return reflection.isInstance(item, FeatureReference);
+}
+
+export interface Documentation extends Comment {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Documentation';
+}
+
+export const Documentation = 'Documentation';
+
+export function isDocumentation(item: unknown): item is Documentation {
+    return reflection.isInstance(item, Documentation);
+}
+
+export interface Class extends Classifier {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActionDefinition' | 'AllocationDefinition' | 'AnalysisCaseDefinition' | 'AssociationStructure' | 'Behavior' | 'CalculationDefinition' | 'CaseDefinition' | 'Class' | 'ConcernDefinition' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConstraintDefinition' | 'FlowConnectionDefinition' | 'Interaction' | 'InterfaceDefinition' | 'ItemDefinition' | 'LifeClass' | 'Metaclass' | 'MetadataDefinition' | 'OccurrenceDefinition' | 'PartDefinition' | 'PortDefinition' | 'Predicate' | 'RenderingDefinition' | 'RequirementDefinition' | 'StateDefinition' | 'Structure' | 'SysMLFunction' | 'UseCaseDefinition' | 'VerificationCaseDefinition' | 'ViewDefinition' | 'ViewpointDefinition';
+}
+
+export const Class = 'Class';
+
+export function isClass(item: unknown): item is Class {
+    return reflection.isInstance(item, Class);
+}
+
+export interface DataType extends Classifier {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AttributeDefinition' | 'DataType' | 'EnumerationDefinition';
+}
+
+export const DataType = 'DataType';
+
+export function isDataType(item: unknown): item is DataType {
+    return reflection.isInstance(item, DataType);
+}
+
+export interface Definition extends Classifier {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActionDefinition' | 'AllocationDefinition' | 'AnalysisCaseDefinition' | 'AttributeDefinition' | 'CalculationDefinition' | 'CaseDefinition' | 'ConcernDefinition' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConstraintDefinition' | 'Definition' | 'EnumerationDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'MetadataDefinition' | 'OccurrenceDefinition' | 'PartDefinition' | 'PortDefinition' | 'RenderingDefinition' | 'RequirementDefinition' | 'StateDefinition' | 'UseCaseDefinition' | 'VerificationCaseDefinition' | 'ViewDefinition' | 'ViewpointDefinition';
+    isIndividual: boolean
+    isVariation: boolean
+}
+
+export const Definition = 'Definition';
+
+export function isDefinition(item: unknown): item is Definition {
+    return reflection.isInstance(item, Definition);
+}
+
+export interface ItemFeature extends Feature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ItemFeature';
+}
+
+export const ItemFeature = 'ItemFeature';
+
+export function isItemFeature(item: unknown): item is ItemFeature {
+    return reflection.isInstance(item, ItemFeature);
+}
+
+export interface ItemFlowEnd extends Feature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ItemFlowEnd';
 }
 
 export const ItemFlowEnd = 'ItemFlowEnd';
@@ -1084,97 +842,47 @@ export function isItemFlowEnd(item: unknown): item is ItemFlowEnd {
     return reflection.isInstance(item, ItemFlowEnd);
 }
 
-export interface MetadataUsage extends ItemUsage, MetadataFeature {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface Multiplicity extends Feature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Multiplicity' | 'MultiplicityRange';
+    range?: OwningMembership
 }
 
-export const MetadataUsage = 'MetadataUsage';
+export const Multiplicity = 'Multiplicity';
 
-export function isMetadataUsage(item: unknown): item is MetadataUsage {
-    return reflection.isInstance(item, MetadataUsage);
+export function isMultiplicity(item: unknown): item is Multiplicity {
+    return reflection.isInstance(item, Multiplicity);
 }
 
-export interface MultiplicityRange extends Multiplicity {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface Step extends Feature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'ExhibitStateUsage' | 'Expression' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'Invariant' | 'InvocationExpression' | 'ItemFlow' | 'JoinNode' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'MetadataAccessExpression' | 'NullExpression' | 'OperatorExpression' | 'PerformActionUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateUsage' | 'Step' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
 }
 
-export const MultiplicityRange = 'MultiplicityRange';
+export const Step = 'Step';
 
-export function isMultiplicityRange(item: unknown): item is MultiplicityRange {
-    return reflection.isInstance(item, MultiplicityRange);
+export function isStep(item: unknown): item is Step {
+    return reflection.isInstance(item, Step);
 }
 
-export interface ActionUsage extends OccurrenceUsage, Step {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    actionKind?: StateSubactionKind
-    isParallel: boolean
-    parameters: Array<ReferenceUsage>
-    send?: InlineExpression
-    to?: InlineExpression
-    via?: InlineExpression
+export interface Usage extends Feature {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AllocationUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'AttributeUsage' | 'BindingConnectorAsUsage' | 'CalculationUsage' | 'CaseUsage' | 'ConcernUsage' | 'ConnectionUsage' | 'ConnectorAsUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'InterfaceUsage' | 'ItemUsage' | 'JoinNode' | 'LoopActionUsage' | 'MergeNode' | 'MetadataUsage' | 'OccurrenceUsage' | 'PartUsage' | 'PerformActionUsage' | 'PortUsage' | 'ReferenceUsage' | 'RenderingUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SendActionUsage' | 'StateUsage' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'TransitionUsage' | 'Usage' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    isIndividual: boolean
+    isReference: boolean
+    isVariation: boolean
+    portionKind?: PortionKind
 }
 
-export const ActionUsage = 'ActionUsage';
+export const Usage = 'Usage';
 
-export function isActionUsage(item: unknown): item is ActionUsage {
-    return reflection.isInstance(item, ActionUsage);
-}
-
-export interface Expression extends Step {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    result?: Result
-    return: Array<Feature>
-    variants: Array<Feature>
-}
-
-export const Expression = 'Expression';
-
-export function isExpression(item: unknown): item is Expression {
-    return reflection.isInstance(item, Expression);
-}
-
-export interface AttributeUsage extends Usage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const AttributeUsage = 'AttributeUsage';
-
-export function isAttributeUsage(item: unknown): item is AttributeUsage {
-    return reflection.isInstance(item, AttributeUsage);
-}
-
-export interface OccurrenceUsage extends Usage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const OccurrenceUsage = 'OccurrenceUsage';
-
-export function isOccurrenceUsage(item: unknown): item is OccurrenceUsage {
-    return reflection.isInstance(item, OccurrenceUsage);
-}
-
-export interface ReferenceUsage extends Usage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    isSubject: boolean
-    trigger?: TriggerInvocationExpression
-}
-
-export const ReferenceUsage = 'ReferenceUsage';
-
-export function isReferenceUsage(item: unknown): item is ReferenceUsage {
-    return reflection.isInstance(item, ReferenceUsage);
+export function isUsage(item: unknown): item is Usage {
+    return reflection.isInstance(item, Usage);
 }
 
 export interface ConnectionDefinition extends AssociationStructure, PartDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition';
 }
 
 export const ConnectionDefinition = 'ConnectionDefinition';
@@ -1184,8 +892,8 @@ export function isConnectionDefinition(item: unknown): item is ConnectionDefinit
 }
 
 export interface FlowConnectionDefinition extends ActionDefinition, ConnectionDefinition, Interaction {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FlowConnectionDefinition';
 }
 
 export const FlowConnectionDefinition = 'FlowConnectionDefinition';
@@ -1194,89 +902,9 @@ export function isFlowConnectionDefinition(item: unknown): item is FlowConnectio
     return reflection.isInstance(item, FlowConnectionDefinition);
 }
 
-export interface ActionDefinition extends Behavior, OccurrenceDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const ActionDefinition = 'ActionDefinition';
-
-export function isActionDefinition(item: unknown): item is ActionDefinition {
-    return reflection.isInstance(item, ActionDefinition);
-}
-
-export interface SysMLFunction extends Behavior {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    result?: Result
-    return: Array<Feature>
-}
-
-export const SysMLFunction = 'SysMLFunction';
-
-export function isSysMLFunction(item: unknown): item is SysMLFunction {
-    return reflection.isInstance(item, SysMLFunction);
-}
-
-export interface ConstraintDefinition extends OccurrenceDefinition, Predicate {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const ConstraintDefinition = 'ConstraintDefinition';
-
-export function isConstraintDefinition(item: unknown): item is ConstraintDefinition {
-    return reflection.isInstance(item, ConstraintDefinition);
-}
-
-export interface ItemDefinition extends OccurrenceDefinition, Structure {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const ItemDefinition = 'ItemDefinition';
-
-export function isItemDefinition(item: unknown): item is ItemDefinition {
-    return reflection.isInstance(item, ItemDefinition);
-}
-
-export interface PortDefinition extends OccurrenceDefinition, Structure {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const PortDefinition = 'PortDefinition';
-
-export function isPortDefinition(item: unknown): item is PortDefinition {
-    return reflection.isInstance(item, PortDefinition);
-}
-
-export interface Metaclass extends Structure {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Metaclass = 'Metaclass';
-
-export function isMetaclass(item: unknown): item is Metaclass {
-    return reflection.isInstance(item, Metaclass);
-}
-
-export interface EnumerationDefinition extends AttributeDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    values: Array<EnumerationUsage>
-}
-
-export const EnumerationDefinition = 'EnumerationDefinition';
-
-export function isEnumerationDefinition(item: unknown): item is EnumerationDefinition {
-    return reflection.isInstance(item, EnumerationDefinition);
-}
-
 export interface BindingConnectorAsUsage extends BindingConnector, ConnectorAsUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'BindingConnectorAsUsage';
 }
 
 export const BindingConnectorAsUsage = 'BindingConnectorAsUsage';
@@ -1286,8 +914,8 @@ export function isBindingConnectorAsUsage(item: unknown): item is BindingConnect
 }
 
 export interface ConnectionUsage extends ConnectorAsUsage, PartUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'SuccessionFlowConnectionUsage';
 }
 
 export const ConnectionUsage = 'ConnectionUsage';
@@ -1297,9 +925,8 @@ export function isConnectionUsage(item: unknown): item is ConnectionUsage {
 }
 
 export interface SuccessionAsUsage extends ConnectorAsUsage, Succession {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    then: Array<SuccessionAsUsage>
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SuccessionAsUsage';
 }
 
 export const SuccessionAsUsage = 'SuccessionAsUsage';
@@ -1309,8 +936,8 @@ export function isSuccessionAsUsage(item: unknown): item is SuccessionAsUsage {
 }
 
 export interface FlowConnectionUsage extends ActionUsage, ConnectionUsage, ItemFlow {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FlowConnectionUsage' | 'SuccessionFlowConnectionUsage';
 }
 
 export const FlowConnectionUsage = 'FlowConnectionUsage';
@@ -1320,8 +947,8 @@ export function isFlowConnectionUsage(item: unknown): item is FlowConnectionUsag
 }
 
 export interface SuccessionItemFlow extends ItemFlow, Succession {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow';
 }
 
 export const SuccessionItemFlow = 'SuccessionItemFlow';
@@ -1330,200 +957,335 @@ export function isSuccessionItemFlow(item: unknown): item is SuccessionItemFlow 
     return reflection.isInstance(item, SuccessionItemFlow);
 }
 
-export interface AcceptActionUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface EndFeatureMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'EndFeatureMembership';
 }
 
-export const AcceptActionUsage = 'AcceptActionUsage';
+export const EndFeatureMembership = 'EndFeatureMembership';
 
-export function isAcceptActionUsage(item: unknown): item is AcceptActionUsage {
-    return reflection.isInstance(item, AcceptActionUsage);
+export function isEndFeatureMembership(item: unknown): item is EndFeatureMembership {
+    return reflection.isInstance(item, EndFeatureMembership);
 }
 
-export interface AssignmentActionUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    left: InlineExpression
-    right: InlineExpression
+export interface ObjectiveMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ObjectiveMembership';
 }
 
-export const AssignmentActionUsage = 'AssignmentActionUsage';
+export const ObjectiveMembership = 'ObjectiveMembership';
 
-export function isAssignmentActionUsage(item: unknown): item is AssignmentActionUsage {
-    return reflection.isInstance(item, AssignmentActionUsage);
+export function isObjectiveMembership(item: unknown): item is ObjectiveMembership {
+    return reflection.isInstance(item, ObjectiveMembership);
 }
 
-export interface CalculationUsage extends ActionUsage, Expression {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface ParameterMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership' | 'ParameterMembership' | 'ReturnParameterMembership' | 'StakeholderMembership' | 'SubjectMembership';
 }
 
-export const CalculationUsage = 'CalculationUsage';
+export const ParameterMembership = 'ParameterMembership';
 
-export function isCalculationUsage(item: unknown): item is CalculationUsage {
-    return reflection.isInstance(item, CalculationUsage);
+export function isParameterMembership(item: unknown): item is ParameterMembership {
+    return reflection.isInstance(item, ParameterMembership);
 }
 
-export interface ControlNode extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface RequirementConstraintMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FramedConcernMembership' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership';
+    kind?: RequirementConstraintKind
 }
 
-export const ControlNode = 'ControlNode';
+export const RequirementConstraintMembership = 'RequirementConstraintMembership';
 
-export function isControlNode(item: unknown): item is ControlNode {
-    return reflection.isInstance(item, ControlNode);
+export function isRequirementConstraintMembership(item: unknown): item is RequirementConstraintMembership {
+    return reflection.isInstance(item, RequirementConstraintMembership);
 }
 
-export interface IfActionUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    body: ActionUsage
-    condition: InlineExpression
-    else?: ActionUsage
+export interface ResultExpressionMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ResultExpressionMembership';
 }
 
-export const IfActionUsage = 'IfActionUsage';
+export const ResultExpressionMembership = 'ResultExpressionMembership';
 
-export function isIfActionUsage(item: unknown): item is IfActionUsage {
-    return reflection.isInstance(item, IfActionUsage);
+export function isResultExpressionMembership(item: unknown): item is ResultExpressionMembership {
+    return reflection.isInstance(item, ResultExpressionMembership);
 }
 
-export interface LoopActionUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    body: ActionUsage
-    expression: InlineExpression
+export interface StateSubactionMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'StateSubactionMembership';
+    kind: 'do' | 'entry' | 'exit'
 }
 
-export const LoopActionUsage = 'LoopActionUsage';
+export const StateSubactionMembership = 'StateSubactionMembership';
 
-export function isLoopActionUsage(item: unknown): item is LoopActionUsage {
-    return reflection.isInstance(item, LoopActionUsage);
+export function isStateSubactionMembership(item: unknown): item is StateSubactionMembership {
+    return reflection.isInstance(item, StateSubactionMembership);
 }
 
-export interface PerformActionUsage extends ActionUsage, EventOccurrenceUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface TransitionFeatureMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'TransitionFeatureMembership';
+    kind: 'accept' | 'do' | 'if'
 }
 
-export const PerformActionUsage = 'PerformActionUsage';
+export const TransitionFeatureMembership = 'TransitionFeatureMembership';
 
-export function isPerformActionUsage(item: unknown): item is PerformActionUsage {
-    return reflection.isInstance(item, PerformActionUsage);
+export function isTransitionFeatureMembership(item: unknown): item is TransitionFeatureMembership {
+    return reflection.isInstance(item, TransitionFeatureMembership);
 }
 
-export interface SendActionUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface ViewRenderingMembership extends FeatureMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ViewRenderingMembership';
 }
 
-export const SendActionUsage = 'SendActionUsage';
+export const ViewRenderingMembership = 'ViewRenderingMembership';
 
-export function isSendActionUsage(item: unknown): item is SendActionUsage {
-    return reflection.isInstance(item, SendActionUsage);
+export function isViewRenderingMembership(item: unknown): item is ViewRenderingMembership {
+    return reflection.isInstance(item, ViewRenderingMembership);
 }
 
-export interface StateUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    subactions: Array<ActionUsage>
+export interface MembershipExpose extends Expose, MembershipImport {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MembershipExpose';
 }
 
-export const StateUsage = 'StateUsage';
+export const MembershipExpose = 'MembershipExpose';
 
-export function isStateUsage(item: unknown): item is StateUsage {
-    return reflection.isInstance(item, StateUsage);
+export function isMembershipExpose(item: unknown): item is MembershipExpose {
+    return reflection.isInstance(item, MembershipExpose);
 }
 
-export interface TransitionUsage extends ActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    effect?: ActionUsage
-    else?: SuccessionAsUsage
-    guard?: InlineExpression
-    source?: FeatureReference
-    then?: SuccessionAsUsage
-    trigger?: AcceptActionUsage
+export interface NamespaceExpose extends Expose, NamespaceImport {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'NamespaceExpose';
 }
 
-export const TransitionUsage = 'TransitionUsage';
+export const NamespaceExpose = 'NamespaceExpose';
 
-export function isTransitionUsage(item: unknown): item is TransitionUsage {
-    return reflection.isInstance(item, TransitionUsage);
+export function isNamespaceExpose(item: unknown): item is NamespaceExpose {
+    return reflection.isInstance(item, NamespaceExpose);
 }
 
-export interface BooleanExpression extends Expression {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface ElementFilterMembership extends OwningMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ElementFilterMembership';
 }
 
-export const BooleanExpression = 'BooleanExpression';
+export const ElementFilterMembership = 'ElementFilterMembership';
 
-export function isBooleanExpression(item: unknown): item is BooleanExpression {
-    return reflection.isInstance(item, BooleanExpression);
+export function isElementFilterMembership(item: unknown): item is ElementFilterMembership {
+    return reflection.isInstance(item, ElementFilterMembership);
 }
 
-export interface EnumerationUsage extends AttributeUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface FeatureValue extends OwningMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FeatureValue';
+    isDefault: boolean
+    isInitial: boolean
 }
 
-export const EnumerationUsage = 'EnumerationUsage';
+export const FeatureValue = 'FeatureValue';
 
-export function isEnumerationUsage(item: unknown): item is EnumerationUsage {
-    return reflection.isInstance(item, EnumerationUsage);
+export function isFeatureValue(item: unknown): item is FeatureValue {
+    return reflection.isInstance(item, FeatureValue);
 }
 
-export interface ConstraintUsage extends BooleanExpression, OccurrenceUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    constraintKind?: RequirementConstraintKind
+export interface VariantMembership extends OwningMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'VariantMembership';
 }
 
-export const ConstraintUsage = 'ConstraintUsage';
+export const VariantMembership = 'VariantMembership';
 
-export function isConstraintUsage(item: unknown): item is ConstraintUsage {
-    return reflection.isInstance(item, ConstraintUsage);
+export function isVariantMembership(item: unknown): item is VariantMembership {
+    return reflection.isInstance(item, VariantMembership);
 }
 
-export interface EventOccurrenceUsage extends OccurrenceUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface ConjugatedPortTyping extends FeatureTyping {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConjugatedPortTyping';
 }
 
-export const EventOccurrenceUsage = 'EventOccurrenceUsage';
+export const ConjugatedPortTyping = 'ConjugatedPortTyping';
 
-export function isEventOccurrenceUsage(item: unknown): item is EventOccurrenceUsage {
-    return reflection.isInstance(item, EventOccurrenceUsage);
+export function isConjugatedPortTyping(item: unknown): item is ConjugatedPortTyping {
+    return reflection.isInstance(item, ConjugatedPortTyping);
 }
 
-export interface ItemUsage extends OccurrenceUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface Redefinition extends Subsetting {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Redefinition';
 }
 
-export const ItemUsage = 'ItemUsage';
+export const Redefinition = 'Redefinition';
 
-export function isItemUsage(item: unknown): item is ItemUsage {
-    return reflection.isInstance(item, ItemUsage);
+export function isRedefinition(item: unknown): item is Redefinition {
+    return reflection.isInstance(item, Redefinition);
 }
 
-export interface PortUsage extends OccurrenceUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+export interface ReferenceSubsetting extends Subsetting {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ReferenceSubsetting';
 }
 
-export const PortUsage = 'PortUsage';
+export const ReferenceSubsetting = 'ReferenceSubsetting';
 
-export function isPortUsage(item: unknown): item is PortUsage {
-    return reflection.isInstance(item, PortUsage);
+export function isReferenceSubsetting(item: unknown): item is ReferenceSubsetting {
+    return reflection.isInstance(item, ReferenceSubsetting);
+}
+
+export interface ConjugatedPortReference extends ClassifierReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'ConjugatedPortReference';
+}
+
+export const ConjugatedPortReference = 'ConjugatedPortReference';
+
+export function isConjugatedPortReference(item: unknown): item is ConjugatedPortReference {
+    return reflection.isInstance(item, ConjugatedPortReference);
+}
+
+export interface MetaclassReference extends ClassifierReference {
+    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $type: 'MetaclassReference';
+}
+
+export const MetaclassReference = 'MetaclassReference';
+
+export function isMetaclassReference(item: unknown): item is MetaclassReference {
+    return reflection.isInstance(item, MetaclassReference);
+}
+
+export interface Behavior extends Class {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActionDefinition' | 'AnalysisCaseDefinition' | 'Behavior' | 'CalculationDefinition' | 'CaseDefinition' | 'ConcernDefinition' | 'ConstraintDefinition' | 'FlowConnectionDefinition' | 'Interaction' | 'Predicate' | 'RequirementDefinition' | 'StateDefinition' | 'SysMLFunction' | 'UseCaseDefinition' | 'VerificationCaseDefinition' | 'ViewpointDefinition';
+}
+
+export const Behavior = 'Behavior';
+
+export function isBehavior(item: unknown): item is Behavior {
+    return reflection.isInstance(item, Behavior);
+}
+
+export interface LifeClass extends Class {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LifeClass';
+}
+
+export const LifeClass = 'LifeClass';
+
+export function isLifeClass(item: unknown): item is LifeClass {
+    return reflection.isInstance(item, LifeClass);
+}
+
+export interface OccurrenceDefinition extends Class, Definition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActionDefinition' | 'AllocationDefinition' | 'AnalysisCaseDefinition' | 'CalculationDefinition' | 'CaseDefinition' | 'ConcernDefinition' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConstraintDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'MetadataDefinition' | 'OccurrenceDefinition' | 'PartDefinition' | 'PortDefinition' | 'RenderingDefinition' | 'RequirementDefinition' | 'StateDefinition' | 'UseCaseDefinition' | 'VerificationCaseDefinition' | 'ViewDefinition' | 'ViewpointDefinition';
+}
+
+export const OccurrenceDefinition = 'OccurrenceDefinition';
+
+export function isOccurrenceDefinition(item: unknown): item is OccurrenceDefinition {
+    return reflection.isInstance(item, OccurrenceDefinition);
+}
+
+export interface Structure extends Class {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition' | 'AssociationStructure' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'Metaclass' | 'MetadataDefinition' | 'PartDefinition' | 'PortDefinition' | 'RenderingDefinition' | 'Structure' | 'ViewDefinition';
+}
+
+export const Structure = 'Structure';
+
+export function isStructure(item: unknown): item is Structure {
+    return reflection.isInstance(item, Structure);
+}
+
+export interface AttributeDefinition extends DataType, Definition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AttributeDefinition' | 'EnumerationDefinition';
+}
+
+export const AttributeDefinition = 'AttributeDefinition';
+
+export function isAttributeDefinition(item: unknown): item is AttributeDefinition {
+    return reflection.isInstance(item, AttributeDefinition);
+}
+
+export interface MultiplicityRange extends Multiplicity {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MultiplicityRange';
+}
+
+export const MultiplicityRange = 'MultiplicityRange';
+
+export function isMultiplicityRange(item: unknown): item is MultiplicityRange {
+    return reflection.isInstance(item, MultiplicityRange);
+}
+
+export interface ActionUsage extends OccurrenceUsage, Step {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AnalysisCaseUsage' | 'AssignmentActionUsage' | 'CalculationUsage' | 'CaseUsage' | 'ControlNode' | 'DecisionNode' | 'ExhibitStateUsage' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'JoinNode' | 'LoopActionUsage' | 'MergeNode' | 'PerformActionUsage' | 'SendActionUsage' | 'StateUsage' | 'SuccessionFlowConnectionUsage' | 'TransitionUsage' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'WhileLoopActionUsage';
+    isParallel: boolean
+}
+
+export const ActionUsage = 'ActionUsage';
+
+export function isActionUsage(item: unknown): item is ActionUsage {
+    return reflection.isInstance(item, ActionUsage);
+}
+
+export interface Expression extends Step {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'Expression' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'IncludeUseCaseUsage' | 'Invariant' | 'InvocationExpression' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'MetadataAccessExpression' | 'NullExpression' | 'OperatorExpression' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'TriggerInvocationExpression' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewpointUsage';
+    result?: ResultExpressionMembership
+}
+
+export const Expression = 'Expression';
+
+export function isExpression(item: unknown): item is Expression {
+    return reflection.isInstance(item, Expression);
+}
+
+export interface AttributeUsage extends Usage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AttributeUsage' | 'EnumerationUsage';
+}
+
+export const AttributeUsage = 'AttributeUsage';
+
+export function isAttributeUsage(item: unknown): item is AttributeUsage {
+    return reflection.isInstance(item, AttributeUsage);
+}
+
+export interface OccurrenceUsage extends Usage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AllocationUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'CalculationUsage' | 'CaseUsage' | 'ConcernUsage' | 'ConnectionUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'InterfaceUsage' | 'ItemUsage' | 'JoinNode' | 'LoopActionUsage' | 'MergeNode' | 'MetadataUsage' | 'OccurrenceUsage' | 'PartUsage' | 'PerformActionUsage' | 'PortUsage' | 'RenderingUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SendActionUsage' | 'StateUsage' | 'SuccessionFlowConnectionUsage' | 'TransitionUsage' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+}
+
+export const OccurrenceUsage = 'OccurrenceUsage';
+
+export function isOccurrenceUsage(item: unknown): item is OccurrenceUsage {
+    return reflection.isInstance(item, OccurrenceUsage);
+}
+
+export interface ReferenceUsage extends Usage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ReferenceUsage';
+}
+
+export const ReferenceUsage = 'ReferenceUsage';
+
+export function isReferenceUsage(item: unknown): item is ReferenceUsage {
+    return reflection.isInstance(item, ReferenceUsage);
 }
 
 export interface AllocationDefinition extends ConnectionDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition';
 }
 
 export const AllocationDefinition = 'AllocationDefinition';
@@ -1533,8 +1295,8 @@ export function isAllocationDefinition(item: unknown): item is AllocationDefinit
 }
 
 export interface InterfaceDefinition extends ConnectionDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'InterfaceDefinition';
 }
 
 export const InterfaceDefinition = 'InterfaceDefinition';
@@ -1543,77 +1305,9 @@ export function isInterfaceDefinition(item: unknown): item is InterfaceDefinitio
     return reflection.isInstance(item, InterfaceDefinition);
 }
 
-export interface CalculationDefinition extends ActionDefinition, SysMLFunction {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const CalculationDefinition = 'CalculationDefinition';
-
-export function isCalculationDefinition(item: unknown): item is CalculationDefinition {
-    return reflection.isInstance(item, CalculationDefinition);
-}
-
-export interface StateDefinition extends ActionDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    isParallel: boolean
-    subactions: Array<ActionUsage>
-}
-
-export const StateDefinition = 'StateDefinition';
-
-export function isStateDefinition(item: unknown): item is StateDefinition {
-    return reflection.isInstance(item, StateDefinition);
-}
-
-export interface Predicate extends SysMLFunction {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const Predicate = 'Predicate';
-
-export function isPredicate(item: unknown): item is Predicate {
-    return reflection.isInstance(item, Predicate);
-}
-
-export interface RequirementDefinition extends ConstraintDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const RequirementDefinition = 'RequirementDefinition';
-
-export function isRequirementDefinition(item: unknown): item is RequirementDefinition {
-    return reflection.isInstance(item, RequirementDefinition);
-}
-
-export interface MetadataDefinition extends ItemDefinition, Metaclass {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const MetadataDefinition = 'MetadataDefinition';
-
-export function isMetadataDefinition(item: unknown): item is MetadataDefinition {
-    return reflection.isInstance(item, MetadataDefinition);
-}
-
-export interface PartDefinition extends ItemDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-}
-
-export const PartDefinition = 'PartDefinition';
-
-export function isPartDefinition(item: unknown): item is PartDefinition {
-    return reflection.isInstance(item, PartDefinition);
-}
-
 export interface AllocationUsage extends ConnectionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationUsage';
 }
 
 export const AllocationUsage = 'AllocationUsage';
@@ -1623,8 +1317,8 @@ export function isAllocationUsage(item: unknown): item is AllocationUsage {
 }
 
 export interface InterfaceUsage extends ConnectionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'InterfaceUsage';
 }
 
 export const InterfaceUsage = 'InterfaceUsage';
@@ -1634,8 +1328,8 @@ export function isInterfaceUsage(item: unknown): item is InterfaceUsage {
 }
 
 export interface SuccessionFlowConnectionUsage extends FlowConnectionUsage, SuccessionItemFlow {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SuccessionFlowConnectionUsage';
 }
 
 export const SuccessionFlowConnectionUsage = 'SuccessionFlowConnectionUsage';
@@ -1644,9 +1338,464 @@ export function isSuccessionFlowConnectionUsage(item: unknown): item is Successi
     return reflection.isInstance(item, SuccessionFlowConnectionUsage);
 }
 
+export interface ActorMembership extends ParameterMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActorMembership';
+}
+
+export const ActorMembership = 'ActorMembership';
+
+export function isActorMembership(item: unknown): item is ActorMembership {
+    return reflection.isInstance(item, ActorMembership);
+}
+
+export interface ReturnParameterMembership extends ParameterMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ReturnParameterMembership';
+}
+
+export const ReturnParameterMembership = 'ReturnParameterMembership';
+
+export function isReturnParameterMembership(item: unknown): item is ReturnParameterMembership {
+    return reflection.isInstance(item, ReturnParameterMembership);
+}
+
+export interface StakeholderMembership extends ParameterMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'StakeholderMembership';
+}
+
+export const StakeholderMembership = 'StakeholderMembership';
+
+export function isStakeholderMembership(item: unknown): item is StakeholderMembership {
+    return reflection.isInstance(item, StakeholderMembership);
+}
+
+export interface SubjectMembership extends ParameterMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SubjectMembership';
+}
+
+export const SubjectMembership = 'SubjectMembership';
+
+export function isSubjectMembership(item: unknown): item is SubjectMembership {
+    return reflection.isInstance(item, SubjectMembership);
+}
+
+export interface FramedConcernMembership extends RequirementConstraintMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FramedConcernMembership';
+}
+
+export const FramedConcernMembership = 'FramedConcernMembership';
+
+export function isFramedConcernMembership(item: unknown): item is FramedConcernMembership {
+    return reflection.isInstance(item, FramedConcernMembership);
+}
+
+export interface RequirementVerificationMembership extends RequirementConstraintMembership {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'RequirementVerificationMembership';
+}
+
+export const RequirementVerificationMembership = 'RequirementVerificationMembership';
+
+export function isRequirementVerificationMembership(item: unknown): item is RequirementVerificationMembership {
+    return reflection.isInstance(item, RequirementVerificationMembership);
+}
+
+export interface ActionDefinition extends Behavior, OccurrenceDefinition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ActionDefinition' | 'AnalysisCaseDefinition' | 'CalculationDefinition' | 'CaseDefinition' | 'FlowConnectionDefinition' | 'StateDefinition' | 'UseCaseDefinition' | 'VerificationCaseDefinition';
+}
+
+export const ActionDefinition = 'ActionDefinition';
+
+export function isActionDefinition(item: unknown): item is ActionDefinition {
+    return reflection.isInstance(item, ActionDefinition);
+}
+
+export interface SysMLFunction extends Behavior {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseDefinition' | 'CalculationDefinition' | 'CaseDefinition' | 'ConcernDefinition' | 'ConstraintDefinition' | 'Predicate' | 'RequirementDefinition' | 'SysMLFunction' | 'UseCaseDefinition' | 'VerificationCaseDefinition' | 'ViewpointDefinition';
+    result?: ResultExpressionMembership
+}
+
+export const SysMLFunction = 'SysMLFunction';
+
+export function isSysMLFunction(item: unknown): item is SysMLFunction {
+    return reflection.isInstance(item, SysMLFunction);
+}
+
+export interface ConstraintDefinition extends OccurrenceDefinition, Predicate {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConcernDefinition' | 'ConstraintDefinition' | 'RequirementDefinition' | 'ViewpointDefinition';
+}
+
+export const ConstraintDefinition = 'ConstraintDefinition';
+
+export function isConstraintDefinition(item: unknown): item is ConstraintDefinition {
+    return reflection.isInstance(item, ConstraintDefinition);
+}
+
+export interface ItemDefinition extends OccurrenceDefinition, Structure {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'MetadataDefinition' | 'PartDefinition' | 'RenderingDefinition' | 'ViewDefinition';
+}
+
+export const ItemDefinition = 'ItemDefinition';
+
+export function isItemDefinition(item: unknown): item is ItemDefinition {
+    return reflection.isInstance(item, ItemDefinition);
+}
+
+export interface PortDefinition extends OccurrenceDefinition, Structure {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConjugatedPortDefinition' | 'PortDefinition';
+}
+
+export const PortDefinition = 'PortDefinition';
+
+export function isPortDefinition(item: unknown): item is PortDefinition {
+    return reflection.isInstance(item, PortDefinition);
+}
+
+export interface Metaclass extends Structure {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'Metaclass' | 'MetadataDefinition';
+}
+
+export const Metaclass = 'Metaclass';
+
+export function isMetaclass(item: unknown): item is Metaclass {
+    return reflection.isInstance(item, Metaclass);
+}
+
+export interface EnumerationDefinition extends AttributeDefinition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'EnumerationDefinition';
+}
+
+export const EnumerationDefinition = 'EnumerationDefinition';
+
+export function isEnumerationDefinition(item: unknown): item is EnumerationDefinition {
+    return reflection.isInstance(item, EnumerationDefinition);
+}
+
+export interface AcceptActionUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AcceptActionUsage';
+}
+
+export const AcceptActionUsage = 'AcceptActionUsage';
+
+export function isAcceptActionUsage(item: unknown): item is AcceptActionUsage {
+    return reflection.isInstance(item, AcceptActionUsage);
+}
+
+export interface AssignmentActionUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AssignmentActionUsage';
+}
+
+export const AssignmentActionUsage = 'AssignmentActionUsage';
+
+export function isAssignmentActionUsage(item: unknown): item is AssignmentActionUsage {
+    return reflection.isInstance(item, AssignmentActionUsage);
+}
+
+export interface CalculationUsage extends ActionUsage, Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseUsage' | 'CalculationUsage' | 'CaseUsage' | 'IncludeUseCaseUsage' | 'UseCaseUsage' | 'VerificationCaseUsage';
+}
+
+export const CalculationUsage = 'CalculationUsage';
+
+export function isCalculationUsage(item: unknown): item is CalculationUsage {
+    return reflection.isInstance(item, CalculationUsage);
+}
+
+export interface ControlNode extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ControlNode' | 'DecisionNode' | 'ForkNode' | 'JoinNode' | 'MergeNode';
+}
+
+export const ControlNode = 'ControlNode';
+
+export function isControlNode(item: unknown): item is ControlNode {
+    return reflection.isInstance(item, ControlNode);
+}
+
+export interface IfActionUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'IfActionUsage';
+}
+
+export const IfActionUsage = 'IfActionUsage';
+
+export function isIfActionUsage(item: unknown): item is IfActionUsage {
+    return reflection.isInstance(item, IfActionUsage);
+}
+
+export interface LoopActionUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ForLoopActionUsage' | 'LoopActionUsage' | 'WhileLoopActionUsage';
+}
+
+export const LoopActionUsage = 'LoopActionUsage';
+
+export function isLoopActionUsage(item: unknown): item is LoopActionUsage {
+    return reflection.isInstance(item, LoopActionUsage);
+}
+
+export interface PerformActionUsage extends ActionUsage, EventOccurrenceUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ExhibitStateUsage' | 'IncludeUseCaseUsage' | 'PerformActionUsage';
+}
+
+export const PerformActionUsage = 'PerformActionUsage';
+
+export function isPerformActionUsage(item: unknown): item is PerformActionUsage {
+    return reflection.isInstance(item, PerformActionUsage);
+}
+
+export interface SendActionUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SendActionUsage';
+}
+
+export const SendActionUsage = 'SendActionUsage';
+
+export function isSendActionUsage(item: unknown): item is SendActionUsage {
+    return reflection.isInstance(item, SendActionUsage);
+}
+
+export interface StateUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ExhibitStateUsage' | 'StateUsage';
+}
+
+export const StateUsage = 'StateUsage';
+
+export function isStateUsage(item: unknown): item is StateUsage {
+    return reflection.isInstance(item, StateUsage);
+}
+
+export interface TransitionUsage extends ActionUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'TransitionUsage';
+}
+
+export const TransitionUsage = 'TransitionUsage';
+
+export function isTransitionUsage(item: unknown): item is TransitionUsage {
+    return reflection.isInstance(item, TransitionUsage);
+}
+
+export interface BooleanExpression extends Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AssertConstraintUsage' | 'BooleanExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'Invariant' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'ViewpointUsage';
+}
+
+export const BooleanExpression = 'BooleanExpression';
+
+export function isBooleanExpression(item: unknown): item is BooleanExpression {
+    return reflection.isInstance(item, BooleanExpression);
+}
+
+export interface FeatureReferenceExpression extends Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FeatureReferenceExpression';
+    expression: Membership
+}
+
+export const FeatureReferenceExpression = 'FeatureReferenceExpression';
+
+export function isFeatureReferenceExpression(item: unknown): item is FeatureReferenceExpression {
+    return reflection.isInstance(item, FeatureReferenceExpression);
+}
+
+export interface InvocationExpression extends Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'CollectExpression' | 'FeatureChainExpression' | 'InvocationExpression' | 'OperatorExpression' | 'SelectExpression' | 'TriggerInvocationExpression';
+}
+
+export const InvocationExpression = 'InvocationExpression';
+
+export function isInvocationExpression(item: unknown): item is InvocationExpression {
+    return reflection.isInstance(item, InvocationExpression);
+}
+
+export interface LiteralExpression extends Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString';
+}
+
+export const LiteralExpression = 'LiteralExpression';
+
+export function isLiteralExpression(item: unknown): item is LiteralExpression {
+    return reflection.isInstance(item, LiteralExpression);
+}
+
+export interface MetadataAccessExpression extends Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MetadataAccessExpression';
+    reference: ElementReference
+}
+
+export const MetadataAccessExpression = 'MetadataAccessExpression';
+
+export function isMetadataAccessExpression(item: unknown): item is MetadataAccessExpression {
+    return reflection.isInstance(item, MetadataAccessExpression);
+}
+
+export interface NullExpression extends Expression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'NullExpression';
+}
+
+export const NullExpression = 'NullExpression';
+
+export function isNullExpression(item: unknown): item is NullExpression {
+    return reflection.isInstance(item, NullExpression);
+}
+
+export interface EnumerationUsage extends AttributeUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'EnumerationUsage';
+}
+
+export const EnumerationUsage = 'EnumerationUsage';
+
+export function isEnumerationUsage(item: unknown): item is EnumerationUsage {
+    return reflection.isInstance(item, EnumerationUsage);
+}
+
+export interface ConstraintUsage extends BooleanExpression, OccurrenceUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AssertConstraintUsage' | 'ConcernUsage' | 'ConstraintUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'ViewpointUsage';
+}
+
+export const ConstraintUsage = 'ConstraintUsage';
+
+export function isConstraintUsage(item: unknown): item is ConstraintUsage {
+    return reflection.isInstance(item, ConstraintUsage);
+}
+
+export interface EventOccurrenceUsage extends OccurrenceUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'IncludeUseCaseUsage' | 'PerformActionUsage';
+}
+
+export const EventOccurrenceUsage = 'EventOccurrenceUsage';
+
+export function isEventOccurrenceUsage(item: unknown): item is EventOccurrenceUsage {
+    return reflection.isInstance(item, EventOccurrenceUsage);
+}
+
+export interface ItemUsage extends OccurrenceUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'ItemUsage' | 'MetadataUsage' | 'PartUsage' | 'RenderingUsage' | 'SuccessionFlowConnectionUsage' | 'ViewUsage';
+}
+
+export const ItemUsage = 'ItemUsage';
+
+export function isItemUsage(item: unknown): item is ItemUsage {
+    return reflection.isInstance(item, ItemUsage);
+}
+
+export interface PortUsage extends OccurrenceUsage {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'PortUsage';
+}
+
+export const PortUsage = 'PortUsage';
+
+export function isPortUsage(item: unknown): item is PortUsage {
+    return reflection.isInstance(item, PortUsage);
+}
+
+export interface CalculationDefinition extends ActionDefinition, SysMLFunction {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseDefinition' | 'CalculationDefinition' | 'CaseDefinition' | 'UseCaseDefinition' | 'VerificationCaseDefinition';
+}
+
+export const CalculationDefinition = 'CalculationDefinition';
+
+export function isCalculationDefinition(item: unknown): item is CalculationDefinition {
+    return reflection.isInstance(item, CalculationDefinition);
+}
+
+export interface StateDefinition extends ActionDefinition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'StateDefinition';
+    isParallel: boolean
+}
+
+export const StateDefinition = 'StateDefinition';
+
+export function isStateDefinition(item: unknown): item is StateDefinition {
+    return reflection.isInstance(item, StateDefinition);
+}
+
+export interface Predicate extends SysMLFunction {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConcernDefinition' | 'ConstraintDefinition' | 'Predicate' | 'RequirementDefinition' | 'ViewpointDefinition';
+}
+
+export const Predicate = 'Predicate';
+
+export function isPredicate(item: unknown): item is Predicate {
+    return reflection.isInstance(item, Predicate);
+}
+
+export interface RequirementDefinition extends ConstraintDefinition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConcernDefinition' | 'RequirementDefinition' | 'ViewpointDefinition';
+}
+
+export const RequirementDefinition = 'RequirementDefinition';
+
+export function isRequirementDefinition(item: unknown): item is RequirementDefinition {
+    return reflection.isInstance(item, RequirementDefinition);
+}
+
+export interface MetadataDefinition extends ItemDefinition, Metaclass {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MetadataDefinition';
+}
+
+export const MetadataDefinition = 'MetadataDefinition';
+
+export function isMetadataDefinition(item: unknown): item is MetadataDefinition {
+    return reflection.isInstance(item, MetadataDefinition);
+}
+
+export interface PartDefinition extends ItemDefinition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'PartDefinition' | 'RenderingDefinition' | 'ViewDefinition';
+}
+
+export const PartDefinition = 'PartDefinition';
+
+export function isPartDefinition(item: unknown): item is PartDefinition {
+    return reflection.isInstance(item, PartDefinition);
+}
+
+export interface ConjugatedPortDefinition extends PortDefinition {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConjugatedPortDefinition';
+}
+
+export const ConjugatedPortDefinition = 'ConjugatedPortDefinition';
+
+export function isConjugatedPortDefinition(item: unknown): item is ConjugatedPortDefinition {
+    return reflection.isInstance(item, ConjugatedPortDefinition);
+}
+
 export interface CaseUsage extends CalculationUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseUsage' | 'CaseUsage' | 'IncludeUseCaseUsage' | 'UseCaseUsage' | 'VerificationCaseUsage';
 }
 
 export const CaseUsage = 'CaseUsage';
@@ -1656,8 +1805,8 @@ export function isCaseUsage(item: unknown): item is CaseUsage {
 }
 
 export interface DecisionNode extends ControlNode {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'DecisionNode';
 }
 
 export const DecisionNode = 'DecisionNode';
@@ -1667,8 +1816,8 @@ export function isDecisionNode(item: unknown): item is DecisionNode {
 }
 
 export interface ForkNode extends ControlNode {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ForkNode';
 }
 
 export const ForkNode = 'ForkNode';
@@ -1678,8 +1827,8 @@ export function isForkNode(item: unknown): item is ForkNode {
 }
 
 export interface JoinNode extends ControlNode {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'JoinNode';
 }
 
 export const JoinNode = 'JoinNode';
@@ -1689,8 +1838,8 @@ export function isJoinNode(item: unknown): item is JoinNode {
 }
 
 export interface MergeNode extends ControlNode {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'MergeNode';
 }
 
 export const MergeNode = 'MergeNode';
@@ -1700,9 +1849,8 @@ export function isMergeNode(item: unknown): item is MergeNode {
 }
 
 export interface ForLoopActionUsage extends LoopActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    for: ReferenceUsage
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ForLoopActionUsage';
 }
 
 export const ForLoopActionUsage = 'ForLoopActionUsage';
@@ -1712,9 +1860,8 @@ export function isForLoopActionUsage(item: unknown): item is ForLoopActionUsage 
 }
 
 export interface WhileLoopActionUsage extends LoopActionUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    until?: InlineExpression
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'WhileLoopActionUsage';
 }
 
 export const WhileLoopActionUsage = 'WhileLoopActionUsage';
@@ -1724,8 +1871,8 @@ export function isWhileLoopActionUsage(item: unknown): item is WhileLoopActionUs
 }
 
 export interface ExhibitStateUsage extends PerformActionUsage, StateUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ExhibitStateUsage';
 }
 
 export const ExhibitStateUsage = 'ExhibitStateUsage';
@@ -1735,8 +1882,8 @@ export function isExhibitStateUsage(item: unknown): item is ExhibitStateUsage {
 }
 
 export interface IncludeUseCaseUsage extends PerformActionUsage, UseCaseUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'IncludeUseCaseUsage';
 }
 
 export const IncludeUseCaseUsage = 'IncludeUseCaseUsage';
@@ -1746,8 +1893,8 @@ export function isIncludeUseCaseUsage(item: unknown): item is IncludeUseCaseUsag
 }
 
 export interface Invariant extends BooleanExpression {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AssertConstraintUsage' | 'Invariant' | 'SatisfyRequirementUsage';
     isNegated: boolean
 }
 
@@ -1757,9 +1904,81 @@ export function isInvariant(item: unknown): item is Invariant {
     return reflection.isInstance(item, Invariant);
 }
 
+export interface OperatorExpression extends InvocationExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'CollectExpression' | 'FeatureChainExpression' | 'OperatorExpression' | 'SelectExpression';
+    operands: Array<Expression>
+    operator?: string
+}
+
+export const OperatorExpression = 'OperatorExpression';
+
+export function isOperatorExpression(item: unknown): item is OperatorExpression {
+    return reflection.isInstance(item, OperatorExpression);
+}
+
+export interface TriggerInvocationExpression extends InvocationExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'TriggerInvocationExpression';
+    kind: 'after' | 'at' | 'when'
+}
+
+export const TriggerInvocationExpression = 'TriggerInvocationExpression';
+
+export function isTriggerInvocationExpression(item: unknown): item is TriggerInvocationExpression {
+    return reflection.isInstance(item, TriggerInvocationExpression);
+}
+
+export interface LiteralBoolean extends LiteralExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LiteralBoolean';
+    literal: boolean
+}
+
+export const LiteralBoolean = 'LiteralBoolean';
+
+export function isLiteralBoolean(item: unknown): item is LiteralBoolean {
+    return reflection.isInstance(item, LiteralBoolean);
+}
+
+export interface LiteralInfinity extends LiteralExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LiteralInfinity';
+}
+
+export const LiteralInfinity = 'LiteralInfinity';
+
+export function isLiteralInfinity(item: unknown): item is LiteralInfinity {
+    return reflection.isInstance(item, LiteralInfinity);
+}
+
+export interface LiteralNumber extends LiteralExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LiteralNumber';
+    literal: number
+}
+
+export const LiteralNumber = 'LiteralNumber';
+
+export function isLiteralNumber(item: unknown): item is LiteralNumber {
+    return reflection.isInstance(item, LiteralNumber);
+}
+
+export interface LiteralString extends LiteralExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'LiteralString';
+    literal: string
+}
+
+export const LiteralString = 'LiteralString';
+
+export function isLiteralString(item: unknown): item is LiteralString {
+    return reflection.isInstance(item, LiteralString);
+}
+
 export interface AssertConstraintUsage extends ConstraintUsage, Invariant {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AssertConstraintUsage' | 'SatisfyRequirementUsage';
 }
 
 export const AssertConstraintUsage = 'AssertConstraintUsage';
@@ -1769,9 +1988,8 @@ export function isAssertConstraintUsage(item: unknown): item is AssertConstraint
 }
 
 export interface RequirementUsage extends ConstraintUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    requirementKind?: RequirementKind
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConcernUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'ViewpointUsage';
 }
 
 export const RequirementUsage = 'RequirementUsage';
@@ -1781,9 +1999,8 @@ export function isRequirementUsage(item: unknown): item is RequirementUsage {
 }
 
 export interface PartUsage extends ItemUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    parameterKind?: ParameterKind
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'PartUsage' | 'RenderingUsage' | 'SuccessionFlowConnectionUsage' | 'ViewUsage';
 }
 
 export const PartUsage = 'PartUsage';
@@ -1793,8 +2010,8 @@ export function isPartUsage(item: unknown): item is PartUsage {
 }
 
 export interface CaseDefinition extends CalculationDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseDefinition' | 'CaseDefinition' | 'UseCaseDefinition' | 'VerificationCaseDefinition';
 }
 
 export const CaseDefinition = 'CaseDefinition';
@@ -1804,8 +2021,8 @@ export function isCaseDefinition(item: unknown): item is CaseDefinition {
 }
 
 export interface ConcernDefinition extends RequirementDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConcernDefinition';
 }
 
 export const ConcernDefinition = 'ConcernDefinition';
@@ -1815,8 +2032,8 @@ export function isConcernDefinition(item: unknown): item is ConcernDefinition {
 }
 
 export interface ViewpointDefinition extends RequirementDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ViewpointDefinition';
 }
 
 export const ViewpointDefinition = 'ViewpointDefinition';
@@ -1826,8 +2043,8 @@ export function isViewpointDefinition(item: unknown): item is ViewpointDefinitio
 }
 
 export interface RenderingDefinition extends PartDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'RenderingDefinition';
 }
 
 export const RenderingDefinition = 'RenderingDefinition';
@@ -1837,8 +2054,8 @@ export function isRenderingDefinition(item: unknown): item is RenderingDefinitio
 }
 
 export interface ViewDefinition extends PartDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ViewDefinition';
 }
 
 export const ViewDefinition = 'ViewDefinition';
@@ -1848,8 +2065,8 @@ export function isViewDefinition(item: unknown): item is ViewDefinition {
 }
 
 export interface AnalysisCaseUsage extends CaseUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseUsage';
 }
 
 export const AnalysisCaseUsage = 'AnalysisCaseUsage';
@@ -1859,8 +2076,8 @@ export function isAnalysisCaseUsage(item: unknown): item is AnalysisCaseUsage {
 }
 
 export interface UseCaseUsage extends CaseUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'IncludeUseCaseUsage' | 'UseCaseUsage';
 }
 
 export const UseCaseUsage = 'UseCaseUsage';
@@ -1870,8 +2087,8 @@ export function isUseCaseUsage(item: unknown): item is UseCaseUsage {
 }
 
 export interface VerificationCaseUsage extends CaseUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'VerificationCaseUsage';
 }
 
 export const VerificationCaseUsage = 'VerificationCaseUsage';
@@ -1880,10 +2097,42 @@ export function isVerificationCaseUsage(item: unknown): item is VerificationCase
     return reflection.isInstance(item, VerificationCaseUsage);
 }
 
+export interface CollectExpression extends OperatorExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'CollectExpression';
+}
+
+export const CollectExpression = 'CollectExpression';
+
+export function isCollectExpression(item: unknown): item is CollectExpression {
+    return reflection.isInstance(item, CollectExpression);
+}
+
+export interface FeatureChainExpression extends OperatorExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'FeatureChainExpression';
+}
+
+export const FeatureChainExpression = 'FeatureChainExpression';
+
+export function isFeatureChainExpression(item: unknown): item is FeatureChainExpression {
+    return reflection.isInstance(item, FeatureChainExpression);
+}
+
+export interface SelectExpression extends OperatorExpression {
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SelectExpression';
+}
+
+export const SelectExpression = 'SelectExpression';
+
+export function isSelectExpression(item: unknown): item is SelectExpression {
+    return reflection.isInstance(item, SelectExpression);
+}
+
 export interface SatisfyRequirementUsage extends AssertConstraintUsage, RequirementUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    by?: FeatureReference
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'SatisfyRequirementUsage';
 }
 
 export const SatisfyRequirementUsage = 'SatisfyRequirementUsage';
@@ -1893,9 +2142,8 @@ export function isSatisfyRequirementUsage(item: unknown): item is SatisfyRequire
 }
 
 export interface ConcernUsage extends RequirementUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
-    isFramed: boolean
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ConcernUsage';
 }
 
 export const ConcernUsage = 'ConcernUsage';
@@ -1905,8 +2153,8 @@ export function isConcernUsage(item: unknown): item is ConcernUsage {
 }
 
 export interface ViewpointUsage extends RequirementUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ViewpointUsage';
 }
 
 export const ViewpointUsage = 'ViewpointUsage';
@@ -1916,8 +2164,8 @@ export function isViewpointUsage(item: unknown): item is ViewpointUsage {
 }
 
 export interface RenderingUsage extends PartUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'RenderingUsage';
 }
 
 export const RenderingUsage = 'RenderingUsage';
@@ -1927,8 +2175,8 @@ export function isRenderingUsage(item: unknown): item is RenderingUsage {
 }
 
 export interface ViewUsage extends PartUsage {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'ViewUsage';
 }
 
 export const ViewUsage = 'ViewUsage';
@@ -1938,8 +2186,8 @@ export function isViewUsage(item: unknown): item is ViewUsage {
 }
 
 export interface AnalysisCaseDefinition extends CaseDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'AnalysisCaseDefinition';
 }
 
 export const AnalysisCaseDefinition = 'AnalysisCaseDefinition';
@@ -1949,8 +2197,8 @@ export function isAnalysisCaseDefinition(item: unknown): item is AnalysisCaseDef
 }
 
 export interface UseCaseDefinition extends CaseDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'UseCaseDefinition';
 }
 
 export const UseCaseDefinition = 'UseCaseDefinition';
@@ -1960,8 +2208,8 @@ export function isUseCaseDefinition(item: unknown): item is UseCaseDefinition {
 }
 
 export interface VerificationCaseDefinition extends CaseDefinition {
-    readonly $container: ActionUsage | Connector | Definition | Element | EnumerationDefinition | Expression | ForLoopActionUsage | IfActionUsage | InitialNode | ItemFlow | LoopActionUsage | Namespace | StateDefinition | StateUsage | SuccessionAsUsage | SysMLFunction | TransitionUsage | Type | Usage;
-    readonly $type: string;
+    readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SysMLFunction | Type;
+    readonly $type: 'VerificationCaseDefinition';
 }
 
 export const VerificationCaseDefinition = 'VerificationCaseDefinition';
@@ -1974,13 +2222,13 @@ export interface SysMlAstType {
     AcceptActionUsage: AcceptActionUsage
     ActionDefinition: ActionDefinition
     ActionUsage: ActionUsage
-    Alias: Alias
+    ActorMembership: ActorMembership
     AllocationDefinition: AllocationDefinition
     AllocationUsage: AllocationUsage
     AnalysisCaseDefinition: AnalysisCaseDefinition
     AnalysisCaseUsage: AnalysisCaseUsage
+    AnnotatingElement: AnnotatingElement
     Annotation: Annotation
-    Argument: Argument
     AssertConstraintUsage: AssertConstraintUsage
     AssignmentActionUsage: AssignmentActionUsage
     Association: Association
@@ -2003,13 +2251,14 @@ export interface SysMlAstType {
     Comment: Comment
     ConcernDefinition: ConcernDefinition
     ConcernUsage: ConcernUsage
+    ConjugatedPortDefinition: ConjugatedPortDefinition
     ConjugatedPortReference: ConjugatedPortReference
+    ConjugatedPortTyping: ConjugatedPortTyping
     Conjugation: Conjugation
     ConnectionDefinition: ConnectionDefinition
     ConnectionUsage: ConnectionUsage
     Connector: Connector
     ConnectorAsUsage: ConnectorAsUsage
-    ConnectorEnd: ConnectorEnd
     ConstraintDefinition: ConstraintDefinition
     ConstraintUsage: ConstraintUsage
     ControlNode: ControlNode
@@ -2017,11 +2266,13 @@ export interface SysMlAstType {
     DecisionNode: DecisionNode
     Definition: Definition
     Dependency: Dependency
+    Differencing: Differencing
     Disjoining: Disjoining
     Documentation: Documentation
     Element: Element
-    ElementFilter: ElementFilter
+    ElementFilterMembership: ElementFilterMembership
     ElementReference: ElementReference
+    EndFeatureMembership: EndFeatureMembership
     EnumerationDefinition: EnumerationDefinition
     EnumerationUsage: EnumerationUsage
     EqualityOperator: EqualityOperator
@@ -2031,25 +2282,30 @@ export interface SysMlAstType {
     Expression: Expression
     Feature: Feature
     FeatureChainExpression: FeatureChainExpression
+    FeatureChaining: FeatureChaining
     FeatureDirectionKind: FeatureDirectionKind
     FeatureInverting: FeatureInverting
+    FeatureMembership: FeatureMembership
     FeatureReference: FeatureReference
     FeatureReferenceExpression: FeatureReferenceExpression
+    FeatureRelationship: FeatureRelationship
     FeatureTyping: FeatureTyping
     FeatureValue: FeatureValue
+    Featuring: Featuring
     FlowConnectionDefinition: FlowConnectionDefinition
     FlowConnectionUsage: FlowConnectionUsage
     ForLoopActionUsage: ForLoopActionUsage
     ForkNode: ForkNode
+    FramedConcernMembership: FramedConcernMembership
     IfActionUsage: IfActionUsage
     Import: Import
     ImportKind: ImportKind
     IncludeUseCaseUsage: IncludeUseCaseUsage
-    InitialNode: InitialNode
     InlineExpression: InlineExpression
     Interaction: Interaction
     InterfaceDefinition: InterfaceDefinition
     InterfaceUsage: InterfaceUsage
+    Intersecting: Intersecting
     Invariant: Invariant
     InvocationExpression: InvocationExpression
     ItemDefinition: ItemDefinition
@@ -2059,12 +2315,17 @@ export interface SysMlAstType {
     ItemUsage: ItemUsage
     JoinNode: JoinNode
     LibraryPackage: LibraryPackage
+    LifeClass: LifeClass
     LiteralBoolean: LiteralBoolean
     LiteralExpression: LiteralExpression
     LiteralInfinity: LiteralInfinity
     LiteralNumber: LiteralNumber
     LiteralString: LiteralString
     LoopActionUsage: LoopActionUsage
+    Membership: Membership
+    MembershipExpose: MembershipExpose
+    MembershipImport: MembershipImport
+    MembershipReference: MembershipReference
     MergeNode: MergeNode
     Metaclass: Metaclass
     MetaclassReference: MetaclassReference
@@ -2074,43 +2335,56 @@ export interface SysMlAstType {
     MetadataUsage: MetadataUsage
     Multiplicity: Multiplicity
     MultiplicityRange: MultiplicityRange
-    NamedArgument: NamedArgument
     Namespace: Namespace
+    NamespaceExpose: NamespaceExpose
+    NamespaceImport: NamespaceImport
+    NamespaceReference: NamespaceReference
+    NonOwnerType: NonOwnerType
     NullExpression: NullExpression
+    ObjectiveMembership: ObjectiveMembership
     OccurrenceDefinition: OccurrenceDefinition
     OccurrenceUsage: OccurrenceUsage
     OperatorExpression: OperatorExpression
+    OwningMembership: OwningMembership
     Package: Package
     ParameterKind: ParameterKind
+    ParameterMembership: ParameterMembership
     PartDefinition: PartDefinition
     PartUsage: PartUsage
     PerformActionUsage: PerformActionUsage
+    PortConjugation: PortConjugation
     PortDefinition: PortDefinition
     PortUsage: PortUsage
     PortionKind: PortionKind
     Predicate: Predicate
     Redefinition: Redefinition
+    ReferenceSubsetting: ReferenceSubsetting
     ReferenceUsage: ReferenceUsage
     RelationalOperator: RelationalOperator
     Relationship: Relationship
     RenderingDefinition: RenderingDefinition
     RenderingUsage: RenderingUsage
     RequirementConstraintKind: RequirementConstraintKind
+    RequirementConstraintMembership: RequirementConstraintMembership
     RequirementDefinition: RequirementDefinition
     RequirementKind: RequirementKind
     RequirementUsage: RequirementUsage
-    Result: Result
+    RequirementVerificationMembership: RequirementVerificationMembership
+    ResultExpressionMembership: ResultExpressionMembership
+    ReturnParameterMembership: ReturnParameterMembership
     SatisfyRequirementUsage: SatisfyRequirementUsage
     SelectExpression: SelectExpression
-    SelfReferenceExpression: SelfReferenceExpression
     SendActionUsage: SendActionUsage
     Specialization: Specialization
+    StakeholderMembership: StakeholderMembership
     StateDefinition: StateDefinition
     StateSubactionKind: StateSubactionKind
+    StateSubactionMembership: StateSubactionMembership
     StateUsage: StateUsage
     Step: Step
     Structure: Structure
     Subclassification: Subclassification
+    SubjectMembership: SubjectMembership
     Subsetting: Subsetting
     Subtype: Subtype
     Succession: Succession
@@ -2121,25 +2395,28 @@ export interface SysMlAstType {
     TextualAnnotatingElement: TextualAnnotatingElement
     TextualRepresentation: TextualRepresentation
     TransitionFeatureKind: TransitionFeatureKind
+    TransitionFeatureMembership: TransitionFeatureMembership
     TransitionUsage: TransitionUsage
     TransparentElement: TransparentElement
     TriggerInvocationExpression: TriggerInvocationExpression
     TriggerKind: TriggerKind
     Type: Type
     TypeFeaturing: TypeFeaturing
-    TypeOrFeatureReference: TypeOrFeatureReference
     TypeReference: TypeReference
+    TypeRelationship: TypeRelationship
     UnaryOperator: UnaryOperator
+    Unioning: Unioning
     Usage: Usage
     UseCaseDefinition: UseCaseDefinition
     UseCaseUsage: UseCaseUsage
+    VariantMembership: VariantMembership
     VerificationCaseDefinition: VerificationCaseDefinition
     VerificationCaseUsage: VerificationCaseUsage
     ViewDefinition: ViewDefinition
+    ViewRenderingMembership: ViewRenderingMembership
     ViewUsage: ViewUsage
     ViewpointDefinition: ViewpointDefinition
     ViewpointUsage: ViewpointUsage
-    VisibilityElement: VisibilityElement
     VisibilityKind: VisibilityKind
     WhileLoopActionUsage: WhileLoopActionUsage
 }
@@ -2147,7 +2424,7 @@ export interface SysMlAstType {
 export class SysMlAstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return ['AcceptActionUsage', 'ActionDefinition', 'ActionUsage', 'Alias', 'AllocationDefinition', 'AllocationUsage', 'AnalysisCaseDefinition', 'AnalysisCaseUsage', 'Annotation', 'Argument', 'AssertConstraintUsage', 'AssignmentActionUsage', 'Association', 'AssociationStructure', 'AttributeDefinition', 'AttributeUsage', 'Behavior', 'BindingConnector', 'BindingConnectorAsUsage', 'BooleanExpression', 'CalculationDefinition', 'CalculationUsage', 'CaseDefinition', 'CaseUsage', 'Class', 'ClassificationTestOperator', 'Classifier', 'ClassifierReference', 'CollectExpression', 'Comment', 'ConcernDefinition', 'ConcernUsage', 'ConjugatedPortReference', 'Conjugation', 'ConnectionDefinition', 'ConnectionUsage', 'Connector', 'ConnectorAsUsage', 'ConnectorEnd', 'ConstraintDefinition', 'ConstraintUsage', 'ControlNode', 'DataType', 'DecisionNode', 'Definition', 'Dependency', 'Disjoining', 'Documentation', 'Element', 'ElementFilter', 'ElementReference', 'EnumerationDefinition', 'EnumerationUsage', 'EqualityOperator', 'EventOccurrenceUsage', 'ExhibitStateUsage', 'Expose', 'Expression', 'Feature', 'FeatureChainExpression', 'FeatureDirectionKind', 'FeatureInverting', 'FeatureReference', 'FeatureReferenceExpression', 'FeatureTyping', 'FeatureValue', 'FlowConnectionDefinition', 'FlowConnectionUsage', 'ForLoopActionUsage', 'ForkNode', 'IfActionUsage', 'Import', 'ImportKind', 'IncludeUseCaseUsage', 'InitialNode', 'InlineExpression', 'Interaction', 'InterfaceDefinition', 'InterfaceUsage', 'Invariant', 'InvocationExpression', 'ItemDefinition', 'ItemFeature', 'ItemFlow', 'ItemFlowEnd', 'ItemUsage', 'JoinNode', 'LibraryPackage', 'LiteralBoolean', 'LiteralExpression', 'LiteralInfinity', 'LiteralNumber', 'LiteralString', 'LoopActionUsage', 'MergeNode', 'Metaclass', 'MetaclassReference', 'MetadataAccessExpression', 'MetadataDefinition', 'MetadataFeature', 'MetadataUsage', 'Multiplicity', 'MultiplicityRange', 'NamedArgument', 'Namespace', 'NullExpression', 'OccurrenceDefinition', 'OccurrenceUsage', 'OperatorExpression', 'Package', 'ParameterKind', 'PartDefinition', 'PartUsage', 'PerformActionUsage', 'PortDefinition', 'PortUsage', 'PortionKind', 'Predicate', 'Redefinition', 'ReferenceUsage', 'RelationalOperator', 'Relationship', 'RenderingDefinition', 'RenderingUsage', 'RequirementConstraintKind', 'RequirementDefinition', 'RequirementKind', 'RequirementUsage', 'Result', 'SatisfyRequirementUsage', 'SelectExpression', 'SelfReferenceExpression', 'SendActionUsage', 'Specialization', 'StateDefinition', 'StateSubactionKind', 'StateUsage', 'Step', 'Structure', 'Subclassification', 'Subsetting', 'Subtype', 'Succession', 'SuccessionAsUsage', 'SuccessionFlowConnectionUsage', 'SuccessionItemFlow', 'SysMLFunction', 'TextualAnnotatingElement', 'TextualRepresentation', 'TransitionFeatureKind', 'TransitionUsage', 'TransparentElement', 'TriggerInvocationExpression', 'TriggerKind', 'Type', 'TypeFeaturing', 'TypeOrFeatureReference', 'TypeReference', 'UnaryOperator', 'Usage', 'UseCaseDefinition', 'UseCaseUsage', 'VerificationCaseDefinition', 'VerificationCaseUsage', 'ViewDefinition', 'ViewUsage', 'ViewpointDefinition', 'ViewpointUsage', 'VisibilityElement', 'VisibilityKind', 'WhileLoopActionUsage'];
+        return ['AcceptActionUsage', 'ActionDefinition', 'ActionUsage', 'ActorMembership', 'AllocationDefinition', 'AllocationUsage', 'AnalysisCaseDefinition', 'AnalysisCaseUsage', 'AnnotatingElement', 'Annotation', 'AssertConstraintUsage', 'AssignmentActionUsage', 'Association', 'AssociationStructure', 'AttributeDefinition', 'AttributeUsage', 'Behavior', 'BindingConnector', 'BindingConnectorAsUsage', 'BooleanExpression', 'CalculationDefinition', 'CalculationUsage', 'CaseDefinition', 'CaseUsage', 'Class', 'ClassificationTestOperator', 'Classifier', 'ClassifierReference', 'CollectExpression', 'Comment', 'ConcernDefinition', 'ConcernUsage', 'ConjugatedPortDefinition', 'ConjugatedPortReference', 'ConjugatedPortTyping', 'Conjugation', 'ConnectionDefinition', 'ConnectionUsage', 'Connector', 'ConnectorAsUsage', 'ConstraintDefinition', 'ConstraintUsage', 'ControlNode', 'DataType', 'DecisionNode', 'Definition', 'Dependency', 'Differencing', 'Disjoining', 'Documentation', 'Element', 'ElementFilterMembership', 'ElementReference', 'EndFeatureMembership', 'EnumerationDefinition', 'EnumerationUsage', 'EqualityOperator', 'EventOccurrenceUsage', 'ExhibitStateUsage', 'Expose', 'Expression', 'Feature', 'FeatureChainExpression', 'FeatureChaining', 'FeatureDirectionKind', 'FeatureInverting', 'FeatureMembership', 'FeatureReference', 'FeatureReferenceExpression', 'FeatureRelationship', 'FeatureTyping', 'FeatureValue', 'Featuring', 'FlowConnectionDefinition', 'FlowConnectionUsage', 'ForLoopActionUsage', 'ForkNode', 'FramedConcernMembership', 'IfActionUsage', 'Import', 'ImportKind', 'IncludeUseCaseUsage', 'InlineExpression', 'Interaction', 'InterfaceDefinition', 'InterfaceUsage', 'Intersecting', 'Invariant', 'InvocationExpression', 'ItemDefinition', 'ItemFeature', 'ItemFlow', 'ItemFlowEnd', 'ItemUsage', 'JoinNode', 'LibraryPackage', 'LifeClass', 'LiteralBoolean', 'LiteralExpression', 'LiteralInfinity', 'LiteralNumber', 'LiteralString', 'LoopActionUsage', 'Membership', 'MembershipExpose', 'MembershipImport', 'MembershipReference', 'MergeNode', 'Metaclass', 'MetaclassReference', 'MetadataAccessExpression', 'MetadataDefinition', 'MetadataFeature', 'MetadataUsage', 'Multiplicity', 'MultiplicityRange', 'Namespace', 'NamespaceExpose', 'NamespaceImport', 'NamespaceReference', 'NonOwnerType', 'NullExpression', 'ObjectiveMembership', 'OccurrenceDefinition', 'OccurrenceUsage', 'OperatorExpression', 'OwningMembership', 'Package', 'ParameterKind', 'ParameterMembership', 'PartDefinition', 'PartUsage', 'PerformActionUsage', 'PortConjugation', 'PortDefinition', 'PortUsage', 'PortionKind', 'Predicate', 'Redefinition', 'ReferenceSubsetting', 'ReferenceUsage', 'RelationalOperator', 'Relationship', 'RenderingDefinition', 'RenderingUsage', 'RequirementConstraintKind', 'RequirementConstraintMembership', 'RequirementDefinition', 'RequirementKind', 'RequirementUsage', 'RequirementVerificationMembership', 'ResultExpressionMembership', 'ReturnParameterMembership', 'SatisfyRequirementUsage', 'SelectExpression', 'SendActionUsage', 'Specialization', 'StakeholderMembership', 'StateDefinition', 'StateSubactionKind', 'StateSubactionMembership', 'StateUsage', 'Step', 'Structure', 'Subclassification', 'SubjectMembership', 'Subsetting', 'Subtype', 'Succession', 'SuccessionAsUsage', 'SuccessionFlowConnectionUsage', 'SuccessionItemFlow', 'SysMLFunction', 'TextualAnnotatingElement', 'TextualRepresentation', 'TransitionFeatureKind', 'TransitionFeatureMembership', 'TransitionUsage', 'TransparentElement', 'TriggerInvocationExpression', 'TriggerKind', 'Type', 'TypeFeaturing', 'TypeReference', 'TypeRelationship', 'UnaryOperator', 'Unioning', 'Usage', 'UseCaseDefinition', 'UseCaseUsage', 'VariantMembership', 'VerificationCaseDefinition', 'VerificationCaseUsage', 'ViewDefinition', 'ViewRenderingMembership', 'ViewUsage', 'ViewpointDefinition', 'ViewpointUsage', 'VisibilityKind', 'WhileLoopActionUsage'];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -2167,15 +2444,11 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case ActionUsage: {
                 return this.isSubtype(OccurrenceUsage, supertype) || this.isSubtype(Step, supertype);
             }
-            case Alias:
-            case Conjugation:
-            case Dependency:
-            case Disjoining:
-            case FeatureInverting:
-            case Import:
-            case Specialization:
-            case TypeFeaturing: {
-                return this.isSubtype(Relationship, supertype);
+            case ActorMembership:
+            case ReturnParameterMembership:
+            case StakeholderMembership:
+            case SubjectMembership: {
+                return this.isSubtype(ParameterMembership, supertype);
             }
             case AllocationDefinition:
             case InterfaceDefinition: {
@@ -2195,14 +2468,20 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case VerificationCaseUsage: {
                 return this.isSubtype(CaseUsage, supertype);
             }
+            case AnnotatingElement:
+            case Namespace:
+            case Relationship: {
+                return this.isSubtype(Element, supertype);
+            }
+            case Annotation:
+            case Membership: {
+                return this.isSubtype(NonOwnerType, supertype) || this.isSubtype(Relationship, supertype);
+            }
             case AssertConstraintUsage: {
                 return this.isSubtype(ConstraintUsage, supertype) || this.isSubtype(Invariant, supertype);
             }
-            case Association:
-            case Class:
-            case DataType:
-            case Definition: {
-                return this.isSubtype(Classifier, supertype);
+            case Association: {
+                return this.isSubtype(Classifier, supertype) || this.isSubtype(Relationship, supertype);
             }
             case AssociationStructure: {
                 return this.isSubtype(Association, supertype) || this.isSubtype(Structure, supertype);
@@ -2216,6 +2495,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return this.isSubtype(Usage, supertype);
             }
             case Behavior:
+            case LifeClass:
             case Structure: {
                 return this.isSubtype(Class, supertype);
             }
@@ -2241,12 +2521,17 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case CaseUsage: {
                 return this.isSubtype(CalculationUsage, supertype);
             }
+            case Class:
+            case DataType:
+            case Definition: {
+                return this.isSubtype(Classifier, supertype);
+            }
             case Classifier:
             case Feature: {
                 return this.isSubtype(Type, supertype);
             }
             case ClassifierReference:
-            case MetaclassReference: {
+            case FeatureReference: {
                 return this.isSubtype(TypeReference, supertype);
             }
             case CollectExpression:
@@ -2256,7 +2541,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
             }
             case Comment:
             case TextualRepresentation: {
-                return this.isSubtype(Annotation, supertype) || this.isSubtype(TextualAnnotatingElement, supertype);
+                return this.isSubtype(TextualAnnotatingElement, supertype);
             }
             case ConcernDefinition:
             case ViewpointDefinition: {
@@ -2266,8 +2551,23 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case ViewpointUsage: {
                 return this.isSubtype(RequirementUsage, supertype);
             }
-            case ConjugatedPortReference: {
+            case ConjugatedPortDefinition: {
+                return this.isSubtype(PortDefinition, supertype);
+            }
+            case ConjugatedPortReference:
+            case MetaclassReference: {
                 return this.isSubtype(ClassifierReference, supertype);
+            }
+            case ConjugatedPortTyping: {
+                return this.isSubtype(FeatureTyping, supertype);
+            }
+            case Conjugation:
+            case Differencing:
+            case Disjoining:
+            case Intersecting:
+            case Specialization:
+            case Unioning: {
+                return this.isSubtype(Relationship, supertype) || this.isSubtype(TypeRelationship, supertype);
             }
             case ConnectionDefinition: {
                 return this.isSubtype(AssociationStructure, supertype) || this.isSubtype(PartDefinition, supertype);
@@ -2275,14 +2575,8 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case ConnectionUsage: {
                 return this.isSubtype(ConnectorAsUsage, supertype) || this.isSubtype(PartUsage, supertype);
             }
-            case Connector:
-            case ConnectorEnd:
-            case InitialNode:
-            case ItemFeature:
-            case Multiplicity:
-            case Step:
-            case Usage: {
-                return this.isSubtype(Feature, supertype);
+            case Connector: {
+                return this.isSubtype(Feature, supertype) || this.isSubtype(Relationship, supertype);
             }
             case ConnectorAsUsage: {
                 return this.isSubtype(Connector, supertype) || this.isSubtype(Usage, supertype);
@@ -2299,13 +2593,28 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case MergeNode: {
                 return this.isSubtype(ControlNode, supertype);
             }
-            case Documentation: {
-                return this.isSubtype(Annotation, supertype) || this.isSubtype(Comment, supertype);
+            case Dependency:
+            case Featuring:
+            case Import: {
+                return this.isSubtype(Relationship, supertype);
             }
-            case Element:
-            case ElementFilter:
-            case Result: {
-                return this.isSubtype(VisibilityElement, supertype);
+            case Documentation: {
+                return this.isSubtype(Comment, supertype);
+            }
+            case ElementFilterMembership:
+            case FeatureValue:
+            case VariantMembership: {
+                return this.isSubtype(OwningMembership, supertype);
+            }
+            case EndFeatureMembership:
+            case ObjectiveMembership:
+            case ParameterMembership:
+            case RequirementConstraintMembership:
+            case ResultExpressionMembership:
+            case StateSubactionMembership:
+            case TransitionFeatureMembership:
+            case ViewRenderingMembership: {
+                return this.isSubtype(FeatureMembership, supertype);
             }
             case EnumerationDefinition: {
                 return this.isSubtype(AttributeDefinition, supertype);
@@ -2321,28 +2630,31 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case ExhibitStateUsage: {
                 return this.isSubtype(PerformActionUsage, supertype) || this.isSubtype(StateUsage, supertype);
             }
-            case Expose: {
+            case Expose:
+            case MembershipImport:
+            case NamespaceImport: {
                 return this.isSubtype(Import, supertype);
             }
             case Expression: {
                 return this.isSubtype(Step, supertype);
             }
-            case FeatureReference: {
-                return this.isSubtype(TypeOrFeatureReference, supertype) || this.isSubtype(TypeReference, supertype);
+            case FeatureChaining:
+            case FeatureInverting: {
+                return this.isSubtype(FeatureRelationship, supertype) || this.isSubtype(Relationship, supertype);
+            }
+            case FeatureMembership: {
+                return this.isSubtype(Featuring, supertype) || this.isSubtype(OwningMembership, supertype);
             }
             case FeatureReferenceExpression:
             case InvocationExpression:
             case LiteralExpression:
             case MetadataAccessExpression:
-            case NullExpression:
-            case SelfReferenceExpression: {
-                return this.isSubtype(InlineExpression, supertype);
+            case NullExpression: {
+                return this.isSubtype(Expression, supertype) || this.isSubtype(InlineExpression, supertype);
             }
             case FeatureTyping:
-            case Subclassification:
-            case Subsetting:
-            case Subtype: {
-                return this.isSubtype(Specialization, supertype);
+            case Subsetting: {
+                return this.isSubtype(FeatureRelationship, supertype) || this.isSubtype(Specialization, supertype);
             }
             case FlowConnectionDefinition: {
                 return this.isSubtype(ActionDefinition, supertype) || this.isSubtype(ConnectionDefinition, supertype) || this.isSubtype(Interaction, supertype);
@@ -2353,6 +2665,10 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case ForLoopActionUsage:
             case WhileLoopActionUsage: {
                 return this.isSubtype(LoopActionUsage, supertype);
+            }
+            case FramedConcernMembership:
+            case RequirementVerificationMembership: {
+                return this.isSubtype(RequirementConstraintMembership, supertype);
             }
             case IncludeUseCaseUsage: {
                 return this.isSubtype(PerformActionUsage, supertype) || this.isSubtype(UseCaseUsage, supertype);
@@ -2367,11 +2683,15 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case PortDefinition: {
                 return this.isSubtype(OccurrenceDefinition, supertype) || this.isSubtype(Structure, supertype);
             }
+            case ItemFeature:
+            case ItemFlowEnd:
+            case Multiplicity:
+            case Step:
+            case Usage: {
+                return this.isSubtype(Feature, supertype);
+            }
             case ItemFlow: {
                 return this.isSubtype(Connector, supertype) || this.isSubtype(Step, supertype);
-            }
-            case ItemFlowEnd: {
-                return this.isSubtype(ConnectorEnd, supertype);
             }
             case LibraryPackage: {
                 return this.isSubtype(Package, supertype);
@@ -2385,6 +2705,13 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case LoopActionUsage: {
                 return this.isSubtype(ActionUsage, supertype) || this.isSubtype(TransparentElement, supertype);
             }
+            case MembershipExpose: {
+                return this.isSubtype(Expose, supertype) || this.isSubtype(MembershipImport, supertype);
+            }
+            case MembershipReference:
+            case NamespaceReference: {
+                return this.isSubtype(ElementReference, supertype);
+            }
             case Metaclass: {
                 return this.isSubtype(Structure, supertype);
             }
@@ -2392,7 +2719,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return this.isSubtype(ItemDefinition, supertype) || this.isSubtype(Metaclass, supertype);
             }
             case MetadataFeature: {
-                return this.isSubtype(Annotation, supertype) || this.isSubtype(Feature, supertype);
+                return this.isSubtype(AnnotatingElement, supertype) || this.isSubtype(Feature, supertype);
             }
             case MetadataUsage: {
                 return this.isSubtype(ItemUsage, supertype) || this.isSubtype(MetadataFeature, supertype);
@@ -2400,19 +2727,20 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case MultiplicityRange: {
                 return this.isSubtype(Multiplicity, supertype);
             }
-            case NamedArgument: {
-                return this.isSubtype(Argument, supertype);
+            case NamespaceExpose: {
+                return this.isSubtype(Expose, supertype) || this.isSubtype(NamespaceImport, supertype);
             }
-            case Namespace:
-            case Relationship:
-            case TextualAnnotatingElement: {
-                return this.isSubtype(Element, supertype);
+            case NonOwnerType: {
+                return this.isSubtype(TransparentElement, supertype);
             }
             case OccurrenceDefinition: {
                 return this.isSubtype(Class, supertype) || this.isSubtype(Definition, supertype);
             }
             case OperatorExpression: {
                 return this.isSubtype(InlineExpression, supertype) || this.isSubtype(InvocationExpression, supertype);
+            }
+            case OwningMembership: {
+                return this.isSubtype(Membership, supertype);
             }
             case Package:
             case Type: {
@@ -2427,11 +2755,15 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case PerformActionUsage: {
                 return this.isSubtype(ActionUsage, supertype) || this.isSubtype(EventOccurrenceUsage, supertype);
             }
+            case PortConjugation: {
+                return this.isSubtype(Conjugation, supertype);
+            }
             case Predicate: {
                 return this.isSubtype(SysMLFunction, supertype);
             }
-            case Redefinition: {
-                return this.isSubtype(Subsetting, supertype);
+            case Redefinition:
+            case ReferenceSubsetting: {
+                return this.isSubtype(FeatureRelationship, supertype) || this.isSubtype(Subsetting, supertype);
             }
             case RenderingDefinition:
             case ViewDefinition: {
@@ -2453,6 +2785,12 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case StateDefinition: {
                 return this.isSubtype(ActionDefinition, supertype);
             }
+            case Subclassification: {
+                return this.isSubtype(Specialization, supertype) || this.isSubtype(TypeRelationship, supertype);
+            }
+            case Subtype: {
+                return this.isSubtype(Specialization, supertype);
+            }
             case SuccessionAsUsage: {
                 return this.isSubtype(ConnectorAsUsage, supertype) || this.isSubtype(Succession, supertype);
             }
@@ -2465,11 +2803,20 @@ export class SysMlAstReflection extends AbstractAstReflection {
             case SysMLFunction: {
                 return this.isSubtype(Behavior, supertype);
             }
+            case TextualAnnotatingElement: {
+                return this.isSubtype(AnnotatingElement, supertype);
+            }
             case TriggerInvocationExpression: {
                 return this.isSubtype(InvocationExpression, supertype);
             }
+            case TypeFeaturing: {
+                return this.isSubtype(FeatureRelationship, supertype) || this.isSubtype(Featuring, supertype);
+            }
             case TypeReference: {
-                return this.isSubtype(ElementReference, supertype) || this.isSubtype(TypeOrFeatureReference, supertype);
+                return this.isSubtype(NamespaceReference, supertype);
+            }
+            case TypeRelationship: {
+                return this.isSubtype(FeatureRelationship, supertype);
             }
             default: {
                 return false;
@@ -2480,12 +2827,14 @@ export class SysMlAstReflection extends AbstractAstReflection {
     getReferenceType(refInfo: ReferenceInfo): string {
         const referenceId = `${refInfo.container.$type}:${refInfo.property}`;
         switch (referenceId) {
-            case 'ClassifierReference:chain':
-            case 'ConjugatedPortReference:chain':
-            case 'ElementReference:chain':
-            case 'FeatureReference:chain':
-            case 'MetaclassReference:chain':
-            case 'TypeReference:chain': {
+            case 'ClassifierReference:parts':
+            case 'ConjugatedPortReference:parts':
+            case 'ElementReference:parts':
+            case 'FeatureReference:parts':
+            case 'MembershipReference:parts':
+            case 'MetaclassReference:parts':
+            case 'NamespaceReference:parts':
+            case 'TypeReference:parts': {
                 return Element;
             }
             default: {
@@ -2496,54 +2845,27 @@ export class SysMlAstReflection extends AbstractAstReflection {
 
     getTypeMetaData(type: string): TypeMetaData {
         switch (type) {
-            case 'ElementReference': {
-                return {
-                    name: 'ElementReference',
-                    mandatory: [
-                        { name: 'chain', type: 'array' }
-                    ]
-                };
-            }
-            case 'FeatureValue': {
-                return {
-                    name: 'FeatureValue',
-                    mandatory: [
-                        { name: 'isDefault', type: 'boolean' },
-                        { name: 'isInitial', type: 'boolean' }
-                    ]
-                };
-            }
-            case 'InvocationExpression': {
-                return {
-                    name: 'InvocationExpression',
-                    mandatory: [
-                        { name: 'args', type: 'array' }
-                    ]
-                };
-            }
-            case 'LiteralBoolean': {
-                return {
-                    name: 'LiteralBoolean',
-                    mandatory: [
-                        { name: 'value', type: 'boolean' }
-                    ]
-                };
-            }
             case 'Element': {
                 return {
                     name: 'Element',
                     mandatory: [
-                        { name: 'aliases', type: 'array' },
-                        { name: 'comments', type: 'array' },
-                        { name: 'docs', type: 'array' },
-                        { name: 'elements', type: 'array' },
-                        { name: 'features', type: 'array' },
-                        { name: 'imports', type: 'array' },
-                        { name: 'members', type: 'array' },
-                        { name: 'metadata', type: 'array' },
-                        { name: 'prefixes', type: 'array' },
-                        { name: 'relationships', type: 'array' },
-                        { name: 'reps', type: 'array' }
+                        { name: 'prefixes', type: 'array' }
+                    ]
+                };
+            }
+            case 'ElementReference': {
+                return {
+                    name: 'ElementReference',
+                    mandatory: [
+                        { name: 'parts', type: 'array' }
+                    ]
+                };
+            }
+            case 'AnnotatingElement': {
+                return {
+                    name: 'AnnotatingElement',
+                    mandatory: [
+                        { name: 'about', type: 'array' }
                     ]
                 };
             }
@@ -2551,7 +2873,13 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'Namespace',
                     mandatory: [
-                        { name: 'filters', type: 'array' }
+                        { name: 'aliases', type: 'array' },
+                        { name: 'annotatingMembers', type: 'array' },
+                        { name: 'filters', type: 'array' },
+                        { name: 'imports', type: 'array' },
+                        { name: 'members', type: 'array' },
+                        { name: 'namespaceMembers', type: 'array' },
+                        { name: 'relationshipMembers', type: 'array' }
                     ]
                 };
             }
@@ -2559,8 +2887,9 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'Relationship',
                     mandatory: [
-                        { name: 'source', type: 'array' },
-                        { name: 'target', type: 'array' }
+                        { name: 'annotations', type: 'array' },
+                        { name: 'chains', type: 'array' },
+                        { name: 'elements', type: 'array' }
                     ]
                 };
             }
@@ -2568,13 +2897,8 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'Type',
                     mandatory: [
-                        { name: 'conjugates', type: 'array' },
-                        { name: 'differences', type: 'array' },
-                        { name: 'disjoins', type: 'array' },
-                        { name: 'intersects', type: 'array' },
                         { name: 'isSufficient', type: 'boolean' },
-                        { name: 'specializes', type: 'array' },
-                        { name: 'unions', type: 'array' }
+                        { name: 'typeRelationships', type: 'array' }
                     ]
                 };
             }
@@ -2591,16 +2915,8 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'Import',
                     mandatory: [
-                        { name: 'conditions', type: 'array' },
-                        { name: 'importsAll', type: 'boolean' }
-                    ]
-                };
-            }
-            case 'Comment': {
-                return {
-                    name: 'Comment',
-                    mandatory: [
-                        { name: 'about', type: 'array' }
+                        { name: 'importsAll', type: 'boolean' },
+                        { name: 'isRecursive', type: 'boolean' }
                     ]
                 };
             }
@@ -2616,15 +2932,8 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'Feature',
                     mandatory: [
-                        { name: 'chains', type: 'array' },
-                        { name: 'featuredBy', type: 'array' },
-                        { name: 'inverseOf', type: 'array' },
                         { name: 'isNonunique', type: 'boolean' },
-                        { name: 'isOrdered', type: 'boolean' },
-                        { name: 'redefines', type: 'array' },
-                        { name: 'references', type: 'array' },
-                        { name: 'subsets', type: 'array' },
-                        { name: 'typedBy', type: 'array' }
+                        { name: 'isOrdered', type: 'boolean' }
                     ]
                 };
             }
@@ -2633,35 +2942,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
                     name: 'Definition',
                     mandatory: [
                         { name: 'isIndividual', type: 'boolean' },
-                        { name: 'isVariation', type: 'boolean' },
-                        { name: 'variants', type: 'array' }
-                    ]
-                };
-            }
-            case 'Connector': {
-                return {
-                    name: 'Connector',
-                    mandatory: [
-                        { name: 'ends', type: 'array' }
-                    ]
-                };
-            }
-            case 'InitialNode': {
-                return {
-                    name: 'InitialNode',
-                    mandatory: [
-                        { name: 'comments', type: 'array' },
-                        { name: 'docs', type: 'array' },
-                        { name: 'metadata', type: 'array' },
-                        { name: 'reps', type: 'array' }
-                    ]
-                };
-            }
-            case 'MetadataFeature': {
-                return {
-                    name: 'MetadataFeature',
-                    mandatory: [
-                        { name: 'about', type: 'array' }
+                        { name: 'isVariation', type: 'boolean' }
                     ]
                 };
             }
@@ -2671,8 +2952,16 @@ export class SysMlAstReflection extends AbstractAstReflection {
                     mandatory: [
                         { name: 'isIndividual', type: 'boolean' },
                         { name: 'isReference', type: 'boolean' },
-                        { name: 'isVariation', type: 'boolean' },
-                        { name: 'variants', type: 'array' }
+                        { name: 'isVariation', type: 'boolean' }
+                    ]
+                };
+            }
+            case 'FeatureValue': {
+                return {
+                    name: 'FeatureValue',
+                    mandatory: [
+                        { name: 'isDefault', type: 'boolean' },
+                        { name: 'isInitial', type: 'boolean' }
                     ]
                 };
             }
@@ -2680,57 +2969,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'ActionUsage',
                     mandatory: [
-                        { name: 'isParallel', type: 'boolean' },
-                        { name: 'parameters', type: 'array' }
-                    ]
-                };
-            }
-            case 'Expression': {
-                return {
-                    name: 'Expression',
-                    mandatory: [
-                        { name: 'return', type: 'array' },
-                        { name: 'variants', type: 'array' }
-                    ]
-                };
-            }
-            case 'ReferenceUsage': {
-                return {
-                    name: 'ReferenceUsage',
-                    mandatory: [
-                        { name: 'isSubject', type: 'boolean' }
-                    ]
-                };
-            }
-            case 'SysMLFunction': {
-                return {
-                    name: 'SysMLFunction',
-                    mandatory: [
-                        { name: 'return', type: 'array' }
-                    ]
-                };
-            }
-            case 'EnumerationDefinition': {
-                return {
-                    name: 'EnumerationDefinition',
-                    mandatory: [
-                        { name: 'values', type: 'array' }
-                    ]
-                };
-            }
-            case 'SuccessionAsUsage': {
-                return {
-                    name: 'SuccessionAsUsage',
-                    mandatory: [
-                        { name: 'then', type: 'array' }
-                    ]
-                };
-            }
-            case 'StateUsage': {
-                return {
-                    name: 'StateUsage',
-                    mandatory: [
-                        { name: 'subactions', type: 'array' }
+                        { name: 'isParallel', type: 'boolean' }
                     ]
                 };
             }
@@ -2738,8 +2977,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return {
                     name: 'StateDefinition',
                     mandatory: [
-                        { name: 'isParallel', type: 'boolean' },
-                        { name: 'subactions', type: 'array' }
+                        { name: 'isParallel', type: 'boolean' }
                     ]
                 };
             }
@@ -2751,11 +2989,19 @@ export class SysMlAstReflection extends AbstractAstReflection {
                     ]
                 };
             }
-            case 'ConcernUsage': {
+            case 'OperatorExpression': {
                 return {
-                    name: 'ConcernUsage',
+                    name: 'OperatorExpression',
                     mandatory: [
-                        { name: 'isFramed', type: 'boolean' }
+                        { name: 'operands', type: 'array' }
+                    ]
+                };
+            }
+            case 'LiteralBoolean': {
+                return {
+                    name: 'LiteralBoolean',
+                    mandatory: [
+                        { name: 'literal', type: 'boolean' }
                     ]
                 };
             }

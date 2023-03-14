@@ -370,6 +370,7 @@
         "jest": "^29.4.3",
         "jest-junit": "^15.0.0",
         "jest-matcher-utils": "^29.4.3",
+        "jest-snapshot": "^29.5.0",
         "jsonschema": "^1.4.1",
         "langium-cli": "^1.1.0",
         "ovsx": "^0.8.0",

@@ -14,16 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { formatString } from "typescript-string-operations";
-import { withQualifiedName, qualifiedTypeReference, anything } from "../../../../testing";
-import { Conjugation, Documentation } from "../../../generated/ast";
-
 const Common = `
-type Original {
+class Original {
     in feature Input;
 }
-type Conjugate1;
-type Conjugate2;
+class Conjugate1;
+class Conjugate2;
 `;
 
 test("conjugation can be parsed", async () => {
@@ -34,70 +30,22 @@ test("conjugation can be parsed", async () => {
     conjugation c2 conjugate Conjugate2 ~ Original {
         doc /* same as c1 */
     }`
-    ).toParseKerML({
-        relationships: [
-            {
-                $type: Conjugation,
-                ...withQualifiedName("c1"),
-                specific: qualifiedTypeReference("Conjugate1"),
-                general: qualifiedTypeReference("Original"),
-            },
-            {
-                $type: Conjugation,
-                ...withQualifiedName("c2"),
-                specific: qualifiedTypeReference("Conjugate2"),
-                general: qualifiedTypeReference("Original"),
-                docs: [
-                    {
-                        $type: Documentation,
-                        body: "/* same as c1 */",
-                    },
-                ],
-            },
-        ],
-    });
+    ).toParseKerML("snapshot");
 });
 
-test.concurrent.each(["conjugates", "~"])(
+test.each(["conjugates", "~"])(
     "conjugation may be omitted without identifiers with '%s'",
     async (token: string) => {
-        return expect(
-            formatString(
-                Common +
-                    `
-    conjugate Conjugate1 {0} Original;`,
-                token
-            )
-        ).toParseKerML({
-            relationships: [
-                {
-                    $type: Conjugation,
-                    specific: qualifiedTypeReference("Conjugate1"),
-                    general: qualifiedTypeReference("Original"),
-                },
-            ],
-        });
+        return expect(Common + `conjugate Conjugate1 ${token} Original;`).toParseKerML("snapshot");
     }
 );
 
-test.concurrent.each(["conjugates", "~"])(
+test.each(["conjugates", "~"])(
     "type can declare owned conjugations with '%s'",
     async (token: string) => {
         return expect(
-            formatString(
-                `
-    type Original;
-    type Conjugate1 {0} Original;`,
-                token
-            )
-        ).toParseKerML({
-            elements: [
-                ...anything(1),
-                {
-                    ...withQualifiedName("Conjugate1"),
-                    conjugates: [qualifiedTypeReference("Original")],
-                },
-            ],
-        });
+            `class Original;
+    class Conjugate1 ${token} Original;`
+        ).toParseKerML("snapshot");
     }
 );

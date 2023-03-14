@@ -23,19 +23,18 @@ import {
     FormattingContext,
     FormattingMove,
     FormattingRegion,
-    getDocument,
     LangiumDocument,
     NodeFormatter,
+    Properties,
+    streamAllContents,
 } from "langium";
 import { TextualAnnotatingMeta, typeIndex, TypeMap } from "../../model";
 import * as ast from "../../generated/ast";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { KeysMatching } from "../../utils/common";
-import { isKeyword } from "langium/lib/grammar/generated/ast";
 import { linesDiff } from "../../utils/ast-util";
-import { getNextNode, getPreviousNode } from "../../utils/cst-util";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import { findChildren, getNextNode, getPreviousNode } from "../../utils/cst-util";
 
 type Format<T extends AstNode = AstNode> = (node: T, formatter: NodeFormatter<T>) => void;
 type FormatMap = {
@@ -71,6 +70,7 @@ const Options = {
     newLine: Formatting.newLine(),
     twoLines: Formatting.newLines(2),
     uptoTwoLines: Formatting.fit(Formatting.newLines(1), Formatting.newLines(2)),
+    uptoTwoIndents: addIndent(Formatting.fit(Formatting.newLines(1), Formatting.newLines(2)), 1),
     inline: Formatting.oneSpace(),
     spaceOrIndent: Formatting.fit(Formatting.indent(), Formatting.oneSpace()),
     spaceOrLine: Formatting.fit(Formatting.newLine(), Formatting.oneSpace()),
@@ -123,62 +123,52 @@ export class SysMLFormatter extends AbstractFormatter {
         formatting.call(this, node, formatter);
     }
 
-    /**
-     * Handle the overall indentation/lines of element nodes
-     */
-    protected formatPrepend(node: AstNode, formatter: NodeFormatter<AstNode>): void {
-        const depth = !node.$container ? 0 : !node.$container.$container ? 1 : 2;
-        const region = formatter.node(node);
+    protected indentChildren(
+        node: ast.Element,
+        formatter: NodeFormatter<ast.Element>,
+        range?: Range
+    ): CstNode[] {
+        if (!node.$cstNode) return [];
+        const children = findChildren(node.$cstNode, range);
+        if (children.length === 0) return children;
 
-        switch (depth) {
-            case 1: {
-                // elements inside root namespace
-                const start = node.$cstNode?.offset;
-                const isFirst = start === node.$container?.$cstNode?.offset;
-                if (isFirst) {
-                    // comments are not a part of the AST so have to check in the document directly
-                    try {
-                        const doc = getDocument(node);
-                        if (doc.textDocument.getText().substring(0, start).trim().length === 0) {
-                            region.prepend(Options.noSpace);
-                            return;
-                        }
-                    } catch {
-                        /* empty */
-                    }
-
-                    // no empty space to the first element
-                    region.prepend(Formatting.fit(Options.noSpace, Options.newLine));
-                    return;
-                }
-
-                region.prepend(Formatting.fit(Options.noIndent, Options.uptoTwoLines));
-
-                break;
-            }
-            case 2: {
-                // nested elements
-                const isFirst = node.$cstNode?.offset === node.$cstNode?.parent?.offset;
-                const isLast = node.$cstNode?.end === node.$cstNode?.parent?.end;
-
-                if (isFirst) {
-                    if (isLast) {
-                        // for some reason a single item is not indented with
-                        // interior...
-                        region.prepend(Options.indent);
-                    }
+        formatter.cst([children[0]]).prepend(Options.indent);
+        children.slice(1).forEach((node, i) => {
+            if (node.hidden) {
+                if (node.range.start.line === node.range.end.line) {
+                    // inline comment
+                    formatter
+                        .cst([node])
+                        .prepend(
+                            node.range.start.line === children[i].range.end.line
+                                ? Options.oneSpace
+                                : Options.uptoTwoIndents
+                        );
                 } else {
-                    // remove any extraneous new lines after 1 empty line
-                    region.prepend(Options.uptoTwoLines);
+                    // multiline comment
+                    formatter.cst([node]).prepend(Options.uptoTwoIndents);
+                }
+            } else {
+                if (children[i].hidden || /(?:;|\}|\*\/)$/.test(children[i].text)) {
+                    // previous cst is a comment or another element, indent this one
+                    formatter.cst([node]).prepend(Options.uptoTwoIndents);
+                } else {
+                    // previous element a kind of prefix
+                    formatter.cst([node]).prepend(Options.oneSpace);
                 }
             }
-        }
+        });
+        return children;
     }
 
     /**
      * Format the interior of a node
      */
-    protected formatBody(formatter: NodeFormatter<ast.Element>, initial = Options.oneSpace): void {
+    protected formatBody(
+        node: ast.Element,
+        formatter: NodeFormatter<ast.Element>,
+        initial = Options.oneSpace
+    ): void {
         const bracesOpen = formatter.keyword("{");
 
         if (bracesOpen.nodes.length === 0) {
@@ -188,10 +178,13 @@ export class SysMLFormatter extends AbstractFormatter {
             const bracesClose = formatter.keyword("}");
             bracesOpen.prepend(initial);
 
-            const interior = formatter.interior(bracesOpen, bracesClose);
-            if (interior.nodes.length > 0) {
-                // indent all children
-                interior.prepend(Options.indent);
+            // indent all children
+            const children = this.indentChildren(
+                node,
+                formatter,
+                Range.create(bracesOpen.nodes[0].range.end, bracesClose.nodes[0].range.start)
+            );
+            if (children.length > 0) {
                 // and put the closing brace on a new line
                 bracesClose.prepend(Options.newLine);
             } else {
@@ -211,19 +204,12 @@ export class SysMLFormatter extends AbstractFormatter {
     @formatter(ast.Element) element(
         node: ast.Element,
         formatter: NodeFormatter<ast.Element>,
-        prepend = true,
         prependNames = true
     ): void {
-        if (prepend) this.formatPrepend(node, formatter);
-
-        if (node.visibility) {
-            formatter.property("visibility").append(Options.oneSpace);
-        }
-
         if (node.prefixes.length > 0) {
-            const prefixes = formatter.property("prefixes");
+            const prefixes = formatter.nodes(...node.prefixes);
             const next = getNextNode(prefixes.nodes[prefixes.nodes.length - 1]);
-            if (next?.text !== ";") prefixes.append(Options.spaceOrIndent);
+            if (next && next.text !== ";") formatter.cst([next]).prepend(Options.spaceOrIndent);
         }
 
         if (node.declaredShortName && !node.$cstNode?.text.startsWith("<")) {
@@ -233,35 +219,176 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.keyword(">").prepend(Options.noSpace);
         }
 
-        if (
-            node.declaredName &&
-            (prependNames || node.declaredShortName) &&
-            !node.$cstNode?.text.startsWith(node.declaredName)
-        ) {
-            formatter
-                .property("declaredName")
-                .prepend(node.declaredShortName ? Options.spaceOrIndent : Options.oneSpace);
+        if (node.declaredName && (prependNames || node.declaredShortName)) {
+            const region = formatter.property("declaredName");
+            if (region.nodes[0].offset !== node.$cstNode?.offset)
+                region.prepend(node.declaredShortName ? Options.spaceOrIndent : Options.oneSpace);
         }
 
-        this.formatBody(formatter);
+        this.formatBody(node, formatter);
+    }
+
+    @formatter(ast.Namespace) namespace(
+        node: ast.Namespace,
+        formatter: NodeFormatter<ast.Namespace>
+    ): void {
+        if (!node.$container) {
+            // root namespace
+            if (!node.$cstNode) return;
+            const children = findChildren(node.$cstNode);
+            if (children.length === 0) return;
+
+            // also need to collect hidden comments prior to this since they are
+            // not actually a part of namespace and won't be returned as
+            // children
+
+            const leading: CstNode[] = [children[0]];
+            for (;;) {
+                const previous = getPreviousNode(leading[leading.length - 1], true);
+                if (!previous) break;
+                leading.push(previous);
+            }
+
+            formatter.cst([leading[leading.length - 1]]).prepend(Options.noSpace);
+            formatter.cst(children.slice(1)).prepend(Options.uptoTwoLines);
+            formatter.cst(leading.slice(0, leading.length - 1)).prepend(Options.uptoTwoLines);
+        } else {
+            this.element(node, formatter);
+        }
+    }
+
+    @formatter(ast.Relationship) relationship<T extends ast.Relationship>(
+        node: T,
+        formatter: NodeFormatter<T>,
+        prefix?: { keyword: string } | { property: Properties<T> }
+    ): void {
+        this.element(node, formatter);
+        if (node.visibility) {
+            formatter.property("visibility" as Properties<T>).append(Options.oneSpace);
+        }
+
+        if (!prefix) return;
+        const region =
+            "keyword" in prefix
+                ? formatter.keyword(prefix.keyword)
+                : formatter.property(prefix.property);
+        region.append(Options.oneSpace);
+    }
+
+    @formatter(ast.StateSubactionMembership) stateSubactionMembership(
+        node: ast.StateSubactionMembership,
+        formatter: NodeFormatter<ast.StateSubactionMembership>
+    ): void {
+        this.relationship(node, formatter, { property: "kind" });
+    }
+
+    @formatter(ast.TransitionFeatureMembership) transitionFeatureMembership(
+        node: ast.TransitionFeatureMembership,
+        formatter: NodeFormatter<ast.TransitionFeatureMembership>
+    ): void {
+        this.relationship(node, formatter, { property: "kind" });
+    }
+
+    @formatter(ast.RequirementConstraintMembership) requirementConstraintMembership(
+        node: ast.RequirementConstraintMembership,
+        formatter: NodeFormatter<ast.RequirementConstraintMembership>
+    ): void {
+        this.relationship(node, formatter, { property: "kind" });
+    }
+
+    @formatter(ast.SubjectMembership) subjectMembership(
+        node: ast.SubjectMembership,
+        formatter: NodeFormatter<ast.SubjectMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "subject" });
+    }
+
+    @formatter(ast.ActorMembership) actorMembership(
+        node: ast.ActorMembership,
+        formatter: NodeFormatter<ast.ActorMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "actor" });
+    }
+
+    @formatter(ast.ReturnParameterMembership) returnParameterMembership(
+        node: ast.ReturnParameterMembership,
+        formatter: NodeFormatter<ast.ReturnParameterMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "return" });
+    }
+
+    @formatter(ast.StakeholderMembership) StakeholderMembership(
+        node: ast.StakeholderMembership,
+        formatter: NodeFormatter<ast.StakeholderMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "stakeholder" });
+    }
+
+    @formatter(ast.RequirementVerificationMembership) RequirementVerificationMembership(
+        node: ast.RequirementVerificationMembership,
+        formatter: NodeFormatter<ast.RequirementVerificationMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "verify" });
+    }
+
+    @formatter(ast.ObjectiveMembership) ObjectiveMembership(
+        node: ast.ObjectiveMembership,
+        formatter: NodeFormatter<ast.ObjectiveMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "objective" });
+    }
+
+    @formatter(ast.VariantMembership) VariantMembership(
+        node: ast.VariantMembership,
+        formatter: NodeFormatter<ast.VariantMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "variant" });
+    }
+
+    @formatter(ast.ViewRenderingMembership) ViewRenderingMembership(
+        node: ast.ViewRenderingMembership,
+        formatter: NodeFormatter<ast.ViewRenderingMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "render" });
+    }
+
+    @formatter(ast.OwningMembership) OwningMembership(
+        node: ast.OwningMembership,
+        formatter: NodeFormatter<ast.OwningMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "member" });
+    }
+
+    @formatter(ast.Membership) Membership(
+        node: ast.Membership,
+        formatter: NodeFormatter<ast.Membership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "first" });
+
+        formatter
+            .keyword("for")
+            .prepend(
+                node.declaredName || node.declaredShortName ? Options.indent : Options.oneSpace
+            )
+            .append(Options.oneSpace);
+    }
+
+    @formatter(ast.FramedConcernMembership) FramedConcernMembership(
+        node: ast.FramedConcernMembership,
+        formatter: NodeFormatter<ast.FramedConcernMembership>
+    ): void {
+        this.relationship(node, formatter, { keyword: "frame" });
     }
 
     /**
      * Format {@link ast.ElementReference ElementReference}
      */
     @formatter(ast.ElementReference) reference(
-        _: ast.ElementReference,
+        node: ast.ElementReference,
         formatter: NodeFormatter<ast.ElementReference>
     ): void {
-        formatter.keywords("::").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
-    }
-
-    @formatter(ast.FeatureReference) featureReference(
-        node: ast.FeatureReference,
-        formatter: NodeFormatter<ast.FeatureReference>
-    ): void {
-        this.reference(node, formatter);
-        formatter.keywords(".").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
+        if (node.parts.length > 1)
+            formatter.keywords("::").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
     }
 
     @formatter(ast.ConjugatedPortReference) conjugatePortReference(
@@ -280,10 +407,10 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.MetadataFeature>,
         typed = "typed" // is different in SysML
     ): void {
-        const isPrefix = node.$containerProperty === "prefixes";
+        this.element(node, formatter, false);
+        const isPrefix = node.$container.$containerProperty === "prefixes";
         const keyword = formatter.keyword(isPrefix ? "#" : "@");
         keyword.append(Options.noSpace);
-        this.element(node, formatter, !isPrefix, keyword.nodes.length === 0);
 
         if (node.declaredName || node.declaredShortName) {
             let keyword = formatter.keyword(":");
@@ -305,6 +432,7 @@ export class SysMLFormatter extends AbstractFormatter {
         node: ast.MetadataUsage,
         formatter: NodeFormatter<ast.MetadataUsage>
     ): void {
+        formatter.keyword("metadata").append(Options.oneSpace);
         this.metadataFeature(node, formatter, "defined");
     }
 
@@ -315,9 +443,13 @@ export class SysMLFormatter extends AbstractFormatter {
         node: ast.MultiplicityRange,
         formatter: NodeFormatter<ast.MultiplicityRange>
     ): void {
-        formatter.node(node).prepend(Options.inline);
-        formatter.keyword("[").append(Options.noSpace);
+        const open = formatter.keyword("[");
+        if (!node.$cstNode?.text.startsWith("[")) {
+            open.prepend(Options.oneSpace);
+        }
+        open.append(Options.noSpace);
         formatter.keyword("]").prepend(Options.noSpace);
+        this.formatBody(node, formatter);
     }
 
     @formatter(ast.NullExpression) nullExpression(
@@ -399,6 +531,7 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.element(node, formatter);
 
+        formatter.keyword("dependency").prepend(Options.spaceOrIndent);
         this.formatList(node, "client", formatter, {
             keyword: "from",
             indent: true,
@@ -408,17 +541,6 @@ export class SysMLFormatter extends AbstractFormatter {
             keyword: "to",
             indent: true,
         });
-    }
-
-    @formatter(ast.Alias) alias(node: ast.Alias, formatter: NodeFormatter<ast.Alias>): void {
-        this.element(node, formatter);
-
-        formatter
-            .keyword("for")
-            .prepend(
-                node.declaredName || node.declaredShortName ? Options.indent : Options.oneSpace
-            );
-        formatter.property("for").prepend(Options.oneSpace);
     }
 
     @formatter(ast.Type) type(node: ast.Type, formatter: NodeFormatter<ast.Type>): void {
@@ -432,40 +554,33 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.keyword("all").surround(Options.oneSpace);
         }
 
-        if (node.specializes.length > 0) {
-            this.formatList(node, "specializes", formatter, {
-                keyword: ["specializes", ":>"],
+        if (node.typeRelationships.length > 0) {
+            this.formatList(node, node.typeRelationships, formatter, {
+                keyword: [
+                    "specializes",
+                    ":>",
+                    "disjoint",
+                    "from",
+                    "unions",
+                    "intersects",
+                    "differences",
+                    "inverse",
+                    "of",
+                    "subsets",
+                    "redefines",
+                    ":>>",
+                    "references",
+                    "::>",
+                    ":",
+                    "featured",
+                    "by",
+                    "chains",
+                ].concat(ast.isUsage(node) ? ["defined", ":"] : ["conjugates", "~", "typed"]),
             });
         }
 
-        if (node.conjugates.length > 0) {
-            this.formatList(node, "conjugates", formatter, {
-                keyword: ast.isUsage(node) ? ["defined", "by", ":"] : ["conjugates", "~"],
-            });
-        }
-
-        if (node.disjoins.length > 0) {
-            this.formatList(node, "disjoins", formatter, {
-                keyword: ["disjoint", "from"],
-            });
-        }
-
-        if (node.unions.length > 0) {
-            this.formatList(node, "unions", formatter, {
-                keyword: "unions",
-            });
-        }
-
-        if (node.intersects.length > 0) {
-            this.formatList(node, "intersects", formatter, {
-                keyword: "intersects",
-            });
-        }
-
-        if (node.differences.length > 0) {
-            this.formatList(node, "differences", formatter, {
-                keyword: "differences",
-            });
+        if (node.multiplicity) {
+            formatter.node(node.multiplicity).prepend(Options.oneSpace);
         }
     }
 
@@ -518,18 +633,6 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.property("prefixes").prepend(Options.spaceOrIndent);
         }
 
-        switch (node.$containerProperty) {
-            case "return":
-                formatter.keyword("return").append(Options.oneSpace);
-                break;
-            case "members":
-                formatter.keyword("member").append(Options.oneSpace);
-                break;
-            case "variants":
-                formatter.keyword("variant").append(Options.oneSpace);
-                break;
-        }
-
         if (node.isNonunique) {
             formatter.keyword("nonunique").prepend(Options.oneSpace);
         }
@@ -538,46 +641,12 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.keyword("ordered").prepend(Options.oneSpace);
         }
 
-        if (node.chains.length > 0) {
-            this.formatList(node, "chains", formatter, {
-                keyword: "chains",
-            });
-        }
+        // feature chainings
+        formatter.keywords(".").prepend(Options.noSpace).append(Options.noSpaceOrIndent);
 
-        if (node.inverseOf.length > 0) {
-            this.formatList(node, "inverseOf", formatter, {
-                keyword: ["inverse", "of"],
-            });
-        }
-
-        if (node.featuredBy.length > 0) {
-            this.formatList(node, "featuredBy", formatter, {
-                keyword: ["featured", "by"],
-            });
-        }
-
-        if (node.typedBy.length > 0) {
-            this.formatList(node, "typedBy", formatter, {
-                keyword: [":", ast.isUsage(node) ? "defined" : "typed", "by"],
-            });
-        }
-
-        if (node.subsets.length > 0) {
-            this.formatList(node, "subsets", formatter, {
-                keyword: ["subsets", ":>"],
-            });
-        }
-
-        if (node.redefines.length > 0) {
-            this.formatList(node, "redefines", formatter, {
-                keyword: ["redefines", ":>>"],
-            });
-        }
-
-        if (node.references.length > 0) {
-            this.formatList(node, "references", formatter, {
-                keyword: ["references", "::>"],
-            });
+        if (node.value && node.$meta.owner().is(ast.InvocationExpression)) {
+            // argument
+            formatter.keyword("=").surround(Options.noSpace);
         }
     }
 
@@ -591,17 +660,32 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.keyword("default").prepend(Options.oneSpace);
         }
 
-        formatter.node(node.expression).prepend(addIndent(Options.spaceOrLine, 1));
+        if (node.element && node.element.$cstNode?.offset !== node.$cstNode?.offset)
+            formatter
+                .node(node.element)
+                .prepend(
+                    addIndent(
+                        equal.nodes.length > 0 || node.isDefault
+                            ? Options.spaceOrLine
+                            : Options.noSpace,
+                        1
+                    )
+                );
     }
 
-    @formatter(ast.ElementFilter) elementFilter(
-        node: ast.ElementFilter,
-        formatter: NodeFormatter<ast.ElementFilter>
+    @formatter(ast.ElementFilterMembership) elementFilter(
+        node: ast.ElementFilterMembership,
+        formatter: NodeFormatter<ast.ElementFilterMembership>
     ): void {
-        this.formatPrepend(node, formatter);
-        if (node.visibility) formatter.property("visibility").append(Options.oneSpace);
-        formatter.keyword("filter").append(Options.oneSpace);
-        formatter.keyword(";").prepend(Options.noSpace);
+        if (node.$cstNode?.text.startsWith("[")) {
+            if (node.element) {
+                formatter.node(node).prepend(addIndent(Options.noSpace, 1));
+                this.formatBraces(formatter, "[", "]", formatter.node(node.element));
+            }
+        } else {
+            this.relationship(node, formatter, { keyword: "filter" });
+            formatter.keyword(";").prepend(Options.noSpace);
+        }
     }
 
     @formatter(ast.LibraryPackage) libraryPackage(
@@ -626,101 +710,140 @@ export class SysMLFormatter extends AbstractFormatter {
             );
         }
 
-        if (node.subsets.length > 0) {
-            this.formatList(node, "subsets", formatter, { keyword: ["subsets", ":>"] });
+        if (node.typeRelationships.length > 0) {
+            this.formatList(node, "typeRelationships", formatter, { keyword: ["subsets", ":>"] });
         }
     }
 
-    @formatter(ast.Import) import(node: ast.Import, formatter: NodeFormatter<ast.Import>): void {
-        this.formatPrepend(node, formatter);
-        if (node.visibility) formatter.property("visibility").append(Options.oneSpace);
-        if (node.importsAll) formatter.keyword("all").prepend(Options.oneSpace);
-        if (node.importedNamespace)
-            formatter.property("importedNamespace").prepend(Options.oneSpace);
-        if (node.kind)
-            formatter
-                .property("kind")
-                .prepend(node.importedNamespace ? Options.noSpace : Options.oneSpace);
-        if (node.conditions.length > 0) {
-            node.conditions.forEach((expr, i) =>
-                this.formatBraces(formatter, "[", "]", formatter.node(expr), i).prepend(
-                    Options.noSpaceOrIndent
-                )
-            );
-        }
-
-        this.formatBody(formatter);
+    @formatter(ast.Import) import(
+        node: ast.Import,
+        formatter: NodeFormatter<ast.Import>,
+        kw = "import"
+    ): void {
+        this.relationship(node, formatter, { keyword: kw });
+        formatter.keyword(kw).append(Options.oneSpace);
+        if (node.importsAll) formatter.keyword("all").append(Options.oneSpace);
+        if (node.isRecursive) formatter.keyword("::**").surround(Options.noSpace);
     }
 
-    protected explicitSpecialization(
-        node: ast.Element,
-        formatter: NodeFormatter<ast.Element>,
+    @formatter(ast.NamespaceImport) namespaceImport(
+        node: ast.NamespaceImport,
+        formatter: NodeFormatter<ast.NamespaceImport>,
+        kw = "import"
+    ): void {
+        this.import(node, formatter, kw);
+        formatter.keywords("::*").surround(Options.noSpace);
+    }
+
+    @formatter(ast.MembershipExpose) MembershipExpose(
+        node: ast.MembershipExpose,
+        formatter: NodeFormatter<ast.MembershipExpose>
+    ): void {
+        this.import(node, formatter, "expose");
+    }
+
+    @formatter(ast.NamespaceExpose) NamespaceExpose(
+        node: ast.NamespaceExpose,
+        formatter: NodeFormatter<ast.NamespaceExpose>
+    ): void {
+        this.namespaceImport(node, formatter, "expose");
+    }
+
+    protected typeRelationship(
+        node: ast.Relationship,
+        formatter: NodeFormatter<ast.Relationship>,
         keyword = "specialization"
     ): void {
-        this.element(node, formatter);
+        const declaration = node.$container.$meta.is(ast.Type);
+        if (declaration) return;
+        this.relationship(node, formatter, { keyword });
 
-        formatter.keyword(keyword).append(Options.oneSpace);
         if (node.declaredName) {
             formatter.property("declaredName").append(Options.spaceOrIndent);
         } else if (node.declaredShortName) {
             formatter.keyword(">").append(Options.spaceOrIndent);
         }
+
+        formatter
+            .node(node.source ?? node.chains[0])
+            .prepend(Options.oneSpace)
+            .append(Options.spaceOrIndent);
+        formatter
+            .node(node.reference ?? node.chains[node.chains.length - 1])
+            .prepend(Options.oneSpace);
     }
 
-    @formatter(ast.Specialization) specialization(
-        node: ast.Specialization,
-        formatter: NodeFormatter<ast.Specialization>,
+    @formatter(ast.Specialization) specialization<T extends ast.Specialization | ast.Conjugation>(
+        node: T,
+        formatter: NodeFormatter<T>,
         keyword = "specialization"
     ): void {
-        this.explicitSpecialization(node, formatter, keyword);
-
-        formatter.property("specific").prepend(Options.oneSpace).append(Options.spaceOrIndent);
-        formatter.property("general").prepend(Options.oneSpace);
+        this.typeRelationship(node, formatter, keyword);
     }
 
     @formatter(ast.FeatureTyping) featureTyping(
         node: ast.FeatureTyping,
         formatter: NodeFormatter<ast.FeatureTyping>
     ): void {
-        this.specialization(node, formatter);
+        this.typeRelationship(node, formatter);
         formatter.keyword("typed").append(Options.oneSpace);
+    }
+
+    @formatter(ast.ConjugatedPortTyping) conjugatedPortTyping(
+        node: ast.ConjugatedPortTyping,
+        formatter: NodeFormatter<ast.ConjugatedPortTyping>
+    ): void {
+        this.typeRelationship(node, formatter);
+        formatter.keyword("~").append(Options.noSpace);
     }
 
     @formatter(ast.Conjugation) conjugation(
         node: ast.Conjugation,
         formatter: NodeFormatter<ast.Conjugation>
     ): void {
-        this.specialization(node, formatter, "conjugation");
+        this.typeRelationship(node, formatter, "conjugation");
     }
 
     @formatter(ast.Disjoining) disjoining(
         node: ast.Disjoining,
         formatter: NodeFormatter<ast.Disjoining>
     ): void {
-        this.explicitSpecialization(node, formatter, "disjoining");
-        formatter.property("disjoined").prepend(Options.oneSpace).append(Options.spaceOrIndent);
-        formatter.property("disjoining").prepend(Options.oneSpace);
+        this.typeRelationship(node, formatter, "disjoining");
     }
 
     @formatter(ast.FeatureInverting) featureInverting(
         node: ast.FeatureInverting,
         formatter: NodeFormatter<ast.FeatureInverting>
     ): void {
-        this.explicitSpecialization(node, formatter, "inverting");
-        formatter
-            .property("featureInverted")
-            .prepend(Options.oneSpace)
-            .append(Options.spaceOrIndent);
-        formatter.property("invertingFeature").prepend(Options.oneSpace);
+        this.typeRelationship(node, formatter, "inverting");
     }
 
     @formatter(ast.TypeFeaturing) typeFeaturing(
         node: ast.TypeFeaturing,
         formatter: NodeFormatter<ast.TypeFeaturing>
     ): void {
-        this.explicitSpecialization(node, formatter, "featuring");
-        formatter.property("feature").prepend(Options.oneSpace).append(Options.spaceOrIndent);
-        formatter.property("featuringType").prepend(Options.oneSpace);
+        this.typeRelationship(node, formatter, "featuring");
+    }
+
+    @formatter(ast.Unioning) unioning(
+        node: ast.Unioning,
+        formatter: NodeFormatter<ast.Unioning>
+    ): void {
+        this.typeRelationship(node, formatter, "unioning");
+    }
+
+    @formatter(ast.Intersecting) intersecting(
+        node: ast.Intersecting,
+        formatter: NodeFormatter<ast.Intersecting>
+    ): void {
+        this.typeRelationship(node, formatter, "intersecting");
+    }
+
+    @formatter(ast.Differencing) differencing(
+        node: ast.Differencing,
+        formatter: NodeFormatter<ast.Differencing>
+    ): void {
+        this.typeRelationship(node, formatter, "differencing");
     }
 
     @formatter(ast.Connector) connector(
@@ -730,19 +853,20 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.feature(node, formatter);
 
+        const ends = node.members.filter((m) => m.$meta.is(ast.EndFeatureMembership));
         const braceOpen = formatter.keyword("(");
         if (braceOpen.nodes.length === 0) {
             // binary
             const from = formatter.keyword(keywords[0]);
-            if (from.nodes.length === 0) formatter.node(node.ends[0]).prepend(Options.indent);
+            if (from.nodes.length === 0) formatter.node(ends[0]).prepend(Options.indent);
             else from.prepend(Options.indent).append(Options.oneSpace);
             formatter.keyword(keywords[1]).prepend(Options.indent).append(Options.oneSpace);
-            formatter.nodes(...node.ends).prepend(highPriority(Options.oneSpace));
+            formatter.nodes(...ends).prepend(highPriority(Options.oneSpace));
         } else {
             // nary
             braceOpen.prepend(Options.oneSpace);
             formatter.keyword(")").prepend(Options.indent);
-            this.formatList(node, "ends", formatter, {
+            this.formatList(node, ends, formatter, {
                 // using priority > 0 so that if ends are references only they
                 // don't end up overwriting these moves
                 initial: highPriority(Options.indent),
@@ -754,14 +878,22 @@ export class SysMLFormatter extends AbstractFormatter {
     protected formatBinding(
         node: ast.Feature,
         formatter: NodeFormatter<ast.Feature>,
-        ends: AstNode[],
+        ends: AstNode[] | undefined,
         prefix: string,
         binder: string
     ): void {
         this.feature(node, formatter);
+        if (!ends) {
+            ends = node.members.filter((m) =>
+                m.$meta.isAny([ast.EndFeatureMembership, ast.ParameterMembership])
+            );
+        }
+
         if (ends.length === 0) return;
 
         const first = formatter.keyword(prefix);
+        const bind = formatter.keyword(binder);
+        if (first.nodes.length === 0 && bind.nodes.length === 0) return;
         let start = 0;
         if (first.nodes.length > 0) {
             if (node.$cstNode?.offset !== first.nodes[0].offset)
@@ -771,7 +903,7 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.node(ends[0]).prepend(highPriority(Options.spaceOrIndent));
             start = 1;
         }
-        formatter.keyword(binder).prepend(Options.spaceOrIndent).append(Options.oneSpace);
+        bind.prepend(Options.spaceOrIndent).append(Options.oneSpace);
         formatter.nodes(...ends.slice(start)).prepend(highPriority(Options.oneSpace));
     }
 
@@ -779,21 +911,21 @@ export class SysMLFormatter extends AbstractFormatter {
         node: ast.BindingConnector,
         formatter: NodeFormatter<ast.BindingConnector>
     ): void {
-        this.formatBinding(node, formatter, node.ends, "of", "=");
+        this.formatBinding(node, formatter, undefined, "of", "=");
     }
 
     @formatter(ast.BindingConnectorAsUsage) bindingConnectorAsUsage(
         node: ast.BindingConnectorAsUsage,
         formatter: NodeFormatter<ast.BindingConnectorAsUsage>
     ): void {
-        this.formatBinding(node, formatter, node.ends, "bind", "=");
+        this.formatBinding(node, formatter, undefined, "bind", "=");
     }
 
     @formatter(ast.Succession) succession(
         node: ast.Succession,
         formatter: NodeFormatter<ast.Succession>
     ): void {
-        this.formatBinding(node, formatter, node.ends, "first", "then");
+        this.formatBinding(node, formatter, undefined, "first", "then");
     }
 
     @formatter(ast.ItemFlow) itemFlow(
@@ -801,7 +933,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ItemFlow>,
         keyword = /flow/
     ): void {
-        this.formatBinding(node, formatter, node.ends, "from", "to");
+        this.formatBinding(node, formatter, undefined, "from", "to");
 
         const of = formatter.keyword("of");
         if (of.nodes.length === 0) return;
@@ -841,18 +973,27 @@ export class SysMLFormatter extends AbstractFormatter {
             this.feature(node, formatter);
         } else {
             // expression body
-            this.formatBody(
-                formatter,
-                // first parent is FeatureReferenceExpression
-                ast.isInvocationExpression(node.$container.$container)
-                    ? Options.noSpace
-                    : Options.oneSpace
-            );
+            formatter
+                .keyword("{")
+                .prepend(
+                    node.$cstNode &&
+                        getPreviousNode(node.$cstNode)?.element.$meta?.is(ast.FeatureValue)
+                        ? Options.oneSpace
+                        : Options.noSpace
+                );
+            formatter
+                .keyword("}")
+                .prepend(node.$children.length > 0 ? Options.newLine : Options.noSpace);
+            this.indentChildren(node, formatter);
         }
 
         if (node.result) {
-            formatter.node(node.result).prepend(Options.newLine);
+            formatter.node(node.result).prepend(Options.indent);
         }
+    }
+
+    @formatter(ast.LiteralExpression) literalExpression(): void {
+        /* no formatting required */
     }
 
     protected formatBraces(
@@ -912,7 +1053,7 @@ export class SysMLFormatter extends AbstractFormatter {
             }
 
             case "[": {
-                this.formatBraces(formatter, "[", "]", formatter.node(node.args[1])).prepend(
+                this.formatBraces(formatter, "[", "]", formatter.node(node.operands[1])).prepend(
                     Options.noSpace
                 );
                 break;
@@ -920,7 +1061,7 @@ export class SysMLFormatter extends AbstractFormatter {
 
             default: {
                 if (!node.operator) break;
-                if (node.args.length === 1) {
+                if (node.operands.length + node.members.length <= 1) {
                     operator.append(
                         /not|all/.test(node.operator) ? Options.oneSpace : Options.noSpace
                     );
@@ -932,6 +1073,19 @@ export class SysMLFormatter extends AbstractFormatter {
                 }
                 break;
             }
+        }
+
+        const arrow = formatter.keyword("->");
+        if (arrow.nodes.length > 0) {
+            arrow.prepend(Options.noSpaceOrIndent).append(Options.noSpace);
+            const type = formatter.property("typeRelationships");
+            type.append(
+                // braces should be formatted with no space
+                /\{|\(/.test(getNextNode(type.nodes[0])?.text ?? "")
+                    ? Options.noSpace
+                    : Options.spaceOrIndent
+            );
+            this.formatArgList(node, formatter);
         }
     }
 
@@ -946,23 +1100,20 @@ export class SysMLFormatter extends AbstractFormatter {
         dot.prepend(Options.noSpace).append(Options.noSpace);
     }
 
-    @formatter(ast.InvocationExpression) invocationExpression(
+    protected formatArgList(
         node: ast.InvocationExpression,
         formatter: NodeFormatter<ast.InvocationExpression>
     ): void {
-        if (node.$cstNode?.text.startsWith("(")) {
-            this.formatBraces(formatter, "(", ")").append(Options.newLine);
-        }
-
         const braces = formatter.keyword("(", 1);
 
         if (braces.nodes.length > 0) {
             // arg list
             braces.prepend(Options.noSpace);
             const closing = formatter.keyword(")", 0);
-            if (node.args.length > 0) {
-                if (ast.isNamedArgument(node.args[0])) {
-                    this.formatList(node, "args", formatter, {
+            if (node.members.length > 0) {
+                if ((node.members[0].element as ast.Feature).typeRelationships.length > 0) {
+                    // named arguments
+                    this.formatList(node, node.members, formatter, {
                         initial: Options.newLine,
                         next: Options.newLine,
                     });
@@ -970,7 +1121,7 @@ export class SysMLFormatter extends AbstractFormatter {
                 } else {
                     const inline = linesDiff(braces.nodes[0], closing.nodes[0]) === 0;
 
-                    this.formatList(node, "args", formatter, {
+                    this.formatList(node, node.members, formatter, {
                         initial: inline ? Options.noSpace : Options.newLine,
                         next: inline ? Options.oneSpace : Options.spaceOrLine,
                     });
@@ -982,25 +1133,17 @@ export class SysMLFormatter extends AbstractFormatter {
                 braces.append(Options.noSpace);
             }
         }
-
-        const arrow = formatter.keyword("->");
-        if (arrow.nodes.length > 0) {
-            arrow.prepend(Options.noSpaceOrIndent).append(Options.noSpace);
-            const type = formatter.property("type");
-            type.append(
-                // braces should be formatted with no space
-                braces.nodes.length > 0 || /\{|\(/.test(getNextNode(type.nodes[0])?.text ?? "")
-                    ? Options.noSpace
-                    : Options.spaceOrIndent
-            );
-        }
     }
 
-    @formatter(ast.NamedArgument) namedArgument(
-        node: ast.NamedArgument,
-        formatter: NodeFormatter<ast.NamedArgument>
+    @formatter(ast.InvocationExpression) invocationExpression(
+        node: ast.InvocationExpression,
+        formatter: NodeFormatter<ast.InvocationExpression>
     ): void {
-        formatter.keyword("=").prepend(Options.noSpace).append(Options.noSpace);
+        if (node.$cstNode?.text.startsWith("(")) {
+            this.formatBraces(formatter, "(", ")").append(Options.newLine);
+        }
+
+        this.formatArgList(node, formatter);
     }
 
     @formatter(ast.FeatureChainExpression) featureChainExpression(
@@ -1027,7 +1170,7 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.formatBraces(formatter, "(", ")");
 
-        formatter.keyword(".?").prepend(Options.noSpace).append(highPriority(Options.noSpace));
+        formatter.keyword(".?").prepend(Options.noSpace).append(Options.noSpace);
     }
 
     @formatter(ast.OccurrenceDefinition) occurrenceDefinition(
@@ -1045,15 +1188,6 @@ export class SysMLFormatter extends AbstractFormatter {
         this.usagePart(node, formatter);
         if (node.isIndividual) formatter.keyword("individual").append(Options.oneSpace);
         if (node.portionKind) formatter.property("portionKind").append(Options.oneSpace);
-
-        // handle empty succession usages that start with 'then' and have no ends
-        if (!node.$containerIndex || !("features" in node.$container)) return;
-        const prev = node.$container.features[node.$containerIndex - 1];
-        if (
-            prev?.$type === ast.SuccessionAsUsage &&
-            (prev as ast.SuccessionAsUsage).ends.length === 0
-        )
-            formatter.node(node).prepend(Options.oneSpace);
     }
 
     @formatter(ast.OccurrenceUsage) occurrenceUsage(
@@ -1071,10 +1205,10 @@ export class SysMLFormatter extends AbstractFormatter {
         this.occurrenceUsage(node, formatter);
         const kw = formatter.keyword("occurrence");
         if (kw.nodes.length > 0) kw.prepend(Options.oneSpace);
-        else if (node.references.length > 0) {
+        else if (node.typeRelationships.length > 0) {
             // references is the first sub element without 'occurrence', format
             // it on the same line
-            formatter.node(node.references[0]).prepend(Options.oneSpace);
+            formatter.node(node.typeRelationships[0]).prepend(Options.oneSpace);
         }
     }
 
@@ -1132,21 +1266,13 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("perform").append(Options.oneSpace);
     }
 
-    @formatter(ast.InitialNode) initialNode(
-        node: ast.InitialNode,
-        formatter: NodeFormatter<ast.InitialNode>
-    ): void {
-        this.element(node, formatter);
-        formatter.keyword("first").append(Options.oneSpace);
-    }
-
     @formatter(ast.AcceptActionUsage) acceptActionUsage(
         node: ast.AcceptActionUsage,
         formatter: NodeFormatter<ast.AcceptActionUsage>
     ): void {
         this.actionUsage(node, formatter);
         formatter.keyword("accept").prepend(Options.indent).append(Options.oneSpace);
-        if (node.via) formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
+        formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
     }
 
     @formatter(ast.TriggerInvocationExpression) triggerInvocationExpression(
@@ -1162,8 +1288,10 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.actionUsage(node, formatter);
         formatter.keyword("send").prepend(Options.indent).append(Options.oneSpace);
-        if (node.via) formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
-        if (node.to) formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
+        if (node.members.length >= 2) {
+            formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
+            formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
+        }
     }
 
     @formatter(ast.AssignmentActionUsage) assignmentActionUsage(
@@ -1171,7 +1299,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.AssignmentActionUsage>
     ): void {
         this.actionUsage(node, formatter);
-        this.formatBinding(node, formatter, [node.left, node.right], "assign", ":=");
+        this.formatBinding(node, formatter, [node.members[0], node.members[1]], "assign", ":=");
     }
 
     @formatter(ast.IfActionUsage) ifActionUsage(
@@ -1180,10 +1308,10 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.usage(node, formatter);
         formatter.keyword("if").prepend(Options.indent).append(Options.oneSpace);
-        formatter.node(node.body).prepend(highPriority(addIndent(Options.indent, 1)));
-        if (node.else) {
+        formatter.node(node.members[1]).prepend(highPriority(addIndent(Options.indent, 1)));
+        if (node.members.length > 2) {
             formatter.keyword("else").prepend(Options.indent);
-            formatter.node(node.else).prepend(highPriority(addIndent(Options.oneSpace, 2)));
+            formatter.node(node.members[2]).prepend(highPriority(addIndent(Options.oneSpace, 2)));
         }
     }
 
@@ -1193,16 +1321,17 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.usage(node, formatter);
 
-        if (node.expression) {
-            formatter.keyword("while").prepend(Options.indent);
-            formatter.node(node.expression).prepend(addIndent(Options.oneSpace, 1));
+        const whileKw = formatter.keyword("while");
+        if (whileKw.nodes.length > 0) {
+            whileKw.prepend(Options.indent);
+            formatter.node(node.members[0]).prepend(addIndent(Options.oneSpace, 1));
         } else {
             formatter.keyword("loop").prepend(Options.indent);
         }
-        formatter.node(node.body).prepend(highPriority(addIndent(Options.indent, 1)));
-        if (node.until) {
+        formatter.node(node.members[1]).prepend(highPriority(addIndent(Options.indent, 1)));
+        if (node.members.length > 2) {
             formatter.keyword("until").prepend(Options.indent);
-            formatter.node(node.until).prepend(highPriority(addIndent(Options.oneSpace, 2)));
+            formatter.node(node.members[2]).prepend(highPriority(addIndent(Options.oneSpace, 2)));
         }
     }
 
@@ -1213,16 +1342,23 @@ export class SysMLFormatter extends AbstractFormatter {
         this.usage(node, formatter);
 
         formatter.keyword("for").prepend(Options.indent);
-        formatter.node(node.for).prepend(highPriority(addIndent(Options.oneSpace, 1)));
+        formatter.node(node.members[0]).prepend(highPriority(addIndent(Options.oneSpace, 1)));
         formatter.keyword("in").prepend(Options.spaceOrIndent);
-        formatter.node(node.expression).prepend(addIndent(Options.oneSpace, 1));
-        formatter.node(node.body).prepend(highPriority(addIndent(Options.indent, 1)));
+        formatter.node(node.members[1]).prepend(addIndent(Options.oneSpace, 1));
+        formatter.node(node.members[2]).prepend(highPriority(addIndent(Options.indent, 1)));
     }
 
     @formatter(ast.SuccessionAsUsage) successionAsUsage(
         node: ast.SuccessionAsUsage,
         formatter: NodeFormatter<ast.SuccessionAsUsage>
     ): void {
+        if (node.$cstNode?.text.startsWith("then")) {
+            if (node.members.length === 0) return;
+            formatter.node(node.members[0]).prepend(Options.oneSpace);
+            if (node.members.length === 1) return;
+            formatter.node(node.members[1]).prepend(Options.spaceOrIndent);
+            return;
+        }
         this.usagePart(node, formatter);
         this.succession(node, formatter);
     }
@@ -1233,32 +1369,24 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.occurrenceUsage(node, formatter);
 
-        const formatProp = <K extends KeysMatching<ast.TransitionUsage, AstNode | undefined>>(
-            kw: string,
-            p: K
-        ): void => {
-            const child = node[p];
-            if (child) {
-                const kwRegion = formatter.keyword(kw);
-                kwRegion.prepend(Options.indent);
-                const action =
-                    kwRegion.nodes.length > 0 ? addIndent(Options.oneSpace, 1) : Options.indent;
-                formatter.node(child).prepend(highPriority(action));
-            }
+        const formatProp = (kw: string): void => {
+            const kwRegion = formatter.keyword(kw);
+            if (kwRegion.nodes.length === 0) return;
+            const child = getNextNode(kwRegion.nodes[0], false)?.element;
+            if (!child) return;
+            kwRegion.prepend(Options.indent);
+            const action =
+                kwRegion.nodes.length > 0 ? addIndent(Options.oneSpace, 1) : Options.indent;
+            formatter.node(child).prepend(highPriority(action));
         };
 
-        formatProp("first", "source");
-        formatProp("if", "guard");
-        formatProp("then", "then");
-        formatProp("else", "else");
-        formatProp("do", "effect");
+        formatProp("first");
+        formatProp("then");
+        formatProp("else");
 
-        if (node.trigger) {
-            formatter
-                .keyword("accept")
-                .prepend(Options.indent)
-                .append(addIndent(Options.oneSpace, 1));
-        }
+        formatter
+            .nodes(...node.members.filter((m) => m.$meta.is(ast.TransitionFeatureMembership)))
+            .prepend(Options.indent);
     }
 
     @formatter(ast.ActionUsage) actionUsage(
@@ -1266,10 +1394,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ActionUsage>
     ): void {
         this.occurrenceUsage(node, formatter);
-
-        if (node.actionKind) {
-            formatter.property("actionKind").append(Options.oneSpace);
-        }
     }
 
     @formatter(ast.AssertConstraintUsage) assertConstraintUsage(
@@ -1287,7 +1411,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ReferenceUsage>
     ): void {
         this.usage(node, formatter);
-        if (node.isSubject) formatter.keyword("subject").append(Options.oneSpace);
     }
 
     @formatter(ast.ConstraintUsage) constraintUsage(
@@ -1295,7 +1418,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ConstraintUsage>
     ): void {
         this.occurrenceUsage(node, formatter);
-        if (node.constraintKind) formatter.property("constraintKind").append(Options.oneSpace);
     }
 
     @formatter(ast.ConcernUsage) concernUsage(
@@ -1303,7 +1425,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ConcernUsage>
     ): void {
         this.occurrenceUsage(node, formatter);
-        if (node.isFramed) formatter.keyword("frame").append(Options.oneSpace);
     }
 
     @formatter(ast.PartUsage) partUsage(
@@ -1311,7 +1432,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.PartUsage>
     ): void {
         this.occurrenceUsage(node, formatter);
-        if (node.parameterKind) formatter.property("parameterKind").append(Options.oneSpace);
     }
 
     @formatter(ast.SatisfyRequirementUsage) satisfyRequirementsUsage(
@@ -1320,9 +1440,7 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.assertConstraintUsage(node, formatter);
         formatter.keyword("satisfy").append(Options.oneSpace);
-        if (node.by) {
-            formatter.keyword("by").prepend(Options.indent).append(addIndent(Options.oneSpace, 1));
-        }
+        formatter.keyword("by").prepend(Options.indent).append(addIndent(Options.oneSpace, 1));
     }
 
     @formatter(ast.RequirementUsage) requirementUsage(
@@ -1330,7 +1448,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.RequirementUsage>
     ): void {
         this.constraintUsage(node, formatter);
-        if (node.requirementKind) formatter.property("requirementKind").append(Options.oneSpace);
     }
 
     @formatter(ast.UseCaseUsage) useCaseUsage(
@@ -1360,10 +1477,10 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter.keyword("include").append(Options.oneSpace);
     }
 
-    protected override isNecessary(edit: TextEdit, document: TextDocument): boolean {
-        // preserve new line edits so that they are not overridden when the
-        // document is already formatted
-        return /\n/.test(edit.newText) || super.isNecessary(edit, document);
+    protected override isNecessary(): boolean {
+        // preserve all edits so that overlapping edits can be properly resolved
+        // irrespective of the existing document formatting
+        return true;
     }
 
     protected override doDocumentFormat(
@@ -1387,6 +1504,28 @@ export class SysMLFormatter extends AbstractFormatter {
                 // some in `isNecessary`
                 .filter((edit) => super.isNecessary(edit, text))
         );
+    }
+
+    protected override iterateAstFormatting(document: LangiumDocument, range?: Range): void {
+        const root = document.parseResult.value;
+        this.format(root);
+        const treeIterator = streamAllContents(root).iterator();
+        let result: IteratorResult<AstNode>;
+        do {
+            result = treeIterator.next();
+            if (!result.done) {
+                const node = result.value;
+                // Langium assumes programmatic AST nodes don't exist...
+                const current = node.$cstNode?.range;
+                if (!current) continue;
+                const inside = this.insideRange(current, range);
+                if (inside) {
+                    this.format(node);
+                } else {
+                    treeIterator.prune();
+                }
+            }
+        } while (!result.done);
     }
 
     protected override createHiddenTextEdits(
@@ -1539,7 +1678,7 @@ export class SysMLFormatter extends AbstractFormatter {
             // i.e. the text document is a single comment body
             /* istanbul ignore next (safe-guard and type hint) */
             if (!ast.isNamespace(node.element)) return;
-            element = node.element.$meta.comments[0].element;
+            element = node.element.$meta.comments[0];
         } else {
             element = node.element.$meta;
         }
@@ -1579,8 +1718,12 @@ export class SysMLFormatter extends AbstractFormatter {
     protected owningElement(node: CstNode | undefined): AstNode | undefined {
         // have to skip reference elements when comparing AST nodes as they are
         // always a part of some other AST element
-        if (ast.isElementReference(node?.element)) return node?.element.$container;
-        return node?.element;
+        let owner = node?.element;
+        if (ast.isElementReference(owner)) owner = owner.$container;
+        while (owner?.$cstNode?.text === node?.text) {
+            owner = owner?.$container;
+        }
+        return owner;
     }
 
     /**
@@ -1610,14 +1753,15 @@ export class SysMLFormatter extends AbstractFormatter {
 
     protected formatList<T extends AstNode, K extends KeysMatching<T, AstNode[]>>(
         node: T,
-        property: K,
+        property: K | AstNode[],
         formatter: NodeFormatter<AstNode>,
         options?:
             | { keyword: string | string[]; indent?: boolean }
             | { initial?: FormattingAction; next?: FormattingAction }
     ): void {
-        formatter.keywords(",").prepend(Options.noSpace);
-        const items = node[property] as AstNode[];
+        const commas = formatter.keywords(",");
+        commas.prepend(Options.noSpace);
+        const items = Array.isArray(property) ? property : (node[property] as AstNode[]);
         let initial = Options.spaceOrIndent;
         let next = Options.spaceOrIndent;
         if (options) {
@@ -1641,6 +1785,9 @@ export class SysMLFormatter extends AbstractFormatter {
                     }
                     initial = Options.oneSpace;
                     next = Options.spaceOrIndent;
+                } else if (commas.nodes.length === 0) {
+                    // not a list
+                    return;
                 }
             } else {
                 if (options.initial) initial = options.initial;
@@ -1664,9 +1811,11 @@ export class SysMLFormatter extends AbstractFormatter {
             }
             // handle repeated keywords
             const previous = getPreviousNode(region.nodes[0], false);
-            region.prepend(
-                isKeyword(previous?.feature) && previous?.feature.value === "," ? next : initial
-            );
+            if (previous?.text === ".") {
+                region.prepend(Options.noSpaceOrIndent);
+            } else {
+                region.prepend(previous?.text === "," ? next : initial);
+            }
         });
     }
 

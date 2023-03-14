@@ -15,13 +15,14 @@
  ********************************************************************************/
 
 import {
+    ActorMembership,
     CaseDefinition,
     CaseUsage,
     PartUsage,
     RequirementDefinition,
     RequirementUsage,
+    StakeholderMembership,
 } from "../../generated/ast";
-import { getParameterKind, ParameterKind } from "../enums";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ItemUsageMeta } from "./item-usage";
 
@@ -33,14 +34,8 @@ import { ItemUsageMeta } from "./item-usage";
     caseActor: "Cases::Case::actors",
 })
 export class PartUsageMeta extends ItemUsageMeta {
-    parameterKind: ParameterKind = "none";
-
     constructor(id: ElementID, parent: ModelContainer<PartUsage>) {
         super(id, parent);
-    }
-
-    override initialize(node: PartUsage): void {
-        this.parameterKind = getParameterKind(node);
     }
 
     override defaultSupertype(): string {
@@ -51,32 +46,32 @@ export class PartUsageMeta extends ItemUsageMeta {
     }
 
     protected isRequirementActor(): boolean {
-        const parent = this.parent();
         return (
-            this.parameterKind === "actor" &&
-            parent.isAny([RequirementDefinition, RequirementUsage])
+            this.parent().is(ActorMembership) &&
+            this.owner().isAny([RequirementDefinition, RequirementUsage])
         );
     }
 
     protected isRequirementStakeholder(): boolean {
-        const parent = this.parent();
         return (
-            this.parameterKind === "stakeholder" &&
-            parent.isAny([RequirementDefinition, RequirementUsage])
+            this.parent().is(StakeholderMembership) &&
+            this.owner().isAny([RequirementDefinition, RequirementUsage])
         );
     }
 
     protected isCaseActor(): boolean {
-        const parent = this.parent();
-        return this.parameterKind === "actor" && parent.isAny([CaseDefinition, CaseUsage]);
+        return this.parent().is(ActorMembership) && this.owner().isAny([CaseDefinition, CaseUsage]);
     }
 
     override isIgnoredParameter(): boolean {
-        return super.isIgnoredParameter() || this.parameterKind !== "none";
+        return (
+            super.isIgnoredParameter() ||
+            this.parent().isAny([ActorMembership, StakeholderMembership])
+        );
     }
 
-    override self(): PartUsage | undefined {
-        return super.self() as PartUsage;
+    override ast(): PartUsage | undefined {
+        return this._ast as PartUsage;
     }
 
     override parent(): ModelContainer<PartUsage> {

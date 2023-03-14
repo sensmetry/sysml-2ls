@@ -29,8 +29,8 @@ export class EnumerationDefinitionMeta extends AttributeDefinitionMeta {
         this.isAbstract = true;
     }
 
-    override self(): EnumerationDefinition | undefined {
-        return super.self() as EnumerationDefinition;
+    override ast(): EnumerationDefinition | undefined {
+        return this._ast as EnumerationDefinition;
     }
 
     override parent(): ModelContainer<EnumerationDefinition> {

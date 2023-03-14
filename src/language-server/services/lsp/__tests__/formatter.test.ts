@@ -205,7 +205,7 @@ part def C;`
             
             comment Comment /* comment */
             
-            type Type {
+            namespace Type {
             doc /* doc */
             }
             }`,
@@ -218,7 +218,7 @@ library package Pack {
     comment Comment
         /* comment */
 
-    type Type {
+    namespace Type {
         doc /* doc */
     }
 }`,
@@ -396,27 +396,30 @@ part A {
 
         describe("should leave a single leading space to end of line comment", () => {
             testFormatting("part P {}     // comment", "part P {} // comment");
-            testFormatting("part P {} // comment", "part P {} // comment");
         });
 
         describe("should format comments in the root namespace", () => {
-            testFormatting(
-                `part P {}
+            describe("with no empty lines to the previous element", () => {
+                testFormatting(
+                    `part P {}
             // comment`,
-                `
+                    `
 part P {}
 // comment`
-            );
-            testFormatting(
-                `part P {}
+                );
+            });
+            describe("with multiple empty lines to the previous element", () => {
+                testFormatting(
+                    `part P {}
     
     
             // comment`,
-                `
+                    `
 part P {}
 
 // comment`
-            );
+                );
+            });
         });
 
         describe("should leave a single leading space to end of line multiline comment", () => {
@@ -483,7 +486,6 @@ part def P {
     });
 
     describe("should leave a single space after type keywords", () => {
-        testFormatting("part    def    a;", "part def a;");
         testFormatting(
             `part    
         def    a;`,
@@ -512,15 +514,19 @@ comment ${id}
         });
 
         describe("should leave a single space between references or indent them in `about`", () => {
-            testFormatting(
-                "comment C about   A  ,      \tB /* comment */",
-                "comment C\n    about A, B\n    /* comment */"
-            );
+            describe("without line breaks in about list", () => {
+                testFormatting(
+                    "comment C about   A  ,      \tB /* comment */",
+                    "comment C\n    about A, B\n    /* comment */"
+                );
+            });
 
-            testFormatting(
-                "comment C about   A  ,      \n\n\tB /* comment */",
-                "comment C\n    about A,\n        B\n    /* comment */"
-            );
+            describe("with line breaks in about list", () => {
+                testFormatting(
+                    "comment C about   A  ,      \n\n\tB /* comment */",
+                    "comment C\n    about A,\n        B\n    /* comment */"
+                );
+            });
         });
 
         describe("should format 'about' on the same line without identifiers", () => {
@@ -546,17 +552,6 @@ comment ${id}
             describe("should format comment bodies", () => {
                 testFormatting(
                     `
-        comment /*
-                 * a comment
-                 */`,
-                    `
-comment /*
-         * a comment
-         */`
-                );
-
-                testFormatting(
-                    `
         comment Comment /*
                  * a comment
                  */`,
@@ -569,28 +564,32 @@ comment Comment
             });
 
             describe("should format doc bodies", () => {
-                testFormatting(
-                    `
+                describe("unnamed", () => {
+                    testFormatting(
+                        `
         doc /*
                  * a comment
                  */`,
-                    `
+                        `
 doc /*
      * a comment
      */`
-                );
+                    );
+                });
 
-                testFormatting(
-                    `
+                describe("named", () => {
+                    testFormatting(
+                        `
         doc Doc /*
                  * a comment
                  */`,
-                    `
+                        `
 doc Doc
     /*
      * a comment
      */`
-                );
+                    );
+                });
             });
 
             describe("should insert tabs into indented comment bodies", () => {
@@ -650,22 +649,26 @@ rep Rep language "lang"
     });
 
     describe("should format Dependency clients and suppliers with an indent", () => {
-        testFormatting(
-            "       protected    #Meta       dependency    Dep  from A,   B to C  ,   D;",
-            `
+        describe("with inline lists", () => {
+            testFormatting(
+                "       protected    #Meta       dependency    Dep  from A,   B to C  ,   D;",
+                `
 protected #Meta dependency Dep
     from A, B
     to C, D;`
-        );
+            );
+        });
 
-        testFormatting(
-            "       protected    #Meta       dependency    Dep  from A,\n   B to C\n  ,   D;",
-            `
+        describe("with multiline list", () => {
+            testFormatting(
+                "       protected    #Meta       dependency    Dep  from A,\n   B to C\n  ,   D;",
+                `
 protected #Meta dependency Dep
     from A,
         B
     to C, D;`
-        );
+            );
+        });
     });
 
     describe("should format Alias 'for' on a new line with an identifier present", () => {
@@ -678,72 +681,94 @@ protected #Meta dependency Dep
 
     describe("KerML type is formatted", () => {
         describe("should format 'abstract' on the initial line", () => {
-            testFormatting("  private       \n abstract  type   T;", "private abstract type T;", {
+            testFormatting("  private       \n abstract  class   T;", "private abstract class T;", {
                 langId: "kerml",
             });
         });
 
         describe("should preserve type keyword new line", () => {
-            testFormatting(
-                "  private       \n abstract  \n\ntype   T;",
-                "private abstract type T;",
-                { langId: "kerml" }
-            );
+            describe("without prefixes", () => {
+                testFormatting(
+                    "  private       \n abstract  \n\nclass   T;",
+                    "private abstract class T;",
+                    { langId: "kerml" }
+                );
+            });
 
-            testFormatting(
-                "  private       \n abstract   #Meta\n type   T;",
-                "private abstract #Meta\n    type T;",
-                { langId: "kerml" }
-            );
+            describe("with prefixes", () => {
+                testFormatting(
+                    "  private       \n abstract   #Meta\n class   T;",
+                    "private abstract #Meta\n    class T;",
+                    { langId: "kerml" }
+                );
+            });
         });
 
-        describe.each([
-            "specializes",
-            ":>",
-            "disjoint from",
-            "unions",
-            "intersects",
-            "differences",
-        ])("should format relationship lists with %s", (token) => {
-            testFormatting(
-                `
+        describe.each(["specializes", ":>"])(
+            "should format relationship lists with %s",
+            (token) => {
+                describe("inline", () => {
+                    testFormatting(
+                        `
         private    type    ${token} A,  B  , C  ${token} D;`,
-                `private type ${token} A, B, C ${token} D;`,
-                { langId: "kerml" }
-            );
+                        `private type ${token} A, B, C ${token} D;`,
+                        { langId: "kerml" }
+                    );
+                });
 
-            testFormatting(
-                `
+                describe("multiline", () => {
+                    testFormatting(
+                        `
         private    type    ${token} A,  B  ,\n C \n${token} D;`,
-                `
+                        `
 private type ${token} A, B,
         C
     ${token} D;`,
-                { langId: "kerml" }
-            );
-        });
+                        { langId: "kerml" }
+                    );
+                });
+            }
+        );
+
+        describe.each(["disjoint from", "unions", "intersects", "differences"])(
+            "should format relationship lists with %s",
+            (token) => {
+                describe("inline", () => {
+                    testFormatting(
+                        `
+        private    class    ${token} A,  B  , C  ${token} D;`,
+                        `private class ${token} A, B, C ${token} D;`,
+                        { langId: "kerml" }
+                    );
+                });
+
+                describe("multiline", () => {
+                    testFormatting(
+                        `
+        private    class    ${token} A,  B  ,\n C \n${token} D;`,
+                        `
+private class ${token} A, B,
+        C
+    ${token} D;`,
+                        { langId: "kerml" }
+                    );
+                });
+            }
+        );
 
         describe("should format one space between 'disjoint' and 'from'", () => {
-            testFormatting("type  disjoint   from    B,C;", "type disjoint from B, C;", {
+            testFormatting("class  disjoint   from    B,C;", "class disjoint from B, C;", {
                 langId: "kerml",
             });
         });
 
         describe("should format 'all' surrounded by spaces", () => {
-            testFormatting("abstract    type all T;", "abstract type all T;", {
+            testFormatting("abstract    class all T;", "abstract class all T;", {
                 langId: "kerml",
             });
         });
 
         describe.each(["conjugates", "~"])("should format conjugates relationships", (token) => {
-            testFormatting(
-                `private  type   T  ${token}  A \n${token}  B;`,
-                `
-private type T ${token} A
-    ${token} B;`,
-                { langId: "kerml" }
-            );
-
             testFormatting(
                 `private  type   T  ${token}  A \n${token}
                 
@@ -861,53 +886,54 @@ public ${modifier}
             }
         );
 
-        describe.each([
-            "subsets",
-            ":>",
-            "typed by",
-            ":",
-            "redefines",
-            ":>>",
-            "references",
-            "::>",
-            "featured by",
-        ])("should format relationship lists with %s", (token) => {
-            testFormatting(
-                `
+        describe.each(["subsets", ":>", "typed by", ":", "redefines", ":>>", "featured by"])(
+            "should format relationship lists with %s",
+            (token) => {
+                describe("inline", () => {
+                    testFormatting(
+                        `
         private    feature :  X   ${token} A,  B  , C  ${token} D;`,
-                `private feature : X ${token} A, B, C ${token} D;`,
-                { langId: "kerml" }
-            );
+                        `private feature : X ${token} A, B, C ${token} D;`,
+                        { langId: "kerml" }
+                    );
+                });
 
-            testFormatting(
-                `
+                describe("multiline", () => {
+                    testFormatting(
+                        `
         private    feature:X    ${token} A,  B  ,\n C \n${token} D;`,
-                `
+                        `
 private feature : X ${token} A, B,
         C
     ${token} D;`,
-                { langId: "kerml" }
-            );
-        });
+                        { langId: "kerml" }
+                    );
+                });
+            }
+        );
 
         describe.each(["chains", "inverse of"])("should format '%s' relationships", (token) => {
-            testFormatting(
-                `private  feature   T:X  ${token}  A \n${token}  B;`,
-                `
+            describe("inline", () => {
+                testFormatting(
+                    `private  feature   T:X  ${token}  A \n${token}  B;`,
+                    `
 private feature T : X ${token} A
     ${token} B;`,
-                { langId: "kerml" }
-            );
+                    { langId: "kerml" }
+                );
+            });
 
-            testFormatting(
-                `private  feature   T   :  X  ${token}  A \n${token}
+            describe("multiline", () => {
+                testFormatting(
+                    `private  feature   T   :  X  ${token}  A \n${token}
                 
                 B;`,
-                `
+                    `
 private feature T : X ${token} A
     ${token} B;`,
-                { langId: "kerml" }
-            );
+                    { langId: "kerml" }
+                );
+            });
         });
 
         describe("should not do additional format on the relationship keyword if the feature starts with it", () => {
@@ -994,14 +1020,8 @@ attribute a =
             "should format multiplicity subsettings with '%s'",
             (token) => {
                 testFormatting(
-                    `  public\n multiplicity M \t${token} A ,   B{ }`,
-                    `public multiplicity M ${token} A, B {}`,
-                    { langId: "kerml" }
-                );
-
-                testFormatting(
-                    `  public\n multiplicity M \t${token} A ,\n   B{ }`,
-                    `public multiplicity M ${token} A,\n        B {}`,
+                    `  public\n multiplicity M \t${token} A    \n { }`,
+                    `public multiplicity M ${token} A {}`,
                     { langId: "kerml" }
                 );
             }
@@ -1013,10 +1033,6 @@ attribute a =
             "should format simple import statements on one line with '%s'",
             (suffix) => {
                 testFormatting(
-                    `  public   import   A::B  ${suffix} ;`,
-                    `public import A::B${suffix};`
-                );
-                testFormatting(
                     `  public   import   all   A::B  ${suffix} ;`,
                     `public import all A::B${suffix};`
                 );
@@ -1024,8 +1040,15 @@ attribute a =
         );
 
         describe("should format filter conditions", () => {
-            testFormatting(" import  A::B   [()] [  0 ];", "import A::B[()][0];");
-            testFormatting(" import  A::B   [()]\n[  0 ];", "import A::B[()]\n    [0];");
+            describe("inline", () => {
+                testFormatting(" import  A::B   [()] [  0 ];", "import A::B[()][0];");
+            });
+            describe("multiline", () => {
+                testFormatting(
+                    " import  A::B   [()][\n  0 ];",
+                    "import A::B[()][\n        0\n    ];"
+                );
+            });
         });
     });
 
@@ -1076,21 +1099,25 @@ connector (
         });
 
         describe("should preserve line breaks between ends", () => {
-            testFormatting(
-                `  private  ${type}  all \n${prefix}   a   ${binder} \n  x ;`,
-                `
+            describe("with prefix keyword", () => {
+                testFormatting(
+                    `  private  ${type}  all \n${prefix}   a   ${binder} \n  x ;`,
+                    `
 private ${type} all
     ${prefix} a ${binder} x;`,
-                { langId: "kerml" }
-            );
+                    { langId: "kerml" }
+                );
+            });
 
-            testFormatting(
-                `  private  ${type}  all \n   a   ${binder} \n  x ;`,
-                `
+            describe("without prefix keyword", () => {
+                testFormatting(
+                    `  private  ${type}  all \n   a   ${binder} \n  x ;`,
+                    `
 private ${type} all
     a ${binder} x;`,
-                { langId: "kerml" }
-            );
+                    { langId: "kerml" }
+                );
+            });
         });
     });
 
@@ -1105,44 +1132,54 @@ private ${type} all
         const options: DeepPartial<TestFormattingOptions> = { langId: kerml ? "kerml" : "sysml" };
 
         describe("should format single line nodes", () => {
-            testFormatting(
-                `  private  ${type}   a   ${binder}   x ;`,
-                `private ${safeType} a ${binder} x;`,
-                options
-            );
+            describe("without item feature", () => {
+                testFormatting(
+                    `  private  ${type}   a   ${binder}   x ;`,
+                    `private ${safeType} a ${binder} x;`,
+                    options
+                );
+            });
 
-            testFormatting(
-                `  private  ${type}      of  K ${prefix} a   ${binder}   x ;`,
-                `private ${safeType} of K ${prefix} a ${binder} x;`,
-                options
-            );
+            describe("with item feature", () => {
+                testFormatting(
+                    `  private  ${type}      of  K ${prefix} a   ${binder}   x ;`,
+                    `private ${safeType} of K ${prefix} a ${binder} x;`,
+                    options
+                );
+            });
         });
 
         describe("should preserve line breaks between ends", () => {
-            testFormatting(
-                `  private  ${type}   \n   a   ${binder} \n  x ;`,
-                `
+            describe("without item feature", () => {
+                testFormatting(
+                    `  private  ${type}   \n   a   ${binder} \n  x ;`,
+                    `
 private ${safeType}
     a ${binder} x;`,
-                options
-            );
+                    options
+                );
+            });
 
-            testFormatting(
-                `  private  ${type}  \nof K \n${prefix}   a   ${binder} \n  x ;`,
-                `
+            describe("with item feature", () => {
+                testFormatting(
+                    `  private  ${type}  \nof K \n${prefix}   a   ${binder} \n  x ;`,
+                    `
 private ${safeType} of K
     ${prefix} a ${binder} x;`,
-                options
-            );
+                    options
+                );
+            });
 
-            testFormatting(
-                `  private  ${type}  : X\nof K \n${prefix}   a   ${binder} \n  x ;`,
-                `
+            describe("with typing", () => {
+                testFormatting(
+                    `  private  ${type}  : X\nof K \n${prefix}   a   ${binder} \n  x ;`,
+                    `
 private ${safeType} : X
     of K
     ${prefix} a ${binder} x;`,
-                options
-            );
+                    options
+                );
+            });
         });
     });
 
@@ -1160,9 +1197,8 @@ private ${safeType} : X
         });
 
         describe("should leave no spaces between empty brackets in expressions", () => {
-            testFormatting("part a = (    );", "part a = ();");
             testFormatting(
-                `part a = (    
+                `part a =   (    
     
             );`,
                 "part a = ();"
@@ -1393,8 +1429,12 @@ part x = A
 
     describe("SysML keywords", () => {
         describe("should format conjugated port references", () => {
-            testFormatting("part a defined   by  ~  \nPort {}", "part a defined by ~Port {}");
-            testFormatting("part a    :  ~  \nPort {}", "part a : ~Port {}");
+            describe("definitions", () => {
+                testFormatting("part a defined   by  ~  \nPort {}", "part a defined by ~Port {}");
+            });
+            describe("usages", () => {
+                testFormatting("part a    :  ~  \nPort {}", "part a : ~Port {}");
+            });
         });
 
         describe("should format 'defined by' in usages", () => {
@@ -1402,13 +1442,21 @@ part x = A
         });
 
         describe("should format 'variation'", () => {
-            testFormatting("  variation  part  def A;", "variation part def A;");
-            testFormatting("  variation  part   A;", "variation part A;");
+            describe("definitions", () => {
+                testFormatting("  variation  part  def A;", "variation part def A;");
+            });
+            describe("usages", () => {
+                testFormatting("  variation  part   A;", "variation part A;");
+            });
         });
 
         describe("should format 'individual'", () => {
-            testFormatting("  individual  occurrence  def A;", "individual occurrence def A;");
-            testFormatting("  individual  occurrence   A;", "individual occurrence A;");
+            describe("definitions", () => {
+                testFormatting("  individual  occurrence  def A;", "individual occurrence def A;");
+            });
+            describe("usages", () => {
+                testFormatting("  individual  occurrence   A;", "individual occurrence A;");
+            });
         });
 
         describe("should format 'variant'", () => {
@@ -1466,8 +1514,12 @@ enum def Color {
         });
 
         describe("should format event occurrence usage", () => {
-            testFormatting("  event\noccurrence \nA :  B {}", "event occurrence A : B {}");
-            testFormatting("  event\nA :  B {}", "event A : B {}");
+            describe("with 'occurrence' keyword", () => {
+                testFormatting("  event\noccurrence \nA :  B {}", "event occurrence A : B {}");
+            });
+            describe("without 'occurrence' keyword", () => {
+                testFormatting("  event\nA :  B {}", "event A : B {}");
+            });
         });
 
         describe("should format empty succession usage", () => {
@@ -1602,13 +1654,17 @@ private ${kw}
 
     describe(`${ast.PerformActionUsage} formatting`, () => {
         describe("should leave one space after 'perform'", () => {
-            testFormatting("  perform   \t action  A ;", "perform action A;");
-            testFormatting("  perform   \t  A ;", "perform A;");
+            describe("with 'action' keyword", () => {
+                testFormatting("  perform   \t action  A ;", "perform action A;");
+            });
+            describe("without 'action' keyword", () => {
+                testFormatting("  perform   \t  A ;", "perform A;");
+            });
         });
     });
 
     describe("Action nodes formatting", () => {
-        describe(`should format ${ast.InitialNode}`, () => {
+        describe("should format initial node member", () => {
             testFormatting(
                 " action  A {  private   first   B  {}}",
                 `
@@ -1895,9 +1951,15 @@ ${type} def R {
 
     describe("Use case formatting", () => {
         describe("should format 'use case'", () => {
-            testFormatting("  use   case   def   U;", "use case def U;");
-            testFormatting("  use   case   U;", "use case U;");
-            testFormatting("  include   use   case   U;", "include use case U;");
+            describe("definition", () => {
+                testFormatting("  use   case   def   U;", "use case def U;");
+            });
+            describe("usage", () => {
+                testFormatting("  use   case   U;", "use case U;");
+            });
+            describe("include", () => {
+                testFormatting("  include   use   case   U;", "include use case U;");
+            });
         });
     });
 });

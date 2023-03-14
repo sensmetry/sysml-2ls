@@ -15,8 +15,14 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { ConstraintUsage, ItemDefinition, ItemUsage } from "../../generated/ast";
-import { getRequirementConstraintKind, RequirementConstraintKind } from "../enums";
+import {
+    ConstraintUsage,
+    ItemDefinition,
+    ItemUsage,
+    RequirementConstraintMembership,
+} from "../../generated/ast";
+import { RequirementConstraintKind } from "../enums";
+import { FeatureMeta } from "../KerML";
 import { BooleanExpressionMeta } from "../KerML/boolean-expression";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
@@ -30,15 +36,9 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     assumption: "Requirements::RequirementCheck::assumptions",
     requirement: "Requirements::RequirementCheck::constraints",
 })
-export class ConstraintUsageMeta extends Mixin(OccurrenceUsageMeta, BooleanExpressionMeta) {
-    constraintKind: RequirementConstraintKind = "none";
-
+export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, OccurrenceUsageMeta) {
     constructor(id: ElementID, parent: ModelContainer<ConstraintUsage>) {
         super(id, parent);
-    }
-
-    override initialize(node: ConstraintUsage): void {
-        this.constraintKind = getRequirementConstraintKind(node.constraintKind);
     }
 
     override defaultGeneralTypes(): string[] {
@@ -46,7 +46,8 @@ export class ConstraintUsageMeta extends Mixin(OccurrenceUsageMeta, BooleanExpre
 
         // pushing front to match pilot
         // https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/blob/master/org.omg.sysml/src/org/omg/sysml/adapter/ConstraintUsageAdapter.java#L85
-        if (this.constraintKind !== "none") supertypes.unshift(this.constraintKind);
+        const constraintKind = this.requirementConstraintKind();
+        if (constraintKind) supertypes.unshift(constraintKind);
 
         if (this.isCheckedConstraint()) supertypes.push("checkedConstraint");
         if (this.isOwnedPerformance()) supertypes.push("ownedPerformance");
@@ -63,16 +64,27 @@ export class ConstraintUsageMeta extends Mixin(OccurrenceUsageMeta, BooleanExpre
     isCheckedConstraint(): boolean {
         if (!this.isComposite) return false;
 
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([ItemDefinition, ItemUsage]);
     }
 
-    override self(): ConstraintUsage | undefined {
-        return super.self() as ConstraintUsage;
+    override ast(): ConstraintUsage | undefined {
+        return this._ast as ConstraintUsage;
     }
 
     override parent(): ModelContainer<ConstraintUsage> {
         return this._parent;
+    }
+
+    requirementConstraintKind(): RequirementConstraintKind | undefined {
+        const parent = this.parent();
+        return parent.is(RequirementConstraintMembership) ? parent.kind : undefined;
+    }
+
+    override namingFeature(): FeatureMeta | undefined {
+        return this.requirementConstraintKind()
+            ? this.referencedFeature(ConstraintUsage)
+            : super.namingFeature();
     }
 }
 

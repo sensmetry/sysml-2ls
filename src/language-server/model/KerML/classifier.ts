@@ -14,10 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Association, Class, Classifier, DataType, Structure } from "../../generated/ast";
-import { SpecializationKind, TypeClassifier } from "../enums";
-import { TypeMeta } from "./type";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import {
+    Association,
+    Class,
+    Classifier,
+    DataType,
+    Structure,
+    Subclassification,
+} from "../../generated/ast";
+import { SysMLType } from "../../services/sysml-ast-reflection";
+import { TypeClassifier } from "../enums";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { TypeMeta } from "./_internal";
 
 export const ImplicitClassifiers = {
     base: "Base::Anything",
@@ -43,27 +51,23 @@ export class ClassifierMeta extends TypeMeta {
             }
         } else if (this.is(Class)) {
             this.classifier = TypeClassifier.Class;
-            // @ts-expect-error broken type inference
         } else if (this.is(DataType)) {
-            // @ts-expect-error broken type inference
             this.classifier = TypeClassifier.DataType;
-            // @ts-expect-error broken type inference
         } else if (this.is(Association)) {
-            // @ts-expect-error broken type inference
             this.classifier = TypeClassifier.Association;
         }
     }
 
-    override self(): Classifier | undefined {
-        return super.deref() as Classifier;
+    override ast(): Classifier | undefined {
+        return this._ast as Classifier;
     }
 
     override parent(): ModelContainer<Classifier> {
         return this._parent;
     }
 
-    override specializationKind(): SpecializationKind {
-        return SpecializationKind.Subclassification;
+    override specializationKind(): SysMLType {
+        return Subclassification;
     }
 }
 

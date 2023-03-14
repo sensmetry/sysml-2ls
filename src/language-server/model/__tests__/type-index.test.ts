@@ -18,23 +18,36 @@ import {
     Element,
     Comment,
     TextualAnnotatingElement,
-    VisibilityElement,
     Feature,
     Namespace,
     Type,
-    Annotation,
     OperatorExpression,
-    InlineExpression,
     Definition,
     InvocationExpression,
+    AnnotatingElement,
+    Expression,
+    Step,
+    InlineExpression,
 } from "../../generated/ast";
 import { typeIndex } from "../types";
 
 test.concurrent.each([
-    [Element, [VisibilityElement]],
-    [Comment, [Annotation, TextualAnnotatingElement, Element, VisibilityElement]],
-    [Feature, [Type, Namespace, Element, VisibilityElement]],
-    [OperatorExpression, [InvocationExpression, InlineExpression]],
+    [Element, []],
+    [Comment, [TextualAnnotatingElement, AnnotatingElement, Element]],
+    [Feature, [Type, Namespace, Element]],
+    [
+        OperatorExpression,
+        [
+            InvocationExpression,
+            InlineExpression,
+            Expression,
+            Step,
+            Feature,
+            Type,
+            Namespace,
+            Element,
+        ],
+    ],
 ])("type inheritance is sorted in inheritance order: %s", (type: string, expected: string[]) => {
     expect(Array.from(typeIndex.getInheritanceChain(type))).toStrictEqual(expected);
 });

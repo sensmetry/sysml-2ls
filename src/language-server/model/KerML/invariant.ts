@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Invariant } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { BooleanExpressionMeta } from "./boolean-expression";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { BooleanExpressionMeta } from "./_internal";
 
 export const ImplicitInvariants = {
     base: "Performances::trueEvaluations",
@@ -38,8 +38,8 @@ export class InvariantMeta extends BooleanExpressionMeta {
         this.isNegated = node.isNegated;
     }
 
-    override self(): Invariant | undefined {
-        return super.deref() as Invariant;
+    override ast(): Invariant | undefined {
+        return this._ast as Invariant;
     }
 
     override parent(): ModelContainer<Invariant> {

@@ -14,18 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    parseKerML,
-    NO_ERRORS,
-    sanitizeTree,
-    withQualifiedName,
-    qualifiedTypeReference,
-} from "../../../../testing";
-import { ItemFlow, ItemFeature } from "../../../generated/ast";
+import { parseKerML, NO_ERRORS, sanitizeTree } from "../../../../testing";
+import { Feature, Namespace } from "../../../generated/ast";
 
 test("named item flows are parsed", async () => {
     const result = await parseKerML(`
-    type Fuel;
+    class Fuel;
     struct Vehicle {
         composite feature fuelTank[1] {
             out feature fuelOut[1] : Fuel;
@@ -36,59 +30,24 @@ test("named item flows are parsed", async () => {
         flow fuelFlow from fuelTank::fuelOut to engine::fuelIn;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    const vehicle = result.value.elements[1];
-    const flow = vehicle.features[2];
-    expect(sanitizeTree(flow)).toMatchObject({
-        $type: ItemFlow,
-        ...withQualifiedName("Vehicle::fuelFlow"),
-        ends: [
-            { redefines: [qualifiedTypeReference("Vehicle::fuelTank::fuelOut")] },
-            { redefines: [qualifiedTypeReference("Vehicle::engine::fuelIn")] },
-        ],
-    });
+    const vehicle = result.value.namespaceMembers[1].element as Namespace;
+    const flow = vehicle.members[2].element;
+    expect(sanitizeTree(flow)).toMatchSnapshot();
 });
 
-test.concurrent.each([
-    [
-        "flow source and output targets can be specified using feature chains",
-        "flow fuelFlow",
-        withQualifiedName("vehicle::fuelFlow"),
-    ],
-    ["flow identification can be omitted", "flow", {}],
+test.each([
+    ["flow source and output targets can be specified using feature chains", "flow fuelFlow"],
+    ["flow identification can be omitted", "flow"],
     [
         "flow declaration can also include an explicit declaration of the type",
         "flow of fuelFlow : Fuel",
-        {
-            of: {
-                $type: ItemFeature,
-                typedBy: [qualifiedTypeReference("Fuel")],
-            },
-        },
     ],
-    [
-        "explicit declaration with name only is treated as typing",
-        "flow of Fuel",
-        {
-            of: {
-                $type: ItemFeature,
-                typedBy: [qualifiedTypeReference("Fuel")],
-            },
-        },
-    ],
-    [
-        "explicit declaration with qualified name only is treated as typing",
-        "flow of Fuel::SubFuel",
-        {
-            of: {
-                $type: ItemFeature,
-                typedBy: [qualifiedTypeReference("Fuel::SubFuel")],
-            },
-        },
-    ],
-])("%s", async (_: string, declaration: string, properties: object) => {
+    ["explicit declaration with name only is treated as typing", "flow of Fuel"],
+    ["explicit declaration with qualified name only is treated as typing", "flow of Fuel::SubFuel"],
+])("%s", async (_: string, declaration: string) => {
     const result = await parseKerML(`
-    type Fuel {
-        type SubFuel;
+    class Fuel {
+        class SubFuel;
     }
     struct Vehicle {
         composite feature fuelTank[1] {
@@ -102,14 +61,7 @@ test.concurrent.each([
         ${declaration} from fuelTank.fuelOut to engine.fuelIn;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    const vehicle = result.value.features[0];
-    const flow = vehicle.features[0];
-    expect(sanitizeTree(flow)).toMatchObject({
-        $type: ItemFlow,
-        ends: [
-            { redefines: [qualifiedTypeReference("Vehicle::fuelTank::fuelOut")] },
-            { redefines: [qualifiedTypeReference("Vehicle::engine::fuelIn")] },
-        ],
-        ...properties,
-    });
+    const vehicle = result.value.members[0].element as Feature;
+    const flow = vehicle.members[0].element;
+    expect(sanitizeTree(flow)).toMatchSnapshot();
 });

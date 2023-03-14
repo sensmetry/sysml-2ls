@@ -34,10 +34,10 @@ import {
 import { CrossReference, Keyword } from "langium/lib/grammar/generated/ast";
 import { SysMLDefaultServices } from "../services";
 import {
+    FeatureChainExpression,
+    InlineExpression,
     isElementReference,
     isFeature,
-    isFeatureReference,
-    isInlineExpression,
     MetadataAccessExpression,
 } from "../../generated/ast";
 import {
@@ -186,8 +186,8 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
             // check the text for the token instead
             const maybeToken = text.substring(node.end, tokenEnd + 1).trim();
             if (maybeToken.length > 0) {
-                token = maybeToken;
                 tokenStart = this.backtrackToAnyTriggerStart(text, tokenEnd);
+                token = text.substring(tokenStart, tokenEnd + 1);
             } else {
                 token = node.text;
                 tokenStart = node.offset;
@@ -283,18 +283,15 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                     refAcceptor,
                     document,
                     cancelToken,
-                    node.element.chain.length - end
+                    node.element.parts.length - end
                 );
             }
 
             // only add .metadata completion if the cursor is in inline
             // expression scope and the previous reference is not a feature
             // chain
-            if (
-                (!isFeatureReference(node.element) || !node.element.$meta.isChain) &&
-                token === "." &&
-                isInlineExpression(node.element.$container)
-            ) {
+            const owner = node.element.$meta.owner();
+            if (token === "." && owner.is(InlineExpression) && !owner.is(FeatureChainExpression)) {
                 const item = this.fillCompletionItem(textDocument, offset, {
                     label: "metadata",
                     kind: CompletionItemKind.Operator,
@@ -359,12 +356,11 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         index?: number
     ): Promise<void> {
         try {
-            let property: string | undefined;
             let scope: SysMLScope | undefined;
             if (isElementReference(node)) {
                 if (index === undefined) {
                     // Compute autocompletion for the last reference by default
-                    index = node.chain.length - 1;
+                    index = node.parts.length - 1;
                 }
 
                 if (index < 0) return;
@@ -386,7 +382,6 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                 // use scope from the reference parent container as fallback
                 if (!scope) {
                     node = node.$container;
-                    property = node.$containerProperty;
                 }
             }
 
@@ -395,7 +390,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                 const predicate = (): boolean => document.state < DocumentState.ComputedScopes;
                 await asyncWaitWhile(predicate, {}, token);
                 // completion for parent items
-                scope = this.scopeProvider.initialScope(node.$meta, document, property);
+                scope = this.scopeProvider.initialScope(node.$meta, document);
             }
 
             if (!scope) return;

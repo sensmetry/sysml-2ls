@@ -36,8 +36,8 @@ export class SatisfyRequirementUsageMeta extends Mixin(
         return this.isNegated ? "negated" : "base";
     }
 
-    override self(): SatisfyRequirementUsage | undefined {
-        return super.self() as SatisfyRequirementUsage;
+    override ast(): SatisfyRequirementUsage | undefined {
+        return this._ast as SatisfyRequirementUsage;
     }
 
     override parent(): ModelContainer<SatisfyRequirementUsage> {

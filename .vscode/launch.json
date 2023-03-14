@@ -71,6 +71,20 @@
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
+            "name": "Validation",
+            "type": "node",
+            "request": "launch",
+            "args": [
+                "${workspaceFolder}/scripts/run-validation.ts",
+            ],
+            "runtimeArgs": [
+                "--loader",
+                "tsx"
+            ],
+            "cwd": "${workspaceRoot}",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
             "name": "Run Extension",
             "type": "extensionHost",
             "request": "launch",
@@ -121,8 +135,28 @@
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "sourceMaps": true,
+            "sourceMaps": true
         },
+        {
+            "type": "node",
+            "name": "vscode-jest-tests.v2",
+            "request": "launch",
+            "args": [
+                "run",
+                "test",
+                "--verbose=false",
+                "--runInBand",
+                "--watchAll=false",
+                "--testNamePattern",
+                "${jest.testNamePattern}",
+                "--runTestsByPath",
+                "${jest.testFile}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "runtimeExecutable": "pnpm"
+        }
     ],
     "debug.javascript.terminalOptions": {
         "skipFiles": [

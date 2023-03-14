@@ -14,30 +14,35 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Annotation, isTextualRepresentation } from "../../generated/ast";
-import { metamodelOf, BasicMetamodel, ElementID, ModelContainer } from "../metamodel";
-import { ElementMeta } from "./_internal";
+import { AnnotatingElement, isTextualRepresentation } from "../../generated/ast";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ElementMeta } from "./element";
 
-@metamodelOf(Annotation)
-export class AnnotationMeta extends BasicMetamodel<Annotation> {
+@metamodelOf(AnnotatingElement, "abstract")
+export abstract class AnnotatingElementMeta extends ElementMeta {
     readonly annotates: ElementMeta[] = [];
 
-    constructor(id: ElementID, parent: ModelContainer<Annotation>) {
+    constructor(id: ElementID, parent: ModelContainer<AnnotatingElement>) {
         super(id, parent);
     }
 
-    override initialize(node: Annotation): void {
+    override initialize(node: AnnotatingElement): void {
         if (isTextualRepresentation(node) || node.about.length === 0) {
             this.annotates.push(node.$container.$meta);
         }
     }
 
-    override reset(node: Annotation): void {
+    override reset(node: AnnotatingElement): void {
         this.annotates.length = 0;
         this.initialize(node);
     }
 
-    override self(): Annotation | undefined {
-        return super.self() as Annotation;
+    override ast(): AnnotatingElement | undefined {
+        return this._ast as AnnotatingElement;
+    }
+
+    override owner(): ElementMeta {
+        // only namespaces are entry types
+        return this._owner as ElementMeta;
     }
 }

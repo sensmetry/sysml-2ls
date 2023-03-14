@@ -26,8 +26,8 @@ export class ForkNodeMeta extends ControlNodeMeta {
         super(id, parent);
     }
 
-    override self(): ForkNode | undefined {
-        return super.self() as ForkNode;
+    override ast(): ForkNode | undefined {
+        return this._ast as ForkNode;
     }
 
     override parent(): ModelContainer<ForkNode> {

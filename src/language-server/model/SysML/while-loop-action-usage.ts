@@ -27,8 +27,8 @@ export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
         super(id, parent);
     }
 
-    override self(): WhileLoopActionUsage | undefined {
-        return super.self() as WhileLoopActionUsage;
+    override ast(): WhileLoopActionUsage | undefined {
+        return this._ast as WhileLoopActionUsage;
     }
 
     override parent(): ModelContainer<WhileLoopActionUsage> {

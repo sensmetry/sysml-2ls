@@ -24,8 +24,8 @@ export class LoopActionUsageMeta extends ActionUsageMeta {
         super(id, parent);
     }
 
-    override self(): LoopActionUsage | undefined {
-        return super.self() as LoopActionUsage;
+    override ast(): LoopActionUsage | undefined {
+        return this._ast as LoopActionUsage;
     }
 
     override parent(): ModelContainer<LoopActionUsage> {

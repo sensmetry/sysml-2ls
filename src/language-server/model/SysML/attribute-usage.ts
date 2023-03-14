@@ -26,8 +26,8 @@ export class AttributeUsageMeta extends UsageMeta {
         super(id, parent);
     }
 
-    override self(): AttributeUsage | undefined {
-        return super.self() as AttributeUsage;
+    override ast(): AttributeUsage | undefined {
+        return this._ast as AttributeUsage;
     }
 
     override parent(): ModelContainer<AttributeUsage> {
