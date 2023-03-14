@@ -3,6 +3,11 @@
 # Changelog
 
 <!-- Include links to comparison to the previous version -->
+## Unreleased
+
+### Changed
+
+- Renamed to Systems Modeling IDE (SysIDE)
 
 ## 0.2.1
 
