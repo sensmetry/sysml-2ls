@@ -37,12 +37,12 @@ export class ItemUsageMeta extends OccurrenceUsageMeta {
 
     protected isSubitem(): boolean {
         if (!this.isComposite) return false;
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([ItemDefinition, ItemUsage]);
     }
 
-    override self(): ItemUsage | undefined {
-        return super.self() as ItemUsage;
+    override ast(): ItemUsage | undefined {
+        return this._ast as ItemUsage;
     }
 
     override parent(): ModelContainer<ItemUsage> {

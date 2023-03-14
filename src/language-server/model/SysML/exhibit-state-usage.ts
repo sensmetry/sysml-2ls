@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { ExhibitStateUsage } from "../../generated/ast";
+import { ExhibitStateUsage, ReferenceSubsetting } from "../../generated/ast";
+import { FeatureMeta } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PerformActionUsageMeta } from "./perform-action-usage";
 import { StateUsageMeta } from "./state-usage";
@@ -34,12 +35,16 @@ export class ExhibitStateUsageMeta extends Mixin(StateUsageMeta, PerformActionUs
         return supertypes;
     }
 
-    override self(): ExhibitStateUsage | undefined {
-        return super.self() as ExhibitStateUsage;
+    override ast(): ExhibitStateUsage | undefined {
+        return this._ast as ExhibitStateUsage;
     }
 
     override parent(): ModelContainer<ExhibitStateUsage> {
         return this._parent;
+    }
+
+    override namingFeature(): FeatureMeta | undefined {
+        return this.types(ReferenceSubsetting).head() as FeatureMeta | undefined;
     }
 }
 

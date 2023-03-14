@@ -27,17 +27,21 @@ test.concurrent.each(["subsets", ":>"])(
             doc /* doc */
         }
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: Subsetting,
-                    ...withQualifiedName("Sub"),
-                    specific: qualifiedTypeReference("parent"),
-                    general: qualifiedTypeReference("person"),
-                    docs: [
-                        {
-                            body: "/* doc */",
-                        },
-                    ],
+                    element: {
+                        $type: Subsetting,
+                        ...withQualifiedName("Sub"),
+                        source: qualifiedTypeReference("parent"),
+                        reference: qualifiedTypeReference("person"),
+                        annotations: [
+                            {
+                                element: {
+                                    body: "/* doc */",
+                                },
+                            },
+                        ],
+                    },
                 },
             ],
         });
@@ -52,11 +56,13 @@ test.concurrent.each(["specialization", ""])(
         feature person;
         ${prefix} subset parent :> person;
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: Subsetting,
-                    specific: qualifiedTypeReference("parent"),
-                    general: qualifiedTypeReference("person"),
+                    element: {
+                        $type: Subsetting,
+                        source: qualifiedTypeReference("parent"),
+                        reference: qualifiedTypeReference("person"),
+                    },
                 },
             ],
         });

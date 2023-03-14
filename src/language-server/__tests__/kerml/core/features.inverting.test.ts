@@ -27,17 +27,21 @@ test("feature inverting can be parsed", async () => {
             doc /* doc */
         }
     `).toParseKerML({
-        relationships: [
+        relationshipMembers: [
             {
-                $type: FeatureInverting,
-                ...withQualifiedName("parent_child"),
-                invertingFeature: qualifiedTypeReference("Person::child"),
-                featureInverted: qualifiedTypeReference("Person::parent"),
-                docs: [
-                    {
-                        body: "/* doc */",
-                    },
-                ],
+                element: {
+                    $type: FeatureInverting,
+                    ...withQualifiedName("parent_child"),
+                    source: qualifiedTypeReference("Person::parent"),
+                    reference: qualifiedTypeReference("Person::child"),
+                    annotations: [
+                        {
+                            element: {
+                                body: "/* doc */",
+                            },
+                        },
+                    ],
+                },
             },
         ],
     });
@@ -53,11 +57,13 @@ test.concurrent.each(["inverting", ""])(
         }
         ${prefix} inverse Person::parent of Person::child;
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: FeatureInverting,
-                    invertingFeature: qualifiedTypeReference("Person::child"),
-                    featureInverted: qualifiedTypeReference("Person::parent"),
+                    element: {
+                        $type: FeatureInverting,
+                        source: qualifiedTypeReference("Person::parent"),
+                        reference: qualifiedTypeReference("Person::child"),
+                    },
                 },
             ],
         });
@@ -70,16 +76,26 @@ test("features can own invertings", async () => {
         feature children : Person[*];
         feature parents: Person[*] inverse of children;
     }`).toParseKerML({
-        elements: [
+        namespaceMembers: [
             {
-                features: [
-                    ...anything(1),
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Person::parents"),
-                        inverseOf: [qualifiedTypeReference("Person::children")],
-                    },
-                ],
+                element: {
+                    members: [
+                        ...anything(1),
+                        {
+                            element: {
+                                $type: Feature,
+                                ...withQualifiedName("Person::parents"),
+                                typeRelationships: [
+                                    ...anything(1),
+                                    {
+                                        $type: FeatureInverting,
+                                        reference: qualifiedTypeReference("Person::children"),
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
             },
         ],
     });
@@ -87,7 +103,7 @@ test("features can own invertings", async () => {
 
 test("inverse features can be arbitrarily nested", async () => {
     return expect(`
-    type B;
+    class B;
     classifier A {
         feature b : B {
             feature c : C;
@@ -98,22 +114,34 @@ test("inverse features can be arbitrarily nested", async () => {
             feature a: A inverse of A::b::c;
         }
     }`).toParseKerML({
-        elements: [
+        namespaceMembers: [
             ...anything(2),
             {
-                $type: Classifier,
-                ...withQualifiedName("C"),
-                features: [
-                    {
-                        ...withQualifiedName("C::b"),
-                        features: [
-                            {
-                                ...withQualifiedName("C::b::a"),
-                                inverseOf: [qualifiedTypeReference("A::b::c")],
+                element: {
+                    $type: Classifier,
+                    ...withQualifiedName("C"),
+                    members: [
+                        {
+                            element: {
+                                ...withQualifiedName("C::b"),
+                                members: [
+                                    {
+                                        element: {
+                                            ...withQualifiedName("C::b::a"),
+                                            typeRelationships: [
+                                                ...anything(1),
+                                                {
+                                                    $type: FeatureInverting,
+                                                    reference: qualifiedTypeReference("A::b::c"),
+                                                },
+                                            ],
+                                        },
+                                    },
+                                ],
                             },
-                        ],
-                    },
-                ],
+                        },
+                    ],
+                },
             },
         ],
     });

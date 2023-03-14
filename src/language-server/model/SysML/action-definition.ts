@@ -28,8 +28,8 @@ export class ActionDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, Behavi
         super(id, parent);
     }
 
-    override self(): ActionDefinition | undefined {
-        return super.self() as ActionDefinition;
+    override ast(): ActionDefinition | undefined {
+        return this._ast as ActionDefinition;
     }
 
     override parent(): ModelContainer<ActionDefinition> {

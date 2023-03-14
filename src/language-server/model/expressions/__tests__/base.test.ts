@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { services, parseKerML, NO_ERRORS, sanitizeTree } from "../../../../testing";
+import { FeatureMeta } from "../../KerML";
 
 const Evaluator = services.shared.modelLevelExpressionEvaluator;
 
@@ -55,8 +56,8 @@ test.concurrent.each([
     );
     expect(result).toMatchObject(NO_ERRORS);
 
-    const feature = result.value.features[0].$meta;
-    const expression = feature.value?.element;
+    const feature = result.value.members[0].element?.$meta as FeatureMeta;
+    const expression = feature.value?.element();
     expect(expression).not.toBeUndefined();
     if (!expression) return;
 

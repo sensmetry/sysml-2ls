@@ -1,0 +1,312 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`elements are parseable without bodies with both names: toParseKerML 1`] = `
+{
+  "diagnostics": [],
+  "lexerErrors": [],
+  "parserErrors": [],
+  "value": {
+    "$type": "Namespace",
+    "aliases": [],
+    "annotatingMembers": [],
+    "filters": [],
+    "imports": [],
+    "members": [],
+    "namespaceMembers": [
+      {
+        "$type": "OwningMembership",
+        "annotations": [],
+        "chains": [],
+        "element": {
+          "$type": "Class",
+          "aliases": [],
+          "annotatingMembers": [],
+          "declaredName": "Any",
+          "declaredShortName": "'1.1'",
+          "filters": [],
+          "imports": [],
+          "isSufficient": false,
+          "members": [],
+          "namespaceMembers": [],
+          "prefixes": [],
+          "relationshipMembers": [],
+          "typeRelationships": [],
+        },
+        "elements": [],
+        "prefixes": [],
+      },
+    ],
+    "prefixes": [],
+    "relationshipMembers": [],
+  },
+}
+`;
+
+exports[`elements are parseable without bodies with name: toParseKerML 1`] = `
+{
+  "diagnostics": [],
+  "lexerErrors": [],
+  "parserErrors": [],
+  "value": {
+    "$type": "Namespace",
+    "aliases": [],
+    "annotatingMembers": [],
+    "filters": [],
+    "imports": [],
+    "members": [],
+    "namespaceMembers": [
+      {
+        "$type": "OwningMembership",
+        "annotations": [],
+        "chains": [],
+        "element": {
+          "$type": "Class",
+          "aliases": [],
+          "annotatingMembers": [],
+          "declaredName": "Any_",
+          "filters": [],
+          "imports": [],
+          "isSufficient": false,
+          "members": [],
+          "namespaceMembers": [],
+          "prefixes": [],
+          "relationshipMembers": [],
+          "typeRelationships": [],
+        },
+        "elements": [],
+        "prefixes": [],
+      },
+    ],
+    "prefixes": [],
+    "relationshipMembers": [],
+  },
+}
+`;
+
+exports[`elements are parseable without bodies with no names: toParseKerML 1`] = `
+{
+  "diagnostics": [],
+  "lexerErrors": [],
+  "parserErrors": [],
+  "value": {
+    "$type": "Namespace",
+    "aliases": [],
+    "annotatingMembers": [],
+    "filters": [],
+    "imports": [],
+    "members": [],
+    "namespaceMembers": [
+      {
+        "$type": "OwningMembership",
+        "annotations": [],
+        "chains": [],
+        "element": {
+          "$type": "Class",
+          "aliases": [],
+          "annotatingMembers": [],
+          "filters": [],
+          "imports": [],
+          "isSufficient": false,
+          "members": [],
+          "namespaceMembers": [],
+          "prefixes": [],
+          "relationshipMembers": [],
+          "typeRelationships": [],
+        },
+        "elements": [],
+        "prefixes": [],
+      },
+    ],
+    "prefixes": [],
+    "relationshipMembers": [],
+  },
+}
+`;
+
+exports[`elements are parseable without bodies with short name: toParseKerML 1`] = `
+{
+  "diagnostics": [],
+  "lexerErrors": [],
+  "parserErrors": [],
+  "value": {
+    "$type": "Namespace",
+    "aliases": [],
+    "annotatingMembers": [],
+    "filters": [],
+    "imports": [],
+    "members": [],
+    "namespaceMembers": [
+      {
+        "$type": "OwningMembership",
+        "annotations": [],
+        "chains": [],
+        "element": {
+          "$type": "Class",
+          "aliases": [],
+          "annotatingMembers": [],
+          "declaredShortName": "any",
+          "filters": [],
+          "imports": [],
+          "isSufficient": false,
+          "members": [],
+          "namespaceMembers": [],
+          "prefixes": [],
+          "relationshipMembers": [],
+          "typeRelationships": [],
+        },
+        "elements": [],
+        "prefixes": [],
+      },
+    ],
+    "prefixes": [],
+    "relationshipMembers": [],
+  },
+}
+`;
+
+exports[`elements are parseable without bodies with unrestricted name: toParseKerML 1`] = `
+{
+  "diagnostics": [],
+  "lexerErrors": [],
+  "parserErrors": [],
+  "value": {
+    "$type": "Namespace",
+    "aliases": [],
+    "annotatingMembers": [],
+    "filters": [],
+    "imports": [],
+    "members": [],
+    "namespaceMembers": [
+      {
+        "$type": "OwningMembership",
+        "annotations": [],
+        "chains": [],
+        "element": {
+          "$type": "Class",
+          "aliases": [],
+          "annotatingMembers": [],
+          "declaredName": "'arbitrary/ name+'",
+          "filters": [],
+          "imports": [],
+          "isSufficient": false,
+          "members": [],
+          "namespaceMembers": [],
+          "prefixes": [],
+          "relationshipMembers": [],
+          "typeRelationships": [],
+        },
+        "elements": [],
+        "prefixes": [],
+      },
+    ],
+    "prefixes": [],
+    "relationshipMembers": [],
+  },
+}
+`;
+
+exports[`elements can be nested: toParseKerML 1`] = `
+{
+  "diagnostics": [],
+  "lexerErrors": [],
+  "parserErrors": [],
+  "value": {
+    "$type": "Namespace",
+    "aliases": [],
+    "annotatingMembers": [],
+    "filters": [],
+    "imports": [],
+    "members": [],
+    "namespaceMembers": [
+      {
+        "$type": "OwningMembership",
+        "annotations": [],
+        "chains": [],
+        "element": {
+          "$type": "Class",
+          "aliases": [],
+          "annotatingMembers": [],
+          "declaredName": "A",
+          "filters": [],
+          "imports": [],
+          "isSufficient": false,
+          "members": [],
+          "namespaceMembers": [
+            {
+              "$type": "OwningMembership",
+              "annotations": [],
+              "chains": [],
+              "element": {
+                "$type": "Class",
+                "aliases": [],
+                "annotatingMembers": [],
+                "declaredName": "B",
+                "filters": [],
+                "imports": [],
+                "isSufficient": false,
+                "members": [],
+                "namespaceMembers": [
+                  {
+                    "$type": "OwningMembership",
+                    "annotations": [],
+                    "chains": [],
+                    "element": {
+                      "$type": "Class",
+                      "aliases": [],
+                      "annotatingMembers": [],
+                      "declaredName": "C",
+                      "filters": [],
+                      "imports": [],
+                      "isSufficient": false,
+                      "members": [],
+                      "namespaceMembers": [],
+                      "prefixes": [],
+                      "relationshipMembers": [],
+                      "typeRelationships": [],
+                    },
+                    "elements": [],
+                    "prefixes": [],
+                  },
+                ],
+                "prefixes": [],
+                "relationshipMembers": [],
+                "typeRelationships": [],
+              },
+              "elements": [],
+              "prefixes": [],
+            },
+            {
+              "$type": "OwningMembership",
+              "annotations": [],
+              "chains": [],
+              "element": {
+                "$type": "Class",
+                "aliases": [],
+                "annotatingMembers": [],
+                "declaredName": "D",
+                "filters": [],
+                "imports": [],
+                "isSufficient": false,
+                "members": [],
+                "namespaceMembers": [],
+                "prefixes": [],
+                "relationshipMembers": [],
+                "typeRelationships": [],
+              },
+              "elements": [],
+              "prefixes": [],
+            },
+          ],
+          "prefixes": [],
+          "relationshipMembers": [],
+          "typeRelationships": [],
+        },
+        "elements": [],
+        "prefixes": [],
+      },
+    ],
+    "prefixes": [],
+    "relationshipMembers": [],
+  },
+}
+`;

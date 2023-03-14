@@ -17,7 +17,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-    Argument,
     ElementReference,
     FeatureReference,
     FeatureReferenceExpression,
@@ -29,13 +28,11 @@ import {
     LiteralString,
     MetadataAccessExpression,
     NullExpression,
-    SelfReferenceExpression,
     Type,
     TypeReference,
 } from "../../generated/ast";
 import { SysMLType, SysMLTypeList } from "../../services/sysml-ast-reflection";
 import { KeysMatching } from "../../utils/common";
-import { SpecializationKind } from "../enums";
 import {
     ElementMeta,
     ElementReferenceMeta,
@@ -47,7 +44,6 @@ import {
     LiteralNumberMeta,
     LiteralStringMeta,
     MetadataAccessExpressionMeta,
-    SelfReferenceExpressionMeta,
     TypeMeta,
 } from "../KerML";
 import { Metamodel, Property } from "../metamodel";
@@ -106,16 +102,11 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         return [expression];
     }
 
-    @evaluates(SelfReferenceExpression)
-    evaluateSelfReference(_: SelfReferenceExpressionMeta, target: ElementMeta): [ElementMeta] {
-        return [target];
-    }
-
     @evaluates(LiteralBoolean, LiteralNumber, LiteralString)
     evaluateLiteral(
         expression: LiteralNumberMeta | LiteralBooleanMeta | LiteralStringMeta
     ): [number | boolean | string] {
-        return [expression.value];
+        return [expression.literal];
     }
 
     evaluateArgument(
@@ -125,7 +116,10 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     ): ExpressionResult[] | undefined {
         const arg = expression.args.at(index);
         if (!arg) return undefined;
-        if (arg.is(Argument)) return arg.value ? this.evaluate(arg.value, target) : undefined;
+        if (arg.value) {
+            const expr = arg.value.element();
+            return expr ? this.evaluate(expr, target) : undefined;
+        }
         return this.evaluate(arg, target);
     }
 
@@ -192,11 +186,11 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         expression: FeatureReferenceExpressionMeta,
         target: ElementMeta
     ): ExpressionResult[] | undefined {
-        const referenced = expression.expression?.element;
+        const referenced = expression.expression?.element();
         if (!referenced) return undefined;
         const type = target.is(Type) ? target : undefined;
         if (referenced.is(FeatureReference)) {
-            const feature = referenced.to.target?.element;
+            const feature = referenced.to.target;
             return type && feature ? this.evaluateFeature(feature, type) : undefined;
         }
         if (referenced.is(TypeReference)) return this.evaluateReference(referenced);
@@ -212,7 +206,7 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         const referenced = expression.reference;
         if (!referenced) return;
 
-        const features = [...referenced.allMetadata().map((c) => c.element)];
+        const features = [...referenced.allMetadata()];
         if (referenced.metaclass) features.push(referenced.metaclass);
 
         return features;
@@ -224,7 +218,7 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     ): ExpressionResult[] | undefined {
         if (
             feature
-                .allTypes(SpecializationKind.None, true)
+                .allTypes(undefined, true)
                 .some((s) => s.qualifiedName === "Base::Anything::self")
         ) {
             // TODO: pilot wraps type through feature typing if it is not a
@@ -233,8 +227,9 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         }
         // TODO: implement feature chains
 
-        if (feature.value?.element) {
-            return this.evaluate(feature.value.element, type);
+        const value = feature.value?.element();
+        if (value) {
+            return this.evaluate(value, type);
         }
 
         return [feature];
@@ -242,7 +237,7 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
 
     @evaluates(ElementReference)
     evaluateReference(ref: ElementReferenceMeta): ElementMeta[] | undefined {
-        const target = ref.to.target?.element;
+        const target = ref.to.target;
         if (!target) return undefined;
         return [target];
     }

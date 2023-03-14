@@ -26,8 +26,8 @@ export class DecisionNodeMeta extends ControlNodeMeta {
         super(id, parent);
     }
 
-    override self(): DecisionNode | undefined {
-        return super.self() as DecisionNode;
+    override ast(): DecisionNode | undefined {
+        return this._ast as DecisionNode;
     }
 
     override parent(): ModelContainer<DecisionNode> {

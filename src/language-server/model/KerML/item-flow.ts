@@ -16,9 +16,8 @@
 
 import { Mixin } from "ts-mixer";
 import { ItemFlow } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ConnectorMeta } from "./connector";
-import { StepMeta } from "./step";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ConnectorMeta, StepMeta } from "./_internal";
 
 export const ImplicitItemFlows = {
     base: "Transfers::flowTransfers",
@@ -33,8 +32,8 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
         super(id, parent);
     }
 
-    override self(): ItemFlow | undefined {
-        return super.deref() as ItemFlow;
+    override ast(): ItemFlow | undefined {
+        return this._ast as ItemFlow;
     }
 
     override parent(): ModelContainer<ItemFlow> {

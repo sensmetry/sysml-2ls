@@ -26,8 +26,8 @@ export class ConnectorAsUsageMeta extends Mixin(UsageMeta, ConnectorMeta) {
         super(id, parent);
     }
 
-    override self(): ConnectorAsUsage | undefined {
-        return super.self() as ConnectorAsUsage;
+    override ast(): ConnectorAsUsage | undefined {
+        return this._ast as ConnectorAsUsage;
     }
 
     override parent(): ModelContainer<ConnectorAsUsage> {

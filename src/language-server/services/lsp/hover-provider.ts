@@ -17,7 +17,7 @@
 import { AstNode, AstNodeHoverProvider, getDocument, LangiumDocument, MaybePromise } from "langium";
 import { Hover, HoverParams } from "vscode-languageserver";
 import { Utils } from "vscode-uri";
-import { Alias, isElement, Type } from "../../generated/ast";
+import { isElement, Membership, Type } from "../../generated/ast";
 import { ElementMeta } from "../../model";
 import { LanguageEvents } from "../events";
 import { SysMLDefaultServices } from "../services";
@@ -79,8 +79,8 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
         // use docs from the first specialization that has them
         let docs = node.docs;
         if (docs.length === 0) {
-            if (node.is(Alias)) {
-                const target = node.for.target?.element;
+            if (node.is(Membership)) {
+                const target = node.element();
                 if (target) {
                     content += `Alias for \`${target.qualifiedName}\`\n`;
                     docs = target.docs;
@@ -98,7 +98,7 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
 
         if (docs.length > 0) {
             content += "\n";
-            content += docs.map((doc) => doc.element.body).join("\n\n");
+            content += docs.map((doc) => doc.body).join("\n\n");
         }
 
         if (content) {

@@ -35,15 +35,15 @@ export class PortUsageMeta extends OccurrenceUsageMeta {
     }
 
     isOwnedPort(): boolean {
-        return this.isComposite && this.parent().isAny([PartDefinition, PortUsage]);
+        return this.isComposite && this.owner().isAny([PartDefinition, PortUsage]);
     }
 
     isSubport(): boolean {
-        return this.isComposite && this.parent().isAny([PortDefinition, PortUsage]);
+        return this.isComposite && this.owner().isAny([PortDefinition, PortUsage]);
     }
 
-    override self(): PortUsage | undefined {
-        return super.self() as PortUsage;
+    override ast(): PortUsage | undefined {
+        return this._ast as PortUsage;
     }
 
     override parent(): ModelContainer<PortUsage> {

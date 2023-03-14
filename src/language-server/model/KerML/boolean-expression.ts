@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { BooleanExpression } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ExpressionMeta } from "./expression";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ExpressionMeta } from "./_internal";
 
 export const ImplicitBooleanExpressions = {
     base: "Performances::booleanEvaluations",
@@ -28,8 +28,8 @@ export class BooleanExpressionMeta extends ExpressionMeta {
         super(id, parent);
     }
 
-    override self(): BooleanExpression | undefined {
-        return super.deref() as BooleanExpression;
+    override ast(): BooleanExpression | undefined {
+        return this._ast as BooleanExpression;
     }
 
     override parent(): ModelContainer<BooleanExpression> {

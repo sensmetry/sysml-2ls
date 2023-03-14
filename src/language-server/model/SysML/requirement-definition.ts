@@ -26,8 +26,8 @@ export class RequirementDefinitionMeta extends ConstraintDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): RequirementDefinition | undefined {
-        return super.self() as RequirementDefinition;
+    override ast(): RequirementDefinition | undefined {
+        return this._ast as RequirementDefinition;
     }
 
     override parent(): ModelContainer<RequirementDefinition> {

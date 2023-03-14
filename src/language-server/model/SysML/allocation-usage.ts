@@ -27,8 +27,8 @@ export class AllocationUsageMeta extends ConnectionUsageMeta {
         super(id, parent);
     }
 
-    override self(): AllocationUsage | undefined {
-        return super.self() as AllocationUsage;
+    override ast(): AllocationUsage | undefined {
+        return this._ast as AllocationUsage;
     }
 
     override parent(): ModelContainer<AllocationUsage> {

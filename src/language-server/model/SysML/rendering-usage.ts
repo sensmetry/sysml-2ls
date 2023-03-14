@@ -15,11 +15,14 @@
  ********************************************************************************/
 
 import {
+    ReferenceSubsetting,
     RenderingDefinition,
     RenderingUsage,
     ViewDefinition,
+    ViewRenderingMembership,
     ViewUsage,
 } from "../../generated/ast";
+import { FeatureMeta } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PartUsageMeta } from "./part-usage";
 
@@ -37,21 +40,27 @@ export class RenderingUsageMeta extends PartUsageMeta {
     }
 
     isSubrendering(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([RenderingUsage, RenderingDefinition]);
     }
 
     isRender(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([ViewDefinition, ViewUsage]);
     }
 
-    override self(): RenderingUsage | undefined {
-        return super.self() as RenderingUsage;
+    override ast(): RenderingUsage | undefined {
+        return this._ast as RenderingUsage;
     }
 
     override parent(): ModelContainer<RenderingUsage> {
         return this._parent;
+    }
+
+    override namingFeature(): FeatureMeta | undefined {
+        return this.parent().is(ViewRenderingMembership)
+            ? (this.types(ReferenceSubsetting).head() as FeatureMeta | undefined)
+            : super.namingFeature();
     }
 }
 

@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Classifier, Feature, Multiplicity } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { FeatureMeta } from "./feature";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { FeatureMeta } from "./_internal";
 
 export const ImplicitMultiplicities = {
     base: "Base::naturals",
@@ -30,8 +30,8 @@ export class MultiplicityMeta extends FeatureMeta {
         super(id, parent);
     }
 
-    override self(): Multiplicity | undefined {
-        return super.deref() as Multiplicity;
+    override ast(): Multiplicity | undefined {
+        return this._ast as Multiplicity;
     }
 
     override parent(): ModelContainer<Multiplicity> {
@@ -39,7 +39,7 @@ export class MultiplicityMeta extends FeatureMeta {
     }
 
     override defaultSupertype(): string {
-        const owner = this.parent();
+        const owner = this.owner();
         if (owner.is(Classifier)) return "classifier";
         if (owner.is(Feature)) return "feature";
         return "base";

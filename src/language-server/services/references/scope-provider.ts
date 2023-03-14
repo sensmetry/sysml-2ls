@@ -24,24 +24,22 @@ import {
     ReferenceInfo,
 } from "langium";
 import {
-    Alias,
-    ConnectorEnd,
+    Conjugation,
     ElementReference,
+    EndFeatureMembership,
     Expression,
-    Feature,
+    FeatureChaining,
+    FeatureInverting,
     InlineExpression,
-    isNamedArgument,
+    InvocationExpression,
+    Membership,
     Namespace,
+    ParameterMembership,
+    Specialization,
+    Subsetting,
     SysMLFunction,
-    Type,
-    TypeReference,
 } from "../../generated/ast";
-import {
-    CHILD_CONTENTS_OPTIONS,
-    collectRedefinitions,
-    ContentsOptions,
-    DEFAULT_ALIAS_RESOLVER,
-} from "../../utils/scope-util";
+import { CHILD_CONTENTS_OPTIONS, DEFAULT_ALIAS_RESOLVER } from "../../utils/scope-util";
 import {
     SysMLScope,
     makeScope,
@@ -49,7 +47,6 @@ import {
     FilteredScope,
     ScopeStream,
 } from "../../utils/scopes";
-import { KeysMatching } from "../../utils/common";
 import { SysMLDefaultServices } from "../services";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { MetamodelBuilder } from "../shared/workspace/metamodel-builder";
@@ -57,39 +54,6 @@ import { CancellationToken } from "vscode-languageserver";
 import { getPreviousNode } from "../../utils/cst-util";
 import { ElementMeta, ElementReferenceMeta, Metamodel } from "../../model";
 import { SysMLType } from "../sysml-ast-reflection";
-
-type SpecializationKeys = KeysMatching<Type & Feature, Array<TypeReference>>;
-
-// can't convert type unions to arrays so have to do it manually, however there
-// is a type assertion to make sure we include all keys
-const SpecializationPropertiesArray = (function <T extends SpecializationKeys[]>(...values: T): T {
-    return values;
-})(
-    "chains",
-    "conjugates",
-    "differences",
-    "disjoins",
-    "featuredBy",
-    "intersects",
-    "inverseOf",
-    "redefines",
-    "references",
-    "specializes",
-    "subsets",
-    "typedBy",
-    "unions"
-);
-
-type DeclaredSpecializationKeys = typeof SpecializationPropertiesArray[number];
-
-// casting and constraining to each other so that if any property is missing the
-// type system will warn us, i.e. DeclaredSpecializationKeys ===
-// SpecializationKeys
-const SpecializationProperties = (function <T extends DeclaredSpecializationKeys>(
-    values: T[]
-): Set<string> {
-    return new Set<string>(values);
-})(SpecializationPropertiesArray as SpecializationKeys[]);
 
 export class SysMLScopeProvider extends DefaultScopeProvider {
     protected override indexManager: SysMLIndexManager;
@@ -104,7 +68,10 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     override getScope(context: ReferenceInfo): SysMLScope {
         const unfiltered = this.getScopeUnfiltered(context);
         const referenceType = this.reflection.getReferenceType(context);
-        return new FilteredScope(unfiltered, (desc) => desc.element.is(referenceType as SysMLType));
+        return new FilteredScope(
+            unfiltered,
+            (desc) => !!desc.element()?.is(referenceType as SysMLType)
+        );
     }
 
     /**
@@ -141,12 +108,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             if (context) {
                 parent = context;
             } else {
-                return this.initialScope(
-                    container.parent(),
-                    container.document,
-                    container.self()?.$containerProperty,
-                    aliasResolver
-                );
+                return this.initialScope(container.owner(), container.document, aliasResolver);
             }
         } else {
             // even if the reference was discarded due to the wrong type,
@@ -158,7 +120,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
 
         // not a start of the reference so it has to be resolved in the scope of
         // `parent`
-        const ast = container.self();
+        const ast = container.ast();
         return this.localScope(
             parent,
             container.document ?? (ast ? getDocument(ast) : undefined),
@@ -172,7 +134,6 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @param owner owner of the {@link ElementReference} that the reference is
      * a part of
      * @param document document that contains {@link owner}
-     * @param property property that {@link ElementReference} is assigned to
      * @param aliasResolver alias resolution function
      * @see {@link getElementReferenceScope} (`index === 0`)
      * @returns scope that can be used to resolve the first reference in
@@ -181,48 +142,57 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     initialScope(
         owner: Metamodel | undefined,
         document?: LangiumDocument,
-        property?: string,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
     ): ScopeStream | undefined {
         while (owner?.is(InlineExpression)) {
             // unwrap all the expressions to get the real parent
-            owner = owner.parent();
+            owner = owner.owner();
         }
 
-        let redefinitions: ContentsOptions["visited"] | undefined = undefined;
-        let parent: Metamodel | undefined;
-        if (owner?.is(Type)) {
-            // also skip the first scoping node as references are always a part
-            // of its declaration. However SysML adds more references that are
-            // not used for scope resolution therefore we only skip if the
-            // reference declares a specialization
-            if (property && SpecializationProperties.has(property)) {
-                parent = owner.parent();
-            } else {
-                parent = owner;
+        // need to unwrap feature chaining
+        if (owner?.is(FeatureChaining)) {
+            // if using `chains` notation, two levels up will be the feature
+            // owner, otherwise 2 levels up is a type relationship which will be
+            // handled by the next statement
+            owner = owner.owner().owner();
+        }
+
+        // also skip the first scoping node as references are always a part
+        // of its declaration. However SysML adds more references that are
+        // not used for scope resolution therefore we only skip if the
+        // reference declares a specialization
+        let skip: Metamodel | undefined;
+        if (owner?.isAny([Specialization, Conjugation])) {
+            // TODO: not sure if this is right and specializations are
+            // allowed to reference the declaring element but this fixes a
+            // linking error in
+            // SysML-v2-Release/sysml/src/examples/Individuals%20Examples/JohnIndividualExample.sysml
+            if (owner.nodeType() !== Subsetting && owner.nodeType() !== FeatureInverting) {
+                skip = owner.source();
             }
+            // source == parent if this relationship is a part of declaration,
+            // in that case skip the owner since specialization itself makes no
+            // sense
+            owner = owner.source() === owner.parent() ? owner.parent().owner() : owner.parent();
 
-            if (owner.is(Feature)) {
-                redefinitions = new Set();
-                // collect redefinitions for hiding redefined elements
-                collectRedefinitions(owner, redefinitions);
-
+            if (skip?.parent()?.is(EndFeatureMembership)) {
                 // connector ends cannot reference connector scope
-                if (owner.is(ConnectorEnd)) {
-                    parent = owner.parent().parent();
-                }
+                owner = owner?.owner();
             }
-        } else if (owner?.is(Alias)) {
+        } else if (owner?.parent()?.is(ParameterMembership)) {
+            if (owner.owner()?.is(InvocationExpression)) {
+                // invocation argument
+                return this.initialScope(owner.owner(), document, aliasResolver);
+            }
+        } else if (owner?.is(Membership)) {
             // skip the alias scope since resolution tries to follow aliases to
             // their final destination
-            parent = owner.parent();
-        } else {
-            parent = owner;
+            owner = owner.owner();
         }
 
-        if (!parent) return;
+        if (!owner) return;
 
-        const ast = parent.self();
+        const ast = owner.ast();
         if (ast) {
             // skipping the the owning node to avoid name resolution bugs if the
             // node has the same name as the reference
@@ -236,15 +206,10 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
         }
 
         return makeLinkingScope(
-            parent,
+            owner,
             {
-                aliasResolver: aliasResolver,
-                // TODO: not sure if this is right and specializations are
-                // allowed to reference the declaring element but this fixes a
-                // linking error in
-                // SysML-v2-Release/sysml/src/examples/Individuals%20Examples/JohnIndividualExample.sysml
-                skip: property === "subsets" || property === "inverseOf" ? undefined : owner,
-                visited: redefinitions,
+                aliasResolver,
+                skip,
             },
             this.indexManager.getGlobalScope(document as LangiumDocument<Namespace> | undefined)
         );
@@ -264,7 +229,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
         document?: LangiumDocument,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
     ): SysMLScope {
-        const ast = node.self();
+        const ast = node.ast();
         if (ast && document) this.metamodelBuilder.preLink(ast, document, CancellationToken.None);
         return makeScope(node, {
             ...CHILD_CONTENTS_OPTIONS,
@@ -280,7 +245,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      */
     protected getElementTarget(node: Metamodel): ElementMeta | undefined | "error" {
         if (node.is(ElementReference)) {
-            return node.to.target?.element ?? "error";
+            return node.to.target ?? "error";
         } else if (node.isAny([InlineExpression, Expression, SysMLFunction])) {
             const target = node.returnType();
             return this.indexManager.findType(target) ?? "error";
@@ -296,18 +261,17 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * be linked and {@link Element} for existing context
      */
     protected getContext(ref: ElementReferenceMeta): ElementMeta | undefined | "error" {
-        const ast = ref.self();
+        const ast = ref.ast();
         if (!ast) return;
         const cst = ast.$cstNode;
         if (!cst) return;
 
         // check if the previous CST node is a scope token (`::` or `.`)
-        const previous = getPreviousNode(cst, false);
+        let previous = getPreviousNode(cst, false);
+        if (previous && !isLeafCstNode(previous)) {
+            previous = findLeafNodeAtOffset(previous, previous.end);
+        }
         if (!previous || ![".", "::"].includes(previous.text)) {
-            const owner = ast.$container;
-            if (isNamedArgument(owner)) {
-                return owner.$container.type?.$meta.to.target?.element ?? "error";
-            }
             return;
         }
 

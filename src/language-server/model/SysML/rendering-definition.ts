@@ -26,8 +26,8 @@ export class RenderingDefinitionMeta extends PartDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): RenderingDefinition | undefined {
-        return super.self() as RenderingDefinition;
+    override ast(): RenderingDefinition | undefined {
+        return this._ast as RenderingDefinition;
     }
 
     override parent(): ModelContainer<RenderingDefinition> {

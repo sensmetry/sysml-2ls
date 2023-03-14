@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Package } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { NamespaceMeta } from "./namespace";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ElementMeta, NamespaceMeta } from "./_internal";
 
 @metamodelOf(Package)
 export class PackageMeta extends NamespaceMeta {
@@ -24,12 +24,17 @@ export class PackageMeta extends NamespaceMeta {
         super(id, parent);
     }
 
-    override self(): Package | undefined {
-        return super.deref() as Package;
+    override ast(): Package | undefined {
+        return this._ast as Package;
     }
 
     override parent(): ModelContainer<Package> {
         return this._parent;
+    }
+
+    override owner(): ElementMeta {
+        // only namespaces are entry types
+        return this._owner as ElementMeta;
     }
 }
 

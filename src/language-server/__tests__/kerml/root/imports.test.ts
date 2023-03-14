@@ -14,9 +14,6 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { anything, qualifiedTypeReference } from "../../../../testing";
-import { Namespace, Feature } from "../../../generated/ast";
-
 const N1 = `namespace N1 {
     class A;
     class B;
@@ -46,26 +43,7 @@ test("namespace members can be imported with qualified names", async () => {
             import C; // "C" is re-imported from N2 into M;
         }
     }`
-    ).toParseKerML({
-        elements: [
-            {
-                $type: Namespace,
-                declaredName: "N1",
-            },
-            {
-                $type: Namespace,
-                declaredName: "N2",
-                imports: anything(2),
-                features: [
-                    {
-                        $type: Feature,
-                        declaredName: "B",
-                        typedBy: [qualifiedTypeReference("N1::A")],
-                    },
-                ],
-            },
-        ],
-    });
+    ).toParseKerML("snapshot");
 });
 
 test("wildcard imports all public members from a namespace", async () => {
@@ -76,30 +54,7 @@ test("wildcard imports all public members from a namespace", async () => {
         feature D : A;
         feature E : B;
     }`
-    ).toParseKerML({
-        elements: [
-            {
-                $type: Namespace,
-                declaredName: "N1",
-            },
-            {
-                $type: Namespace,
-                declaredName: "N3",
-                features: [
-                    {
-                        $type: Feature,
-                        declaredName: "D",
-                        typedBy: [qualifiedTypeReference("N1::A")],
-                    },
-                    {
-                        $type: Feature,
-                        declaredName: "E",
-                        typedBy: [qualifiedTypeReference("N1::B")],
-                    },
-                ],
-            },
-        ],
-    });
+    ).toParseKerML("snapshot");
 });
 
 test("double wildcard recursively imports all members from a namespace and its children", async () => {
@@ -122,29 +77,7 @@ test("double wildcard recursively imports all members from a namespace and its c
         // (Note that N4 itself is not imported.)
         feature D : C; // N4::M::C
     }`
-    ).toParseKerML({
-        elements: [
-            {
-                $type: Namespace,
-                declaredName: "N4",
-            },
-            {
-                $type: Namespace,
-                declaredName: "N5",
-            },
-            {
-                $type: Namespace,
-                declaredName: "N6",
-                features: [
-                    {
-                        $type: Feature,
-                        declaredName: "D",
-                        typedBy: [qualifiedTypeReference("N4::M::C")],
-                    },
-                ],
-            },
-        ],
-    });
+    ).toParseKerML("snapshot");
 });
 
 test("visibility affects the visibility of imported members", async () => {
@@ -161,15 +94,7 @@ test("visibility affects the visibility of imported members", async () => {
     }
     }
     feature A : N7::A;`
-    ).toParseKerML({
-        features: [
-            {
-                $type: Feature,
-                declaredName: "A",
-                typedBy: [qualifiedTypeReference("N1::A")],
-            },
-        ],
-    });
+    ).toParseKerML("snapshot");
 });
 
 test("imported elements can be filtered", async () => {
@@ -178,7 +103,7 @@ test("imported elements can be filtered", async () => {
         metaclass Approved;
     }
     namespace NA {
-        type A {
+        class A {
             @Annotations::Approved;
         }
     }
@@ -190,24 +115,5 @@ test("imported elements can be filtered", async () => {
     namespace N9 {
         import Annotations::*;
         import NA::*[not (@Approved)];
-    }`).toParseKerML({
-        elements: [
-            {
-                $type: Namespace,
-                declaredName: "Annotations",
-            },
-            {
-                $type: Namespace,
-                declaredName: "NA",
-            },
-            {
-                $type: Namespace,
-                declaredName: "N8",
-            },
-            {
-                $type: Namespace,
-                declaredName: "N9",
-            },
-        ],
-    });
+    }`).toParseKerML("snapshot");
 });

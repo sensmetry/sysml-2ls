@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Succession } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ConnectorMeta } from "./connector";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ConnectorMeta } from "./_internal";
 
 export const ImplicitSuccessions = {
     binary: "Occurrences::happensBeforeLinks",
@@ -28,8 +28,8 @@ export class SuccessionMeta extends ConnectorMeta {
         super(id, parent);
     }
 
-    override self(): Succession | undefined {
-        return super.deref() as Succession;
+    override ast(): Succession | undefined {
+        return this._ast as Succession;
     }
 
     override parent(): ModelContainer<Succession> {

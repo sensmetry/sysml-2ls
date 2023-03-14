@@ -26,8 +26,8 @@ export class PartDefinitionMeta extends ItemDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): PartDefinition | undefined {
-        return super.self() as PartDefinition;
+    override ast(): PartDefinition | undefined {
+        return this._ast as PartDefinition;
     }
 
     override parent(): ModelContainer<PartDefinition> {

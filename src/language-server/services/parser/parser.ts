@@ -14,24 +14,40 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    AstNode,
-    CstNode,
-    isAstNode,
-    LangiumParser,
-    Mutable,
-    streamContents,
-    streamCst,
-} from "langium";
+import { AstNode, CstNode, isAstNode, LangiumParser, Mutable, streamContents } from "langium";
 import { createParser } from "langium/lib/parser/parser-builder-base";
 import { CstNodeBuilder } from "langium/lib/parser/cst-node-builder";
-import { ActionUsage, OperatorExpression, SelfReferenceExpression } from "../../generated/ast";
+import {
+    ConjugatedPortDefinition,
+    Expose,
+    Feature,
+    FeatureReferenceExpression,
+    Import,
+    isConjugatedPortDefinition,
+    MembershipExpose,
+    MembershipImport,
+    MembershipReference,
+    NamespaceExpose,
+    NamespaceImport,
+    NamespaceReference,
+    OperatorExpression,
+    OwningMembership,
+    Package,
+    ParameterMembership,
+    PortConjugation,
+    PortDefinition,
+    ReturnParameterMembership,
+    TypeReference,
+    Usage,
+    WhileLoopActionUsage,
+} from "../../generated/ast";
 import { typeIndex, TypeMap } from "../../model/types";
 import { SysMLDefaultServices } from "../services";
-import { cstNodeRuleName } from "../../utils/common";
 import { compareRanges } from "../../utils/ast-util";
 import { isRuleCall } from "langium/lib/grammar/generated/ast";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
+import { erase } from "../../utils/common";
+import { DefaultReference } from "../references/linker";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -40,49 +56,118 @@ const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
  * with Langium, resolve it here.
  */
 function fixOperatorExpression(expr: OperatorExpression, services: SysMLDefaultServices): void {
+    if (!expr.operands) expr.operands = [];
     if (
-        expr.args.length === 1 &&
+        expr.operands.length === 0 &&
         expr.operator &&
         ClassificationTestOperator.includes(expr.operator)
     ) {
-        expr.args.forEach((arg, index) => ((arg as Mutable<AstNode>).$containerIndex = index + 1));
-        // Langium discards unused explicit union types
-        (expr.args as Array<AstNode>).unshift(
-            services.shared.AstReflection.createNode(SelfReferenceExpression, {
-                $container: expr,
-                $containerProperty: "args",
-                $containerIndex: 0,
-            })
-        );
+        const reflection = services.shared.AstReflection;
+        const expression = reflection.createNode(FeatureReferenceExpression, {
+            $container: expr,
+            $containerProperty: "operands",
+            $containerIndex: 0,
+        });
+
+        const member = reflection.createNode(ReturnParameterMembership, {
+            $container: expression,
+            $containerProperty: "expression",
+        });
+
+        reflection.createNode(Feature, {
+            $container: member,
+            $containerProperty: "element",
+        });
     }
 }
 
-/**
- * Find a first CST node with a rule named {@link name} and replace its element with {@link element}
- * @param node Root CST node
- * @param name Rule name to change element for
- * @param element New element
- */
-function fixCstNode(node: CstNode, name: string, element: AstNode): void {
-    for (const cst of streamCst(node)) {
-        if (cstNodeRuleName(cst) === name) {
-            (cst as Mutable<CstNode>).element = element;
-            return;
+function addLoopMember(node: WhileLoopActionUsage, services: SysMLDefaultServices): void {
+    if (node.members.length !== 3) {
+        const reflection = services.shared.AstReflection;
+        const membership = reflection.createNode(ParameterMembership, {
+            $container: node,
+            $containerProperty: "members",
+            $containerIndex: 0,
+        });
+
+        reflection.createNode(Usage, {
+            $container: membership,
+            $containerProperty: "element",
+        });
+    }
+}
+
+function finalizeImport(node: Import, services: SysMLDefaultServices): void {
+    const type: string = node.$type;
+    if (type !== Import && type !== Expose) return;
+    if (node.isNamespace || node.element) {
+        if (node.reference) {
+            (node.reference as Mutable<AstNode>).$type = node.isNamespace
+                ? NamespaceReference
+                : MembershipReference;
         }
+        (node as Mutable<Import>).$type = type === Expose ? NamespaceExpose : NamespaceImport;
+        if (node.element && node.reference) {
+            // need to reparent `node.reference`
+            const pack = node.element as Package;
+            const imp = services.shared.AstReflection.createNode(
+                node.isNamespace ? NamespaceImport : MembershipImport,
+                {
+                    $container: pack,
+                    $containerProperty: "imports",
+                    $containerIndex: 0,
+                    isRecursive: node.isRecursive,
+                }
+            );
+            services.shared.AstReflection.assignNode(node.reference, {
+                $container: imp,
+                $containerProperty: "reference",
+            });
+            erase(node.$children, node.reference);
+            delete node.reference;
+        }
+
+        // remove unneeded property
+        delete node.isNamespace;
+    } else {
+        if (node.reference) (node.reference as Mutable<AstNode>).$type = MembershipReference;
+        (node as Mutable<Import>).$type = type === Expose ? MembershipExpose : MembershipImport;
     }
 }
 
-/**
- * Fragments that construct nodes (i.e. with {[infer] ...}) construct their
- * nodes but they are not reachable from the AST afterwards. It seems that the
- * constructed nodes are spread onto the nodes from the parent rules but the CST
- * nodes are not updated to reflect that. This causes LSP services to find
- * these malformed nodes as they use CST to find target nodes. Fix that here.
- */
-function fixSubaction(node: ActionUsage): void {
-    if (!node.actionKind || !node.$cstNode) return;
+function createConjugatedPort(node: PortDefinition, services: SysMLDefaultServices): void {
+    if (!node.members) node.members = [];
+    if (isConjugatedPortDefinition(node.members.at(-1)?.element)) return;
 
-    fixCstNode(node.$cstNode, "PerformedActionUsage", node);
+    const reflection = services.shared.AstReflection;
+    const membership = reflection.createNode(OwningMembership, {
+        $container: node,
+        $containerProperty: "namespaceMembers",
+    });
+
+    const conjugated = reflection.createNode(ConjugatedPortDefinition, {
+        $container: membership,
+        $containerProperty: "element",
+    });
+
+    const conjugation = reflection.createNode(PortConjugation, {
+        $container: conjugated,
+        $containerProperty: "typeRelationships",
+    });
+
+    const ref = reflection.createNode(TypeReference, {
+        $container: conjugation,
+        $containerProperty: "reference",
+        text: node.declaredName ?? node.declaredShortName ?? "",
+    });
+
+    ref.parts.push(<DefaultReference>{
+        // we are not inside a generic grammar so we can create a resolved
+        // reference
+        $refText: ref.text ?? "",
+        ref: node,
+        _ref: node,
+    });
 }
 
 type ProcessingFunction<T extends AstNode = AstNode> = (
@@ -107,7 +192,9 @@ export class SysMLCstNodeBuilder extends CstNodeBuilder {
         // map to postprocess specific AST node types after parsing
         const map: ProcessingMap = {
             OperatorExpression: fixOperatorExpression,
-            ActionUsage: fixSubaction,
+            WhileLoopActionUsage: addLoopMember,
+            Import: finalizeImport,
+            PortDefinition: createConjugatedPort,
         };
 
         this.postprocessingMap = typeIndex.expandToDerivedTypes(

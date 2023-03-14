@@ -26,8 +26,8 @@ export class ConcernDefinitionMeta extends RequirementDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): ConcernDefinition | undefined {
-        return super.self() as ConcernDefinition;
+    override ast(): ConcernDefinition | undefined {
+        return this._ast as ConcernDefinition;
     }
 
     override parent(): ModelContainer<ConcernDefinition> {

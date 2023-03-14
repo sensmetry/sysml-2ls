@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Stream, TreeStreamImpl, EMPTY_STREAM } from "langium";
-import { Alias, Element } from "../generated/ast";
-import { AliasMeta, ElementMeta, Metamodel, FeatureMeta, SpecializationKind } from "../model";
+import { Element, Membership, Redefinition } from "../generated/ast";
+import { ElementMeta, Metamodel, FeatureMeta, MembershipMeta } from "../model";
 import { DeepReadonly } from "./common";
 
 /**
@@ -35,7 +35,7 @@ export function isVisibleWith(visibility: Visibility, constraint: Visibility): b
     return visibility <= constraint;
 }
 
-export type AliasResolver = (node: AliasMeta) => ElementMeta | undefined;
+export type AliasResolver = (node: MembershipMeta) => ElementMeta | undefined;
 
 export interface VisibilityOptions {
     /**
@@ -59,12 +59,12 @@ export interface ContentsOptions {
     imported: VisibilityOptions;
     inherited: VisibilityOptions;
     aliasResolver: undefined | AliasResolver;
-    visited: Set<ElementMeta | string>;
+    visited: Set<ElementMeta | string | undefined>;
     specializations: Set<Metamodel>;
 }
 export type PartialContentOptions = Partial<ContentsOptions>;
 
-export const DEFAULT_ALIAS_RESOLVER: AliasResolver = (node) => node.for.target?.element;
+export const DEFAULT_ALIAS_RESOLVER: AliasResolver = (node) => node.element();
 
 export const PARENT_CONTENTS_OPTIONS: DeepReadonly<PartialContentOptions> = {
     // private visibility by default for parent scopes
@@ -146,7 +146,8 @@ export function resolveContentInputs(
 ): { element?: ElementMeta; options: ContentsOptions } {
     const options = fillContentOptions(opts);
     let resolved: ElementMeta | undefined = undefined;
-    if (node && options.aliasResolver && node.is(Alias)) resolved = options.aliasResolver(node);
+    if (node && options.aliasResolver && node.is(Membership))
+        resolved = options.aliasResolver(node);
     else if (node.is(Element)) resolved = node;
 
     return {
@@ -165,7 +166,7 @@ export function collectRedefinitions<T>(
     redefinitions: Set<ElementMeta | T>
 ): void {
     const visitRedefinitions = (node: FeatureMeta): void => {
-        node.types(SpecializationKind.Redefinition).forEach((t) => {
+        node.types(Redefinition).forEach((t) => {
             // only features can be redefined
             const f = t as FeatureMeta;
             if (redefinitions.has(f)) return;
@@ -187,7 +188,7 @@ export function streamParents(root: Metamodel): Stream<Metamodel> {
     return new TreeStreamImpl(
         root,
         (node) => {
-            const parent = node.parent();
+            const parent = node.owner();
             return parent ? [parent] : EMPTY_STREAM;
         },
         { includeRoot: true }

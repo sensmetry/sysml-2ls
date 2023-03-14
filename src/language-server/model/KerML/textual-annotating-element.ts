@@ -15,14 +15,14 @@
  ********************************************************************************/
 
 import { TextualAnnotatingElement } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { prettyAnnotationBody } from "../util";
-import { ElementMeta } from "./element";
+import { AnnotatingElementMeta } from "./_internal";
 
-@metamodelOf(TextualAnnotatingElement)
-export class TextualAnnotatingMeta extends ElementMeta {
+@metamodelOf(TextualAnnotatingElement, "abstract")
+export abstract class TextualAnnotatingMeta extends AnnotatingElementMeta {
     /**
-     * Trimmed annotation body
+     * Trimmed annotating element body
      */
     body = "";
 
@@ -35,12 +35,16 @@ export class TextualAnnotatingMeta extends ElementMeta {
         if (node.body as string | undefined) this.body = prettyAnnotationBody(node.body);
     }
 
-    override self(): TextualAnnotatingElement | undefined {
-        return super.deref() as TextualAnnotatingElement;
+    override ast(): TextualAnnotatingElement | undefined {
+        return this._ast as TextualAnnotatingElement;
     }
 
     override parent(): ModelContainer<TextualAnnotatingElement> {
         return this._parent;
+    }
+
+    protected collectChildren(_node: TextualAnnotatingElement): void {
+        /* empty */
     }
 }
 

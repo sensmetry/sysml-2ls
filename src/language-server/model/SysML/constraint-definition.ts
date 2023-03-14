@@ -28,8 +28,8 @@ export class ConstraintDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, Pr
         super(id, parent);
     }
 
-    override self(): ConstraintDefinition | undefined {
-        return super.self() as ConstraintDefinition;
+    override ast(): ConstraintDefinition | undefined {
+        return this._ast as ConstraintDefinition;
     }
 
     override parent(): ModelContainer<ConstraintDefinition> {

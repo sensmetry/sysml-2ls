@@ -14,12 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AssociationStructure } from "../../generated/ast";
-import { AssociationMeta } from "./association";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { StructureMeta } from "./structure";
 import { Mixin } from "ts-mixer";
+import { AssociationStructure } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { AssociationMeta, StructureMeta } from "./_internal";
 
 export const ImplicitAssociationStructures = {
     base: "Objects::LinkObject",
@@ -36,8 +35,8 @@ export class AssociationStructMeta extends Mixin(AssociationMeta, StructureMeta)
         this.classifier = TypeClassifier.AssociationStruct;
     }
 
-    override self(): AssociationStructure | undefined {
-        return super.deref() as AssociationStructure;
+    override ast(): AssociationStructure | undefined {
+        return this._ast as AssociationStructure;
     }
 
     override parent(): ModelContainer<AssociationStructure> {

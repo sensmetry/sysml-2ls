@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { Metaclass } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { StructureMeta } from "./structure";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { StructureMeta } from "./_internal";
 
 export const ImplicitMetaclasses = {
     base: "Metaobjects::Metaobject",
@@ -28,8 +28,8 @@ export class MetaclassMeta extends StructureMeta {
         super(id, parent);
     }
 
-    override self(): Metaclass | undefined {
-        return super.deref() as Metaclass;
+    override ast(): Metaclass | undefined {
+        return this._ast as Metaclass;
     }
 
     override parent(): ModelContainer<Metaclass> {

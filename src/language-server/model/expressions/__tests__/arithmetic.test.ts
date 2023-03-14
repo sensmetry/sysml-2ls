@@ -17,6 +17,7 @@
 /* eslint-disable quotes */
 import { services, parseKerML, NO_ERRORS } from "../../../../testing";
 import { LiteralInfinity } from "../../../generated/ast";
+import { FeatureMeta } from "../../KerML";
 
 const Evaluator = services.shared.modelLevelExpressionEvaluator;
 
@@ -28,7 +29,7 @@ test.concurrent.each([
     ["Literal boolean", "true", [true]],
     ["Literal boolean", "false", [false]],
     ["Literal string", '"string"', ["string"]],
-    ["Literal infinity", "*", [{ _self: { $type: LiteralInfinity } }]],
+    ["Literal infinity", "*", [{ _ast: { $type: LiteralInfinity } }]],
     ["Division", "10 / 5", [2]],
     ["Modulo", "5 % 2", [1]],
     ["Multiplication", "5 * 2", [10]],
@@ -62,8 +63,8 @@ test.concurrent.each([
     const result = await parseKerML(`in feature a = ${body};`);
     expect(result).toMatchObject(NO_ERRORS);
 
-    const feature = result.value.features[0].$meta;
-    const expression = feature.value?.element;
+    const feature = result.value.members[0].element?.$meta as FeatureMeta;
+    const expression = feature?.value?.element();
     expect(expression).not.toBeUndefined();
     if (!expression) return;
     expect(Evaluator.evaluate(expression, feature)).toMatchObject(expected);

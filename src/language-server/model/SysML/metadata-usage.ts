@@ -34,8 +34,8 @@ export class MetadataUsageMeta extends Mixin(MetadataFeatureMeta, ItemUsageMeta)
         return "base";
     }
 
-    override self(): MetadataUsage | undefined {
-        return super.self() as MetadataUsage;
+    override ast(): MetadataUsage | undefined {
+        return this._ast as MetadataUsage;
     }
 
     override parent(): ModelContainer<MetadataUsage> {

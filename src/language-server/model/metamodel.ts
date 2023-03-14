@@ -19,8 +19,9 @@
 
 import { AstNode } from "langium";
 import { typeIndex, TypeMap } from "./types";
-import { BuildState, SpecializationKind } from "./enums";
+import { BuildState } from "./enums";
 import { SysMLType, SysMLTypeList } from "../services/sysml-ast-reflection";
+import { NonOwnerType, Specialization } from "../generated/ast";
 
 // Additional metadata stored with the AST nodes from postprocessing steps N.B.
 // all AST nodes here are references
@@ -41,6 +42,8 @@ export type Property<T extends object | undefined, K extends keyof NonNullable<T
 type Meta<T extends AstNode> = Metamodel<T>;
 type Container<T extends AstNode> = T["$container"];
 
+// namespaces are entry types but Langium doesn't generate optional `$container` yet
+// TODO: add `| (Namespace extends T ? undefined : never)`
 export type ModelContainer<T extends AstNode> =
     | Meta<NonNullable<Container<T>>>
     | (undefined extends Container<T> ? undefined : never);
@@ -111,37 +114,61 @@ function getMethods(type: SysMLType, name: MethodName): AnyFunction[] {
  */
 export const IMPLICIT_MAP: TypeMap<SysMLTypeList, [string, string][]> = {};
 
-type Metatype<T extends AstNode> = { new (id: ElementID, parent: ModelContainer<T>): Metamodel<T> };
+type Metatype<T extends AstNode> = new (id: ElementID, parent: ModelContainer<T>) => Metamodel<T>;
+type AbstractMetatype<T extends AstNode> = abstract new (
+    id: ElementID,
+    parent: ModelContainer<T>
+) => Metamodel<T>;
+
+export function metamodelOf<K extends SysMLType>(
+    type: K,
+    generalizations?: ImplicitGeneralizations
+): (target: Metatype<SysMLTypeList[K]>) => void;
+export function metamodelOf<K extends SysMLType>(
+    type: K,
+    abstract: "abstract"
+): (target: AbstractMetatype<SysMLTypeList[K]>) => void;
 
 // seems class decorators are called during module processing so this should
 // work
 export function metamodelOf<K extends SysMLType>(
     type: K,
-    generalizations: ImplicitGeneralizations = {}
+    generalizations: "abstract" | ImplicitGeneralizations = {}
 ): (target: Metatype<SysMLTypeList[K]>) => void {
+    const collect = (target: Metatype<SysMLTypeList[K]>): void => {
+        META_PROTOTYPES[type] = target.prototype;
+        target.prototype.nodeType = function (): SysMLType {
+            return type;
+        };
+
+        const supertypes = new Set(typeIndex.getInheritanceChain(type));
+        supertypes.add(type);
+        target.prototype.is =
+            supertypes.size > 1
+                ? function (t: SysMLType): boolean {
+                      return supertypes.has(t);
+                  }
+                : function (t: SysMLType): boolean {
+                      return type === t;
+                  };
+    };
+
+    if (generalizations === "abstract") {
+        return collect;
+    }
+
     IMPLICIT_MAP[type] = Object.entries(generalizations);
 
     return function (target: Metatype<SysMLTypeList[K]>): void {
-        // can't do module augmentation :(
+        collect(target);
         // @ts-expect-error should be caught by the function declaration
         META_FACTORY[type] = (
             id: ElementID,
             parent: ModelContainer<SysMLTypeList[K]>
         ): Metamodel<SysMLTypeList[K]> => new target(id, parent);
-        META_PROTOTYPES[type] = target.prototype;
 
-        // replace with static functions
         target.prototype.implicitGeneralizations = function (): ImplicitGeneralizations {
             return generalizations;
-        };
-
-        target.prototype.nodeType = function (): SysMLType {
-            return type;
-        };
-
-        const supertypes = typeIndex.getInheritanceChain(type);
-        target.prototype.is = function (t: SysMLType): boolean {
-            return type === t || supertypes.has(t);
         };
     };
 }
@@ -165,12 +192,17 @@ export interface Metamodel<T extends AstNode = AstNode> {
     /**
      * AST node associated with this metamodel
      */
-    self(): T | undefined;
+    ast(): T | undefined;
 
     /**
-     * Owning model
+     * Directly owning model
      */
     parent(): Metamodel | undefined;
+
+    /**
+     * The owning element with relationships unwrapped
+     */
+    owner(): Metamodel | undefined;
 
     /**
      * AST node type
@@ -197,7 +229,7 @@ export interface Metamodel<T extends AstNode = AstNode> {
     /**
      * Default specialization kind for implicit general types
      */
-    specializationKind(): SpecializationKind;
+    specializationKind(): SysMLType;
 
     /**
      * Model type assertion
@@ -235,9 +267,10 @@ export function isMetamodel(o: unknown): o is Metamodel {
 }
 
 export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T> {
-    protected _self?: T;
+    protected _ast?: T;
     readonly elementId: ElementID;
     protected _parent: ModelContainer<T>;
+    protected _owner: Metamodel | undefined;
 
     setupState: BuildState = "none";
     isStandardElement = false;
@@ -245,6 +278,8 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
     constructor(id: ElementID, parent: ModelContainer<T>) {
         this.elementId = id;
         this._parent = parent;
+        if (parent) this._owner = parent.is(NonOwnerType) ? parent.parent() : parent;
+        else this._owner = undefined;
     }
 
     /**
@@ -252,19 +287,23 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
      * have had their metamodels assigned.
      */
     initialize(node: T): void {
-        this._self = node;
+        this._ast = node;
     }
 
-    self(): T | undefined {
-        return this.deref();
+    ast(): T | undefined {
+        return this._ast;
     }
 
     parent(): ModelContainer<T> {
         return this._parent;
     }
 
+    owner(): Metamodel | undefined {
+        return this._owner;
+    }
+
     nodeType(): SysMLType {
-        return (this._self?.$type ?? "Unknown") as SysMLType;
+        return (this._ast?.$type ?? "Unknown") as SysMLType;
     }
 
     implicitGeneralizations(): ImplicitGeneralizations {
@@ -275,12 +314,8 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
      * Reset any cached values in this metamodel
      */
     reset(node: T): void {
-        this._self = node;
+        this._ast = node;
         this.setupState = "none";
-    }
-
-    protected deref(): T | undefined {
-        return this._self;
     }
 
     defaultGeneralTypes(): string[] {
@@ -291,8 +326,8 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
         return "base";
     }
 
-    specializationKind(): SpecializationKind {
-        return SpecializationKind.Specialization;
+    specializationKind(): SysMLType {
+        return Specialization;
     }
 
     is<K extends SysMLType>(type: K): this is SysMLTypeList[K]["$meta"] {

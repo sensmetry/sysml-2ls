@@ -15,13 +15,11 @@
  ********************************************************************************/
 
 import {
-    Argument,
     Expression,
-    FeatureReferenceExpression,
     InlineExpression,
     LiteralExpression,
     MetadataFeature,
-    OperatorExpression,
+    SysMLFunction,
     Type,
 } from "../../generated/ast";
 import * as meta from "../KerML";
@@ -32,7 +30,7 @@ import { concatNames } from "../naming";
 // expressions, generating a large extent upfront may crash the server otherwise
 export type ExpressionResult = BasicMetamodel | number | boolean | string;
 export type ExpressionLike = meta.InvocationExpressionMeta["args"][0];
-export type Evaluable = meta.InlineExpressionMeta | meta.ElementMeta;
+export type Evaluable = meta.ExpressionMeta | meta.ElementMeta;
 
 export abstract class BuiltinFunction {
     get isModelLevelEvaluable(): boolean {
@@ -191,11 +189,9 @@ export function isModelLevelEvaluable(fn: meta.FunctionMeta): boolean {
  */
 export function typeArgument(expr: meta.OperatorExpressionMeta): meta.TypeMeta | undefined {
     const arg = expr.args.at(1);
-    if (arg?.is(FeatureReferenceExpression)) {
-        const expr = arg.expression?.element;
-        if (expr?.is(Type)) return expr;
-        if (expr?.is(OperatorExpression)) return typeArgument(expr);
-    } else if (arg?.is(Type)) return arg;
+    if (arg?.is(Type)) {
+        return arg.types().head();
+    }
 
     return;
 }
@@ -295,7 +291,7 @@ export function typeFor(
  */
 export function typeOf(arg: ExpressionLike): meta.TypeMeta | string | undefined {
     if (!arg) return;
-    if (arg.is(Type)) return arg;
-    if (arg.is(Argument)) return arg.value?.returnType();
-    return arg.returnType();
+    if (arg.value) return arg.value.element()?.returnType();
+    if (arg.isAny([Expression, SysMLFunction])) return arg.returnType();
+    return arg;
 }

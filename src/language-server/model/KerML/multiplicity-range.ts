@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { MultiplicityRange } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { MultiplicityMeta } from "./multiplicity";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { MultiplicityMeta } from "./_internal";
 
 export const ImplicitMultiplicityRanges = {
     feature: "Base::naturals",
@@ -29,8 +29,8 @@ export class MultiplicityRangeMeta extends MultiplicityMeta {
         super(id, parent);
     }
 
-    override self(): MultiplicityRange | undefined {
-        return super.deref() as MultiplicityRange;
+    override ast(): MultiplicityRange | undefined {
+        return this._ast as MultiplicityRange;
     }
 
     override parent(): ModelContainer<MultiplicityRange> {

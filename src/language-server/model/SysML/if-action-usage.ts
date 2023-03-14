@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { IfActionUsage } from "../../generated/ast";
-import { Related } from "../KerML";
+import { ParameterMembershipMeta } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
@@ -25,22 +25,23 @@ import { ActionUsageMeta } from "./action-usage";
     subaction: "Actions::Action::ifSubactions",
 })
 export class IfActionUsageMeta extends ActionUsageMeta {
-    else?: Related<ActionUsageMeta>;
+    else?: ParameterMembershipMeta<ActionUsageMeta>;
 
     constructor(id: ElementID, parent: ModelContainer<IfActionUsage>) {
         super(id, parent);
     }
 
     override initialize(node: IfActionUsage): void {
-        if (node.else) this.else = { element: node.else.$meta };
+        if (node.members.length > 2)
+            this.else = node.members[2].$meta as ParameterMembershipMeta<ActionUsageMeta>;
     }
 
     override reset(node: IfActionUsage): void {
         this.initialize(node);
     }
 
-    override self(): IfActionUsage | undefined {
-        return super.self() as IfActionUsage;
+    override ast(): IfActionUsage | undefined {
+        return this._ast as IfActionUsage;
     }
 
     override parent(): ModelContainer<IfActionUsage> {

@@ -22,7 +22,7 @@ import {
     NO_ERRORS,
     childrenNames,
 } from "../../../../testing";
-import { Redefinition, Feature, Namespace } from "../../../generated/ast";
+import { Redefinition, Feature } from "../../../generated/ast";
 import { Visibility } from "../../../utils/scope-util";
 
 test.concurrent.each(["redefines", ":>>"])(
@@ -35,17 +35,21 @@ test.concurrent.each(["redefines", ":>>"])(
             doc /* doc */
         }
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: Redefinition,
-                    ...withQualifiedName("Redef"),
-                    specific: qualifiedTypeReference("a"),
-                    general: qualifiedTypeReference("b"),
-                    docs: [
-                        {
-                            body: "/* doc */",
-                        },
-                    ],
+                    element: {
+                        $type: Redefinition,
+                        ...withQualifiedName("Redef"),
+                        source: qualifiedTypeReference("a"),
+                        reference: qualifiedTypeReference("b"),
+                        annotations: [
+                            {
+                                element: {
+                                    body: "/* doc */",
+                                },
+                            },
+                        ],
+                    },
                 },
             ],
         });
@@ -60,11 +64,13 @@ test.concurrent.each(["specialization", ""])(
         feature b;
         ${prefix} redefinition a :>> b;
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: Redefinition,
-                    specific: qualifiedTypeReference("a"),
-                    general: qualifiedTypeReference("b"),
+                    element: {
+                        $type: Redefinition,
+                        source: qualifiedTypeReference("a"),
+                        reference: qualifiedTypeReference("b"),
+                    },
                 },
             ],
         });
@@ -76,12 +82,17 @@ test("features can have multiple owned redefinitions", async () => {
     feature a;
     feature b;
     feature c :>> a, b;`).toParseKerML({
-        features: [
+        members: [
             ...anything(2),
             {
-                $type: Feature,
-                ...withQualifiedName("c"),
-                redefines: [qualifiedTypeReference("a"), qualifiedTypeReference("b")],
+                element: {
+                    $type: Feature,
+                    ...withQualifiedName("c"),
+                    typeRelationships: [
+                        { $type: Redefinition, reference: qualifiedTypeReference("a") },
+                        { $type: Redefinition, reference: qualifiedTypeReference("b") },
+                    ],
+                },
             },
         ],
     });
@@ -91,16 +102,14 @@ test("features can have multiple owned redefinitions", async () => {
 
 test("unnamed redefining features implicitly have the same name as the redefined feature", async () => {
     const result = await parseKerML(`
-    type A {
+    class A {
         feature x;
     }
-    type B specializes A {
+    class B specializes A {
         feature :>> x;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.elements[1] as Namespace, Visibility.private)).toStrictEqual([
-        "B::x",
-        "B",
-        "A",
-    ]);
+    expect(
+        childrenNames(result.value.namespaceMembers[1].element, Visibility.private)
+    ).toStrictEqual(["B::x", "B", "A"]);
 });

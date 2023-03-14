@@ -21,18 +21,20 @@ import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 @metamodelOf(Definition)
 export class DefinitionMeta extends ClassifierMeta {
     isVariation = false;
+    isIndividual = false;
 
     constructor(id: ElementID, parent: ModelContainer<Definition>) {
         super(id, parent);
     }
 
     override initialize(node: Definition): void {
+        this.isIndividual = node.isIndividual;
         this.isVariation = node.isVariation;
         this.isAbstract ||= this.isVariation;
     }
 
-    override self(): Definition | undefined {
-        return super.self() as Definition;
+    override ast(): Definition | undefined {
+        return this._ast as Definition;
     }
 
     override parent(): ModelContainer<Definition> {

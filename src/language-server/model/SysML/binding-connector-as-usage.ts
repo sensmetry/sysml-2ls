@@ -29,8 +29,8 @@ export class BindingConnectorAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Bin
         super(id, parent);
     }
 
-    override self(): BindingConnectorAsUsage | undefined {
-        return super.self() as BindingConnectorAsUsage;
+    override ast(): BindingConnectorAsUsage | undefined {
+        return this._ast as BindingConnectorAsUsage;
     }
 
     override parent(): ModelContainer<BindingConnectorAsUsage> {

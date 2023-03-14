@@ -14,42 +14,47 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Type } from "langium/lib/grammar/generated/ast";
 import { qualifiedTypeReference, anything, withQualifiedName } from "../../../../testing";
-import { Specialization, Documentation } from "../../../generated/ast";
+import { Specialization, Documentation, Class } from "../../../generated/ast";
 
 const Common = `
-type A;
-type B;
+class A;
+class B;
 `;
 
 test("specialization can be parsed", async () => {
     return expect(
         Common +
             `
-    type x;
+    class x;
     classifier things;
     specialization Gen subtype A specializes B;
     specialization subtype x :> things {
         doc /* unnamed */
     }`
     ).toParseKerML({
-        relationships: [
+        relationshipMembers: [
             {
-                $type: Specialization,
-                specific: qualifiedTypeReference("A"),
-                general: qualifiedTypeReference("B"),
+                element: {
+                    $type: Specialization,
+                    source: qualifiedTypeReference("A"),
+                    reference: qualifiedTypeReference("B"),
+                },
             },
             {
-                $type: Specialization,
-                specific: qualifiedTypeReference("x"),
-                general: qualifiedTypeReference("things"),
-                docs: [
-                    {
-                        $type: Documentation,
-                        body: "/* unnamed */",
-                    },
-                ],
+                element: {
+                    $type: Specialization,
+                    source: qualifiedTypeReference("x"),
+                    reference: qualifiedTypeReference("things"),
+                    annotations: [
+                        {
+                            element: {
+                                $type: Documentation,
+                                body: "/* unnamed */",
+                            },
+                        },
+                    ],
+                },
             },
         ],
     });
@@ -59,14 +64,19 @@ test("types can specialize multiple types", async () => {
     return expect(
         Common +
             `
-    type C specializes A, B;`
+    class C specializes A, B;`
     ).toParseKerML({
-        elements: [
+        namespaceMembers: [
             ...anything(2),
             {
-                $type: Type,
-                ...withQualifiedName("C"),
-                specializes: [qualifiedTypeReference("A"), qualifiedTypeReference("B")],
+                element: {
+                    $type: Class,
+                    ...withQualifiedName("C"),
+                    typeRelationships: [
+                        { reference: qualifiedTypeReference("A") },
+                        { reference: qualifiedTypeReference("B") },
+                    ],
+                },
             },
         ],
     });

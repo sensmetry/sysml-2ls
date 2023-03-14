@@ -14,19 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Type } from "langium/lib/grammar/generated/ast";
 import { withQualifiedName, qualifiedTypeReference, anything } from "../../../../testing";
-import { Disjoining, Documentation } from "../../../generated/ast";
+import { Class, Disjoining, Documentation, Subclassification } from "../../../generated/ast";
 
 const Common = `
-type Person {
+class Person {
     feature parents: Person[2];
     feature children: Person[*];
 }
-type Mineral;
-type Mammal;
-type A;
-type B;
+class Mineral;
+class Mammal;
+class A;
+class B;
 `;
 
 test("disjoining can be parsed", async () => {
@@ -39,28 +38,36 @@ test("disjoining can be parsed", async () => {
         doc /* No Person can be their own parent. */
     }`
     ).toParseKerML({
-        relationships: [
+        relationshipMembers: [
             {
-                $type: Disjoining,
-                ...withQualifiedName("Disj"),
-                disjoined: qualifiedTypeReference("A"),
-                disjoining: qualifiedTypeReference("B"),
+                element: {
+                    $type: Disjoining,
+                    ...withQualifiedName("Disj"),
+                    source: qualifiedTypeReference("A"),
+                    reference: qualifiedTypeReference("B"),
+                },
             },
             {
-                $type: Disjoining,
-                disjoined: qualifiedTypeReference("Mammal"),
-                disjoining: qualifiedTypeReference("Mineral"),
+                element: {
+                    $type: Disjoining,
+                    source: qualifiedTypeReference("Mammal"),
+                    reference: qualifiedTypeReference("Mineral"),
+                },
             },
             {
-                $type: Disjoining,
-                disjoined: qualifiedTypeReference("Person::parents"),
-                disjoining: qualifiedTypeReference("Person::children"),
-                docs: [
-                    {
-                        $type: Documentation,
-                        body: "/* No Person can be their own parent. */",
-                    },
-                ],
+                element: {
+                    $type: Disjoining,
+                    source: qualifiedTypeReference("Person::parents"),
+                    reference: qualifiedTypeReference("Person::children"),
+                    annotations: [
+                        {
+                            element: {
+                                $type: Documentation,
+                                body: "/* No Person can be their own parent. */",
+                            },
+                        },
+                    ],
+                },
             },
         ],
     });
@@ -74,21 +81,27 @@ test("disjoining may be omitted without identifiers", async () => {
     disjoint Mammal from Mineral;
     disjoint Person::parents from Person::children;`
     ).toParseKerML({
-        relationships: [
+        relationshipMembers: [
             {
-                $type: Disjoining,
-                disjoined: qualifiedTypeReference("A"),
-                disjoining: qualifiedTypeReference("B"),
+                element: {
+                    $type: Disjoining,
+                    source: qualifiedTypeReference("A"),
+                    reference: qualifiedTypeReference("B"),
+                },
             },
             {
-                $type: Disjoining,
-                disjoined: qualifiedTypeReference("Mammal"),
-                disjoining: qualifiedTypeReference("Mineral"),
+                element: {
+                    $type: Disjoining,
+                    source: qualifiedTypeReference("Mammal"),
+                    reference: qualifiedTypeReference("Mineral"),
+                },
             },
             {
-                $type: Disjoining,
-                disjoined: qualifiedTypeReference("Person::parents"),
-                disjoining: qualifiedTypeReference("Person::children"),
+                element: {
+                    $type: Disjoining,
+                    source: qualifiedTypeReference("Person::parents"),
+                    reference: qualifiedTypeReference("Person::children"),
+                },
             },
         ],
     });
@@ -98,26 +111,35 @@ test("types can declare owned disjoinings", async () => {
     return expect(
         Common +
             `
-    type Anything;
-    type C specializes Anything disjoint from A, B;
-    type Animal;
-    type Mammal2 :> Animal disjoint from Mineral;
+    class Anything;
+    class C specializes Anything disjoint from A, B;
+    class Animal;
+    class Mammal2 :> Animal disjoint from Mineral;
     `
     ).toParseKerML({
-        elements: [
+        namespaceMembers: [
             ...anything(6),
             {
-                $type: Type,
-                ...withQualifiedName("C"),
-                specializes: [qualifiedTypeReference("Anything")],
-                disjoins: [qualifiedTypeReference("A"), qualifiedTypeReference("B")],
+                element: {
+                    $type: Class,
+                    ...withQualifiedName("C"),
+                    typeRelationships: [
+                        { $type: Subclassification, reference: qualifiedTypeReference("Anything") },
+                        { $type: Disjoining, reference: qualifiedTypeReference("A") },
+                        { $type: Disjoining, reference: qualifiedTypeReference("B") },
+                    ],
+                },
             },
-            withQualifiedName("Animal"),
+            { element: withQualifiedName("Animal") },
             {
-                $type: Type,
-                ...withQualifiedName("Mammal2"),
-                specializes: [qualifiedTypeReference("Animal")],
-                disjoins: [qualifiedTypeReference("Mineral")],
+                element: {
+                    $type: Class,
+                    ...withQualifiedName("Mammal2"),
+                    typeRelationships: [
+                        { $type: Subclassification, reference: qualifiedTypeReference("Animal") },
+                        { $type: Disjoining, reference: qualifiedTypeReference("Mineral") },
+                    ],
+                },
             },
         ],
     });

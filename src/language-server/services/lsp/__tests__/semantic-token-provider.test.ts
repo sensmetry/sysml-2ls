@@ -152,7 +152,7 @@ specialization subclassifier B :> A {
     metaclass Approved;
 }
 namespace NA {
-    type A {
+    namespace A {
         @Annotations::Approved;
     }
 }
@@ -216,7 +216,7 @@ part def Engine {
 
     comment Comment /* comment */
 
-    type Type {
+    namespace Type {
         doc /* doc */
     }
 
@@ -326,6 +326,6 @@ async function runSemanticTokenSnapshotTest(testCase: Case): Promise<void> {
     expect(semanticTokens.data).toMatchSnapshot();
 }
 
-test.concurrent.each(testTable)("Semantic token provider test", runSemanticTokenTest);
+test.each(testTable)("Semantic token provider test", runSemanticTokenTest);
 
 test.each(snapshotTestTable)("Semantic token provider snapshot test", runSemanticTokenSnapshotTest);

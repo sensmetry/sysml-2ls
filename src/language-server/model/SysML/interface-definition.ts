@@ -27,8 +27,8 @@ export class InterfaceDefinitionMeta extends ConnectionDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): InterfaceDefinition | undefined {
-        return super.self() as InterfaceDefinition;
+    override ast(): InterfaceDefinition | undefined {
+        return this._ast as InterfaceDefinition;
     }
 
     override parent(): ModelContainer<InterfaceDefinition> {

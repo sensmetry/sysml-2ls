@@ -14,20 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Mixin } from "ts-mixer";
 import { Comment } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { AnnotationMeta } from "./annotating-element";
-import { TextualAnnotatingMeta } from "./textual-annotating-element";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { TextualAnnotatingMeta } from "./_internal";
 
 @metamodelOf(Comment)
-export class CommentMeta extends Mixin(TextualAnnotatingMeta, AnnotationMeta) {
+export class CommentMeta extends TextualAnnotatingMeta {
     constructor(id: ElementID, parent: ModelContainer<Comment>) {
         super(id, parent);
     }
 
-    override self(): Comment | undefined {
-        return super.deref() as Comment;
+    override ast(): Comment | undefined {
+        return this._ast as Comment;
     }
 
     override parent(): ModelContainer<Comment> {

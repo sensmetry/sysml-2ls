@@ -15,7 +15,13 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { CaseDefinition, CaseUsage, IncludeUseCaseUsage } from "../../generated/ast";
+import {
+    CaseDefinition,
+    CaseUsage,
+    IncludeUseCaseUsage,
+    ReferenceSubsetting,
+} from "../../generated/ast";
+import { FeatureMeta } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { PerformActionUsageMeta } from "./perform-action-usage";
 import { UseCaseUsageMeta } from "./use-case-usage";
@@ -29,8 +35,8 @@ export class IncludeUseCaseUsageMeta extends Mixin(UseCaseUsageMeta, PerformActi
         super(id, parent);
     }
 
-    override self(): IncludeUseCaseUsage | undefined {
-        return super.self() as IncludeUseCaseUsage;
+    override ast(): IncludeUseCaseUsage | undefined {
+        return this._ast as IncludeUseCaseUsage;
     }
 
     override parent(): ModelContainer<IncludeUseCaseUsage> {
@@ -44,8 +50,12 @@ export class IncludeUseCaseUsageMeta extends Mixin(UseCaseUsageMeta, PerformActi
     }
 
     hasRelevantSubjectParameter(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([CaseDefinition, CaseUsage]);
+    }
+
+    override namingFeature(): FeatureMeta | undefined {
+        return this.types(ReferenceSubsetting).head() as FeatureMeta | undefined;
     }
 }
 

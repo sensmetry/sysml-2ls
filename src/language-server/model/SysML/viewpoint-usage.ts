@@ -32,12 +32,12 @@ export class ViewpointUsageMeta extends RequirementUsageMeta {
     }
 
     isSatisfiedViewpoint(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([ViewDefinition, ViewUsage]);
     }
 
-    override self(): ViewpointUsage | undefined {
-        return super.self() as ViewpointUsage;
+    override ast(): ViewpointUsage | undefined {
+        return this._ast as ViewpointUsage;
     }
 
     override parent(): ModelContainer<ViewpointUsage> {

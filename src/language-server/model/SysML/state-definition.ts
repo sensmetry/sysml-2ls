@@ -15,10 +15,8 @@
  ********************************************************************************/
 
 import { StateDefinition } from "../../generated/ast";
-import { Related } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionDefinitionMeta } from "./action-definition";
-import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(StateDefinition, {
     base: "States::StateAction",
@@ -26,19 +24,16 @@ import { ActionUsageMeta } from "./action-usage";
 export class StateDefinitionMeta extends ActionDefinitionMeta {
     isParallel = false;
 
-    subactions: Related<ActionUsageMeta>[] = [];
-
     constructor(id: ElementID, parent: ModelContainer<StateDefinition>) {
         super(id, parent);
     }
 
     override initialize(node: StateDefinition): void {
         this.isParallel = node.isParallel;
-        this.subactions = node.subactions.map((a) => ({ element: a.$meta }));
     }
 
-    override self(): StateDefinition | undefined {
-        return super.self() as StateDefinition;
+    override ast(): StateDefinition | undefined {
+        return this._ast as StateDefinition;
     }
 
     override parent(): ModelContainer<StateDefinition> {

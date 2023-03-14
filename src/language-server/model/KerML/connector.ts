@@ -14,9 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Connector } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { Related, ConnectorEndMeta, FeatureMeta } from "./_internal";
+import { Mixin } from "ts-mixer";
+import { Connector, EndFeatureMembership, Feature } from "../../generated/ast";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { FeatureMembershipMeta, FeatureMeta, RelationshipMeta } from "./_internal";
 
 export const ImplicitConnectors = {
     base: "Links::links",
@@ -26,18 +27,23 @@ export const ImplicitConnectors = {
 };
 
 @metamodelOf(Connector, ImplicitConnectors)
-export class ConnectorMeta extends FeatureMeta {
+export class ConnectorMeta extends Mixin(RelationshipMeta, FeatureMeta) {
     /**
      * Owned connector ends
      */
-    ends: Related<ConnectorEndMeta>[] = [];
+    ends: FeatureMembershipMeta[] = [];
 
     constructor(id: ElementID, parent: ModelContainer<Connector>) {
         super(id, parent);
     }
 
     override initialize(node: Connector): void {
-        this.ends = node.ends.map((end) => ({ element: end.$meta }));
+        this.ends = node.members
+            .filter(
+                (m) =>
+                    m.element && (m.$meta.is(EndFeatureMembership) || (m.element as Feature)?.isEnd)
+            )
+            .map((m) => m.$meta as FeatureMembershipMeta);
     }
 
     override defaultSupertype(): string {
@@ -50,8 +56,8 @@ export class ConnectorMeta extends FeatureMeta {
         return ends === 2 ? "binary" : "base";
     }
 
-    override self(): Connector | undefined {
-        return super.deref() as Connector;
+    override ast(): Connector | undefined {
+        return this._ast as Connector;
     }
 
     override parent(): ModelContainer<Connector> {

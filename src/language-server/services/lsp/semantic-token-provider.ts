@@ -32,10 +32,10 @@ import {
     Comment,
     TextualRepresentation,
     OperatorExpression,
-    Alias,
     Type,
     Classifier,
     Feature,
+    Membership,
 } from "../../generated/ast";
 import {
     CancellationToken,
@@ -151,9 +151,10 @@ const TYPE_TOKENS: { readonly [K in SysMLType]?: string } = {
     Expression: SysMLSemanticTokenTypes.method,
     LiteralNumber: SysMLSemanticTokenTypes.number,
     LiteralString: SysMLSemanticTokenTypes.string,
-    Alias: SysMLSemanticTokenTypes.relationship,
     Relationship: SysMLSemanticTokenTypes.relationship,
     Metaclass: SysMLSemanticTokenTypes.metaclass,
+    Association: SysMLSemanticTokenTypes.type,
+    AssociationStructure: SysMLSemanticTokenTypes.struct,
 };
 type HighlightFunction<T = AstNode> = (node: T, acceptor: SemanticTokenAcceptor) => ReturnType;
 type HighlightMap = { [K in SysMLType]?: HighlightFunction<SysMLTypeList[K]>[] };
@@ -314,7 +315,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
      */
     protected element(node: Element, acceptor: SemanticTokenAcceptor, type?: string): ReturnType {
         type ??= this.tokenMap.get(node.$type);
-        if (!type) return;
+        if (!type || !(node.declaredName || node.declaredShortName)) return;
         const mods = this.elementModifiers(node.$meta);
 
         // this is also a declaration
@@ -352,16 +353,16 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         if (!node.$meta.to.cached) return;
 
         let index = -1;
-        for (const ref of node.chain) {
+        for (const ref of node.parts) {
             ++index;
             let target = ref.ref?.$meta;
-            if (target?.is(Alias)) target = target.for.target?.element;
+            if (target?.is(Membership)) target = target.element();
             if (!target) continue;
             const type = this.tokenMap.get(target.nodeType());
             if (!type) continue;
             acceptor({
                 node: node,
-                property: "chain",
+                property: "parts",
                 index: index,
                 type: type,
                 modifier: this.elementModifiers(target),

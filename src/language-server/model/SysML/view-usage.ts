@@ -32,12 +32,12 @@ export class ViewUsageMeta extends PartUsageMeta {
     }
 
     isSubview(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([ViewDefinition, ViewUsage]);
     }
 
-    override self(): ViewUsage | undefined {
-        return super.self() as ViewUsage;
+    override ast(): ViewUsage | undefined {
+        return this._ast as ViewUsage;
     }
 
     override parent(): ModelContainer<ViewUsage> {

@@ -28,8 +28,8 @@ export class MetadataDefinitionMeta extends Mixin(ItemDefinitionMeta, MetaclassM
         super(id, parent);
     }
 
-    override self(): MetadataDefinition | undefined {
-        return super.self() as MetadataDefinition;
+    override ast(): MetadataDefinition | undefined {
+        return this._ast as MetadataDefinition;
     }
 
     override parent(): ModelContainer<MetadataDefinition> {

@@ -36,8 +36,8 @@ export class OccurrenceUsageMeta extends UsageMeta {
         return "base";
     }
 
-    override self(): OccurrenceUsage | undefined {
-        return super.self() as OccurrenceUsage;
+    override ast(): OccurrenceUsage | undefined {
+        return this._ast as OccurrenceUsage;
     }
 
     override parent(): ModelContainer<OccurrenceUsage> {

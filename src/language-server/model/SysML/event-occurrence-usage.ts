@@ -31,12 +31,12 @@ export class EventOccurrenceUsageMeta extends OccurrenceUsageMeta {
     }
 
     protected override isSuboccurrence(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([OccurrenceUsage, OccurrenceDefinition]);
     }
 
-    override self(): EventOccurrenceUsage | undefined {
-        return super.self() as EventOccurrenceUsage;
+    override ast(): EventOccurrenceUsage | undefined {
+        return this._ast as EventOccurrenceUsage;
     }
 
     override parent(): ModelContainer<EventOccurrenceUsage> {

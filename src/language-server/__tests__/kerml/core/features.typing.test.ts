@@ -20,30 +20,33 @@ import {
     parseKerML,
     sanitizeTree,
 } from "../../../../testing";
-import { FeatureTyping } from "../../../generated/ast";
-import { SpecializationKind } from "../../../model";
+import { Feature, FeatureTyping } from "../../../generated/ast";
 
 test.concurrent.each(["typed by", ":"])(
     "feature typings can be parsed with '%s'",
     async (token: string) => {
         return expect(`
         feature customer;
-        type Person;
+        class Person;
         specialization t typing customer ${token} Person {
             doc /* doc */
         }
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: FeatureTyping,
-                    ...withQualifiedName("t"),
-                    specific: qualifiedTypeReference("customer"),
-                    general: qualifiedTypeReference("Person"),
-                    docs: [
-                        {
-                            body: "/* doc */",
-                        },
-                    ],
+                    element: {
+                        $type: FeatureTyping,
+                        ...withQualifiedName("t"),
+                        source: qualifiedTypeReference("customer"),
+                        reference: qualifiedTypeReference("Person"),
+                        annotations: [
+                            {
+                                element: {
+                                    body: "/* doc */",
+                                },
+                            },
+                        ],
+                    },
                 },
             ],
         });
@@ -55,14 +58,16 @@ test.concurrent.each(["specialization", ""])(
     async (prefix: string) => {
         return expect(`
         feature customer;
-        type Person;
+        class Person;
         ${prefix} typing customer : Person;
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: FeatureTyping,
-                    specific: qualifiedTypeReference("customer"),
-                    general: qualifiedTypeReference("Person"),
+                    element: {
+                        $type: FeatureTyping,
+                        source: qualifiedTypeReference("customer"),
+                        reference: qualifiedTypeReference("Person"),
+                    },
                 },
             ],
         });
@@ -71,25 +76,29 @@ test.concurrent.each(["specialization", ""])(
 
 test("features typed by aliases resolve to aliased types", async () => {
     const text = `
-        type A;
+        class A;
         alias B for A;
         feature a : B;
     `;
 
     const result = await parseKerML(text);
     expect(result).toParseKerML({
-        features: [
+        members: [
             {
-                ...withQualifiedName("a"),
-                typedBy: [qualifiedTypeReference("A")],
+                element: {
+                    ...withQualifiedName("a"),
+                    typeRelationships: [{ reference: qualifiedTypeReference("A") }],
+                },
             },
         ],
     });
 
     const typings = Array.from(
-        result.value.features[0].$meta.specializations(SpecializationKind.Typing)
+        (result.value.members[0].element as Feature).$meta.specializations(FeatureTyping)
     );
 
     expect(typings).toHaveLength(1);
-    expect(sanitizeTree(typings[0].type.self())).toMatchObject(withQualifiedName("A"));
+    expect(sanitizeTree(typings[0].element()?.ast(), undefined, "include $meta")).toMatchObject(
+        withQualifiedName("A")
+    );
 });

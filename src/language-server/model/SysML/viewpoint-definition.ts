@@ -26,8 +26,8 @@ export class ViewpointDefinitionMeta extends RequirementDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): ViewpointDefinition | undefined {
-        return super.self() as ViewpointDefinition;
+    override ast(): ViewpointDefinition | undefined {
+        return this._ast as ViewpointDefinition;
     }
 
     override parent(): ModelContainer<ViewpointDefinition> {

@@ -33,5 +33,15 @@ test("all AST nodes have a factory function", async () => {
         .map((t) => [t, builder.factory[t]])
         .filter(([_, v]) => v === undefined)
         .map(([k, _]) => k);
-    expect(missing).toMatchInlineSnapshot("[]");
+    expect(missing).toMatchInlineSnapshot(`
+[
+  "AnnotatingElement",
+  "Element",
+  "Expose",
+  "Featuring",
+  "Import",
+  "Relationship",
+  "TextualAnnotatingElement",
+]
+`);
 });

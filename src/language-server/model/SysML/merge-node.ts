@@ -26,8 +26,8 @@ export class MergeNodeMeta extends ControlNodeMeta {
         super(id, parent);
     }
 
-    override self(): MergeNode | undefined {
-        return super.self() as MergeNode;
+    override ast(): MergeNode | undefined {
+        return this._ast as MergeNode;
     }
 
     override parent(): ModelContainer<MergeNode> {

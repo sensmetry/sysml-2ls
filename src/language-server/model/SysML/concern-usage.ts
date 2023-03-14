@@ -27,8 +27,8 @@ export class ConcernUsageMeta extends RequirementUsageMeta {
         super(id, parent);
     }
 
-    override self(): ConcernUsage | undefined {
-        return super.self() as ConcernUsage;
+    override ast(): ConcernUsage | undefined {
+        return this._ast as ConcernUsage;
     }
 
     override parent(): ModelContainer<ConcernUsage> {

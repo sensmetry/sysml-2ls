@@ -14,11 +14,24 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Namespace } from "../../generated/ast";
-import { ElementMeta } from "./element";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import {
+    AnnotatingElement,
+    Comment,
+    Documentation,
+    MetadataFeature,
+    Namespace,
+} from "../../generated/ast";
 import { BuildState } from "../enums";
-import { ImportMeta, AliasMeta } from "./_internal";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import {
+    CommentMeta,
+    DocumentationMeta,
+    ElementMeta,
+    FeatureMeta,
+    ImportMeta,
+    MembershipMeta,
+    RelationshipMeta,
+} from "./_internal";
 
 @metamodelOf(Namespace)
 export class NamespaceMeta extends ElementMeta {
@@ -30,7 +43,7 @@ export class NamespaceMeta extends ElementMeta {
     /**
      * Alias members
      */
-    aliases: AliasMeta[] = [];
+    aliases: MembershipMeta[] = [];
 
     /**
      * Imports resolution state
@@ -46,8 +59,8 @@ export class NamespaceMeta extends ElementMeta {
         this.aliases = node.aliases.map((v) => v.$meta);
     }
 
-    override self(): Namespace | undefined {
-        return super.deref() as Namespace;
+    override ast(): Namespace | undefined {
+        return this._ast as Namespace;
     }
 
     override parent(): ModelContainer<Namespace> {
@@ -57,6 +70,30 @@ export class NamespaceMeta extends ElementMeta {
     override reset(node: Namespace): void {
         this.importResolutionState = "none";
         this.initialize(node);
+    }
+
+    protected override collectChildren(node: Namespace): void {
+        node.annotatingMembers.forEach((a) => {
+            if (!a.element) return;
+
+            const element = a.element as AnnotatingElement;
+            if (element.about.length > 0) return;
+
+            const meta = element.$meta;
+            if (meta.is(MetadataFeature)) this.metadata.push(meta);
+            else if (element.$type === Comment) this.comments.push(meta as CommentMeta);
+            else if (element.$type === Documentation) this.docs.push(meta as DocumentationMeta);
+        });
+
+        node.namespaceMembers.forEach((n) => {
+            this.elements.push(n.$meta as MembershipMeta<NamespaceMeta>);
+        });
+        node.relationshipMembers.forEach((r) => {
+            this.relationships.push(r.$meta as MembershipMeta<RelationshipMeta>);
+        });
+        node.members.forEach((m) => {
+            this.features.push(m.$meta as MembershipMeta<FeatureMeta>);
+        });
     }
 }
 

@@ -27,8 +27,8 @@ export class AllocationDefinitionMeta extends ConnectionDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): AllocationDefinition | undefined {
-        return super.self() as AllocationDefinition;
+    override ast(): AllocationDefinition | undefined {
+        return this._ast as AllocationDefinition;
     }
 
     override parent(): ModelContainer<AllocationDefinition> {

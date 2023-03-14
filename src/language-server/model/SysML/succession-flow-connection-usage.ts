@@ -32,8 +32,8 @@ export class SuccessionFlowConnectionUsageMeta extends Mixin(
         super(id, parent);
     }
 
-    override self(): SuccessionFlowConnectionUsage | undefined {
-        return super.self() as SuccessionFlowConnectionUsage;
+    override ast(): SuccessionFlowConnectionUsage | undefined {
+        return this._ast as SuccessionFlowConnectionUsage;
     }
 
     override parent(): ModelContainer<SuccessionFlowConnectionUsage> {

@@ -15,7 +15,18 @@
  ********************************************************************************/
 
 import { stream, ValidationAcceptor } from "langium";
-import { Type, isAssociation, Subsetting, Feature } from "../../generated/ast";
+import {
+    Type,
+    isAssociation,
+    Subsetting,
+    Feature,
+    Relationship,
+    Unioning,
+    Intersecting,
+    Differencing,
+    isSubsetting,
+    isFeatureChaining,
+} from "../../generated/ast";
 import { validateKerML } from "./kerml-validation-registry";
 
 /**
@@ -24,25 +35,19 @@ import { validateKerML } from "./kerml-validation-registry";
 export class KerMLValidator {
     @validateKerML(Type, false)
     checkTypeRelationships(type: Type, accept: ValidationAcceptor): void {
-        if (type.unions.length === 1) {
-            accept("error", "A single unioning relationship is not allowed", {
-                node: type,
-                property: "unions",
-            });
-        }
+        const relationships: Partial<Record<string, Relationship[]>> = {};
+        type.typeRelationships.reduce((map, r) => {
+            (map[r.$type] ??= <Relationship[]>[]).push(r);
+            return map;
+        }, relationships);
 
-        if (type.intersects.length === 1) {
-            accept("error", "A single intersecting relationship is not allowed", {
-                node: type,
-                property: "intersects",
-            });
-        }
-
-        if (type.differences.length === 1) {
-            accept("error", "A single differencing relationship is not allowed", {
-                node: type,
-                property: "differences",
-            });
+        for (const type of [Unioning, Intersecting, Differencing]) {
+            const array = relationships[type];
+            if (array && array.length === 1) {
+                accept("error", `A single ${type.toLowerCase()} relationship is not allowed`, {
+                    node: array[0] as Relationship,
+                });
+            }
         }
     }
 
@@ -89,8 +94,12 @@ export class KerMLValidator {
     checkSubsettedMultiplicities(feature: Feature, accept: ValidationAcceptor): void {
         this.validateSubsettingMultiplicities(
             feature,
-            stream(feature.subsets)
-                .map((ref) => ref.$meta.to.target?.element.self())
+            stream(feature.typeRelationships)
+                .filter((r) => isSubsetting(r))
+                .map(
+                    (subsetting) =>
+                        (subsetting as Subsetting).reference?.$meta.to.target as Feature | undefined
+                )
                 .nonNullable(),
             accept
         );
@@ -98,8 +107,8 @@ export class KerMLValidator {
 
     @validateKerML(Subsetting)
     checkSubsettingMultiplicities(subsetting: Subsetting, accept: ValidationAcceptor): void {
-        const feature = subsetting.specific.$meta.to.target?.element.self();
-        const subsetted = subsetting.general.$meta.to.target?.element.self();
+        const feature = subsetting.source?.$meta.to.target?.ast() ?? subsetting.$container;
+        const subsetted = subsetting.reference?.$meta.to.target?.ast();
         if (!feature || !subsetted) return;
         // Langium doesn't allow overriding interface properties but Subsetting always references features
         this.validateSubsettingMultiplicities(feature as Feature, [subsetted as Feature], accept);
@@ -107,15 +116,10 @@ export class KerMLValidator {
 
     @validateKerML(Feature)
     checkFeatureChainingLength(feature: Feature, accept: ValidationAcceptor): void {
-        if (feature.chains.length === 0) return;
-        const chains = feature.chains.reduce(
-            (total, ref) => total + ref.$meta.featureIndices.length,
-            0
-        );
-        if (chains < 2) {
+        const chainings = feature.typeRelationships.filter((r) => isFeatureChaining(r));
+        if (chainings.length === 1) {
             accept("error", "Feature chain must be a chain of 2 or more features", {
-                node: feature,
-                property: "chains",
+                node: chainings[0],
             });
         }
     }

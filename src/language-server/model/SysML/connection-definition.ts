@@ -33,8 +33,8 @@ export class ConnectionDefinitionMeta extends Mixin(PartDefinitionMeta, Associat
         return this.isBinary() ? "binary" : "base";
     }
 
-    override self(): ConnectionDefinition | undefined {
-        return super.self() as ConnectionDefinition;
+    override ast(): ConnectionDefinition | undefined {
+        return this._ast as ConnectionDefinition;
     }
 
     override parent(): ModelContainer<ConnectionDefinition> {

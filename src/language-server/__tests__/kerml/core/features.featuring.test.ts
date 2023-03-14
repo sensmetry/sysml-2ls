@@ -14,28 +14,32 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { withQualifiedName, qualifiedTypeReference } from "../../../../testing";
-import { TypeFeaturing, Feature } from "../../../generated/ast";
+import { withQualifiedName, qualifiedTypeReference, anything } from "../../../../testing";
+import { TypeFeaturing, Feature, FeatureTyping } from "../../../generated/ast";
 
 test("type featuring can be parsed", async () => {
     return expect(`
         feature engine;
-        classifier Vehicle;
+        feature Vehicle;
         featuring engine_by_Vehicle of engine by Vehicle {
             doc /* doc */
         }
     `).toParseKerML({
-        relationships: [
+        relationshipMembers: [
             {
-                $type: TypeFeaturing,
-                ...withQualifiedName("engine_by_Vehicle"),
-                feature: qualifiedTypeReference("engine"),
-                featuringType: qualifiedTypeReference("Vehicle"),
-                docs: [
-                    {
-                        body: "/* doc */",
-                    },
-                ],
+                element: {
+                    $type: TypeFeaturing,
+                    ...withQualifiedName("engine_by_Vehicle"),
+                    source: qualifiedTypeReference("engine"),
+                    reference: qualifiedTypeReference("Vehicle"),
+                    annotations: [
+                        {
+                            element: {
+                                body: "/* doc */",
+                            },
+                        },
+                    ],
+                },
             },
         ],
     });
@@ -46,14 +50,16 @@ test.each(["of", ""])(
     async (token: string) => {
         return expect(`
         feature engine;
-        classifier Vehicle;
+        feature Vehicle;
         featuring ${token} engine by Vehicle;
     `).toParseKerML({
-            relationships: [
+            relationshipMembers: [
                 {
-                    $type: TypeFeaturing,
-                    feature: qualifiedTypeReference("engine"),
-                    featuringType: qualifiedTypeReference("Vehicle"),
+                    element: {
+                        $type: TypeFeaturing,
+                        source: qualifiedTypeReference("engine"),
+                        reference: qualifiedTypeReference("Vehicle"),
+                    },
                 },
             ],
         });
@@ -62,15 +68,21 @@ test.each(["of", ""])(
 
 test("features can own type featurings", async () => {
     return expect(`
-    classifier Vehicle;
+    feature Vehicle;
     classifier Engine;
     feature engine : Engine featured by Vehicle;
     `).toParseKerML({
-        features: [
+        members: [
+            ...anything(1),
             {
-                $type: Feature,
-                ...withQualifiedName("engine"),
-                featuredBy: [qualifiedTypeReference("Vehicle")],
+                element: {
+                    $type: Feature,
+                    ...withQualifiedName("engine"),
+                    typeRelationships: [
+                        { $type: FeatureTyping, reference: qualifiedTypeReference("Engine") },
+                        { $type: TypeFeaturing, reference: qualifiedTypeReference("Vehicle") },
+                    ],
+                },
             },
         ],
     });

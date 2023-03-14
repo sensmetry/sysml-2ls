@@ -34,12 +34,12 @@ export class AssertConstraintUsageMeta extends Mixin(ConstraintUsageMeta, Invari
     }
 
     protected override isEnclosedPerformance(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([ActionDefinition, ActionUsage]);
     }
 
-    override self(): AssertConstraintUsage | undefined {
-        return super.self() as AssertConstraintUsage;
+    override ast(): AssertConstraintUsage | undefined {
+        return this._ast as AssertConstraintUsage;
     }
 
     override parent(): ModelContainer<AssertConstraintUsage> {

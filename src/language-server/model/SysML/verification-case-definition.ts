@@ -26,8 +26,8 @@ export class VerificationCaseDefinitionMeta extends CaseDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): VerificationCaseDefinition | undefined {
-        return super.self() as VerificationCaseDefinition;
+    override ast(): VerificationCaseDefinition | undefined {
+        return this._ast as VerificationCaseDefinition;
     }
 
     override parent(): ModelContainer<VerificationCaseDefinition> {

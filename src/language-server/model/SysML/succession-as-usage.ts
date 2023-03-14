@@ -29,8 +29,8 @@ export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Successio
         super(id, parent);
     }
 
-    override self(): SuccessionAsUsage | undefined {
-        return super.self() as SuccessionAsUsage;
+    override ast(): SuccessionAsUsage | undefined {
+        return this._ast as SuccessionAsUsage;
     }
 
     override parent(): ModelContainer<SuccessionAsUsage> {

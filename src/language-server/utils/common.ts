@@ -17,9 +17,9 @@
 import { AstNode, CstNode, DeepPartial, OperationCancelled } from "langium";
 import { isAbstractRule, isRuleCall } from "langium/lib/grammar/generated/ast";
 import { CancellationToken, Range } from "vscode-languageserver";
-import { Element, isElement, isElementReference } from "../generated/ast";
+import { Element, isElementReference } from "../generated/ast";
 import { performance } from "perf_hooks";
-import { isMetamodel, Metamodel } from "../model";
+import { isMetamodel } from "../model";
 import path from "path";
 
 /**
@@ -132,18 +132,17 @@ export function JSONreplacer(key: string, value: unknown): unknown {
     }
 
     if (key === "$meta") {
-        const node = (value as Metamodel).self();
-        if (!isElement(node)) return;
+        if (!isMetamodel(value) || !value.is(Element)) return value;
         // only serialize basic metamodel data to avoid circular references
         return {
-            elementId: node.$meta.elementId,
-            qualifiedName: node.$meta.qualifiedName,
+            elementId: value.elementId,
+            qualifiedName: value.qualifiedName,
         };
-        return;
     }
 
     if (key === "$type") return value;
     if (key === "$cstNode") {
+        if (!value) return;
         const cst = value as CstNode;
         return simplifyCstNode(cst);
     }
@@ -154,13 +153,13 @@ export function JSONreplacer(key: string, value: unknown): unknown {
     if (isElementReference(value)) {
         // serialize human readable data for references, also avoid circular
         // dependencies in AST
-        const target = value.$meta.to.target?.element.qualifiedName ?? null;
+        const target = value.$meta.to.target?.qualifiedName ?? null;
         return {
             $type: value.$type,
             $cstNode: value.$cstNode,
             text: value.$cstNode?.text,
             reference: target,
-            chain: value.chain.map((ref) => ref.ref?.$meta.qualifiedName),
+            parts: value.parts.map((ref) => ref.ref?.$meta.qualifiedName),
         };
     }
 

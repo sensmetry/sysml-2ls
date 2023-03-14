@@ -16,9 +16,8 @@
 
 import { Mixin } from "ts-mixer";
 import { Interaction } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { AssociationMeta } from "./association";
-import { BehaviorMeta } from "./behavior";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { AssociationMeta, BehaviorMeta } from "./_internal";
 
 @metamodelOf(Interaction)
 export class InteractionMeta extends Mixin(AssociationMeta, BehaviorMeta) {
@@ -26,8 +25,8 @@ export class InteractionMeta extends Mixin(AssociationMeta, BehaviorMeta) {
         super(id, parent);
     }
 
-    override self(): Interaction | undefined {
-        return super.deref() as Interaction;
+    override ast(): Interaction | undefined {
+        return this._ast as Interaction;
     }
 
     override parent(): ModelContainer<Interaction> {

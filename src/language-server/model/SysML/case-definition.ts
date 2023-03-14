@@ -26,8 +26,8 @@ export class CaseDefinitionMeta extends CalculationDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): CaseDefinition | undefined {
-        return super.self() as CaseDefinition;
+    override ast(): CaseDefinition | undefined {
+        return this._ast as CaseDefinition;
     }
 
     override parent(): ModelContainer<CaseDefinition> {

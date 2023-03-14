@@ -15,13 +15,11 @@
  ********************************************************************************/
 
 import { TextualRepresentation } from "../../generated/ast";
-import { TextualAnnotatingMeta } from "./textual-annotating-element";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { AnnotationMeta } from "./annotating-element";
-import { Mixin } from "ts-mixer";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { TextualAnnotatingMeta } from "./_internal";
 
 @metamodelOf(TextualRepresentation)
-export class TextualRepresentationMeta extends Mixin(TextualAnnotatingMeta, AnnotationMeta) {
+export class TextualRepresentationMeta extends TextualAnnotatingMeta {
     /**
      * Trimmed language identifier
      */
@@ -35,8 +33,8 @@ export class TextualRepresentationMeta extends Mixin(TextualAnnotatingMeta, Anno
         this.language = node.language.substring(1, node.language.length - 1);
     }
 
-    override self(): TextualRepresentation | undefined {
-        return super.deref() as TextualRepresentation;
+    override ast(): TextualRepresentation | undefined {
+        return this._ast as TextualRepresentation;
     }
 
     override parent(): ModelContainer<TextualRepresentation> {

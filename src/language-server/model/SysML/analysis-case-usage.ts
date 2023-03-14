@@ -27,8 +27,8 @@ export class AnalysisCaseUsageMeta extends CaseUsageMeta {
         super(id, parent);
     }
 
-    override self(): AnalysisCaseUsage | undefined {
-        return super.self() as AnalysisCaseUsage;
+    override ast(): AnalysisCaseUsage | undefined {
+        return this._ast as AnalysisCaseUsage;
     }
 
     override parent(): ModelContainer<AnalysisCaseUsage> {
@@ -40,7 +40,7 @@ export class AnalysisCaseUsageMeta extends CaseUsageMeta {
     }
 
     isSubAnalysisCase(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([AnalysisCaseUsage, AnalysisCaseDefinition]);
     }
 }

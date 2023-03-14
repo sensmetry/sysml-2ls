@@ -14,26 +14,15 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { formatString } from "typescript-string-operations";
-import {
-    defaultLinkingErrorTo,
-    withQualifiedName,
-    qualifiedTypeReference,
-    anything,
-} from "../../../../testing";
-import { Subclassification, Documentation, Classifier } from "../../../generated/ast";
+import { defaultLinkingErrorTo } from "../../../../testing";
 
 describe.each(["specializes", "conjugates"])(
     "classifiers can only specialize other classifiers with '%s'",
     (token: string) => {
         test("specializing non-classifiers issues a diagnostic", async () => {
             return expect(
-                formatString(
-                    `
-        type A;
-        classifier Child {0} A;`,
-                    token
-                )
+                `namespace A;
+        classifier Child ${token} A;`
             ).toParseKerML(
                 {},
                 {
@@ -44,12 +33,8 @@ describe.each(["specializes", "conjugates"])(
 
         test("specializing classifiers is successful", async () => {
             return expect(
-                formatString(
-                    `
-        classifier A;
-        classifier Child {0} A;`,
-                    token
-                )
+                `classifier A;
+        classifier Child ${token} A;`
             ).toParseKerML({});
         });
     }
@@ -62,41 +47,12 @@ test("specializations can be parsed", async () => {
     specialization Super subclassifier A specializes B;
     specialization subclassifier B :> A {
         doc /* unnamed */
-    }`).toParseKerML({
-        relationships: [
-            {
-                $type: Subclassification,
-                ...withQualifiedName("Super"),
-                specific: qualifiedTypeReference("A"),
-                general: qualifiedTypeReference("B"),
-            },
-            {
-                $type: Subclassification,
-                specific: qualifiedTypeReference("B"),
-                general: qualifiedTypeReference("A"),
-                docs: [
-                    {
-                        $type: Documentation,
-                        body: "/* unnamed */",
-                    },
-                ],
-            },
-        ],
-    });
+    }`).toParseKerML("snapshot");
 });
 
 test("classifiers can specialize multiple other classifiers", async () => {
     return expect(`
     classifier A;
     classifier B;
-    classifier C specializes A, B;`).toParseKerML({
-        elements: [
-            ...anything(2),
-            {
-                $type: Classifier,
-                ...withQualifiedName("C"),
-                specializes: [qualifiedTypeReference("A"), qualifiedTypeReference("B")],
-            },
-        ],
-    });
+    classifier C specializes A, B;`).toParseKerML("snapshot");
 });

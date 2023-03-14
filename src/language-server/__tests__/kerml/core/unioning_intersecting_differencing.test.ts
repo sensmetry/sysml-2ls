@@ -16,7 +16,7 @@
 
 import { formatString } from "typescript-string-operations";
 import { anything, withQualifiedName, qualifiedTypeReference } from "../../../../testing";
-import { Classifier, Feature, MultiplicityRange, LiteralInfinity } from "../../../generated/ast";
+import { Classifier, Unioning } from "../../../generated/ast";
 
 const Common = `
 classifier Adult;
@@ -36,65 +36,7 @@ test("type can declare owned unioning, differencing and intersecting", async () 
             intersects dependents, offspring;
     }
     `
-    ).toParseKerML({
-        elements: [
-            ...anything(2),
-            {
-                $type: Classifier,
-                features: [
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Person::dependents"),
-                        typedBy: [qualifiedTypeReference("Child")],
-                        multiplicity: {
-                            $type: MultiplicityRange,
-                            range: { $type: LiteralInfinity },
-                        },
-                    },
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Person::offspring"),
-                        typedBy: [qualifiedTypeReference("Person")],
-                        multiplicity: {
-                            $type: MultiplicityRange,
-                            range: { $type: LiteralInfinity },
-                        },
-                    },
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Person::grownOffspring"),
-                        typedBy: [qualifiedTypeReference("Adult")],
-                        subsets: [qualifiedTypeReference("Person::offspring")],
-                        multiplicity: {
-                            $type: MultiplicityRange,
-                            range: { $type: LiteralInfinity },
-                        },
-                    },
-                    {
-                        $type: Feature,
-                        ...withQualifiedName("Person::dependentOffspring"),
-                        typedBy: [qualifiedTypeReference("Child")],
-                        multiplicity: {
-                            $type: MultiplicityRange,
-                            range: { $type: LiteralInfinity },
-                        },
-                        subsets: [
-                            qualifiedTypeReference("Person::dependents"),
-                            qualifiedTypeReference("Person::offspring"),
-                        ],
-                        differences: [
-                            qualifiedTypeReference("Person::offspring"),
-                            qualifiedTypeReference("Person::grownOffspring"),
-                        ],
-                        intersects: [
-                            qualifiedTypeReference("Person::dependents"),
-                            qualifiedTypeReference("Person::offspring"),
-                        ],
-                    },
-                ],
-            },
-        ],
-    });
+    ).toParseKerML("snapshot");
 });
 
 test("multiple relationships can be specified using multiple clauses", async () => {
@@ -103,12 +45,17 @@ test("multiple relationships can be specified using multiple clauses", async () 
             `
     classifier Person unions Adult unions Child;`
     ).toParseKerML({
-        elements: [
+        namespaceMembers: [
             ...anything(2),
             {
-                $type: Classifier,
-                ...withQualifiedName("Person"),
-                unions: [qualifiedTypeReference("Adult"), qualifiedTypeReference("Child")],
+                element: {
+                    $type: Classifier,
+                    ...withQualifiedName("Person"),
+                    typeRelationships: [
+                        { $type: Unioning, reference: qualifiedTypeReference("Adult") },
+                        { $type: Unioning, reference: qualifiedTypeReference("Child") },
+                    ],
+                },
             },
         ],
     });

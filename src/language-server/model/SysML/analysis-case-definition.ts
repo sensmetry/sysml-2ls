@@ -26,8 +26,8 @@ export class AnalysisCaseDefinitionMeta extends CaseDefinitionMeta {
         super(id, parent);
     }
 
-    override self(): AnalysisCaseDefinition | undefined {
-        return super.self() as AnalysisCaseDefinition;
+    override ast(): AnalysisCaseDefinition | undefined {
+        return this._ast as AnalysisCaseDefinition;
     }
 
     override parent(): ModelContainer<AnalysisCaseDefinition> {

@@ -25,7 +25,6 @@ import {
 import { StepMeta } from "../KerML/step";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
-import { StateSubactionKind, getStateSubactionKind } from "../enums";
 
 @metamodelOf(ActionUsage, {
     base: "Actions::actions",
@@ -34,18 +33,18 @@ import { StateSubactionKind, getStateSubactionKind } from "../enums";
     enclosedPerformance: "Performances::Performance::enclosedPerformances",
 })
 export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
-    stateSubactionKind: StateSubactionKind = "none";
+    isParallel = false;
 
     constructor(id: ElementID, parent: ModelContainer<ActionUsage>) {
         super(id, parent);
     }
 
     override initialize(node: ActionUsage): void {
-        this.stateSubactionKind = getStateSubactionKind(node);
+        this.isParallel = node.isParallel;
     }
 
-    override self(): ActionUsage | undefined {
-        return super.self() as ActionUsage;
+    override ast(): ActionUsage | undefined {
+        return this._ast as ActionUsage;
     }
 
     override parent(): ModelContainer<ActionUsage> {
@@ -70,7 +69,7 @@ export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
     }
 
     isSubaction(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return (
             parent.is(Feature) &&
             parent.isComposite &&
@@ -79,7 +78,7 @@ export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
     }
 
     isOwnedAction(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return (
             parent.is(Feature) && parent.isComposite && parent.isAny([PartUsage, PartDefinition])
         );
@@ -90,7 +89,7 @@ export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
     }
 
     isPerformedAction(): boolean {
-        const parent = this.parent();
+        const parent = this.owner();
         return parent.isAny([PartUsage, PartDefinition]);
     }
 }

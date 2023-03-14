@@ -16,8 +16,8 @@
 
 import { AstNode, CstNode, TreeStream, TreeStreamImpl } from "langium";
 import { Position, Range } from "vscode-languageserver";
-import { Alias, isAlias } from "../generated/ast";
-import { AliasMeta, ElementMeta, Metamodel } from "../model";
+import { isMembership, Membership } from "../generated/ast";
+import { ElementMeta, MembershipMeta, Metamodel } from "../model";
 import { AssignableKeys } from "./common";
 
 /**
@@ -117,13 +117,13 @@ export function resolveAlias<T extends AstNode>(
  * @returns
  */
 export function followAstAlias(node: AstNode | undefined): AstNode | undefined {
-    if (isAlias(node)) {
-        return node.$meta.for.target?.element.self();
+    if (isMembership(node)) {
+        return node.$meta.element()?.ast();
     }
     return node;
 }
 
-export function followAlias(node: AliasMeta | undefined): ElementMeta | undefined;
+export function followAlias(node: MembershipMeta | undefined): ElementMeta | undefined;
 export function followAlias(node: ElementMeta | undefined): ElementMeta | undefined;
 export function followAlias(node: Metamodel | undefined): Metamodel | undefined;
 
@@ -133,8 +133,8 @@ export function followAlias(node: Metamodel | undefined): Metamodel | undefined;
  * @returns
  */
 export function followAlias(node: Metamodel | undefined): Metamodel | undefined {
-    if (node?.is(Alias)) {
-        return node.for.target?.element;
+    if (node?.is(Membership)) {
+        return node.element();
     }
     return node;
 }

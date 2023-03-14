@@ -15,18 +15,16 @@
  ********************************************************************************/
 
 import { stream } from "langium";
-import { Type, TypeReference, isFeature } from "../generated/ast";
-import { SpecializationKind } from "./enums";
-import { JSONConvertible } from "../utils/common";
-import { TypeMeta } from "./KerML";
+import { Specialization, Conjugation } from "../generated/ast";
+import { SysMLTypeList } from "../services/sysml-ast-reflection";
+import { JSONConvertible, KeysMatching } from "../utils/common";
+import { ConjugationMeta, SpecializationMeta } from "./KerML";
 
-export type SpecializationSource = "explicit" | "implicit";
-
-export type SpecializationType<T extends TypeMeta = TypeMeta> = {
-    type: T;
-    kind: SpecializationKind;
-    source: SpecializationSource;
-};
+export type SpecializationKeys = KeysMatching<SysMLTypeList, Specialization | Conjugation>;
+// eslint-disable-next-line unused-imports/no-unused-vars
+export type SpecializationType<K extends SpecializationKeys | undefined = undefined> =
+    | SpecializationMeta
+    | ConjugationMeta;
 
 /**
  * Container for specializations that also allows filtering with caching
@@ -35,15 +33,17 @@ export class Specializations
     implements Iterable<SpecializationType>, JSONConvertible<SpecializationType[]>
 {
     toJSON(): SpecializationType[] {
-        return this.get(SpecializationKind.None);
+        return this.get();
     }
 
     [Symbol.iterator](): Iterator<SpecializationType, undefined, undefined> {
         return this.types.values()[Symbol.iterator]();
     }
 
-    protected readonly types = new Map<TypeMeta, SpecializationType>();
-    protected caches: { [key in SpecializationKind]?: SpecializationType[] } = {};
+    protected readonly types = new Set<SpecializationType>();
+    protected caches: { [K in SpecializationKeys]?: SpecializationType<K>[] } & {
+        all?: SpecializationType[];
+    } = {};
 
     /**
      * Clear all registered specializations
@@ -59,41 +59,32 @@ export class Specializations
      * @param kind specialization kind
      * @param source specialization source
      */
-    add(type: TypeMeta, kind: SpecializationKind, source: SpecializationSource = "explicit"): void {
-        if (this.types.has(type)) return;
+    add<T extends SpecializationType>(specialization: T): void {
+        if (this.types.has(specialization)) return;
 
-        this.types.set(type, { type, kind, source });
+        this.types.add(specialization);
         this.caches = {};
     }
+
+    get<K extends SpecializationKeys>(kind: K): SpecializationType<K>[];
+    get<K extends SpecializationKeys = SpecializationKeys>(
+        kind: K | undefined
+    ): SpecializationType<K | undefined>[];
+    get(kind?: undefined): SpecializationType[];
 
     /**
      * @param kind specialization kind
      * @returns all specializations matching {@link kind}
      */
-    get(kind: SpecializationKind): SpecializationType[] {
-        let cached = this.caches[kind];
-        if (cached) return cached;
+    get<K extends SpecializationKeys = SpecializationKeys>(
+        kind?: K
+    ): SpecializationType<K | undefined>[] {
+        if (!kind) {
+            return (this.caches["all"] ??= Array.from(this.types));
+        }
 
-        cached =
-            kind === SpecializationKind.None
-                ? Array.from(this)
-                : stream(this)
-                      .filter((s) => (s.kind & kind) === kind)
-                      .toArray();
-        this.caches[kind] = cached;
-        return cached;
+        return (this.caches[kind] ??= stream(this.types)
+            .filter((s) => s.is(kind))
+            .toArray() as NonNullable<typeof this.caches[K]>);
     }
-}
-
-/**
- * @param node type to collect explicit specializations for
- * @returns type references used in explicit specialization in the order they
- * were declared in the parsed file
- */
-export function getExplicitSpecializations(node: Type): TypeReference[] {
-    let refs = stream(node.specializes, node.conjugates);
-    if (isFeature(node))
-        refs = refs.concat(stream(node.typedBy, node.references, node.redefines, node.subsets));
-
-    return refs.toArray().sort((l, r) => l.$childIndex - r.$childIndex);
 }

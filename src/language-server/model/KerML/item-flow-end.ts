@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { ItemFlowEnd } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { ConnectorEndMeta } from "./connector-end";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { FeatureMeta } from "./_internal";
 
 export const ImplicitItemFlowEnds = {
     sourceOutput: "Transfers::Transfer::source::sourceOutput", // TODO
@@ -24,13 +24,13 @@ export const ImplicitItemFlowEnds = {
 };
 
 @metamodelOf(ItemFlowEnd, ImplicitItemFlowEnds)
-export class ItemFlowEndMeta extends ConnectorEndMeta {
+export class ItemFlowEndMeta extends FeatureMeta {
     constructor(id: ElementID, parent: ModelContainer<ItemFlowEnd>) {
         super(id, parent);
     }
 
-    override self(): ItemFlowEnd | undefined {
-        return super.deref() as ItemFlowEnd;
+    override ast(): ItemFlowEnd | undefined {
+        return this._ast as ItemFlowEnd;
     }
 
     override parent(): ModelContainer<ItemFlowEnd> {

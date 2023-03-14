@@ -15,12 +15,13 @@
  ********************************************************************************/
 
 import {
+    ObjectiveMembership,
     RequirementDefinition,
     RequirementUsage,
+    RequirementVerificationMembership,
     VerificationCaseDefinition,
     VerificationCaseUsage,
 } from "../../generated/ast";
-import { getRequirementKind, RequirementKind } from "../enums";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConstraintUsageMeta } from "./constraint-usage";
 
@@ -29,14 +30,8 @@ import { ConstraintUsageMeta } from "./constraint-usage";
     subrequirement: "Requirements::RequirementCheck::subrequirements",
 })
 export class RequirementUsageMeta extends ConstraintUsageMeta {
-    requirementKind: RequirementKind = "none";
-
     constructor(id: ElementID, parent: ModelContainer<RequirementUsage>) {
         super(id, parent);
-    }
-
-    override initialize(node: RequirementUsage): void {
-        this.requirementKind = getRequirementKind(node);
     }
 
     override defaultSupertype(): string {
@@ -44,23 +39,21 @@ export class RequirementUsageMeta extends ConstraintUsageMeta {
     }
 
     isVerifiedRequirement(): boolean {
-        if (this.requirementKind !== "verification") return false;
+        const parent = this.parent();
+        if (!parent.is(RequirementVerificationMembership)) return false;
 
-        let parent = this.parent();
-        if (!parent.is(RequirementUsage) || parent.requirementKind !== "objective") return false;
-
-        parent = parent.parent();
-        return parent.isAny([VerificationCaseDefinition, VerificationCaseUsage]);
+        const owner = this.owner();
+        if (!owner.is(RequirementUsage) || !owner.parent().is(ObjectiveMembership)) return false;
+        return owner.owner().isAny([VerificationCaseDefinition, VerificationCaseUsage]);
     }
 
     isSubrequirement(): boolean {
-        if (this.constraintKind === "assumption") return false;
-        const parent = this.parent();
-        return parent.isAny([RequirementUsage, RequirementDefinition]);
+        if (this.requirementConstraintKind() === "assumption") return false;
+        return this.isComposite && this.owner().isAny([RequirementUsage, RequirementDefinition]);
     }
 
-    override self(): RequirementUsage | undefined {
-        return super.self() as RequirementUsage;
+    override ast(): RequirementUsage | undefined {
+        return this._ast as RequirementUsage;
     }
 
     override parent(): ModelContainer<RequirementUsage> {

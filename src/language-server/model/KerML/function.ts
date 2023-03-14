@@ -14,12 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { BehaviorMeta } from "./behavior";
-import { SysMLFunction } from "../../generated/ast";
-import { FunctionMixin } from "../mixins/function";
 import { Mixin } from "ts-mixer";
-import { Related, FeatureMeta, TypeMeta, castToRelated } from "./_internal";
+import { SysMLFunction } from "../../generated/ast";
+import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { FunctionMixin } from "../mixins/function";
+import { BehaviorMeta, TypeMeta } from "./_internal";
 
 export const ImplicitFunctions = {
     base: "Performances::Evaluation",
@@ -27,24 +26,20 @@ export const ImplicitFunctions = {
 
 @metamodelOf(SysMLFunction, ImplicitFunctions)
 export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
-    returns: Related<FeatureMeta>[] = [];
-
     constructor(id: ElementID, parent: ModelContainer<SysMLFunction>) {
         super(id, parent);
     }
 
     override initialize(node: SysMLFunction): void {
-        if (node.result) this.result = castToRelated(node.result.$meta);
-
-        this.returns = node.return.map((f) => ({ element: f.$meta }));
+        if (node.result) this.result = node.result.$meta;
     }
 
     override reset(node: SysMLFunction): void {
         this.initialize(node);
     }
 
-    override self(): SysMLFunction | undefined {
-        return super.deref() as SysMLFunction;
+    override ast(): SysMLFunction | undefined {
+        return this._ast as SysMLFunction;
     }
 
     override parent(): ModelContainer<SysMLFunction> {

@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { ReturnParameterMembership } from "../../generated/ast";
 import { ExpressionMeta, FunctionMeta, TypeMeta } from "../KerML/_internal";
 
 export class FunctionMixin {
@@ -27,10 +28,9 @@ export class FunctionMixin {
     ): TypeMeta | string | undefined {
         if (!self) return;
         if (self.result) {
-            return self.result.element.returnType();
+            return self.result.element()?.returnType();
         }
         // TODO: multiple return statements?
-        if (self.returns.length === 0) return;
-        return self.returns[0].element;
+        return self.features.find((m) => m.is(ReturnParameterMembership))?.element();
     }
 }

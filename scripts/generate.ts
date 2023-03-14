@@ -106,10 +106,26 @@ Object.defineProperty(InterfaceType.prototype, "superProperties", {
     configurable: true,
 });
 
+function buildType(type: InterfaceType): void {
+    // Recursively collect all subtype names
+    const visited = new Set<TypeOption>();
+    const collect = (type: TypeOption): void => {
+        if (visited.has(type)) return;
+        visited.add(type);
+        type.typeNames.add(type.name);
+        for (const subtype of type.subTypes) {
+            collect(subtype);
+            subtype.typeNames.forEach((n) => type.typeNames.add(n));
+        }
+    };
+    collect(type);
+}
+
 const toAstTypesString = InterfaceType.prototype.toAstTypesString;
 InterfaceType.prototype.toAstTypesString = function (reflectionInfo: boolean): string {
     // $type inference seems to be broken currently
-    return toAstTypesString.call(this, reflectionInfo).replace(/\$type:.*$/m, "$type: string;");
+    buildType(this);
+    return toAstTypesString.call(this, reflectionInfo);
 };
 
 async function generate(): Promise<void> {

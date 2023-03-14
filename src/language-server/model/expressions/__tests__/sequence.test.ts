@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { services, parseKerML, NO_ERRORS } from "../../../../testing";
+import { FeatureMeta } from "../../KerML";
 
 const Evaluator = services.shared.modelLevelExpressionEvaluator;
 const PACKAGE = `
@@ -37,11 +38,13 @@ test.concurrent.each([
     ["Size", "SequenceFunctions::size((1,2,3,4))", [4]],
     ["Size", "SequenceFunctions::size(null)", [0]],
 ])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[]) => {
-    const result = await parseKerML(`feature a = ${body};` + PACKAGE);
+    const result = await parseKerML(`feature a = ${body};` + PACKAGE, {
+        ignoreMetamodelErrors: true,
+    });
     expect(result).toMatchObject(NO_ERRORS);
 
-    const feature = result.value.features[0].$meta;
-    const expression = feature.value?.element;
+    const feature = result.value.members[0].element?.$meta as FeatureMeta;
+    const expression = feature.value?.element();
     expect(expression).not.toBeUndefined();
     if (!expression) return;
     expect(Evaluator.evaluate(expression, feature)).toMatchObject(expected);

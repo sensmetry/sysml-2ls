@@ -10,55 +10,39 @@ type RelationalOperator = '<' | '<=' | '>' | '>=';
 
 // Unions
 
-type InlineExpression = 
+type InlineExpression =
     FeatureChainExpression
-// | FeatureChainMember
     | InvocationExpression
     | LiteralExpression
     | MetadataAccessExpression
     | NullExpression
     | OperatorExpression
-    | SelfReferenceExpression
     | CollectExpression
     | SelectExpression
     | FeatureReferenceExpression
 ;
 
-type Annotation =
-    Comment
-    | Documentation
-    | MetadataFeature
-    | TextualRepresentation
+type NonOwnerType = 
+    Membership
+    | Annotation
 ;
-
-type LiteralExpression =
-    LiteralBoolean
-    | LiteralInfinity
-    | LiteralNumber
-    | LiteralString
-;
-
-type TypeOrFeatureReference = 
-    FeatureReference | TypeReference
-;
-
-// Common interfaces
-
-interface VisibilityElement {
-    visibility?: VisibilityKind;
-}
 
 // Annotations
 
-interface TextualAnnotatingElement extends Element {
+interface Annotation extends Relationship {
+    annotatedElement?: ElementReference;
+}
+
+interface AnnotatingElement extends Element {
+    about: Annotation[];
+}
+
+interface TextualAnnotatingElement extends AnnotatingElement {
     body: string;
 }
 
-interface Comment extends TextualAnnotatingElement {
-    about: ElementReference[];
-}
-interface Documentation extends Comment {
-}
+interface Comment extends TextualAnnotatingElement {}
+interface Documentation extends Comment {}
 
 interface TextualRepresentation extends TextualAnnotatingElement {
     language: string;
@@ -66,67 +50,65 @@ interface TextualRepresentation extends TextualAnnotatingElement {
 
 // Elements
 
-interface Element extends VisibilityElement {
-    aliases: Alias[];
-    elements: Element[];
-    features: Feature[];
-    imports: Import[];
-    members: Feature[];
-    relationships: Relationship[];
-    comments: Comment[];
-    docs: Documentation[];
-    metadata: MetadataFeature[];
-    prefixes: MetadataFeature[]
-    reps: TextualRepresentation[];
+interface Element {
     declaredName?: string;
     declaredShortName?: string;
+    prefixes: OwningMembership[];
 }
 
 interface Namespace extends Element {
-    filters: ElementFilter[];
+    imports: Import[];
+    aliases: Membership[];
+    annotatingMembers: OwningMembership[];
+    relationshipMembers: OwningMembership[];
+    namespaceMembers: OwningMembership[];
+    filters: ElementFilterMembership[];
+// remaining members (features)
+    members: Membership[];
 }
+
+type TypeRelationship =
+    Unioning
+    | Differencing
+    | Disjoining
+    | Intersecting
+    | Specialization
+    | Conjugation
+    | Subclassification
+;
+
+type FeatureRelationship =
+    TypeRelationship
+    | FeatureChaining
+    | FeatureInverting
+    | TypeFeaturing
+    | FeatureTyping
+    | Subsetting
+    | ReferenceSubsetting
+    | Redefinition
+;
 
 interface Type extends Namespace {
-    conjugates: TypeReference[];
-    differences: TypeReference[];
-    disjoins: TypeReference[];
-    intersects: TypeReference[];
     isSufficient: boolean;
-    multiplicity?: MultiplicityRange;
-    specializes: TypeReference[];
-    unions: TypeReference[];
     isAbstract?: 'abstract';
+
+// can't override in base interfaces so have to use union of all possible
+// variants
+    typeRelationships: (TypeRelationship | FeatureRelationship)[];
+    multiplicity?: OwningMembership;
 }
 
-interface Classifier extends Type {
-// conjugates: ClassifierReference[];
-// specializes: ClassifierReference[];
-}
-
-interface DataType extends Classifier {
-}
-
-interface Class extends Classifier {
-}
-
-interface Structure extends Class {
-}
-
-interface Behavior extends Class {
-}
-
-interface Association extends Classifier {
-}
-
-interface AssociationStructure extends Association, Structure {
-}
-
-interface Metaclass extends Structure {
-}
+interface Classifier extends Type {}
+interface DataType extends Classifier {}
+interface Class extends Classifier {}
+interface Structure extends Class {}
+interface Behavior extends Class {}
+interface Association extends Classifier, Relationship {}
+interface AssociationStructure extends Association, Structure {}
+interface Metaclass extends Structure {}
 
 interface SysMLFunction extends Behavior {
-    result?: Result
-    return: Feature[];
+    result?: ResultExpressionMembership;
 }
 
 interface Predicate extends SysMLFunction {
@@ -136,145 +118,99 @@ interface Interaction extends Association, Behavior {
 }
 
 interface Feature extends Type {
-    chains: FeatureReference[];
-    featuredBy: TypeReference[];
-    inverseOf: FeatureReference[];
-    isNonunique: boolean
+    isNonunique: boolean;
     isOrdered: boolean;
-    redefines: FeatureReference[];
-    references: FeatureReference[];
-    subsets: FeatureReference[];
-    typedBy: TypeReference[];
+    direction?: FeatureDirectionKind;
+    isComposite?: 'composite';
+    isDerived?: 'derived';
+    isEnd?: 'end';
+    isPortion?: 'portion';
+    isReadOnly?: 'readonly';
+
     value?: FeatureValue;
-    direction?: FeatureDirectionKind
-    isComposite?: 'composite'
-    isDerived?: 'derived'
-    isEnd?: 'end'
-    isPortion?: 'portion'
-    isReadOnly?: 'readonly'
+    write?: Membership;
 }
 
-interface MetadataFeature extends Feature {
-    about: ElementReference[];
-}
+interface MetadataFeature extends Feature, AnnotatingElement {}
 
 interface Multiplicity extends Feature {
-    range?: InlineExpression
+    range?: OwningMembership;
 }
 
-interface MultiplicityRange extends Multiplicity {
-}
+interface MultiplicityRange extends Multiplicity {}
+interface ItemFeature extends Feature {}
+interface Step extends Feature {}
 
-interface ItemFeature extends Feature {
+interface Connector extends Feature, Relationship {
 }
+interface ItemFlowEnd extends Feature {}
 
-interface ConnectorEnd extends Feature {
-}
-
-interface ItemFlowEnd extends ConnectorEnd {
-}
-
-interface Step extends Feature {
-}
-
-interface Connector extends Feature {
-    ends: ConnectorEnd[];
-}
-
-interface Succession extends Connector {
-}
-
-interface BindingConnector extends Connector {
-}
+interface Succession extends Connector {}
+interface BindingConnector extends Connector {}
 
 interface Expression extends Step {
-    result?: Result
-    return: Feature[];
-    variants: Feature[];
+    result?: ResultExpressionMembership;
 }
 
-interface ItemFlow extends Connector, Step {
-    of?: ItemFeature;
-}
-
-interface SuccessionItemFlow extends ItemFlow, Succession {
-}
-
-interface BooleanExpression extends Expression {
-}
+interface ItemFlow extends Connector, Step {}
+interface SuccessionItemFlow extends ItemFlow, Succession {}
+interface BooleanExpression extends Expression {}
 
 interface Invariant extends BooleanExpression {
     isNegated: boolean;
 }
 
-interface ElementFilter extends VisibilityElement {
-    expression: InlineExpression;
-}
-
-interface Import extends Relationship {
-    conditions: InlineExpression[];
-    importedNamespace?: ElementReference;
-    importsAll: boolean;
-    kind?: ImportKind;
-}
-
-interface Package extends Namespace {
-
-}
+interface Package extends Namespace {}
 
 interface LibraryPackage extends Package {
     isStandard: boolean;
 }
 
-// Relationshipns
-
-interface Alias extends Relationship {
-    for: ElementReference
-}
+// Relationships
 
 interface Relationship extends Element {
-    source: ElementReference[];
-    target: ElementReference[];
+    visibility?: VisibilityKind;
+    annotations: Annotation[];
+    elements: (Namespace | Relationship | Feature)[];
+    chains: Feature[];
+// edge source
+    source?: ElementReference;
+
+// edge targets
+    element?: Element;
+    reference?: ElementReference;
 }
 
+interface Unioning extends Relationship {
+}
+interface Differencing extends Relationship {
+}
+interface Intersecting extends Relationship {
+}
+interface FeatureChaining extends Relationship {
+}
 interface Specialization extends Relationship {
-    specific: TypeReference;
-    general: TypeReference;
 }
-
 interface Disjoining extends Relationship {
-    disjoined: TypeReference
-    disjoining: TypeReference
 }
-
 interface FeatureInverting extends Relationship {
-    featureInverted: FeatureReference
-    invertingFeature: FeatureReference
 }
-
-interface TypeFeaturing extends Relationship {
-    feature: FeatureReference
-    featuringType: TypeReference
+interface TypeFeaturing extends Featuring {
 }
-
 interface FeatureTyping extends Specialization {
 }
-
 interface Subclassification extends Specialization {
 }
-
 interface Subsetting extends Specialization {
 }
-
-interface Subtype extends Specialization {
-}
+interface Subtype extends Specialization {}
 
 interface Conjugation extends Relationship {
-    specific: TypeReference;
-    general: TypeReference;
 }
 
 interface Redefinition extends Subsetting {
+}
+interface ReferenceSubsetting extends Subsetting {
 }
 
 interface Dependency extends Relationship {
@@ -282,90 +218,70 @@ interface Dependency extends Relationship {
     supplier: ElementReference[];
 }
 
-// References
-
-interface ElementReference {
-    chain: @Element[];
+interface Import extends Relationship {
+    importsAll: boolean;
+    isRecursive: boolean;
+    isNamespace?: '::*';
 }
 
-interface TypeReference extends ElementReference {
+interface MembershipImport extends Import {
+}
+interface NamespaceImport extends Import {
 }
 
-interface ClassifierReference extends TypeReference {
-}
-
-interface FeatureReference extends TypeReference {
-}
-
-interface MetaclassReference extends TypeReference {
-}
-
-interface ConjugatedPortReference extends ClassifierReference {}
-
-// Expressions
-
-interface Argument {
-    value: InlineExpression;
-}
-
-interface NamedArgument extends Argument {
-    name: FeatureReference;
-}
-
-interface OperatorExpression extends InvocationExpression {
-    operator?: string;
-}
-
-interface CollectExpression extends OperatorExpression {}
-interface SelectExpression extends OperatorExpression {}
-
-// interface FeatureChainMember {
-//     value: ElementReference;
-// }
-
-interface FeatureChainExpression extends OperatorExpression {
-}
-
-interface FeatureValue {
-    expression: InlineExpression;
+interface Membership extends Relationship {}
+interface OwningMembership extends Membership {}
+interface FeatureValue extends OwningMembership {
     isDefault: boolean;
     isInitial: boolean;
 }
+interface ElementFilterMembership extends OwningMembership {}
+interface Featuring extends Relationship {}
+interface FeatureMembership extends Featuring, OwningMembership {}
+interface EndFeatureMembership extends FeatureMembership {}
+interface ParameterMembership extends FeatureMembership {}
+interface ResultExpressionMembership extends FeatureMembership {}
+interface ReturnParameterMembership extends ParameterMembership {}
 
-interface InvocationExpression {
-    args: Argument[] | InlineExpression[] | TypeReference[];
-    type?: TypeReference;
+// References
+
+interface ElementReference {
+    parts: @Element[];
 }
 
-interface LiteralBoolean {
-    value: boolean;
-}
+interface NamespaceReference extends ElementReference {}
+interface TypeReference extends NamespaceReference {}
+interface ClassifierReference extends TypeReference {}
+interface FeatureReference extends TypeReference {}
+interface MetaclassReference extends ClassifierReference {}
+interface MembershipReference extends ElementReference {}
 
-interface LiteralInfinity {
-}
+// Expressions
 
-interface LiteralNumber {
-    value: number;
+interface LiteralExpression extends Expression {}
+interface LiteralBoolean extends LiteralExpression {
+    literal: boolean;
 }
-
-interface LiteralString {
-    value: string;
+interface LiteralString extends LiteralExpression {
+    literal: string;
 }
-
-interface NullExpression { 
+interface LiteralNumber extends LiteralExpression {
+    literal: number;
 }
-
-interface MetadataAccessExpression {
+interface LiteralInfinity extends LiteralExpression {}
+interface NullExpression extends Expression {}
+interface InvocationExpression extends Expression {
+}
+interface OperatorExpression extends InvocationExpression {
+    operator?: string;
+    operands: Expression[];
+}
+interface FeatureChainExpression extends OperatorExpression {}
+interface CollectExpression extends OperatorExpression {}
+interface SelectExpression extends OperatorExpression {}
+interface FeatureReferenceExpression extends Expression {
+    expression: Membership;
+}
+interface MetadataAccessExpression extends Expression {
     reference: ElementReference;
-}
-
-interface Result extends VisibilityElement {
-    expression: InlineExpression;
-}
-
-interface SelfReferenceExpression {
-}
-
-interface FeatureReferenceExpression {
-    expression: InlineExpression;
 }

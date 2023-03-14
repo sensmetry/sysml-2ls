@@ -28,8 +28,8 @@ export class PortDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, Structur
         super(id, parent);
     }
 
-    override self(): PortDefinition | undefined {
-        return super.self() as PortDefinition;
+    override ast(): PortDefinition | undefined {
+        return this._ast as PortDefinition;
     }
 
     override parent(): ModelContainer<PortDefinition> {

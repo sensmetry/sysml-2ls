@@ -28,8 +28,8 @@ export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
         super(id, parent);
     }
 
-    override self(): ForLoopActionUsage | undefined {
-        return super.self() as ForLoopActionUsage;
+    override ast(): ForLoopActionUsage | undefined {
+        return this._ast as ForLoopActionUsage;
     }
 
     override parent(): ModelContainer<ForLoopActionUsage> {

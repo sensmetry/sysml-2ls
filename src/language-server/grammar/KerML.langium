@@ -3,574 +3,1118 @@ grammar KerML
 import 'KerML.interfaces'
 import 'KerML.expressions'
 
-/* Element groups */
-
-// For reference from KerML:
-
-//! DO NOT USE UNIONS SINCE THEY CAN EASILY LEAD TO INFINITE RECURSION IN SUBTYPE COMPUTATION
-
-NonFeatureElement<visible> returns Element:
-    Namespace<visible>
-	| Package<visible>
-    | LibraryPackage<visible>
-	| Multiplicity<visible>
-	| Type<visible>
-	| Classifier<visible>
-	| Class<visible>
-	| Structure<visible>
-	| Metaclass<visible>
-	| DataType<visible>
-	| Association<visible>
-    | AssociationStructure<visible>
-	| Interaction<visible>
-	| Behavior<visible>
-    // prevent Function from also extending Element (again)
-	| {Behavior} SysMLFunction<visible>
-	| Predicate<visible>
+entry RootNamespace returns Namespace:
+    NamespaceBodyElements
 ;
-
-RelationshipElement<visible> returns Relationship:
-    Dependency<visible>
-    | Specialization<visible>
-	| Conjugation<visible>
-    | FeatureTyping<visible>
-	| Subclassification<visible>
-	| Disjoining<visible>
-	| FeatureInverting<visible>
-	| Subsetting<visible>
-	| Redefinition<visible>
-	| TypeFeaturing<visible>
-;
-
-fragment CompositeOrPortion:
-    // TODO: use boolean properties, Langium is bugged currently and always
-    // parses them as false but strings work fine
-    isComposite='composite' | isPortion='portion';
-
-fragment FeaturePrefixSuffix:
-    CompositeOrPortion? Readonly? Derived? End? PrefixMetadataMembers?;
-fragment FeaturePrefix<visible>:
-    (<visible> Visibility)? (direction=FeatureDirectionKind)? Abstract? FeaturePrefixSuffix;
-
-FeatureElement<visible> returns Feature:
-    (Feature<visible>
-    | Connector<visible>
-    | BindingConnector<visible>
-    | Succession<visible>
-    | Step<visible>
-    | ItemFlow<visible>
-    | SuccessionItemFlow<visible>
-    | Expression<visible>
-    | BooleanExpression<visible>
-    | Invariant<visible>
-    )
-;
-
-fragment AnnotatingMember:
-    comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-;
-
-entry Model returns Namespace:
-    NamespaceMembers;
 
 // Tokens
 
 fragment TypedByToken returns string:
-    ':' | 'typed' 'by';
+    ':' | 'typed' 'by'
+;
 fragment ConjugatesToken returns string:
-    '~' | 'conjugates';
+    '~' | 'conjugates'
+;
 
-// Elements
-
-fragment ElementFrag:
-    PrefixMetadataMembers? Visibility? Identification? RelationshipBody;
-DummyElement returns Element:
-    ElementFrag;
-DummyVisibleElement returns VisibilityElement:
-    DummyElement;
+/* Elements */
 
 // Relationships
 
 fragment RelationshipBody:
-    ';' | '{' RelationshipItems '}'
+    ';' | '{' RelationshipOwnedElements '}'
 ;
 
-fragment RelationshipItems:
-    ( comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-    | features+=FeatureElement<false>
-    | elements+=NonFeatureElement<false>
-    | relationships+=RelationshipElement<false>
-    )*
+fragment RelationshipOwnedElements:
+    RelationshipOwnedElement*
 ;
 
-DummyRelationship returns Relationship:
-    ElementFrag source+=ElementReference target+=ElementReference;
+fragment RelationshipOwnedElement:
+    annotations+=OwnedAnnotation
+    | elements+=FeatureElement
+    | elements+=NonFeatureElement
+    | elements+=RelationshipElement
+;
 
-// Dependencies
+/* Dependencies */
 
-Dependency<visible> returns Dependency:
-    (<visible> Visibility?)? PrefixMetadataMembers? 'dependency' Identification? 'from'?
+Dependency returns Dependency:
+    ( annotations+=PrefixMetadataAnnotation )*
+    'dependency' (Identification 'from')?
     client+=ElementReference ( ',' client+=ElementReference )* 'to'
     supplier+=ElementReference ( ',' supplier+=ElementReference )*
     RelationshipBody
 ;
 
-// Namespaces
-Namespace<visible> returns Namespace:
-    (<visible> Visibility)? PrefixMetadataMembers? 'namespace' Identification? NamespaceBody;
+/* Annotations */
+
+OwnedAnnotation returns Annotation:
+    element=AnnotatingElement
+;
+
+AnnotatingElement returns AnnotatingElement:
+    Comment
+    | Documentation
+    | TextualRepresentation
+    | MetadataFeature
+;
+
+/* Namespaces */
+
+Namespace returns Namespace:
+    PrefixMetadata? 'namespace' Identification? NamespaceBody
+;
+
 fragment NamespaceBody:
-    ';' | '{' NamespaceMembers '}'
-;
-fragment NamespaceMembers:
-    ( features+=FeatureElement<true>
-    | elements+=NonFeatureElement<true>
-    | relationships+=RelationshipElement<true>
-    | imports+=Import | aliases+=Alias
-    | comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-    )*
+    ';' | '{' NamespaceBodyElements '}'
 ;
 
-Alias returns Alias:
-    Visibility? 'alias' Identification? 'for' for=ElementReference TypeBody;
-
-// Type
-fragment TypePrefix<visible> returns Type:
-    (<visible> Visibility)? Abstract? PrefixMetadataMembers?;
-Type<visible> returns Type:
-    TypePrefix<visible> 'type' TypeDeclaration TypeBody;
-fragment TypeDeclaration:
-    Sufficient? Identification? OwnedMultiplicity? (SpecializationPart | ConjugationPart)* TypeRelationshipPart*;
-fragment SpecializationPart:
-    SpecializesToken specializes+=TypeReference (',' specializes+=TypeReference)*;
-fragment ConjugationPart:
-    ConjugatesToken conjugates+=TypeReference;
-fragment TypeRelationshipPart:
-    DisjoiningPart | UnioningPart | IntersectingPart | DifferencingPart;
-fragment DisjoiningPart:
-    'disjoint' 'from' disjoins+=TypeReferenceOrFeatureChain (',' disjoins+=TypeReferenceOrFeatureChain)*;
-fragment UnioningPart:
-    'unions' unions+=TypeReferenceOrFeatureChain (',' unions+=TypeReferenceOrFeatureChain)*;
-fragment IntersectingPart:
-    'intersects' intersects+=TypeReferenceOrFeatureChain (',' intersects+=TypeReferenceOrFeatureChain)*;
-fragment DifferencingPart:
-    'differences' differences+=TypeReferenceOrFeatureChain (',' differences+=TypeReferenceOrFeatureChain)*;
-fragment TypeBody:
-    ';' | '{' TypeItems '}'
-;
-fragment TypeItems:
-    ( features+=FeatureElement<true>
-    | members+=MemberFeature
-    | relationships+=RelationshipElement<true>
-    | elements+=NonFeatureElement<true>
-    | comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-    | imports+=Import | aliases+=Alias
-    )*
+fragment NamespaceBodyElements:
+    NamespaceBodyElement*
 ;
 
-// Datatypes
-DataType<visible> returns DataType:
-    TypePrefix<visible> 'datatype' ClassifierDeclaration TypeBody;
-
-// Classes
-Class<visible> returns Class:
-    TypePrefix<visible> 'class' ClassifierDeclaration TypeBody;
-
-// Structures
-Structure<visible> returns Structure:
-    TypePrefix<visible> 'struct' ClassifierDeclaration TypeBody;
-
-// Associations
-AssociationDeclaration returns Association:
-    ClassifierDeclaration TypeBody;
-AssociationStructure<visible> returns AssociationStructure:
-    TypePrefix<visible> 'assoc' 'struct' ClassifierDeclaration TypeBody;
-Association<visible> returns Association:
-    TypePrefix<visible> 'assoc' AssociationDeclaration;
-
-// Behaviours
-Behavior<visible> returns Behavior:
-    TypePrefix<visible> 'behavior' ClassifierDeclaration TypeBody;
-
-// Interactions
-Interaction<visible> returns Interaction:
-    TypePrefix<visible> 'interaction' ClassifierDeclaration TypeBody;
-// Metadata
-Metaclass<visible> returns Metaclass:
-    TypePrefix<visible> 'metaclass' ClassifierDeclaration TypeBody;
-
-// Functions
-SysMLFunction<visible> returns SysMLFunction:
-    TypePrefix<visible> 'function' ClassifierDeclaration FunctionBody;
-fragment FunctionBody returns Type:
-    ';' | '{' FunctionBodyPart '}';
-fragment FunctionBodyPart:
-    ( elements+=NonFeatureElement<true>
-    | relationships+=RelationshipElement<true>
-    | features+=FeatureElement<true>
-    | members+=MemberFeature
-	| imports+=Import | aliases+=Alias
-    | comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-	| return+=ReturnFeature
-	)* 
-	( result=ResultExpression )?
-;
-ReturnFeature returns Feature:
-    Visibility? 'return' FeatureElement<false>;
-ResultExpression returns Result:
-    Visibility? expression=InlineExpression;
-ResultHierarchy returns VisibilityElement:
-    ResultExpression;
-
-// Feature values
-FeatureValue returns FeatureValue:
-    ( '=' | isInitial?=':=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) expression=InlineExpression;
-
-// Packages
-Filter returns ElementFilter:
-    Visibility? 'filter' expression=InlineExpression ';';
-Package<visible> returns Package:
-    (<visible> Visibility)? PrefixMetadataMembers? 'package' Identification? PackageBody;
-LibraryPackage<visible> returns LibraryPackage:
-    (<visible> Visibility)? Standard? 'library' PrefixMetadataMembers? 'package' Identification? PackageBody;
-fragment PackageBody:
-    ';' | '{' PackageItems '}'
-;
-fragment PackageItems:
-    ( features+=FeatureElement<true>
-    | elements+=NonFeatureElement<true>
-    | relationships+=RelationshipElement<true>
-    | imports+=Import | aliases+=Alias
-    | comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-    | filters+=Filter
-    )*
+fragment NamespaceBodyElement:
+    imports+=Import
+    | aliases+=AliasMember
+    | annotatingMembers+=AnnotatingMember
+    | namespaceMembers+=NonFeatureMember
+    | members+=NamespaceFeatureMember
+    | relationshipMembers+=RelationshipMember
 ;
 
-// Multiplicity
-Multiplicity<visible> returns Multiplicity:
-    (<visible> Visibility)? 'multiplicity' Identification? (MultiplicityBounds | Subsets?) TypeBody;
-fragment MultiplicityBounds:
-    '[' range=InlineExpression ']';
-MultiplicityRange returns MultiplicityRange:
-    MultiplicityBounds;
-fragment OwnedMultiplicity:
-    multiplicity=MultiplicityRange;
-fragment MultiplicityPart:
-    OwnedMultiplicity MultiplicityProperties?
-    | MultiplicityProperties
+NonFeatureMember returns OwningMembership:
+    Visibility? element=NonFeatureElement
 ;
 
-fragment Subsets:
-    SubsetsToken subsets+=FeatureChain (',' subsets+=FeatureChain)*;
+NamespaceFeatureMember returns OwningMembership:
+    Visibility? element=FeatureElement
+;
 
+RelationshipMember returns OwningMembership:
+    Visibility? element=RelationshipElement
+;
+
+AnnotatingMember returns OwningMembership:
+    Visibility? element=AnnotatingElement
+;
+
+AliasMember returns Membership:
+    Visibility? 'alias' Identification? 'for' reference=ElementReference RelationshipBody
+;
+
+// Imports
+
+fragment ImportPrefix:
+    Visibility? 'import' ImportAll?
+;
+
+fragment ImportedReference:
+    // TODO: split '::**' into 2 tokens,
+    // https://github.com/langium/chevrotain-allstar/issues/1
+    reference=ElementReference (isNamespace='::*')? ( isRecursive?='::**' )?
+;
+
+// modified import to work with Langium parser and completion suggestions,
+// the original rule is not parsed on reference errors and thus cannot
+// compute completions. Postprocessed in code to fit the spec AST
 Import returns Import:
-    Visibility? 'import' ImportAll? ImportedNamespace ('[' conditions+=InlineExpression ']')*  RelationshipBody;
-
-// Features
-
-Feature<visible> returns Feature:
-    FeaturePrefix<visible>
-    ( 'feature'? FeatureDeclaration
-	| 'feature'
-	)
-    ValuePart? TypeBody;
-
-fragment FeatureDeclarationSuffixPart:
-    ( Identification (FeatureSpecializationPart | FeatureConjugationPart)?
-    | FeatureSpecializationPart
-    | FeatureConjugationPart
-    )
-	FeatureRelationshipPart*
+    ImportPrefix ImportedReference (element=FilterPackage)? RelationshipBody
 ;
 
-fragment FeatureDeclaration:
-    Sufficient? FeatureDeclarationSuffixPart
+// MembershipImport returns MembershipImport:
+//     ImportPrefix ImportedMembership
+// ;
+
+// fragment ImportedMembership:
+//     reference=MembershipReference ( isRecursive?='::**' )?
+// ;
+
+// NamespaceImport returns NamespaceImport:
+//     ImportPrefix
+//     ( ImportedNamespace
+// 	| element=FilterPackage
+// 	)
+// ;
+
+// fragment ImportedNamespace:
+//     reference=NamespaceReference '::*' ( isRecursive?='::**' )?
+// ;
+
+FilterPackage returns Package:
+    // imports+=FilterPackageImport
+    ( filters+=FilterPackageMember )+
 ;
 
-// TODO: use validation to check for either specialization or multiplicity since
-// unbounded lookahead complains about ambiguous alternatives
-fragment FeatureSpecializationPart:
-    FeatureSpecialization+ MultiplicityPart? FeatureSpecialization* | MultiplicityPart FeatureSpecialization*
+// FilterPackageImport returns Import:
+//     FilterPackageMembershipImport | FilterPackageNamespaceImport
+// ;
+
+// FilterPackageMembershipImport returns MembershipImport:
+//     ImportedMembership
+// ;
+
+// FilterPackageNamespaceImport returns NamespaceImport:
+//     ImportedNamespace
+// ;
+
+FilterPackageMember returns ElementFilterMembership:
+    // TODO: always private visibility
+    '[' element=OwnedExpression ']'
 ;
-fragment FeatureTypingFrag returns Feature:
-    TypedByToken OwnedFeatureTypings;
-fragment FeatureSpecialization:
-    FeatureTypingFrag | Subsets | FeatureReferences | FeatureRedefinition;
-fragment FeatureReferences:
-    ReferencesToken references+=FeatureChain (',' references+=FeatureChain)*;
-fragment FeatureRedefinition:
-    RedefinesToken redefines+=FeatureChain (',' redefines+=FeatureChain)*;
-fragment FeatureConjugationPart:
-    ConjugatesToken conjugates+=FeatureAsTypeReference;
-FeatureAsTypeReference returns TypeReference:
-    QualifiedFeatureReference;
 
-fragment ValuePart:
-    value=FeatureValue;
+/* Namespace Elements */
 
-fragment FeatureRelationshipPart:
-    TypeRelationshipPart | ChainingPart | InvertingPart | TypeFeaturingPart;
-
-fragment ChainingPart:
-    'chains' chains+=FeatureChain;
-fragment InvertingPart:
-    'inverse' 'of' inverseOf+=FeatureChain;
-fragment TypeFeaturingPart:
-    'featured' 'by' featuredBy+=TypeReference (',' featuredBy+=TypeReference)*;
-
-// Classifiers
-fragment ClassifierDeclaration:
-    Sufficient? Identification?
-	( OwnedMultiplicity )?
-	( SpecializesToken specializes+=ClassifierReference (',' specializes+=ClassifierReference)* | 
-        ConjugatesToken conjugates+=ClassifierReference (',' conjugates+=ClassifierReference)* )?
-	TypeRelationshipPart*
+RelationshipElement returns Relationship:
+    Dependency
+    | Specialization
+	| Conjugation
+	| FeatureTyping
+	| Subclassification
+	| Disjoining
+	| FeatureInverting
+	| Subsetting
+	| Redefinition
+	| TypeFeaturing
 ;
-Classifier<visible> returns Classifier:
-    TypePrefix<visible> 'classifier' ClassifierDeclaration TypeBody;
-fragment SuperclassingPart:
-    SpecializesToken OwnedSubclassification ( ',' OwnedSubclassification )*;
-fragment OwnedSubclassification:
-    superclassifies=TypeReference;
 
-// Specialization
-FeatureTyping<visible> returns FeatureTyping:
-    (<visible> Visibility)? ('specialization' Identification?)? 'typing' specific=QualifiedFeatureReference TypedByToken GeneralType RelationshipBody;
-Subclassification<visible> returns Subclassification:
-    (<visible> Visibility)? ('specialization' Identification?)? 'subclassifier' specific=ClassifierReference SpecializesToken general=ClassifierReference RelationshipBody;
-Subsetting<visible> returns Subsetting:
-    (<visible> Visibility)? ('specialization' Identification?)? 'subset' SpecificFeature SubsetsToken GeneralFeature RelationshipBody;
-Redefinition<visible> returns Redefinition:
-    (<visible> Visibility)? ('specialization' Identification?)? 'redefinition' SpecificFeature RedefinesToken GeneralFeature RelationshipBody;
-Specialization<visible> returns Specialization:
-    (<visible> Visibility)? ('specialization' Identification?)? 'subtype' SpecificType SpecializesToken GeneralType RelationshipBody;
+NonFeatureElement returns Namespace:
+    Namespace
+	| Package
+	| LibraryPackage 
+	| Multiplicity
+	| Type
+	| Classifier 
+	| Class
+	| Structure
+	| Metaclass
+	| DataType 
+	| Association
+	| AssociationStructure
+	| Interaction
+	| Behavior
+	| SysMLFunction
+	| Predicate
+;
 
-// Conjugation
-Conjugation<visible> returns Conjugation:
-    (<visible> Visibility)? ( 'conjugation' Identification? )?
-    'conjugate' 
-    SpecificType
-    ConjugatesToken 
-    GeneralType
+FeatureElement returns Feature:
+    Feature
+	| Step
+	| Expression
+	| BooleanExpression
+	| Invariant
+	| Connector
+	| BindingConnector
+	| Succession
+	| ItemFlow
+	| SuccessionItemFlow
+;
+
+/* Packages */
+
+Package returns Package:
+    PrefixMetadata? 'package' Identification? PackageBody
+;
+
+LibraryPackage returns LibraryPackage:
+    Standard? 'library' PrefixMetadata? 'package' Identification? PackageBody
+;
+
+fragment PackageBody:
+    ';' | '{' PackageBodyElements '}'
+;
+
+fragment PackageBodyElements:
+    PackageBodyElement*
+;
+
+fragment PackageBodyElement:
+    members+=NamespaceFeatureMember
+    | namespaceMembers+=NonFeatureMember
+    | annotatingMembers+=AnnotatingMember
+    | relationshipMembers+=RelationshipMember
+    | imports+=Import
+    | aliases+=AliasMember
+    | filters+=ElementFilterMember
+;
+
+ElementFilterMember returns ElementFilterMembership:
+    Visibility? 'filter' element=OwnedExpression ';'
+;
+
+/* Types */
+
+fragment TypePrefix:
+    Abstract? PrefixMetadata?
+;
+
+Type returns Type:
+    TypePrefix 'type' TypeDeclaration TypeBody
+;
+
+fragment TypeDeclaration:
+    Sufficient? Identification? (multiplicity=OwnedMultiplicity)?
+    (SpecializationPart | ConjugationPart)+ TypeRelationshipPart*
+;
+
+fragment SpecializationPart:
+    SpecializesToken typeRelationships+=OwnedSpecialization (',' typeRelationships+=OwnedSpecialization)*
+;
+
+fragment ConjugationPart:
+    ConjugatesToken typeRelationships+=OwnedConjugation
+;
+
+fragment TypeRelationshipPart:
+    DisjoiningPart | UnioningPart | IntersectingPart | DifferencingPart
+;
+
+fragment DisjoiningPart:
+    'disjoint' 'from' typeRelationships+=OwnedDisjoining (',' typeRelationships+=OwnedDisjoining)*
+;
+
+fragment UnioningPart:
+    'unions' typeRelationships+=Unioning (',' typeRelationships+=Unioning)*
+;
+
+fragment IntersectingPart:
+    'intersects' typeRelationships+=Intersecting (',' typeRelationships+=Intersecting)*
+;
+
+fragment DifferencingPart:
+    'differences' typeRelationships+=Differencing (',' typeRelationships+=Differencing)*
+;
+
+fragment TypeBody:
+    ';' | '{' TypeBodyElements '}'
+;
+
+fragment TypeBodyElements:
+    TypeBodyElement*
+;
+
+fragment TypeBodyElement:
+    members+=FeatureMember
+    | namespaceMembers+=NonFeatureMember
+    | annotatingMembers+=AnnotatingMember
+    | relationshipMembers+=RelationshipMember
+    | imports+=Import
+    | aliases+=AliasMember
+;
+
+/* Feature Membership */
+
+FeatureMember returns OwningMembership:
+    TypeFeatureMember | OwnedFeatureMember
+;
+
+TypeFeatureMember returns OwningMembership:
+    Visibility? 'member' element=FeatureElement
+;
+
+OwnedFeatureMember returns FeatureMembership:
+    Visibility? element=FeatureElement
+;
+
+/* Specialization */
+
+Specialization returns Specialization:
+    ( 'specialization' Identification? )? 'subtype' 
+	( source=TypeReference | chains+=OwnedFeatureChain )
+    SpecializesToken
+	( reference=TypeReference | chains+=OwnedFeatureChain )
 	RelationshipBody
 ;
 
-// Disjoining
-Disjoining<visible> returns Disjoining:
-    (<visible> Visibility)? ('disjoining' Identification? )? 'disjoint' disjoined=TypeReferenceOrFeatureChain 'from' OwnedDisjoining TypeBody;
-fragment OwnedDisjoining:
-    disjoining=TypeReferenceOrFeatureChain;
+OwnedSpecialization returns Specialization:
+    reference=TypeReference | chains+=OwnedFeatureChain
+;
 
-// Feature membership
-MemberFeature returns Feature:
-    Visibility? 'member' FeatureElement<false>;
+/* Conjugation */
 
-// Metadata
+Conjugation returns Conjugation:
+    ( 'conjugation' Identification? )? 'conjugate' 
+    ( source=TypeReference | chains+=OwnedFeatureChain )
+    ConjugatesToken
+    ( reference=TypeReference | chains+=OwnedFeatureChain )
+	RelationshipBody
+;
+
+OwnedConjugation returns Conjugation:
+    reference=TypeReference | chains+=OwnedFeatureChain
+;
+
+/* Disjoining */
+
+Disjoining returns Disjoining:
+    ( 'disjoining' Identification? )? 'disjoint' 
+	( source=TypeReference  | chains+=OwnedFeatureChain )
+	'from' 
+	( reference=TypeReference | chains+=OwnedFeatureChain )
+	RelationshipBody
+;
+
+OwnedDisjoining returns Disjoining:
+    reference=TypeReference | chains+=OwnedFeatureChain
+;
+
+/* Unioning, Intersecting and Differencing */
+
+Unioning returns Unioning:
+    reference=TypeReference | chains+=OwnedFeatureChain
+;
+
+Intersecting returns Intersecting:
+    reference=TypeReference | chains+=OwnedFeatureChain
+;
+
+Differencing returns Differencing:
+    reference=TypeReference | chains+=OwnedFeatureChain
+;
+
+/* CLASSIFIERS */
+
+/* Classifiers */
+
+Classifier returns Classifier:
+    TypePrefix 'classifier' ClassifierDeclaration TypeBody
+;
+
+fragment ClassifierDeclaration:
+    Sufficient? Identification? ( multiplicity=OwnedMultiplicity )?
+	( SuperclassingPart | ClassifierConjugationPart )?
+	TypeRelationshipPart*
+;
+
+fragment SuperclassingPart:
+    SpecializesToken typeRelationships+=OwnedSubclassification ( ',' typeRelationships+=OwnedSubclassification )*
+;
+
+fragment ClassifierConjugationPart:
+    ConjugatesToken typeRelationships+=ClassifierConjugation
+;
+
+/* Subclassification */
+
+Subclassification returns Subclassification:
+    ( 'specialization' Identification? )?
+    'subclassifier' source=ClassifierReference
+    SpecializesToken reference=ClassifierReference
+    RelationshipBody
+;
+
+OwnedSubclassification returns Subclassification:
+    reference=ClassifierReference
+;
+
+/* Classifier Conjugation */
+
+ClassifierConjugation returns Conjugation:
+    reference=ClassifierReference
+;
+
+/* FEATURES */
+
+/* Features */
+
+fragment FeaturePrefix:
+    ( direction=FeatureDirectionKind )?
+	Abstract? ( isComposite='composite' | isPortion='portion' )? 
+	Readonly? Derived? End? PrefixMetadata?
+;
+
+Feature returns Feature:
+    FeaturePrefix
+	( 'feature'? FeatureDeclaration
+	| prefixes+=PrefixMetadataMember
+	| 'feature'
+	) 
+	ValuePart? TypeBody
+;
+
+fragment FeatureDeclaration:
+    Sufficient? 
+	( Identification ( FeatureSpecializationPart | FeatureConjugationPart )?
+	| FeatureSpecializationPart
+	| FeatureConjugationPart
+	)
+	FeatureRelationshipPart*
+;
+
+fragment FeatureRelationshipPart:
+    TypeRelationshipPart | ChainingPart | InvertingPart | TypeFeaturingPart
+;
+
+fragment ChainingPart:
+    'chains' ( typeRelationships+=OwnedFeatureChaining | FeatureChain )
+;
+
+fragment InvertingPart:
+    'inverse' 'of' typeRelationships+=OwnedFeatureInverting
+;
+
+fragment TypeFeaturingPart:
+    'featured' 'by' typeRelationships+=OwnedTypeFeaturing 
+	( ',' typeRelationships+=OwnedTypeFeaturing )*
+;
+
+fragment FeatureSpecializationPart:
+    ( FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+	| MultiplicityPart FeatureSpecialization*
+;
+
+fragment MultiplicityPart:
+    multiplicity=OwnedMultiplicity MultiplicityProperties?
+	| MultiplicityProperties
+;
+
+fragment FeatureSpecialization:
+    Typings | Subsettings | References | Redefinitions
+;
+
+fragment Typings:
+    TypedBy ( ',' typeRelationships+=OwnedFeatureTyping )*
+;
+
+fragment TypedBy:
+    TypedByToken typeRelationships+=OwnedFeatureTyping
+;
+
+fragment Subsettings:
+    Subsets ( ',' typeRelationships+=OwnedSubsetting )*
+;
+
+fragment Subsets:
+    SubsetsToken typeRelationships+=OwnedSubsetting
+;
+
+fragment References:
+    ReferencesToken typeRelationships+=OwnedReferenceSubsetting
+;
+
+fragment Redefinitions:
+    Redefines ( ',' typeRelationships+=OwnedRedefinition )*
+;
+
+fragment Redefines:
+    RedefinesToken typeRelationships+=OwnedRedefinition
+;
+
+/* Feature Inverting */
+
+FeatureInverting returns FeatureInverting:
+    ( 'inverting' Identification? )? 'inverse' 
+	( source=FeatureReference | chains+=OwnedFeatureChain )
+	'of' ( reference=FeatureReference | chains+=OwnedFeatureChain )
+	RelationshipBody
+;
+
+OwnedFeatureInverting returns FeatureInverting:
+    reference=FeatureReference | chains+=OwnedFeatureChain
+;
+
+/* Type Featuring */
+
+TypeFeaturing returns TypeFeaturing:
+    'featuring' ( Identification? 'of')? source=FeatureReference
+	'by' reference=TypeReference
+	RelationshipBody
+;
+
+OwnedTypeFeaturing returns TypeFeaturing:
+    reference=TypeReference
+;
+
+/* Feature Typing */
+
+FeatureTyping returns FeatureTyping:
+    ( 'specialization' Identification? )?
+    'typing' source=FeatureReference
+    TypedByToken FeatureType
+    RelationshipBody
+;
+
+/* Subsetting */
+
+Subsetting returns Subsetting:
+    ( 'specialization' Identification? )? 'subset' 
+    ( source=FeatureReference | chains+=OwnedFeatureChain )
+    SubsetsToken
+    ( reference=FeatureReference | chains+=OwnedFeatureChain )
+	RelationshipBody
+;
+
+OwnedSubsetting returns Subsetting:
+    reference=FeatureReference | chains+=OwnedFeatureChain
+;
+
+OwnedReferenceSubsetting returns ReferenceSubsetting:
+    reference=FeatureReference | chains+=OwnedFeatureChain
+;
+
+/* Redefinition */
+
+Redefinition returns Redefinition:
+    ( 'specialization' Identification? )? 'redefinition' 
+    ( source=FeatureReference | chains+=OwnedFeatureChain )
+    RedefinesToken
+    ( reference=FeatureReference | chains+=OwnedFeatureChain )
+	RelationshipBody
+;
+
+OwnedRedefinition returns Redefinition:
+    reference=FeatureReference | chains+=OwnedFeatureChain
+;
+
+/* Feature Conjugation */
+
+fragment FeatureConjugationPart:
+    ConjugatesToken typeRelationships+=FeatureConjugation
+;
+
+FeatureConjugation returns Conjugation:
+    reference=FeatureReference
+;
+
+/* FEATURE VALUES */
+
+fragment ValuePart:
+    value=FeatureValue
+	| value=FeatureValueExpression
+	  write=EmptyFeatureWriteMember
+;
+
+FeatureValue returns FeatureValue:
+    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) element=OwnedExpression
+;
+
+FeatureValueExpression returns FeatureValue:
+    isInitial?=':=' element=OwnedExpression
+;
+
+EmptyFeatureWriteMember returns OwningMembership:
+    element=EmptyFeatureWrite
+;
+
+EmptyFeatureWrite returns Step:
+    members+=EmptyTargetMember
+	members+=EmptyParameterMember
+;
+
+EmptyTargetMember returns ParameterMembership:
+    element=EmptyTargetParameter
+;
+
+// SysML type in KerML? Really?
+EmptyTargetParameter returns Feature:
+    members+=TargetFeatureMember
+;
+
+TargetFeatureMember returns FeatureMembership:
+    element=TargetFeature
+;
+
+TargetFeature returns Feature:
+    members+=EmptyFeatureMember
+;
+
+EmptyFeatureMember returns FeatureMembership:
+    element=EmptyFeature
+;
+
+EmptyParameterMember returns ParameterMembership:
+    element=EmptyFeature
+;
+
+/* MULTIPLICITIES */
+
+Multiplicity returns Multiplicity:
+    MultiplicitySubset | MultiplicityRange
+;
+
+MultiplicitySubset returns Multiplicity:
+    'multiplicity' Identification? Subsets TypeBody
+;
+
+MultiplicityRange returns MultiplicityRange:
+    'multiplicity' Identification? MultiplicityBounds TypeBody
+;
+
+OwnedMultiplicity returns OwningMembership:
+    element=OwnedMultiplicityRange
+;
+
+OwnedMultiplicityRange returns MultiplicityRange:
+    MultiplicityBounds
+;
+
+fragment MultiplicityBounds:
+    '[' range=MultiplicityExpressionMember ']'
+;
+
+MultiplicityExpressionMember returns OwningMembership:
+    element=OwnedExpression
+;
+
+/* CLASSIFICATION */
+
+/* Data Types */
+
+DataType returns DataType:
+    TypePrefix 'datatype' ClassifierDeclaration TypeBody
+;
+
+/* Classes */
+
+Class returns Class:
+    TypePrefix 'class' ClassifierDeclaration TypeBody
+;
+
+/* STRUCTURES */
+
+Structure returns Structure:
+    TypePrefix 'struct' ClassifierDeclaration TypeBody
+;
+
+
+/* ASSOCIATIONS */
+
+Association returns Association:
+    TypePrefix 'assoc' ClassifierDeclaration TypeBody
+;
+
+AssociationStructure returns AssociationStructure:
+    TypePrefix 'assoc' 'struct' ClassifierDeclaration TypeBody
+;
+
+/* CONNECTORS */
+
+/* Connectors */
+
+Connector returns Connector:
+    FeaturePrefix 'connector' ConnectorDeclaration TypeBody
+;
+
+fragment ConnectorDeclaration:
+    BinaryConnectorDeclaration | NaryConnectorDeclaration
+;
+
+fragment BinaryConnectorDeclaration:
+    ( FeatureDeclaration? 'from' | Sufficient 'from'? )?
+	members+=ConnectorEndMember 'to' 
+	members+=ConnectorEndMember
+;
+
+fragment NaryConnectorDeclaration:
+    FeatureDeclaration?
+	( '(' members+=ConnectorEndMember ( ',' members+=ConnectorEndMember )+ ')' )?
+;
+
+ConnectorEndMember returns EndFeatureMembership:
+    element=ConnectorEnd
+;
+
+ConnectorEnd returns Feature:
+    ( RegularName ReferencesToken )? typeRelationships+=OwnedReferenceSubsetting
+	( multiplicity=OwnedMultiplicity )?
+;
+
+/* Binding Connectors */
+
+BindingConnector returns BindingConnector:
+    FeaturePrefix 'binding' BindingConnectorDeclaration TypeBody
+;
+
+fragment BindingConnectorDeclaration:
+    FeatureDeclaration ( 'of' members+=ConnectorEndMember '=' members+=ConnectorEndMember )?
+	| Sufficient? ( 'of'? members+=ConnectorEndMember '=' members+=ConnectorEndMember )?
+;
+
+/* Successions */
+
+Succession returns Succession:
+    FeaturePrefix 'succession' SuccessionDeclaration TypeBody
+;
+
+fragment SuccessionDeclaration:
+    FeatureDeclaration ( 'first' members+=ConnectorEndMember 'then' members+=ConnectorEndMember )?
+    | Sufficient? ( 'first'? members+=ConnectorEndMember  'then' members+=ConnectorEndMember )?
+;
+
+/* BEHAVIORS */
+
+/* Behaviors */
+
+Behavior returns Behavior:
+    TypePrefix 'behavior'  ClassifierDeclaration TypeBody
+;
+
+/* Steps */
+
+Step returns Step:
+    FeaturePrefix 'step' StepDeclaration TypeBody
+;
+
+fragment StepDeclaration:
+    FeatureDeclaration? ValuePart?
+;
+
+/* FUNCTIONS */
+
+/* Functions */
+
+SysMLFunction returns SysMLFunction:
+    TypePrefix 'function' ClassifierDeclaration FunctionBody
+;
+
+fragment FunctionBody:
+    ';' | '{' FunctionBodyPart '}'
+;
+
+fragment FunctionBodyPart:
+    ( namespaceMembers+=NonFeatureMember 
+    | annotatingMembers+=AnnotatingMember
+    | relationshipMembers+=RelationshipMember
+	| members+=FeatureMember 
+	| aliases+=AliasMember
+	| imports+=Import
+	| members+=ReturnFeatureMember
+	)* 
+	( result=ResultExpressionMember )?
+;
+
+ReturnFeatureMember returns ReturnParameterMembership:
+    Visibility? 'return' element=FeatureElement
+;
+
+ResultExpressionMember returns ResultExpressionMembership:
+    Visibility? element=OwnedExpression
+;
+
+/* Expressions */
+
+Expression returns Expression:
+    FeaturePrefix 'expr' ExpressionDeclaration FunctionBody
+;
+
+fragment ExpressionDeclaration:
+    FeatureDeclaration? ValuePart?
+;
+
+/* Predicates */
+
+Predicate returns Predicate:
+    TypePrefix 'predicate' ClassifierDeclaration FunctionBody
+;
+
+/* Boolean Expressions */
+
+BooleanExpression returns BooleanExpression:
+    FeaturePrefix 'bool' ExpressionDeclaration FunctionBody
+;
+
+/* Invariants */
+
+Invariant returns Invariant:
+    FeaturePrefix 'inv' ( 'true' | isNegated?='false' )? ExpressionDeclaration FunctionBody
+;
+
+/* INTERACTIONS */
+
+/* Interactions */
+
+Interaction returns Interaction:
+    TypePrefix 'interaction' ClassifierDeclaration TypeBody
+;
+
+/* Item Flows */
+
+ItemFlow returns ItemFlow:
+    FeaturePrefix 'flow' ItemFlowDeclaration TypeBody
+;
+
+SuccessionItemFlow returns SuccessionItemFlow:
+    FeaturePrefix 'succession' 'flow' ItemFlowDeclaration TypeBody
+;
+
+fragment ItemFlowDeclaration:
+    FeatureDeclaration? ValuePart? ( 'of'  members+=ItemFeatureMember )?
+	  ( 'from' members+=ItemFlowEndMember 'to' members+=ItemFlowEndMember )?
+    | Sufficient? members+=ItemFlowEndMember 'to' members+=ItemFlowEndMember
+;
+
+ItemFeatureMember returns FeatureMembership:
+    element=ItemFeature
+;
+
+ItemFeature returns ItemFeature:
+    Identification? (ItemFeatureSpecializationPart ValuePart? | ValuePart)
+    | typeRelationships+=OwnedFeatureTyping ( multiplicity=OwnedMultiplicity )?
+    | multiplicity=OwnedMultiplicity typeRelationships+=OwnedFeatureTyping
+;
+
+fragment ItemFeatureSpecializationPart:
+    ( FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+	| MultiplicityPart FeatureSpecialization+
+;
+
+ItemFlowEndMember returns EndFeatureMembership:
+    element=ItemFlowEnd
+;
+
+ItemFlowEnd returns ItemFlowEnd:
+    ( typeRelationships+=ItemFlowEndSubsetting )? members+=ItemFlowFeatureMember
+;
+
+ItemFlowEndSubsetting returns ReferenceSubsetting:
+    reference=FeatureReference '.' | chains+=FeatureChainPrefix
+;
+
+ItemFlowFeatureMember returns FeatureMembership:
+    element=ItemFlowFeature
+;
+
+ItemFlowFeature returns Feature:
+    typeRelationships+=ItemFlowRedefinition
+;
+
+ItemFlowRedefinition returns Redefinition:
+    reference=FeatureReference
+;
+
+/* METADATA */
+
+Metaclass returns Metaclass:
+    TypePrefix 'metaclass' ClassifierDeclaration TypeBody
+;
+
+PrefixMetadataAnnotation returns Annotation:
+    element=PrefixMetadataFeature
+;
+
+PrefixMetadataMember returns OwningMembership:
+    element=PrefixMetadataFeature
+;
+
+fragment PrefixMetadata:
+    (prefixes+=PrefixMetadataMember)+
+;
+
+PrefixMetadataFeature returns MetadataFeature:
+    '#' typeRelationships+=MetadataTyping
+;
 
 MetadataFeature returns MetadataFeature:
-    ( '@' | 'metadata' ) (Identification TypedByToken)? typedBy+=MetaclassReference ( 'about' about+=ElementReference ( ',' about+=ElementReference)* )? MetadataBody;
+    ( '@' | 'metadata' ) MetadataFeatureDeclaration 
+	( 'about' about+=Annotation ( ',' about+=Annotation )* )?
+	MetadataBody
+;
+
+fragment MetadataFeatureDeclaration:
+    ( Identification TypedByToken )? typeRelationships+=MetadataTyping
+;
+
 fragment MetadataBody:
-    ';' | '{' MetadataItems '}'
+    ';' | '{' MetadataBodyElements '}'
 ;
-fragment MetadataItems:
-    ( elements+=NonFeatureElement<true>
-    | relationships+=RelationshipElement<true>
-    | comments+=Comment
-    | docs+=Documentation
-    | reps+=TextualRepresentation
-    | metadata+=MetadataFeature
-    | features+=MetadataBodyFeature
-    | imports+=Import | aliases+=Alias
-    )*
+
+fragment MetadataBodyElements:
+    MetadataBodyElement*
 ;
+
+fragment MetadataBodyElement:
+    namespaceMembers+=NonFeatureMember
+    | annotatingMembers+=AnnotatingMember
+    | relationshipMembers+=RelationshipMember
+    | members+=MetadataBodyFeatureMember 
+    | aliases+=AliasMember
+    | imports+=Import
+;
+
+MetadataBodyFeatureMember returns FeatureMembership:
+    element=MetadataBodyFeature
+;
+
 MetadataBodyFeature returns Feature:
-    'feature'? RedefinesToken? redefines+=FeatureChain 
+    'feature'? RedefinesToken? typeRelationships+=OwnedRedefinition 
 	FeatureSpecializationPart? ValuePart?
 	MetadataBody
 ;
 
-// Feature inverting
-FeatureInverting<visible> returns FeatureInverting:
-    (<visible> Visibility)? ( 'inverting' Identification? )? 'inverse' ( featureInverted=FeatureChain) 'of' ( invertingFeature=FeatureChain ) TypeBody;
 
-// Type featuring
-TypeFeaturing<visible> returns TypeFeaturing:
-    (<visible> Visibility)? 'featuring' ( Identification? 'of')? feature=QualifiedFeatureReference 'by' featuringType=TypeReference TypeBody;
+/* EXPRESSIONS */
 
-// Connectors
-Connector<visible> returns Connector:
-    FeaturePrefix<visible>? 'connector' ConnectorDeclaration TypeBody;
-fragment ConnectorDeclaration:
-    BinaryConnectorDeclaration | NaryConnectorDeclaration
-;
-fragment BinaryConnectorDeclaration:
-    ( FeatureDeclaration? 'from' | isSufficient?='all' 'from'? )?
-	ends+=ConnectorEnd 'to' 
-	ends+=ConnectorEnd
-;
-fragment NaryConnectorDeclaration:
-    FeatureDeclaration?
-	( '(' ends+=ConnectorEnd ',' ends+=ConnectorEnd ( ',' ends+=ConnectorEnd )* ')' )?
-;
-ConnectorEnd returns ConnectorEnd:
-    ( RegularName ReferencesToken )? references+=FeatureChain OwnedMultiplicity?;
-
-// Binding connectors
-BindingConnector<visible> returns BindingConnector:
-    FeaturePrefix<visible>? 'binding' BindingConnectorDeclaration TypeBody;
-fragment BindingConnectorDeclaration returns BindingConnector:
-    FeatureDeclaration ( 'of' ends+=ConnectorEnd '=' ends+=ConnectorEnd )?
-	| Sufficient? ( 'of'? ends+=ConnectorEnd '=' ends+=ConnectorEnd )?
+ExpressionBody returns Expression:
+    '{' FunctionBodyPart '}'
 ;
 
-// Successions
-Succession<visible> returns Succession:
-    FeaturePrefix<visible>? 'succession' SuccessionDeclaration TypeBody;
-SuccessionItemFlow<visible> returns SuccessionItemFlow:
-    FeaturePrefix<visible>? 'succession' 'flow' ItemFlowDeclaration TypeBody;
-fragment SuccessionDeclaration returns Succession:
-    FeatureDeclaration ( 'first' ends+=ConnectorEnd 'then' ends+=ConnectorEnd )?
-    | Sufficient? ( 'first'? ends+=ConnectorEnd 'then' ends+=ConnectorEnd )?
-;
-// Item flows
-ItemFlow<visible> returns ItemFlow:
-    FeaturePrefix<visible>? 'flow' ItemFlowDeclaration TypeBody;
-fragment ItemFlowDeclaration:
-    FeatureDeclaration? ValuePart?
-      ( 'of'  of=ItemFeature )?
-	  ( 'from' ends+=ItemFlowEnd 
-	    'to' ends+=ItemFlowEnd )?
-    | Sufficient?
-      ends+=ItemFlowEnd 'to'
-	  ends+=ItemFlowEnd
-;
-ItemFlowEnd returns ItemFlowEnd:
-    redefines+=FeatureChain; // TODO: chain.length >= 2, first chain reference is referenced feature
-ItemFeature returns ItemFeature:
-    Identification? (ItemFeatureSpecializationPart ValuePart? | ValuePart)
-    | typedBy+=TypeReferenceOrFeatureChain OwnedMultiplicity?
-    | OwnedMultiplicity typedBy+=TypeReferenceOrFeatureChain
-;
-fragment ItemFeatureSpecializationPart:
-    FeatureSpecialization+ MultiplicityPart? FeatureSpecialization* | MultiplicityPart FeatureSpecialization+
+// Operator Expressions
+
+OwnedExpressionMember returns FeatureMembership:
+    element=OwnedExpression
 ;
 
-// Steps
-Step<visible> returns Step:
-    FeaturePrefix<visible>? 'step' StepDeclaration TypeBody;
-fragment StepDeclaration:
-    FeatureDeclaration ValuePart?;
+OwnedExpression returns Expression:
+    ConditionalExpression
+;
 
-// Expressions
-Expression<visible> returns Expression:
-    FeaturePrefix<visible>? 'expr' ExpressionDeclaration FunctionBody;
-fragment ExpressionDeclaration:
-    FeatureDeclaration? ValuePart?;
+OwnedExpressionReference returns FeatureReferenceExpression:
+    expression=OwnedExpressionMember
+;
 
-// Predicates
-Predicate<visible> returns Predicate:
-    TypePrefix<visible> 'predicate' ClassifierDeclaration FunctionBody;
-
-// Boolean expressions
-BooleanExpression<visible> returns BooleanExpression:
-    FeaturePrefix<visible>? 'bool' ExpressionDeclaration FunctionBody;
-Invariant<visible> returns Invariant:
-    FeaturePrefix<visible>? 'inv' ( 'true' | isNegated?='false' )? ExpressionDeclaration FunctionBody;
-
-// Operator expressions
-InlineExpressionReference returns FeatureReferenceExpression:
-    expression=InlineExpression;
+// Conditional Expressions
 
 ConcreteConditionalExpression returns OperatorExpression:
-    operator='if' args+=NullCoalescingExpression '?' args+=InlineExpressionReference 'else' args+=InlineExpressionReference;
-ConditionalExpression returns InlineExpression:
-    NullCoalescingExpression | ConcreteConditionalExpression;
-
-NullCoalescingExpression returns InlineExpression:
-    ImpliesExpression ( {OperatorExpression.args+=current} operator='??' args+=ImpliesExpressionReference )*;
-
-ImpliesExpression returns InlineExpression:
-    OrExpression ( {OperatorExpression.args+=current} operator='implies' args+=OrExpressionReference )*;
-ImpliesExpressionReference returns FeatureReferenceExpression:
-    expression=ImpliesExpression;
-
-OrExpression returns InlineExpression:
-    XorExpression ( {OperatorExpression.args+=current}( operator='|' args+=XorExpression | operator='or' args+=XorExpressionReference) )*;
-OrExpressionReference returns FeatureReferenceExpression:
-    expression=OrExpression;
-
-XorExpression returns InlineExpression:
-    AndExpression ( {OperatorExpression.args+=current} operator='xor' args+=AndExpression )*;
-XorExpressionReference returns FeatureReferenceExpression:
-    expression=XorExpression;
-
-AndExpression returns InlineExpression:
-    EqualityExpression ( {OperatorExpression.args+=current} (operator='&'args+=EqualityExpression | operator='and' args+=EqualityExpressionReference) )*;
-
-EqualityExpression returns InlineExpression:
-    ClassificationExpression ( {OperatorExpression.args+=current} operator=EqualityOperator  args+=ClassificationExpression )*;
-EqualityExpressionReference returns FeatureReferenceExpression:
-    expression=EqualityExpression;
-
-ClassificationExpression returns InlineExpression:
-    RelationalExpression ( 
-        {OperatorExpression.args+=current} operator=(ClassificationTestOperator | 'as') args+=TypeReference
-        )?
-    // Note: empty rule breaks parsing here 
-	| {OperatorExpression} /* args+=SelfReferenceExpression */ operator=(ClassificationTestOperator | 'as') args+=TypeReference
-	| {OperatorExpression} args+=MetadataReference operator=('@@' | 'meta') args+=TypeReference
+    operator='if' operands+=NullCoalescingExpression '?' operands+=OwnedExpressionReference 'else' operands+=OwnedExpressionReference
 ;
-MetadataReference returns MetadataAccessExpression:
-    reference=ElementReference;
 
-RelationalExpression returns InlineExpression:
-    RangeExpression ( {OperatorExpression.args+=current} operator=RelationalOperator args+=RangeExpression )*;
-RangeExpression returns InlineExpression:
-    Addition ( {OperatorExpression.args+=current} operator='..' args+=Addition )?;
-Addition returns InlineExpression:
-    Multiplication ({OperatorExpression.args+=current} operator=('+' | '-') args+=Multiplication)*;
-Multiplication returns InlineExpression:
-    Exponentation ({OperatorExpression.args+=current} operator=('*' | '/' | '%') args+=Exponentation)*;
-Exponentation returns InlineExpression:
-    UnaryOperatorExpression ({OperatorExpression.args+=current} operator=('**' | '^') args+=UnaryOperatorExpression)*;
-UnaryOperatorExpression returns InlineExpression:
-    {OperatorExpression} operator=UnaryOperator args+=ExtentExpression | ExtentExpression;
-ExtentExpression returns InlineExpression:
-    {OperatorExpression} operator='all' args+=TypeReference | PrimaryExpression;
-SequenceExpression returns InlineExpression:
-    InlineExpression (',' | {OperatorExpression.args+=current} operator=',' args+=SequenceExpression)?;
+ConditionalExpression returns Expression:
+    NullCoalescingExpression | ConcreteConditionalExpression
+;
 
-Argument returns Argument:
-    value=InlineExpression;
-NamedArgument returns NamedArgument:
-    name=QualifiedFeatureReference '=' value=InlineExpression;
+NullCoalescingExpression returns Expression:
+    ImpliesExpression ( {OperatorExpression.operands+=current} operator='??' operands+=ImpliesExpressionReference )*
+;
 
-fragment PositionalArguments:
-    args+=Argument (',' args+=Argument)*;
-fragment NamedArguments:
-    args+=NamedArgument (',' args+=NamedArgument)*;
+// Logical Expressions
 
-fragment ArgumentList:
-    '(' (PositionalArguments | NamedArguments)? ')';
+ImpliesExpressionReference returns FeatureReferenceExpression:
+    expression=ImpliesExpressionMember
+;
 
-BaseExpression returns InlineExpression:
+ImpliesExpressionMember returns FeatureMembership:
+    element=ImpliesExpression
+;
+
+ImpliesExpression returns Expression:
+    OrExpression ( {OperatorExpression.operands+=current} operator='implies' operands+=OrExpressionReference )*
+;
+
+OrExpressionReference returns FeatureReferenceExpression:
+    expression=OrExpressionMember
+;
+
+OrExpressionMember returns FeatureMembership:
+    element=OrExpression
+;
+
+OrExpression returns Expression:
+    XorExpression ( {OperatorExpression.operands+=current}(
+        operator='|' operands+=XorExpression
+        | operator='or' operands+=XorExpressionReference
+        )
+    )*
+;
+
+XorExpressionReference returns FeatureReferenceExpression:
+    expression=XorExpressionMember
+;
+
+XorExpressionMember returns FeatureMembership:
+    element=XorExpression
+;
+
+XorExpression returns Expression:
+    AndExpression ( {OperatorExpression.operands+=current} operator='xor' operands+=AndExpression )*
+;
+
+AndExpression returns Expression:
+    EqualityExpression ( {OperatorExpression.operands+=current} (
+        operator='&'operands+=EqualityExpression
+        | operator='and' operands+=EqualityExpressionReference
+        )
+    )*
+;
+
+// Equality Expressions
+
+EqualityExpressionReference returns FeatureReferenceExpression:
+    expression=EqualityExpressionMember
+;
+
+EqualityExpressionMember returns FeatureMembership:
+    element=EqualityExpression
+;
+
+EqualityExpression returns Expression:
+    ClassificationExpression ( {OperatorExpression.operands+=current} operator=EqualityOperator operands+=ClassificationExpression )*
+;
+
+// Classification Expressions
+
+ClassificationExpression returns Expression:
+    RelationalExpression ( 
+        {OperatorExpression.operands+=current} (
+            operator=ClassificationTestOperator members+=TypeReferenceMember
+            | operator='as' members+=TypeResultMember
+        )
+    )?
+    // Note: empty rule breaks parsing here 
+	| {OperatorExpression} /* operands+=SelfReferenceExpression */ operator=ClassificationTestOperator members+=TypeReferenceMember
+	| {OperatorExpression} operands+=MetadataReference operator='@@' members+=TypeReferenceMember
+	| {OperatorExpression} /* operands+=SelfReferenceExpression */ operator='as' members+=TypeResultMember
+	| {OperatorExpression} operands+=MetadataReference operator='meta' members+=TypeResultMember
+;
+
+// Relational Expressions
+
+RelationalExpression returns Expression:
+    RangeExpression ( {OperatorExpression.operands+=current} operator=RelationalOperator operands+=RangeExpression )*
+;
+
+// Range Expressions
+
+RangeExpression returns Expression:
+    AdditiveExpression ( {OperatorExpression.operands+=current} operator='..' operands+=AdditiveExpression )?
+;
+
+// Arithmetic Expressions
+
+AdditiveExpression returns Expression:
+    MultiplicativeExpression ({OperatorExpression.operands+=current} operator=('+' | '-') operands+=MultiplicativeExpression)*
+;
+
+MultiplicativeExpression returns Expression:
+    ExponentiationExpression ({OperatorExpression.operands+=current} operator=('*' | '/' | '%') operands+=ExponentiationExpression)*
+;
+
+ExponentiationExpression returns Expression:
+    UnaryExpression ({OperatorExpression.operands+=current} operator=('**' | '^') operands+=UnaryExpression)*
+;
+
+// Unary Expressions
+
+UnaryExpression returns Expression:
+    {OperatorExpression} operator=UnaryOperator operands+=ExtentExpression
+    | ExtentExpression
+;
+
+// Extent Expressions
+
+ExtentExpression returns Expression:
+    {OperatorExpression} operator='all' result=TypeResultMember
+    | PrimaryExpression
+;
+
+// Primary Expressions
+
+PrimaryExpression returns Expression:
+    BaseExpression
+	( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+	(   ( {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
+        | {OperatorExpression.operands+=current} '->' typeRelationships+=ReferenceTyping 
+            ( members+=ExpressionBodyMember
+            | members+=FunctionReferenceMember
+            | ArgumentList
+            )
+        | {CollectExpression.operands+=current} '.' members+=ExpressionBodyMember // collect
+        | {SelectExpression.operands+=current} '.?' members+=ExpressionBodyMember // select
+        )
+        ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+	)*
+;
+
+// Base Expressions
+
+BaseExpression returns Expression:
     NullExpression
     | LiteralExpression 
     | FeatureReferenceExpression 
@@ -580,43 +1124,63 @@ BaseExpression returns InlineExpression:
 	| '(' SequenceExpression ')'
 ;
 
-FeatureReferenceExpression returns FeatureReferenceExpression:
-    expression=QualifiedFeatureReference;
-MetadataAccessExpression returns MetadataAccessExpression:
-    reference=ElementReference '.' 'metadata';
-InvocationExpression returns InvocationExpression:
-    type=TypeReferenceOrFeatureChain ArgumentList;
-
-InlineExpression returns InlineExpression:
-    ConditionalExpression;
-
-PrimaryExpression returns InlineExpression:
-    BaseExpression
-	( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
-	(   ( {OperatorExpression.args+=current} operator='[' args+=SequenceExpression ']' // indexing
-        | {InvocationExpression.args+=current} '->' type=TypeReference 
-            ( args+=BodyExpression
-            | args+=FunctionReferenceExpression
-            | '(' (args+=Argument (',' args+=Argument)* | args+=NamedArgument (',' args+=NamedArgument)*)? ')'
-            )
-        | {CollectExpression.args+=current} '.' args+=BodyExpression // collect
-        | {SelectExpression.args+=current} '.?' args+=BodyExpression // select
-        )
-        ( {FeatureChainExpression.args+=current} '.' args+=FeatureChain)?
-	)*
-;
-
-FunctionReferenceExpression returns FeatureReferenceExpression:
-    expression=TypeReference;
+// Expression Bodies
 
 BodyExpression returns FeatureReferenceExpression:
-    expression=ExpressionBody;
+    expression=ExpressionBodyMember
+;
 
-ExpressionBody returns Expression:
-    '{' FunctionBodyPart '}';
+ExpressionBodyMember returns FeatureMembership:
+    element=ExpressionBody
+;
 
-// programmatic AST
-SelfReferenceExpression returns SelfReferenceExpression:
-    {SelfReferenceExpression};
-SelfRefOperator returns OperatorExpression:
-    args+=SelfReferenceExpression;
+// Sequence Expressions
+
+SequenceExpression returns Expression:
+    OwnedExpression (
+        ','
+        | {OperatorExpression.operands+=current} operator=',' operands+=SequenceExpression
+    )?
+;
+
+// Invocation Expressions
+
+InvocationExpression returns InvocationExpression:
+    typeRelationships+=OwnedFeatureTyping ArgumentList
+;
+
+fragment ArgumentList:
+    '(' ( PositionalArgumentList | NamedArgumentList )? ')'
+;
+
+fragment PositionalArgumentList:
+    members+=ArgumentMember ( ',' members+=ArgumentMember )*
+;
+
+ArgumentMember returns ParameterMembership:
+    element=Argument
+;
+
+Argument returns Feature:
+    value=ArgumentValue
+;
+
+fragment NamedArgumentList:
+    members+=NamedArgumentMember ( ',' members+=NamedArgumentMember )*
+;
+
+NamedArgumentMember returns ParameterMembership:
+    element=NamedArgument
+;
+
+NamedArgument returns Feature:
+    typeRelationships+=ParameterRedefinition '=' value=ArgumentValue
+;
+
+ParameterRedefinition returns Redefinition:
+    reference=FeatureReference
+;
+
+ArgumentValue returns FeatureValue:
+    element=OwnedExpression
+;

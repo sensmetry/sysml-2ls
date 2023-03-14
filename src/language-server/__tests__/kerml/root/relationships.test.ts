@@ -15,27 +15,25 @@
  ********************************************************************************/
 
 import { qualifiedTypeReference } from "../../../../testing";
+import { Dependency } from "../../../generated/ast";
 
 test("relationships are parseable", async () => {
     return expect(`
-    type <'1'> A;
-    type <'2'> B;
-    type <'3'> C;
-    type <'4'> D;
+    class <'1'> A;
+    class <'2'> B;
+    class <'3'> C;
+    class <'4'> D;
     dependency <'5'> R from '1', D to B, C;
     `).toParseKerML({
-        elements: [
-            { declaredName: "A", declaredShortName: "'1'" },
-            { declaredName: "B", declaredShortName: "'2'" },
-            { declaredName: "C", declaredShortName: "'3'" },
-            { declaredName: "D", declaredShortName: "'4'" },
-        ],
-        relationships: [
+        relationshipMembers: [
             {
-                declaredName: "R",
-                declaredShortName: "'5'",
-                client: [qualifiedTypeReference("A"), qualifiedTypeReference("D")],
-                supplier: [qualifiedTypeReference("B"), qualifiedTypeReference("C")],
+                element: {
+                    $type: Dependency,
+                    declaredName: "R",
+                    declaredShortName: "'5'",
+                    client: [qualifiedTypeReference("A"), qualifiedTypeReference("D")],
+                    supplier: [qualifiedTypeReference("B"), qualifiedTypeReference("C")],
+                },
             },
         ],
     });
