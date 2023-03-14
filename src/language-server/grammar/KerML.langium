@@ -457,7 +457,8 @@ fragment TypeFeaturingPart:
 ;
 
 fragment FeatureSpecializationPart:
-    ( FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+    FeatureSpecialization+
+    | FeatureSpecialization+ MultiplicityPart FeatureSpecialization*
 	| MultiplicityPart FeatureSpecialization*
 ;
 

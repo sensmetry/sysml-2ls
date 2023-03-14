@@ -3728,6 +3728,14 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "$type": "Alternatives",
         "elements": [
           {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@73"
+            },
+            "arguments": [],
+            "cardinality": "+"
+          },
+          {
             "$type": "Group",
             "elements": [
               {
@@ -3743,8 +3751,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "rule": {
                   "$ref": "#/rules@72"
                 },
-                "arguments": [],
-                "cardinality": "?"
+                "arguments": []
               },
               {
                 "$type": "RuleCall",
@@ -16536,6 +16543,14 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "$type": "Alternatives",
         "elements": [
           {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@46"
+            },
+            "arguments": [],
+            "cardinality": "+"
+          },
+          {
             "$type": "Group",
             "elements": [
               {
@@ -16551,8 +16566,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                 "rule": {
                   "$ref": "#/rules@45"
                 },
-                "arguments": [],
-                "cardinality": "?"
+                "arguments": []
               },
               {
                 "$type": "RuleCall",
@@ -21473,6 +21487,14 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "$type": "Alternatives",
         "elements": [
           {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@46"
+            },
+            "arguments": [],
+            "cardinality": "+"
+          },
+          {
             "$type": "Group",
             "elements": [
               {
@@ -21488,8 +21510,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                 "rule": {
                   "$ref": "#/rules@45"
                 },
-                "arguments": [],
-                "cardinality": "?"
+                "arguments": []
               },
               {
                 "$type": "RuleCall",

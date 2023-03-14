@@ -266,7 +266,8 @@ fragment FeatureDeclaration:
 ;
 
 fragment FeatureSpecializationPart:
-    FeatureSpecialization+ MultiplicityPart? FeatureSpecialization*
+    FeatureSpecialization+
+    | FeatureSpecialization+ MultiplicityPart FeatureSpecialization*
     | MultiplicityPart FeatureSpecialization*
 ;
 
@@ -900,7 +901,8 @@ fragment PayloadFeature:
 
 // TODO: optimize
 fragment PayloadFeatureSpecializationPart:
-    ( FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+    FeatureSpecialization+
+    | FeatureSpecialization+ MultiplicityPart FeatureSpecialization*
     | MultiplicityPart FeatureSpecialization+
 ;
 
