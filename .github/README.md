@@ -1,4 +1,4 @@
-# SysML2 Tools
+# Systems Modeling IDE (SysIDE)
 
 **NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
 
@@ -6,9 +6,9 @@
 [![coverage report](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/coverage.svg)](https://sensmetry.gitlab.io/public/sysml-2ls)
 [![Latest Release](https://gitlab.com/sensmetry/public/sysml-2ls/-/badges/release.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/releases)
 
-Provides language support for systems modeling in SysML v2 in VS Code.
+SysIDE (pronounced "seaside") provides SysML v2 language support in VS Code.
 
-SysML2 Tools is a language server for SysML v2 and KerML [2022-12 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2022-12) specifications.
+SysIDE is a language server for SysML v2 and KerML [2022-12 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2022-12) specifications.
 
 This extension provides:
 
@@ -23,7 +23,7 @@ This extension provides:
 - renaming,
 - documentation on hover.
 
-SysML2 Tools is built and maintained by [Sensmetry](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission & safety critical systems.
+SysIDE is built and maintained by [Sensmetry](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission & safety critical systems.
 
 The initial version has been created as an R&D effort, and contributions are highly encouraged. To provide your contributions please see the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
@@ -125,4 +125,4 @@ See [CONTRIBUTING.md](/CONTRIBUTING.md).
 
 ## Disclaimer
 
-SysML2 Tools is developed for the language that carries the name of SysML which is a trademark of OMG. SysML2 Tools has been started and continues to be maintained by Sensmetry. The project is open source. For further information, see [LICENSE](/LICENSE).
+SysIDE is developed for the language that carries the name of SysML which is a trademark of OMG. SysIDE has been started and continues to be maintained by Sensmetry. The project is open source. For further information, see [LICENSE](/LICENSE).

@@ -1,7 +1,7 @@
 {
     "name": "sysml-2ls",
-    "displayName": "SysML2 Tools",
-    "description": "Provides language support for systems modeling in SysML v2 in VS Code.",
+    "displayName": "SysIDE",
+    "description": "SysML v2 language support in VS Code.",
     "publisher": "Sensmetry",
     "version": "0.2.1",
     "icon": "docs/images/logo.png",
