@@ -1,4 +1,4 @@
-# Systems Modeling IDE (SysIDE)
+# _SysIDE_: SysML v2 Modeling IDE
 
 **NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
 
@@ -6,9 +6,9 @@
 [![coverage report](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/coverage.svg)](https://sensmetry.gitlab.io/public/sysml-2ls)
 [![Latest Release](https://gitlab.com/sensmetry/public/sysml-2ls/-/badges/release.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/releases)
 
-SysIDE (pronounced "seaside") provides SysML v2 language support in VS Code.
+_SysIDE_ (pronounced "seaside") provides SysML v2 language support in VS Code.
 
-SysIDE is a language server for SysML v2 and KerML [2022-12 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2022-12) specifications.
+_SysIDE_ includes a language server for SysML v2 and KerML [2022-12 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2022-12) specifications. Together with VS Code, _SysIDE_ serves as integrated development environment (IDE) for SysML v2.
 
 This extension provides:
 
@@ -23,7 +23,7 @@ This extension provides:
 - renaming,
 - documentation on hover.
 
-SysIDE is built and maintained by [Sensmetry](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission & safety critical systems.
+_SysIDE_ is built and maintained by [Sensmetry](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission & safety critical systems.
 
 The initial version has been created as an R&D effort, and contributions are highly encouraged. To provide your contributions please see the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
@@ -125,4 +125,6 @@ See [CONTRIBUTING.md](/CONTRIBUTING.md).
 
 ## Disclaimer
 
-SysIDE is developed for the language that carries the name of SysML which is a trademark of OMG. SysIDE has been started and continues to be maintained by Sensmetry. The project is open source. For further information, see [LICENSE](/LICENSE).
+_SysIDE_ is developed for the language that carries the name of SysML which is a trademark of OMG. _SysIDE_ has been started and continues to be maintained by [Sensmetry](https://sensmetry.com/).
+
+The project is open source. For further information, see [LICENSE](/LICENSE).
