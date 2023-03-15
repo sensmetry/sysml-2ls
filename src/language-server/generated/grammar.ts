@@ -24296,145 +24296,12 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "$type": "Group",
             "elements": [
               {
-                "$type": "Action",
-                "type": {
-                  "$ref": "#/interfaces@82"
-                },
-                "feature": "operands",
-                "operator": "+="
-              },
-              {
-                "$type": "Keyword",
-                "value": "."
-              },
-              {
-                "$type": "Assignment",
-                "feature": "members",
-                "operator": "+=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@449"
-                  },
-                  "arguments": []
-                }
-              }
-            ],
-            "cardinality": "?"
-          },
-          {
-            "$type": "Alternatives",
-            "elements": [
-              {
                 "$type": "Group",
                 "elements": [
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@81"
-                    },
-                    "feature": "operands",
-                    "operator": "+="
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "operator",
-                    "operator": "=",
-                    "terminal": {
-                      "$type": "Keyword",
-                      "value": "["
-                    }
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "operands",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@369"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": "]"
-                  }
-                ]
-              },
-              {
-                "$type": "Group",
-                "elements": [
-                  {
-                    "$type": "Action",
-                    "type": {
-                      "$ref": "#/interfaces@81"
-                    },
-                    "feature": "operands",
-                    "operator": "+="
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": "->"
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "typeRelationships",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@442"
-                      },
-                      "arguments": []
-                    }
-                  },
-                  {
-                    "$type": "Alternatives",
-                    "elements": [
-                      {
-                        "$type": "Assignment",
-                        "feature": "members",
-                        "operator": "+=",
-                        "terminal": {
-                          "$type": "RuleCall",
-                          "rule": {
-                            "$ref": "#/rules@368"
-                          },
-                          "arguments": []
-                        }
-                      },
-                      {
-                        "$type": "Assignment",
-                        "feature": "members",
-                        "operator": "+=",
-                        "terminal": {
-                          "$type": "RuleCall",
-                          "rule": {
-                            "$ref": "#/rules@447"
-                          },
-                          "arguments": []
-                        }
-                      },
-                      {
-                        "$type": "RuleCall",
-                        "rule": {
-                          "$ref": "#/rules@371"
-                        },
-                        "arguments": []
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "$type": "Group",
-                "elements": [
-                  {
-                    "$type": "Action",
-                    "type": {
-                      "$ref": "#/interfaces@83"
+                      "$ref": "#/interfaces@82"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -24450,39 +24317,177 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@368"
+                        "$ref": "#/rules@449"
                       },
                       "arguments": []
                     }
                   }
-                ]
+                ],
+                "cardinality": "?"
               },
               {
-                "$type": "Group",
+                "$type": "Alternatives",
                 "elements": [
                   {
-                    "$type": "Action",
-                    "type": {
-                      "$ref": "#/interfaces@84"
-                    },
-                    "feature": "operands",
-                    "operator": "+="
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": ".?"
-                  },
-                  {
-                    "$type": "Assignment",
-                    "feature": "members",
-                    "operator": "+=",
-                    "terminal": {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@368"
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "type": {
+                          "$ref": "#/interfaces@81"
+                        },
+                        "feature": "operands",
+                        "operator": "+="
                       },
-                      "arguments": []
-                    }
+                      {
+                        "$type": "Assignment",
+                        "feature": "operator",
+                        "operator": "=",
+                        "terminal": {
+                          "$type": "Keyword",
+                          "value": "["
+                        }
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "operands",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@369"
+                          },
+                          "arguments": []
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "]"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "type": {
+                          "$ref": "#/interfaces@81"
+                        },
+                        "feature": "operands",
+                        "operator": "+="
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "->"
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "typeRelationships",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@442"
+                          },
+                          "arguments": []
+                        }
+                      },
+                      {
+                        "$type": "Alternatives",
+                        "elements": [
+                          {
+                            "$type": "Assignment",
+                            "feature": "members",
+                            "operator": "+=",
+                            "terminal": {
+                              "$type": "RuleCall",
+                              "rule": {
+                                "$ref": "#/rules@368"
+                              },
+                              "arguments": []
+                            }
+                          },
+                          {
+                            "$type": "Assignment",
+                            "feature": "members",
+                            "operator": "+=",
+                            "terminal": {
+                              "$type": "RuleCall",
+                              "rule": {
+                                "$ref": "#/rules@447"
+                              },
+                              "arguments": []
+                            }
+                          },
+                          {
+                            "$type": "RuleCall",
+                            "rule": {
+                              "$ref": "#/rules@371"
+                            },
+                            "arguments": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "type": {
+                          "$ref": "#/interfaces@83"
+                        },
+                        "feature": "operands",
+                        "operator": "+="
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "."
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "members",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@368"
+                          },
+                          "arguments": []
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "type": {
+                          "$ref": "#/interfaces@84"
+                        },
+                        "feature": "operands",
+                        "operator": "+="
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": ".?"
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "members",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@368"
+                          },
+                          "arguments": []
+                        }
+                      }
+                    ]
                   }
                 ]
               }

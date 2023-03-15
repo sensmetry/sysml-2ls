@@ -1239,8 +1239,8 @@ TargetBinding returns FeatureValue:
 
 TargetExpression returns Expression:
     BaseExpression
-    ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
-    (   ( {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
+    (  ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+       ( {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
         | {OperatorExpression.operands+=current} '->' typeRelationships+=ReferenceTyping 
             ( members+=ExpressionBodyMember
             | members+=FunctionReferenceMember
