@@ -33,7 +33,7 @@ export class AssertConstraintUsageMeta extends Mixin(ConstraintUsageMeta, Invari
         return this.isNegated ? "negated" : "base";
     }
 
-    protected override isEnclosedPerformance(): boolean {
+    protected override isBehaviorOwned(): boolean {
         const parent = this.owner();
         return parent.isAny([ActionDefinition, ActionUsage]);
     }

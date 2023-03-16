@@ -17,9 +17,9 @@
 import { ElementMeta, InvocationExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
-    ExpressionResult,
     ModelLevelExpressionEvaluator,
     functionFor,
+    ExpressionResult,
 } from "../util";
 
 const PACKAGE = "NumericalFunctions";
@@ -30,14 +30,13 @@ export class ProductFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        if (values === undefined) return;
 
         let result = 1;
         for (const value of values) {
-            if (typeof value === "number") result *= value;
-            else return;
+            if (typeof value !== "number") throw new Error("Not a number argument");
+            result *= value;
         }
 
         return [result];
@@ -50,14 +49,13 @@ export class SumFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        if (values === undefined) return;
 
         let result = 0;
         for (const value of values) {
-            if (typeof value === "number") result += value;
-            else return;
+            if (typeof value !== "number") throw new Error("Not a number argument");
+            result += value;
         }
 
         return [result];

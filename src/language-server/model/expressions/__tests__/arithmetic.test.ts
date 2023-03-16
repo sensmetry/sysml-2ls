@@ -15,11 +15,8 @@
  ********************************************************************************/
 
 /* eslint-disable quotes */
-import { services, parseKerML, NO_ERRORS } from "../../../../testing";
 import { LiteralInfinity } from "../../../generated/ast";
-import { FeatureMeta } from "../../KerML";
-
-const Evaluator = services.shared.modelLevelExpressionEvaluator;
+import { expectEvaluationResult } from "./util";
 
 test.concurrent.each([
     ["Literal number", "15", [15]],
@@ -29,7 +26,7 @@ test.concurrent.each([
     ["Literal boolean", "true", [true]],
     ["Literal boolean", "false", [false]],
     ["Literal string", '"string"', ["string"]],
-    ["Literal infinity", "*", [{ _ast: { $type: LiteralInfinity } }]],
+    ["Literal infinity", "*", [{ $type: LiteralInfinity }]],
     ["Division", "10 / 5", [2]],
     ["Modulo", "5 % 2", [1]],
     ["Multiplication", "5 * 2", [10]],
@@ -60,12 +57,9 @@ test.concurrent.each([
     ["Exponentiation", "2 ** 3", [8]],
     ["Exponentiation", "2 ^ 3", [8]],
 ])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[]) => {
-    const result = await parseKerML(`in feature a = ${body};`);
-    expect(result).toMatchObject(NO_ERRORS);
-
-    const feature = result.value.members[0].element?.$meta as FeatureMeta;
-    const expression = feature?.value?.element();
-    expect(expression).not.toBeUndefined();
-    if (!expression) return;
-    expect(Evaluator.evaluate(expression, feature)).toMatchObject(expected);
+    await expectEvaluationResult({
+        text: `in feature a = ${body};`,
+        langId: "kerml",
+        result: expected,
+    });
 });

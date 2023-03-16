@@ -76,7 +76,6 @@ import {
     isMetamodel,
     MetaCtor,
     META_FACTORY,
-    ModelLevelExpressionEvaluator,
     TransitionUsageMeta,
     TypeMeta,
     MetadataFeatureMeta,
@@ -104,6 +103,8 @@ import {
 import { AstParent, AstPropertiesFor, streamAst } from "../../../utils/ast-util";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { URI } from "vscode-uri";
+import { ModelUtil } from "../model-utils";
+import { SysMLExpressionEvaluator } from "../evaluator";
 
 const MetaclassPackages = [
     "KerML::Root::",
@@ -173,16 +174,6 @@ export interface MetamodelBuilder {
     getMetamodelErrors(document: LangiumDocument): readonly SysMLError[];
 }
 
-class ElementIdProvider {
-    private count = 0;
-
-    next(): number {
-        // sequential IDs are simple and fast but may not be best if used as
-        // hash keys
-        return this.count++;
-    }
-}
-
 // All linking of scope importing references (imports, specializations) has to
 // be done recursively unless synchronizing on additional document build stages
 
@@ -214,13 +205,13 @@ function builder<K extends SysMLType>(type: K | K[], order = 0) {
  * relationships
  */
 export class SysMLMetamodelBuilder implements MetamodelBuilder {
-    protected readonly idProvider = new ElementIdProvider();
+    protected readonly util: ModelUtil;
     protected readonly indexManager: SysMLIndexManager;
     protected readonly registry: ServiceRegistry;
     protected readonly config: SysMLConfigurationProvider;
     protected readonly astReflection: SysMLAstReflection;
     protected readonly statistics: Statistics;
-    protected readonly evaluator: ModelLevelExpressionEvaluator;
+    protected readonly evaluator: SysMLExpressionEvaluator;
 
     protected readonly metamodelErrors = new MultiMap<string, SysMLError>();
     protected readonly metaFactories: Partial<Record<string, MetaCtor<AstNode>>>;
@@ -231,8 +222,9 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         this.registry = services.ServiceRegistry;
         this.config = services.workspace.ConfigurationProvider;
         this.astReflection = services.AstReflection;
-        this.evaluator = services.modelLevelExpressionEvaluator;
+        this.evaluator = services.Evaluator;
         this.statistics = services.statistics;
+        this.util = services.Util;
 
         // TODO: these should be computed once and reused between multiple
         // instances of SysML services, testing may be easier by creating new
@@ -341,7 +333,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     ): SysMLTypeList[K]["$meta"] {
         const factory = this.metaFactories[type];
         if (!factory) throw new Error(`Invalid type for metamodel: ${type}`);
-        return factory(this.idProvider.next(), parent) as SysMLTypeList[K]["$meta"];
+        return factory(this.util.createId(), parent) as SysMLTypeList[K]["$meta"];
     }
 
     async preLink(
@@ -446,9 +438,9 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                     this.preLinkNode(metaclass);
 
                     // not assigning to any specific parent property
-                    feature = new MetadataFeatureMeta(this.idProvider.next(), node.$meta);
+                    feature = new MetadataFeatureMeta(this.util.createId(), node.$meta);
                     feature.annotates.push(node.$meta);
-                    const typing = new FeatureTypingMeta(builder.idProvider.next(), feature);
+                    const typing = new FeatureTypingMeta(this.util.createId(), feature);
                     typing.setElement(metaclass.$meta);
 
                     feature.addSpecialization(typing);
@@ -567,10 +559,19 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
                 const expr = value.ast();
                 if (expr) this.buildNode(expr, document);
-                const result = this.evaluator.evaluate(value, baseType)?.at(0);
-                if (!result || !isMetamodel(result) || !result.is(MetadataFeature)) continue;
+                const result = this.evaluator.evaluate(value, baseType);
+                if ("message" in result) {
+                    this.metamodelErrors.add(document.uriString, {
+                        message: result.message,
+                        node: result.stack.map((e) => e.ast()).find((a) => a) ?? node,
+                    });
+                    continue;
+                }
 
-                for (const annotated of result.annotates) {
+                const meta = result.at(0);
+                if (!meta || !isMetamodel(meta) || !meta.is(MetadataFeature)) continue;
+
+                for (const annotated of meta.annotates) {
                     if (!annotated.is(Type)) continue;
                     const specialization = this.constructMetamodel(
                         node.$meta.specializationKind(),

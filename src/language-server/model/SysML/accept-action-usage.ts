@@ -20,7 +20,6 @@ import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(AcceptActionUsage, {
     base: "Actions::acceptActions",
-    trigger: "Actions::acceptMessageActions",
     subactions: "Actions::Action::acceptSubactions",
 })
 export class AcceptActionUsageMeta extends ActionUsageMeta {

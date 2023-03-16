@@ -15,10 +15,8 @@
  ********************************************************************************/
 
 /* eslint-disable quotes */
-import { services, parseKerML, NO_ERRORS } from "../../../../testing";
-import { FeatureMeta } from "../../KerML";
+import { expectEvaluationResult } from "./util";
 
-const Evaluator = services.shared.modelLevelExpressionEvaluator;
 const PACKAGE = `
 package StringFunctions {
     ${["Length", "Substring"].map((f) => "abstract function " + f).join(";\n\t")};
@@ -28,20 +26,23 @@ package StringFunctions {
 test.concurrent.each([
     ["Length", 'StringFunctions::Length("string")', [6]],
     ["Length", 'StringFunctions::Length("")', [0]],
-    ["Length", "StringFunctions::Length(null)", undefined],
+    ["Length", "StringFunctions::Length(null)", expect.stringContaining("Not a string")],
     ["Substring", 'StringFunctions::Substring("string", 1, 4)', ["stri"]],
     ["Substring", 'StringFunctions::Substring("string", 3, 4)', ["ri"]],
-])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[] | undefined) => {
-    const result = await parseKerML(`feature a = ${body};` + PACKAGE, {
-        ignoreMetamodelErrors: true,
+])("%s (%s) can be evaluated", async (_: string, body: string, expected) => {
+    await expectEvaluationResult({
+        text:
+            PACKAGE +
+            `
+        in feature a = ${body};
+        `,
+        langId: "kerml",
+        ...(Array.isArray(expected)
+            ? { result: expected }
+            : {
+                  error: {
+                      message: expected,
+                  },
+              }),
     });
-    expect(result).toMatchObject(NO_ERRORS);
-
-    const feature = result.value.members[0].element?.$meta as FeatureMeta;
-    const expression = feature.value?.element();
-    expect(expression).not.toBeUndefined();
-    if (!expression) return;
-    const exprResult = Evaluator.evaluate(expression, feature);
-    if (expected) expect(exprResult).toMatchObject(expected);
-    else expect(exprResult).toBeUndefined();
 });

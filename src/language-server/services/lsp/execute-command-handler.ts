@@ -305,7 +305,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     ): unknown | undefined {
         const node = this.findCursorNode(editor)?.$meta;
         if (!node) return;
-        const evaluator = this.shared.modelLevelExpressionEvaluator;
+        const evaluator = this.shared.Evaluator;
         if (node.is(InlineExpression)) {
             let parent: Metamodel | undefined = node.owner();
             while (parent && !parent.is(Element)) parent = parent.owner();

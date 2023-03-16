@@ -3,6 +3,15 @@
 # Changelog
 
 <!-- Include links to comparison to the previous version -->
+
+## main
+
+### Changed
+
+- Updated to [2023-02 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-02)
+  - Indexing now uses `#(<sequence expression>)` syntax, `[...]` is now only
+    used for multiplicities and quantities
+
 ## 0.3.0
 
 ### Changed

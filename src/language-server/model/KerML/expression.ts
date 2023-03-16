@@ -22,7 +22,7 @@ import { StepMeta, TypeMeta } from "./_internal";
 
 export const ImplicitExpressions = {
     base: "Performances::evaluations",
-    enclosedPerformance: "Performances::Performance::enclosedEvaluations",
+    enclosedPerformance: "Performances::Performance::enclosedPerformances",
 };
 
 @metamodelOf(Expression, ImplicitExpressions)
@@ -41,9 +41,9 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
 
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
-        if (this.isOwnedPerformance()) supertypes.push("ownedPerformance");
-        if (this.isSubperformance()) supertypes.push("subperformance");
-        if (this.isEnclosedPerformance()) supertypes.push("enclosedPerformance");
+        if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
+        if (this.isBehaviorOwnedComposite()) supertypes.push("subperformance");
+        if (this.isBehaviorOwned()) supertypes.push("enclosedPerformance");
         return supertypes;
     }
 

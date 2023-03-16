@@ -9682,8 +9682,8 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "result",
-                "operator": "=",
+                "feature": "members",
+                "operator": "+=",
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
@@ -9762,6 +9762,48 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Alternatives",
                 "elements": [
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "type": {
+                          "$ref": "#/interfaces@81"
+                        },
+                        "feature": "operands",
+                        "operator": "+="
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "operator",
+                        "operator": "=",
+                        "terminal": {
+                          "$type": "Keyword",
+                          "value": "#"
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "("
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "operands",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@196"
+                          },
+                          "arguments": []
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": ")"
+                      }
+                    ]
+                  },
                   {
                     "$type": "Group",
                     "elements": [
@@ -31610,8 +31652,8 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "result",
-                "operator": "=",
+                "feature": "members",
+                "operator": "+=",
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
@@ -31690,6 +31732,48 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Alternatives",
                 "elements": [
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "type": {
+                          "$ref": "#/interfaces@81"
+                        },
+                        "feature": "operands",
+                        "operator": "+="
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "operator",
+                        "operator": "=",
+                        "terminal": {
+                          "$type": "Keyword",
+                          "value": "#"
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "("
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "operands",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@369"
+                          },
+                          "arguments": []
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": ")"
+                      }
+                    ]
+                  },
                   {
                     "$type": "Group",
                     "elements": [

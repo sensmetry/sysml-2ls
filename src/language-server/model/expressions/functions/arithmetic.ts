@@ -27,135 +27,131 @@ import {
 const PACKAGE = "DataFunctions";
 
 abstract class ArithmeticFunction extends BuiltinFunction {
-    protected unaryNumber(x: number): ExpressionResult | undefined {
-        return;
+    protected unaryNumber(x: number): ExpressionResult {
+        throw new Error("Cannot evaluate unary number");
     }
-    protected binaryNumber(x: number, y: number): ExpressionResult | undefined {
-        return;
+    protected binaryNumber(x: number, y: number): ExpressionResult {
+        throw new Error("Cannot evaluate binary numbers");
     }
-    protected binaryString(x: string, y: string): ExpressionResult | undefined {
-        return;
+    protected binaryString(x: string, y: string): ExpressionResult {
+        throw new Error("Cannot evaluate binary strings");
     }
 
     override call(
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const x = evaluator.asArgument(expression, 0, target);
-        const y = evaluator.asArgument(expression, 1, target);
 
         if (expression.args.length === 1) {
-            if (typeof x === "number") return this.wrap(this.unaryNumber(x));
-            return undefined;
+            if (typeof x === "number") return [this.unaryNumber(x)];
+            throw new Error("Expected a number argument");
         }
 
-        if (typeof x === "number" && typeof y === "number")
-            return this.wrap(this.binaryNumber(x, y));
-        if (typeof x === "string" && typeof y === "string")
-            return this.wrap(this.binaryString(x, y));
-        return;
-    }
-
-    private wrap(result?: ExpressionResult): ExpressionResult[] | undefined {
-        return result !== undefined ? [result] : undefined;
+        const y = evaluator.asArgument(expression, 1, target);
+        if (typeof x === "number" && typeof y === "number") return [this.binaryNumber(x, y)];
+        if (typeof x === "string" && typeof y === "string") return [this.binaryString(x, y)];
+        throw new Error("Mismatched argument types");
     }
 }
 
 @functionFor(PACKAGE, "'/'")
 export class DivideFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
-        return y !== 0 ? x / y : undefined;
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
+        if (y === 0) throw new Error("Cannot divide by 0");
+        return x / y;
     }
 }
 
 @functionFor(PACKAGE, "'%'")
 export class RemainderFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
-        return y !== 0 ? x % y : undefined;
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
+        if (y === 0) throw new Error("Cannot use modulo operation on 0");
+        return x % y;
     }
 }
 
 @functionFor(PACKAGE, "'*'")
 export class ProdFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x * y;
     }
 }
 
 @functionFor(PACKAGE, "'>'")
 export class GreaterThanFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x > y;
     }
 
-    protected override binaryString(x: string, y: string): ExpressionResult | undefined {
+    protected override binaryString(x: string, y: string): ExpressionResult {
         return x.localeCompare(y) > 0;
     }
 }
 
 @functionFor(PACKAGE, "'>='")
 export class GreaterEqualFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x >= y;
     }
 
-    protected override binaryString(x: string, y: string): ExpressionResult | undefined {
+    protected override binaryString(x: string, y: string): ExpressionResult {
         return x.localeCompare(y) >= 0;
     }
 }
 
 @functionFor(PACKAGE, "'<'")
 export class LessThanFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x < y;
     }
 
-    protected override binaryString(x: string, y: string): ExpressionResult | undefined {
+    protected override binaryString(x: string, y: string): ExpressionResult {
         return x.localeCompare(y) < 0;
     }
 }
 
 @functionFor(PACKAGE, "'<='")
 export class LessEqualFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x <= y;
     }
 
-    protected override binaryString(x: string, y: string): ExpressionResult | undefined {
+    protected override binaryString(x: string, y: string): ExpressionResult {
         return x.localeCompare(y) <= 0;
     }
 }
 
 @functionFor(PACKAGE, "'-'")
 export class SubtractionFunction extends ArithmeticFunction {
-    protected override unaryNumber(x: number): ExpressionResult | undefined {
+    protected override unaryNumber(x: number): ExpressionResult {
         return -x;
     }
 
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x - y;
     }
 }
 
 @functionFor(PACKAGE, "'+'")
 export class AdditionFunction extends ArithmeticFunction {
-    protected override unaryNumber(x: number): ExpressionResult | undefined {
+    protected override unaryNumber(x: number): ExpressionResult {
         return x;
     }
 
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return x + y;
     }
 
-    protected override binaryString(x: string, y: string): ExpressionResult | undefined {
+    protected override binaryString(x: string, y: string): ExpressionResult {
         return x.concat(y);
     }
 }
 
 @functionFor(PACKAGE, ["'**'", "'^'"])
 export class ExponentiationFunction extends ArithmeticFunction {
-    protected override binaryNumber(x: number, y: number): ExpressionResult | undefined {
+    protected override binaryNumber(x: number, y: number): ExpressionResult {
         return Math.pow(x, y);
     }
 }

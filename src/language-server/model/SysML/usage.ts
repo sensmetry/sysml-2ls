@@ -14,7 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { SubjectMembership, Usage, VariantMembership } from "../../generated/ast";
+import {
+    ActionDefinition,
+    ActionUsage,
+    PartDefinition,
+    PartUsage,
+    PortionKind,
+    StateSubactionMembership,
+    SubjectMembership,
+    Usage,
+    VariantMembership,
+} from "../../generated/ast";
 import { FeatureMeta } from "../KerML/feature";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 
@@ -24,6 +34,7 @@ export class UsageMeta extends FeatureMeta {
     isVariation = false;
     isIndividual = false;
     isReference = false;
+    portionKind?: PortionKind;
 
     constructor(id: ElementID, parent: ModelContainer<Usage>) {
         super(id, parent);
@@ -38,6 +49,7 @@ export class UsageMeta extends FeatureMeta {
         this.isAbstract ||= node.isVariation;
         this.isIndividual = node.isIndividual;
         this.isReference = node.isReference;
+        this.portionKind = node.portionKind;
     }
 
     override isIgnoredParameter(): boolean {
@@ -63,6 +75,27 @@ export class UsageMeta extends FeatureMeta {
             if (referenced) return referenced;
         }
         return super.namingFeature();
+    }
+
+    isNonEntryExitComposite(): boolean {
+        return this.isComposite && !this.isEntryExitAction();
+    }
+
+    isActionOwnedComposite(): boolean {
+        return (
+            this.isComposite &&
+            !this.isEntryExitAction() &&
+            this.owner().isAny([ActionDefinition, ActionUsage])
+        );
+    }
+
+    isPartOwnedComposite(): boolean {
+        return this.isComposite && this.owner().isAny([PartDefinition, PartUsage]);
+    }
+
+    isEntryExitAction(): boolean {
+        const parent = this.parent();
+        return parent.is(StateSubactionMembership) && parent.kind !== "do";
     }
 }
 

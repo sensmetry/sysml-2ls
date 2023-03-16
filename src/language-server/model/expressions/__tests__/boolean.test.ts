@@ -14,10 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { services, parseKerML, NO_ERRORS } from "../../../../testing";
-import { FeatureMeta } from "../../KerML";
-
-const Evaluator = services.shared.modelLevelExpressionEvaluator;
+import { expectEvaluationResult } from "./util";
 
 test.concurrent.each([
     ["And", "true & false", [false]],
@@ -35,12 +32,9 @@ test.concurrent.each([
     ["Not", "not true", [false]],
     ["Not", "not false", [true]],
 ])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[]) => {
-    const result = await parseKerML(`feature a = ${body};`);
-    expect(result).toMatchObject(NO_ERRORS);
-
-    const feature = result.value.members[0].element?.$meta as FeatureMeta;
-    const expression = feature.value?.element();
-    expect(expression).not.toBeUndefined();
-    if (!expression) return;
-    expect(Evaluator.evaluate(expression, feature)).toMatchObject(expected);
+    await expectEvaluationResult({
+        text: `in feature a = ${body};`,
+        langId: "kerml",
+        result: expected,
+    });
 });

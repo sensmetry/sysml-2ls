@@ -88,6 +88,12 @@ export class FeatureMeta extends TypeMeta {
 
     chainings: FeatureChainingMeta[] = [];
 
+    get chainingFeatures(): FeatureMeta[] {
+        return this.chainings
+            .map((chaining) => chaining.element())
+            .filter((e) => e) as FeatureMeta[];
+    }
+
     value?: FeatureValueMeta;
 
     constructor(elementId: ElementID, parent: ModelContainer<Feature>) {
@@ -169,7 +175,7 @@ export class FeatureMeta extends TypeMeta {
      * @returns true if this feature is owned by a behavior or step, false
      * otherwise
      */
-    protected isEnclosedPerformance(): boolean {
+    protected isBehaviorOwned(): boolean {
         const owner = this.owner();
         return owner.isAny([Behavior, Step]);
     }
@@ -178,8 +184,8 @@ export class FeatureMeta extends TypeMeta {
      * @returns true if this feature is composite and is enclosed performance,
      * false otherwise
      */
-    protected isSubperformance(): boolean {
-        return this.isComposite && this.isEnclosedPerformance();
+    protected isBehaviorOwnedComposite(): boolean {
+        return this.isComposite && this.isBehaviorOwned();
     }
 
     /**
@@ -195,7 +201,7 @@ export class FeatureMeta extends TypeMeta {
     /**
      * @returns same as {@link FeatureMeta.isSubobject isSubobject}
      */
-    protected isOwnedPerformance(): boolean {
+    protected isStructureOwnedComposite(): boolean {
         return this.isSubobject();
     }
 

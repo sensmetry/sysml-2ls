@@ -25,25 +25,25 @@ import {
 const PACKAGE = "ControlFunctions";
 
 abstract class ConditionalLogicalFunction extends BuiltinFunction {
-    protected abstract test(value: boolean | undefined): boolean;
+    protected abstract test(value: boolean): boolean;
     protected abstract result(): boolean;
 
     override call(
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const first = evaluator.asBoolean(expression, 0, target);
         if (this.test(first)) return [this.result()];
         const second = evaluator.asBoolean(expression, 1, target);
-        return second === undefined ? undefined : [second];
+        return [second];
     }
 }
 
 @functionFor(PACKAGE, "'and'")
 export class ConditionalAndFunction extends ConditionalLogicalFunction {
-    protected override test(value: boolean | undefined): boolean {
-        return value !== true;
+    protected override test(value: boolean): boolean {
+        return !value;
     }
 
     protected override result(): boolean {
@@ -53,8 +53,8 @@ export class ConditionalAndFunction extends ConditionalLogicalFunction {
 
 @functionFor(PACKAGE, "'implies'")
 export class ConditionalImpliesFunction extends ConditionalLogicalFunction {
-    protected override test(value: boolean | undefined): boolean {
-        return value !== true;
+    protected override test(value: boolean): boolean {
+        return !value;
     }
 
     protected override result(): boolean {
@@ -64,8 +64,8 @@ export class ConditionalImpliesFunction extends ConditionalLogicalFunction {
 
 @functionFor(PACKAGE, "'or'")
 export class ConditionalOrFunction extends ConditionalLogicalFunction {
-    protected override test(value: boolean | undefined): boolean {
-        return value === true;
+    protected override test(value: boolean): boolean {
+        return value;
     }
 
     protected override result(): boolean {
@@ -79,9 +79,8 @@ export class ConditionalFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const test = evaluator.asBoolean(expression, 0, target);
-        if (test === undefined) return undefined;
         return evaluator.evaluateArgument(expression, test ? 1 : 2, target);
     }
 }
@@ -101,10 +100,9 @@ export class NullCoalescingFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        if (values !== undefined && values.length === 0)
-            return evaluator.evaluateArgument(expression, 1, target);
+        if (values.length === 0) return evaluator.evaluateArgument(expression, 1, target);
         return values;
     }
 }

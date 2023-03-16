@@ -19,7 +19,6 @@ import { AstNodeLocator } from "langium/lib/workspace/ast-node-locator";
 import { MetamodelBuilder } from "./shared/workspace/metamodel-builder";
 import { SysMLParser } from "./parser/parser";
 import { SysMLConfig } from "./config";
-import { ModelLevelExpressionEvaluator } from "../model/expressions/util";
 import { Statistics } from "../utils/common";
 import { SysMLLanguageServer } from "./lsp/language-server";
 import { SysMLDocumentFactory } from "./shared/workspace/documents";
@@ -36,6 +35,8 @@ import { SysMLScopeComputation } from "./references/scope-computation";
 import { SysMLFileSystemProvider } from "./shared/workspace/file-system-provider";
 import { LanguageEvents, SharedEvents } from "./events";
 import { ExtensionManager } from "./shared/extension-manager";
+import { ModelUtil } from "./shared/model-utils";
+import { SysMLExpressionEvaluator } from "./shared/evaluator";
 
 export type SysMLAddedSharedServices = {
     workspace: {
@@ -54,11 +55,12 @@ export type SysMLAddedSharedServices = {
         LanguageServer: SysMLLanguageServer;
     };
     config: SysMLConfig;
-    modelLevelExpressionEvaluator: ModelLevelExpressionEvaluator;
+    Evaluator: SysMLExpressionEvaluator;
     statistics: Statistics;
     AstReflection: SysMLAstReflection;
     ExtensionManager: ExtensionManager;
     Events: SharedEvents;
+    Util: ModelUtil;
 };
 export type SysMLSharedServices = LangiumSharedServices & SysMLAddedSharedServices;
 
