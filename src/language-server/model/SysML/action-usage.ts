@@ -15,13 +15,7 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import {
-    ActionDefinition,
-    ActionUsage,
-    Feature,
-    PartDefinition,
-    PartUsage,
-} from "../../generated/ast";
+import { ActionUsage, PartDefinition, PartUsage } from "../../generated/ast";
 import { StepMeta } from "../KerML/step";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
@@ -31,6 +25,12 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     subaction: "Actions::Action::subactions",
     ownedAction: "Parts::Part::ownedActions",
     enclosedPerformance: "Performances::Performance::enclosedPerformances",
+    entry: "States::StateAction::entryAction",
+    do: "States::StateAction::doAction",
+    exit: "States::StateAction::exitAction",
+    trigger: "Actions::TransitionAction::accepter",
+    guard: "Actions::TransitionAction::guard",
+    effect: "Actions::TransitionAction::effect",
 })
 export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
     isParallel = false;
@@ -59,33 +59,21 @@ export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
         const supertypes = super.defaultGeneralTypes();
         const subactionType = this.getSubactionType();
         if (subactionType) supertypes.push(subactionType);
-        if (this.isOwnedPerformance()) supertypes.push("ownedPerformance");
-        else if (this.isEnclosedPerformance()) supertypes.push("enclosedPerformance");
+        if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
+        else if (this.isBehaviorOwned()) supertypes.push("enclosedPerformance");
         return supertypes;
     }
 
     getSubactionType(): string | undefined {
-        return this.isSubaction() ? "subaction" : this.isOwnedAction() ? "ownedAction" : undefined;
-    }
-
-    isSubaction(): boolean {
-        const parent = this.owner();
-        return (
-            parent.is(Feature) &&
-            parent.isComposite &&
-            parent.isAny([ActionUsage, ActionDefinition])
-        );
-    }
-
-    isOwnedAction(): boolean {
-        const parent = this.owner();
-        return (
-            parent.is(Feature) && parent.isComposite && parent.isAny([PartUsage, PartDefinition])
-        );
+        return this.isActionOwnedComposite()
+            ? "subaction"
+            : this.isPartOwnedComposite()
+            ? "ownedAction"
+            : undefined;
     }
 
     protected override isSuboccurrence(): boolean {
-        return super.isSuboccurrence() && !this.isSubaction();
+        return super.isSuboccurrence() && !this.isActionOwnedComposite();
     }
 
     isPerformedAction(): boolean {

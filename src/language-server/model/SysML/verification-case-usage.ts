@@ -33,7 +33,10 @@ export class VerificationCaseUsageMeta extends CaseUsageMeta {
 
     isSubVerificationCase(): boolean {
         const parent = this.owner();
-        return parent.isAny([VerificationCaseUsage, VerificationCaseDefinition]);
+        return (
+            this.isNonEntryExitComposite() &&
+            parent.isAny([VerificationCaseUsage, VerificationCaseDefinition])
+        );
     }
 
     override ast(): VerificationCaseUsage | undefined {

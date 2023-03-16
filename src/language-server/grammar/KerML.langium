@@ -166,46 +166,46 @@ FilterPackageMember returns ElementFilterMembership:
 RelationshipElement returns Relationship:
     Dependency
     | Specialization
-	| Conjugation
-	| FeatureTyping
-	| Subclassification
-	| Disjoining
-	| FeatureInverting
-	| Subsetting
-	| Redefinition
-	| TypeFeaturing
+    | Conjugation
+    | FeatureTyping
+    | Subclassification
+    | Disjoining
+    | FeatureInverting
+    | Subsetting
+    | Redefinition
+    | TypeFeaturing
 ;
 
 NonFeatureElement returns Namespace:
     Namespace
-	| Package
-	| LibraryPackage 
-	| Multiplicity
-	| Type
-	| Classifier 
-	| Class
-	| Structure
-	| Metaclass
-	| DataType 
-	| Association
-	| AssociationStructure
-	| Interaction
-	| Behavior
-	| SysMLFunction
-	| Predicate
+    | Package
+    | LibraryPackage 
+    | Multiplicity
+    | Type
+    | Classifier 
+    | Class
+    | Structure
+    | Metaclass
+    | DataType 
+    | Association
+    | AssociationStructure
+    | Interaction
+    | Behavior
+    | SysMLFunction
+    | Predicate
 ;
 
 FeatureElement returns Feature:
     Feature
-	| Step
-	| Expression
-	| BooleanExpression
-	| Invariant
-	| Connector
-	| BindingConnector
-	| Succession
-	| ItemFlow
-	| SuccessionItemFlow
+    | Step
+    | Expression
+    | BooleanExpression
+    | Invariant
+    | Connector
+    | BindingConnector
+    | Succession
+    | ItemFlow
+    | SuccessionItemFlow
 ;
 
 /* Packages */
@@ -318,10 +318,10 @@ OwnedFeatureMember returns FeatureMembership:
 
 Specialization returns Specialization:
     ( 'specialization' Identification? )? 'subtype' 
-	( source=TypeReference | chains+=OwnedFeatureChain )
+    ( source=TypeReference | chains+=OwnedFeatureChain )
     SpecializesToken
-	( reference=TypeReference | chains+=OwnedFeatureChain )
-	RelationshipBody
+    ( reference=TypeReference | chains+=OwnedFeatureChain )
+    RelationshipBody
 ;
 
 OwnedSpecialization returns Specialization:
@@ -335,7 +335,7 @@ Conjugation returns Conjugation:
     ( source=TypeReference | chains+=OwnedFeatureChain )
     ConjugatesToken
     ( reference=TypeReference | chains+=OwnedFeatureChain )
-	RelationshipBody
+    RelationshipBody
 ;
 
 OwnedConjugation returns Conjugation:
@@ -346,10 +346,10 @@ OwnedConjugation returns Conjugation:
 
 Disjoining returns Disjoining:
     ( 'disjoining' Identification? )? 'disjoint' 
-	( source=TypeReference  | chains+=OwnedFeatureChain )
-	'from' 
-	( reference=TypeReference | chains+=OwnedFeatureChain )
-	RelationshipBody
+    ( source=TypeReference  | chains+=OwnedFeatureChain )
+    'from' 
+    ( reference=TypeReference | chains+=OwnedFeatureChain )
+    RelationshipBody
 ;
 
 OwnedDisjoining returns Disjoining:
@@ -380,8 +380,8 @@ Classifier returns Classifier:
 
 fragment ClassifierDeclaration:
     Sufficient? Identification? ( multiplicity=OwnedMultiplicity )?
-	( SuperclassingPart | ClassifierConjugationPart )?
-	TypeRelationshipPart*
+    ( SuperclassingPart | ClassifierConjugationPart )?
+    TypeRelationshipPart*
 ;
 
 fragment SuperclassingPart:
@@ -417,26 +417,26 @@ ClassifierConjugation returns Conjugation:
 
 fragment FeaturePrefix:
     ( direction=FeatureDirectionKind )?
-	Abstract? ( isComposite='composite' | isPortion='portion' )? 
-	Readonly? Derived? End? PrefixMetadata?
+    Abstract? ( isComposite='composite' | isPortion='portion' )? 
+    Readonly? Derived? End? PrefixMetadata?
 ;
 
 Feature returns Feature:
     FeaturePrefix
-	( 'feature'? FeatureDeclaration
-	| prefixes+=PrefixMetadataMember
-	| 'feature'
-	) 
-	ValuePart? TypeBody
+    ( 'feature'? FeatureDeclaration
+    | prefixes+=PrefixMetadataMember
+    | 'feature'
+    ) 
+    ValuePart? TypeBody
 ;
 
 fragment FeatureDeclaration:
     Sufficient? 
-	( Identification ( FeatureSpecializationPart | FeatureConjugationPart )?
-	| FeatureSpecializationPart
-	| FeatureConjugationPart
-	)
-	FeatureRelationshipPart*
+    ( Identification ( FeatureSpecializationPart | FeatureConjugationPart )?
+    | FeatureSpecializationPart
+    | FeatureConjugationPart
+    )
+    FeatureRelationshipPart*
 ;
 
 fragment FeatureRelationshipPart:
@@ -453,18 +453,18 @@ fragment InvertingPart:
 
 fragment TypeFeaturingPart:
     'featured' 'by' typeRelationships+=OwnedTypeFeaturing 
-	( ',' typeRelationships+=OwnedTypeFeaturing )*
+    ( ',' typeRelationships+=OwnedTypeFeaturing )*
 ;
 
 fragment FeatureSpecializationPart:
     FeatureSpecialization+
     | FeatureSpecialization+ MultiplicityPart FeatureSpecialization*
-	| MultiplicityPart FeatureSpecialization*
+    | MultiplicityPart FeatureSpecialization*
 ;
 
 fragment MultiplicityPart:
     multiplicity=OwnedMultiplicity MultiplicityProperties?
-	| MultiplicityProperties
+    | MultiplicityProperties
 ;
 
 fragment FeatureSpecialization:
@@ -503,9 +503,9 @@ fragment Redefines:
 
 FeatureInverting returns FeatureInverting:
     ( 'inverting' Identification? )? 'inverse' 
-	( source=FeatureReference | chains+=OwnedFeatureChain )
-	'of' ( reference=FeatureReference | chains+=OwnedFeatureChain )
-	RelationshipBody
+    ( source=FeatureReference | chains+=OwnedFeatureChain )
+    'of' ( reference=FeatureReference | chains+=OwnedFeatureChain )
+    RelationshipBody
 ;
 
 OwnedFeatureInverting returns FeatureInverting:
@@ -516,8 +516,8 @@ OwnedFeatureInverting returns FeatureInverting:
 
 TypeFeaturing returns TypeFeaturing:
     'featuring' ( Identification? 'of')? source=FeatureReference
-	'by' reference=TypeReference
-	RelationshipBody
+    'by' reference=TypeReference
+    RelationshipBody
 ;
 
 OwnedTypeFeaturing returns TypeFeaturing:
@@ -540,7 +540,7 @@ Subsetting returns Subsetting:
     ( source=FeatureReference | chains+=OwnedFeatureChain )
     SubsetsToken
     ( reference=FeatureReference | chains+=OwnedFeatureChain )
-	RelationshipBody
+    RelationshipBody
 ;
 
 OwnedSubsetting returns Subsetting:
@@ -558,7 +558,7 @@ Redefinition returns Redefinition:
     ( source=FeatureReference | chains+=OwnedFeatureChain )
     RedefinesToken
     ( reference=FeatureReference | chains+=OwnedFeatureChain )
-	RelationshipBody
+    RelationshipBody
 ;
 
 OwnedRedefinition returns Redefinition:
@@ -579,8 +579,8 @@ FeatureConjugation returns Conjugation:
 
 fragment ValuePart:
     value=FeatureValue
-	| value=FeatureValueExpression
-	  write=EmptyFeatureWriteMember
+    | value=FeatureValueExpression
+      write=EmptyFeatureWriteMember
 ;
 
 FeatureValue returns FeatureValue:
@@ -597,7 +597,7 @@ EmptyFeatureWriteMember returns OwningMembership:
 
 EmptyFeatureWrite returns Step:
     members+=EmptyTargetMember
-	members+=EmptyParameterMember
+    members+=EmptyParameterMember
 ;
 
 EmptyTargetMember returns ParameterMembership:
@@ -700,13 +700,13 @@ fragment ConnectorDeclaration:
 
 fragment BinaryConnectorDeclaration:
     ( FeatureDeclaration? 'from' | Sufficient 'from'? )?
-	members+=ConnectorEndMember 'to' 
-	members+=ConnectorEndMember
+    members+=ConnectorEndMember 'to' 
+    members+=ConnectorEndMember
 ;
 
 fragment NaryConnectorDeclaration:
     FeatureDeclaration?
-	( '(' members+=ConnectorEndMember ( ',' members+=ConnectorEndMember )+ ')' )?
+    ( '(' members+=ConnectorEndMember ( ',' members+=ConnectorEndMember )+ ')' )?
 ;
 
 ConnectorEndMember returns EndFeatureMembership:
@@ -715,7 +715,7 @@ ConnectorEndMember returns EndFeatureMembership:
 
 ConnectorEnd returns Feature:
     ( RegularName ReferencesToken )? typeRelationships+=OwnedReferenceSubsetting
-	( multiplicity=OwnedMultiplicity )?
+    ( multiplicity=OwnedMultiplicity )?
 ;
 
 /* Binding Connectors */
@@ -726,7 +726,7 @@ BindingConnector returns BindingConnector:
 
 fragment BindingConnectorDeclaration:
     FeatureDeclaration ( 'of' members+=ConnectorEndMember '=' members+=ConnectorEndMember )?
-	| Sufficient? ( 'of'? members+=ConnectorEndMember '=' members+=ConnectorEndMember )?
+    | Sufficient? ( 'of'? members+=ConnectorEndMember '=' members+=ConnectorEndMember )?
 ;
 
 /* Successions */
@@ -774,12 +774,12 @@ fragment FunctionBodyPart:
     ( namespaceMembers+=NonFeatureMember 
     | annotatingMembers+=AnnotatingMember
     | relationshipMembers+=RelationshipMember
-	| members+=FeatureMember 
-	| aliases+=AliasMember
-	| imports+=Import
-	| members+=ReturnFeatureMember
-	)* 
-	( result=ResultExpressionMember )?
+    | members+=FeatureMember 
+    | aliases+=AliasMember
+    | imports+=Import
+    | members+=ReturnFeatureMember
+    )* 
+    ( result=ResultExpressionMember )?
 ;
 
 ReturnFeatureMember returns ReturnParameterMembership:
@@ -838,7 +838,7 @@ SuccessionItemFlow returns SuccessionItemFlow:
 
 fragment ItemFlowDeclaration:
     FeatureDeclaration? ValuePart? ( 'of'  members+=ItemFeatureMember )?
-	  ( 'from' members+=ItemFlowEndMember 'to' members+=ItemFlowEndMember )?
+      ( 'from' members+=ItemFlowEndMember 'to' members+=ItemFlowEndMember )?
     | Sufficient? members+=ItemFlowEndMember 'to' members+=ItemFlowEndMember
 ;
 
@@ -854,7 +854,7 @@ ItemFeature returns ItemFeature:
 
 fragment ItemFeatureSpecializationPart:
     ( FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
-	| MultiplicityPart FeatureSpecialization+
+    | MultiplicityPart FeatureSpecialization+
 ;
 
 ItemFlowEndMember returns EndFeatureMembership:
@@ -905,8 +905,8 @@ PrefixMetadataFeature returns MetadataFeature:
 
 MetadataFeature returns MetadataFeature:
     ( '@' | 'metadata' ) MetadataFeatureDeclaration 
-	( 'about' about+=Annotation ( ',' about+=Annotation )* )?
-	MetadataBody
+    ( 'about' about+=Annotation ( ',' about+=Annotation )* )?
+    MetadataBody
 ;
 
 fragment MetadataFeatureDeclaration:
@@ -936,8 +936,8 @@ MetadataBodyFeatureMember returns FeatureMembership:
 
 MetadataBodyFeature returns Feature:
     'feature'? RedefinesToken? typeRelationships+=OwnedRedefinition 
-	FeatureSpecializationPart? ValuePart?
-	MetadataBody
+    FeatureSpecializationPart? ValuePart?
+    MetadataBody
 ;
 
 
@@ -1049,10 +1049,10 @@ ClassificationExpression returns Expression:
         )
     )?
     // Note: empty rule breaks parsing here 
-	| {OperatorExpression} /* operands+=SelfReferenceExpression */ operator=ClassificationTestOperator members+=TypeReferenceMember
-	| {OperatorExpression} operands+=MetadataReference operator='@@' members+=TypeReferenceMember
-	| {OperatorExpression} /* operands+=SelfReferenceExpression */ operator='as' members+=TypeResultMember
-	| {OperatorExpression} operands+=MetadataReference operator='meta' members+=TypeResultMember
+    | {OperatorExpression} /* operands+=SelfReferenceExpression */ operator=ClassificationTestOperator members+=TypeReferenceMember
+    | {OperatorExpression} operands+=MetadataReference operator='@@' members+=TypeReferenceMember
+    | {OperatorExpression} /* operands+=SelfReferenceExpression */ operator='as' members+=TypeResultMember
+    | {OperatorExpression} operands+=MetadataReference operator='meta' members+=TypeResultMember
 ;
 
 // Relational Expressions
@@ -1091,7 +1091,7 @@ UnaryExpression returns Expression:
 // Extent Expressions
 
 ExtentExpression returns Expression:
-    {OperatorExpression} operator='all' result=TypeResultMember
+    {OperatorExpression} operator='all' members+=TypeResultMember
     | PrimaryExpression
 ;
 
@@ -1099,8 +1099,9 @@ ExtentExpression returns Expression:
 
 PrimaryExpression returns Expression:
     BaseExpression
-	( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
-	(   ( {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
+    ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+    (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
+        | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
         | {OperatorExpression.operands+=current} '->' typeRelationships+=ReferenceTyping 
             ( members+=ExpressionBodyMember
             | members+=FunctionReferenceMember
@@ -1110,7 +1111,7 @@ PrimaryExpression returns Expression:
         | {SelectExpression.operands+=current} '.?' members+=ExpressionBodyMember // select
         )
         ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
-	)*
+    )*
 ;
 
 // Base Expressions
@@ -1119,10 +1120,10 @@ BaseExpression returns Expression:
     NullExpression
     | LiteralExpression 
     | FeatureReferenceExpression 
-	| MetadataAccessExpression
-	| InvocationExpression 
-	| BodyExpression
-	| '(' SequenceExpression ')'
+    | MetadataAccessExpression
+    | InvocationExpression 
+    | BodyExpression
+    | '(' SequenceExpression ')'
 ;
 
 // Expression Bodies

@@ -24,9 +24,11 @@ import { ConnectionUsageMeta } from "./connection-usage";
 @metamodelOf(FlowConnectionUsage, {
     base: "Connections::flowConnections",
     message: "Connections::messageConnections",
-    enclosedPerformance: "Performances::Performance::enclosedTransfers",
+    enclosedPerformance: "Performances::Performance::enclosedPerformances",
     subperformance: "Performances::Performance::subperformances",
     ownedPerformance: "Objects::Object::ownedPerformances",
+    subaction: "Actions::Action::subactions",
+    ownedAction: "Parts::Part::ownedActions",
 })
 export class FlowConnectionUsageMeta extends Mixin(
     ConnectionUsageMeta,
@@ -39,9 +41,12 @@ export class FlowConnectionUsageMeta extends Mixin(
 
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
-        if (this.isOwnedPerformance()) supertypes.push("ownedPerformance");
-        if (this.isSubperformance()) supertypes.push("subperformance");
-        if (this.isEnclosedPerformance()) supertypes.push("enclosedPerformance");
+        if (this.isPartOwnedComposite()) supertypes.push("ownedAction");
+        else if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
+
+        if (this.isActionOwnedComposite()) supertypes.push("subaction");
+        else if (this.isBehaviorOwnedComposite()) supertypes.push("subperformance");
+        else if (this.isBehaviorOwned()) supertypes.push("enclosedPerformance");
 
         return supertypes;
     }

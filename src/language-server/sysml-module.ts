@@ -56,7 +56,6 @@ import { SysMLExecuteCommandHandler } from "./services/lsp/execute-command-handl
 import { SysMLWorkspaceManager } from "./services/shared/workspace/workspace-manager";
 import { SysMLDocumentFactory } from "./services/shared/workspace/documents";
 import { DefaultSysMLConfig, SysMLConfig } from "./services/config";
-import { BuiltinFunctionEvaluator } from "./model/expressions/evaluator";
 import { mergeWithPartial, PartialKeys, Statistics } from "./utils/common";
 import { SysMLSemanticTokenProvider } from "./services/lsp/semantic-token-provider";
 import { SysMLLanguageServer } from "./services/lsp/language-server";
@@ -70,6 +69,8 @@ import { SysMLValidator } from "./services/validation/sysml-validator";
 import { SysMLFileSystemProvider } from "./services/shared/workspace/file-system-provider";
 import { LanguageEvents, SharedEvents } from "./services/events";
 import { ExtensionManager } from "./services/shared/extension-manager";
+import { ModelUtil } from "./services/shared/model-utils";
+import { SysMLExpressionEvaluator } from "./services/shared/evaluator";
 
 /**
  * Dependency injection module that overrides Langium default services and
@@ -144,10 +145,11 @@ export const SysMLSharedModule: Module<
         LanguageServer: (services) => new SysMLLanguageServer(services),
     },
     config: () => DefaultSysMLConfig as SysMLConfig,
-    modelLevelExpressionEvaluator: () => new BuiltinFunctionEvaluator(),
+    Evaluator: (services) => new SysMLExpressionEvaluator(services),
     statistics: () => new Statistics(),
     ExtensionManager: (services) => new ExtensionManager(services),
     Events: () => new SharedEvents(),
+    Util: () => new ModelUtil(),
 };
 
 export interface SharedModuleContext extends DefaultSharedModuleContext {

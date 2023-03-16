@@ -20,6 +20,8 @@ import { UsageMeta } from "./usage";
 
 @metamodelOf(OccurrenceUsage, {
     base: "Occurrences::occurrences",
+    timeslice: "Occurrences::Occurrence::timeSlices",
+    snapshot: "Occurrences::Occurrence::snapshots",
 })
 export class OccurrenceUsageMeta extends UsageMeta {
     constructor(id: ElementID, parent: ModelContainer<OccurrenceUsage>) {
@@ -29,6 +31,8 @@ export class OccurrenceUsageMeta extends UsageMeta {
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isSuboccurrence()) supertypes.push("suboccurrence");
+        if (this.portionKind) supertypes.push(this.portionKind);
+
         return supertypes;
     }
 

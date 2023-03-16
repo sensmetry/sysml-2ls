@@ -28,6 +28,7 @@ import { ConstraintUsageMeta } from "./constraint-usage";
 @metamodelOf(RequirementUsage, {
     base: "Requirements::requirementChecks",
     subrequirement: "Requirements::RequirementCheck::subrequirements",
+    verification: "VerificationCases::VerificationCase::obj::requirementVerifications",
 })
 export class RequirementUsageMeta extends ConstraintUsageMeta {
     constructor(id: ElementID, parent: ModelContainer<RequirementUsage>) {
@@ -50,6 +51,12 @@ export class RequirementUsageMeta extends ConstraintUsageMeta {
     isSubrequirement(): boolean {
         if (this.requirementConstraintKind() === "assumption") return false;
         return this.isComposite && this.owner().isAny([RequirementUsage, RequirementDefinition]);
+    }
+
+    override requirementConstraintSupertype(): string | undefined {
+        return this.isVerifiedRequirement()
+            ? "verification"
+            : super.requirementConstraintSupertype();
     }
 
     override ast(): RequirementUsage | undefined {

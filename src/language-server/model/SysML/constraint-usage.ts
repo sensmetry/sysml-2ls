@@ -30,7 +30,7 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
 @metamodelOf(ConstraintUsage, {
     base: "Constraints::constraintChecks",
     checkedConstraint: "Items::Item::checkedConstraints",
-    enclosedPerformance: "Performances::Performance::enclosedEvaluations",
+    enclosedPerformance: "Performances::Performance::enclosedPerformances",
     subperformance: "Performances::Performance::subperformances",
     ownedPerformance: "Objects::Object::ownedPerformances",
     assumption: "Requirements::RequirementCheck::assumptions",
@@ -42,17 +42,14 @@ export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, Occurrence
     }
 
     override defaultGeneralTypes(): string[] {
-        const supertypes = super.defaultGeneralTypes();
-
-        // pushing front to match pilot
-        // https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/blob/master/org.omg.sysml/src/org/omg/sysml/adapter/ConstraintUsageAdapter.java#L85
-        const constraintKind = this.requirementConstraintKind();
-        if (constraintKind) supertypes.unshift(constraintKind);
+        const supertype = this.requirementConstraintSupertype();
+        const supertypes = supertype ? [supertype] : [];
+        supertypes.push(...super.defaultGeneralTypes());
 
         if (this.isCheckedConstraint()) supertypes.push("checkedConstraint");
-        if (this.isOwnedPerformance()) supertypes.push("ownedPerformance");
-        if (this.isSubperformance()) supertypes.push("subperformance");
-        if (this.isEnclosedPerformance()) supertypes.push("enclosedPerformance");
+        if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
+        if (this.isBehaviorOwnedComposite()) supertypes.push("subperformance");
+        if (this.isBehaviorOwned()) supertypes.push("enclosedPerformance");
 
         return supertypes;
     }
@@ -85,6 +82,10 @@ export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, Occurrence
         return this.requirementConstraintKind()
             ? this.referencedFeature(ConstraintUsage)
             : super.namingFeature();
+    }
+
+    requirementConstraintSupertype(): string | undefined {
+        return this.requirementConstraintKind();
     }
 }
 

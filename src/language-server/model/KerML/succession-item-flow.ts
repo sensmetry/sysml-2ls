@@ -21,7 +21,7 @@ import { ItemFlowMeta, SuccessionMeta } from "./_internal";
 
 export const ImplicitSuccessionItemFlows = {
     base: "Transfers::flowTransfersBefore",
-    enclosedperformance: "Performances::Performance::enclosedTransfersBefore",
+    enclosedperformance: "Performances::Performance::enclosedPerformances",
     subperformance: "Performances::Performance::subperformances",
     ownedPerformance: "Objects::Object::ownedPerformances",
 };

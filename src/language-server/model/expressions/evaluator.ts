@@ -18,6 +18,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
     ElementReference,
+    Expression,
+    Feature,
     FeatureReference,
     FeatureReferenceExpression,
     InlineExpression,
@@ -27,7 +29,9 @@ import {
     LiteralNumber,
     LiteralString,
     MetadataAccessExpression,
+    MetadataFeature,
     NullExpression,
+    Redefinition,
     Type,
     TypeReference,
 } from "../../generated/ast";
@@ -38,6 +42,7 @@ import {
     ElementReferenceMeta,
     FeatureMeta,
     FeatureReferenceExpressionMeta,
+    FeatureTypingMeta,
     InvocationExpressionMeta,
     LiteralBooleanMeta,
     LiteralInfinityMeta,
@@ -47,21 +52,26 @@ import {
     TypeMeta,
 } from "../KerML";
 import { Metamodel, Property } from "../metamodel";
-import { typeIndex, TypeMap } from "../types";
 import {
     builtinFunction,
     Evaluable,
     ExpressionResult,
+    isMetaclassFeature,
     ModelLevelExpressionEvaluator,
 } from "./util";
+import { SysMLSharedServices } from "../../services/services";
+import { ModelUtil } from "../../services/shared/model-utils";
+import { SysMLIndexManager } from "../../services/shared/workspace/index-manager";
 
 // import last
 import "./functions";
+import { LangiumDocument } from "langium";
+import { typeIndex, TypeMap } from "../types";
 
-type EvaluatorFunction<T = Metamodel> = (
+export type EvaluatorFunction<T = Metamodel> = (
     expression: T,
     target: ElementMeta
-) => ExpressionResult[] | undefined;
+) => ExpressionResult[];
 type EvaluatorMap = {
     [K in SysMLType]?: EvaluatorFunction<Property<SysMLTypeList[K], "$meta">>;
 };
@@ -78,18 +88,83 @@ function evaluates<K extends SysMLType>(...type: K[]) {
     };
 }
 
+export function defaultEvaluators(): Map<string, EvaluatorFunction> {
+    return typeIndex.expandToDerivedTypes(Evaluators as TypeMap<SysMLType, EvaluatorFunction>);
+}
+
 export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     protected readonly evaluators: Map<string, EvaluatorFunction>;
+    protected readonly util: ModelUtil;
+    protected readonly index: SysMLIndexManager;
+    protected readonly stack: ElementMeta[] = [];
 
-    constructor() {
-        this.evaluators = typeIndex.expandToDerivedTypes(
-            Evaluators as TypeMap<SysMLType, EvaluatorFunction>
-        );
+    constructor(services: SysMLSharedServices, evaluators: Map<string, EvaluatorFunction>) {
+        this.evaluators = evaluators;
+        this.util = services.Util;
+        this.index = services.workspace.IndexManager;
     }
 
-    evaluate(expression: Evaluable, target: ElementMeta): ExpressionResult[] | undefined {
+    get currentEvaluationStack(): readonly ElementMeta[] {
+        return this.stack;
+    }
+
+    libraryType(qualifiedName: string, context?: ElementMeta): TypeMeta | undefined {
+        let document: LangiumDocument | undefined;
+        if (context) {
+            let root: ElementMeta = context;
+            for (;;) {
+                const owner = root.owner();
+                if (!owner) break;
+                root = owner;
+            }
+
+            document = root.ast()?.$document;
+        }
+        return this.index.findType(qualifiedName, document);
+    }
+
+    evaluate(expression: Evaluable, target: ElementMeta): ExpressionResult[] {
+        this.stack.push(expression);
         const evaluator = this.evaluators.get(expression.nodeType());
-        return evaluator ? evaluator.call(this, expression, target) : [];
+        if (evaluator) {
+            const result = evaluator.call(this, expression, target);
+            this.stack.pop();
+            return result;
+        }
+
+        throw new Error(`No evaluator found for ${expression.nodeType()}`);
+    }
+
+    targetFeatureFor(target: ElementMeta): FeatureMeta {
+        if (target.is(Feature)) return target;
+
+        const feature = new FeatureMeta(this.util.createId(), target);
+        if (target.is(Type)) {
+            const typing = new FeatureTypingMeta(this.util.createId(), feature);
+            typing.isImplied = true;
+            typing.setElement(target);
+            feature.addSpecialization(typing);
+        }
+
+        return feature;
+    }
+
+    evaluateFeatureChain(features: FeatureMeta[], type: TypeMeta): ExpressionResult[] {
+        if (features.length === 0) return [];
+        const values = this.evaluateFeature(features[0], type);
+        if (features.length === 1) return values;
+
+        const subchain = features.slice(1);
+        return values.flatMap((value) => {
+            if (typeof value !== "object" || !value.is(Type)) return [value];
+
+            const target = value.is(Feature)
+                ? type === value
+                    ? value
+                    : this.util.chainFeatures(value, this.targetFeatureFor(type), value)
+                : type;
+            return this.evaluateFeatureChain(subchain, target);
+        });
     }
 
     @evaluates(NullExpression)
@@ -113,59 +188,59 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         expression: InvocationExpressionMeta,
         index: number,
         target: ElementMeta
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const arg = expression.args.at(index);
-        if (!arg) return undefined;
+        if (!arg) throw new Error(`Missing argument at position ${index}`);
         if (arg.value) {
             const expr = arg.value.element();
-            return expr ? this.evaluate(expr, target) : undefined;
+            if (!expr) {
+                this.stack.push(arg, arg.value);
+                throw new Error("Missing value expression");
+            }
+            return this.evaluate(expr, target);
         }
         return this.evaluate(arg, target);
     }
 
-    asBoolean(
-        expression: InvocationExpressionMeta,
-        index: number,
-        target: ElementMeta
-    ): boolean | undefined {
+    asBoolean(expression: InvocationExpressionMeta, index: number, target: ElementMeta): boolean {
         const value = this.asArgument(expression, index, target);
-        return typeof value === "boolean" ? value : undefined;
+        if (typeof value !== "boolean") {
+            throw new Error("Not a boolean");
+        }
+        return value;
     }
 
-    asString(
-        expression: InvocationExpressionMeta,
-        index: number,
-        target: ElementMeta
-    ): string | undefined {
+    asString(expression: InvocationExpressionMeta, index: number, target: ElementMeta): string {
         const value = this.asArgument(expression, index, target);
-        return typeof value === "string" ? value : undefined;
+        if (typeof value !== "string") {
+            throw new Error("Not a string");
+        }
+        return value;
     }
 
-    asNumber(
-        expression: InvocationExpressionMeta,
-        index: number,
-        target: ElementMeta
-    ): number | undefined {
+    asNumber(expression: InvocationExpressionMeta, index: number, target: ElementMeta): number {
         const value = this.asArgument(expression, index, target);
-        return typeof value === "number" ? value : undefined;
+        if (typeof value !== "number") {
+            throw new Error("Not a number");
+        }
+        return value;
     }
 
     asArgument(
         expression: InvocationExpressionMeta,
         index: number,
         target: ElementMeta
-    ): ExpressionResult | undefined {
+    ): ExpressionResult | null {
         const values = this.evaluateArgument(expression, index, target);
-        if (values === undefined || values.length > 1) return undefined;
+        if (values.length > 1) {
+            throw new Error("Too many values, expected 1");
+        }
+
+        if (values.length === 0) return null;
         return values[0];
     }
 
-    equal(
-        left?: ExpressionResult | undefined,
-        right?: ExpressionResult | undefined
-    ): boolean | undefined {
-        if (left === undefined) return right === undefined;
-        if (right === undefined) return false;
+    equal(left?: ExpressionResult | null, right?: ExpressionResult | null): boolean {
         return left === right;
     }
 
@@ -173,11 +248,11 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     evaluateInvocation(
         expression: InvocationExpressionMeta,
         target: ElementMeta
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const fn = expression.getFunction();
-        if (!fn) return;
+        if (!fn) throw new Error("No associated function found");
         const builtin = builtinFunction(fn);
-        if (!builtin) return;
+        if (!builtin) throw new Error("No associated builtin function found");
         return builtin.call(expression, target, this);
     }
 
@@ -185,26 +260,33 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     evaluateFeatureReference(
         expression: FeatureReferenceExpressionMeta,
         target: ElementMeta
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const referenced = expression.expression?.element();
-        if (!referenced) return undefined;
+        if (!referenced) throw new Error("No referenced element");
         const type = target.is(Type) ? target : undefined;
         if (referenced.is(FeatureReference)) {
             const feature = referenced.to.target;
-            return type && feature ? this.evaluateFeature(feature, type) : undefined;
+            if (!feature) throw new Error("No linked reference");
+            if (!type)
+                throw new Error(
+                    "Cannot evaluate feature reference expression in a non-type context"
+                );
+            return this.evaluateFeature(feature, type);
         }
         if (referenced.is(TypeReference)) return this.evaluateReference(referenced);
         if (referenced.is(InlineExpression)) return this.evaluate(referenced, target);
-        return type ? this.evaluateFeature(referenced, type) : undefined;
+        if (!type)
+            throw new Error("Cannot evaluate feature reference expression in a non-type context");
+        return this.evaluateFeature(referenced, type);
     }
 
     @evaluates(MetadataAccessExpression)
     evaluateMetadataAccess(
         expression: MetadataAccessExpressionMeta,
         target: ElementMeta
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const referenced = expression.reference;
-        if (!referenced) return;
+        if (!referenced) throw new Error("No linked reference");
 
         const features = [...referenced.allMetadata()];
         if (referenced.metaclass) features.push(referenced.metaclass);
@@ -212,20 +294,44 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         return features;
     }
 
-    protected evaluateFeature(
-        feature: FeatureMeta,
-        type: TypeMeta
-    ): ExpressionResult[] | undefined {
-        if (
-            feature
-                .allTypes(undefined, true)
-                .some((s) => s.qualifiedName === "Base::Anything::self")
-        ) {
-            // TODO: pilot wraps type through feature typing if it is not a
-            // feature
-            return [type];
+    protected evaluateFeature(feature: FeatureMeta, type: TypeMeta): ExpressionResult[] {
+        if (feature.conforms("Base::Anything::self")) {
+            return [this.targetFeatureFor(type)];
         }
-        // TODO: implement feature chains
+
+        if (feature.chainings.length > 0) {
+            return this.evaluateFeatureChain(feature.chainingFeatures, type);
+        }
+
+        const types =
+            type.is(Feature) && type.chainings.length > 0 ? type.chainingFeatures : [type];
+
+        for (const t of types.reverse()) {
+            if (
+                t.is(MetadataFeature) &&
+                feature.conforms("Metaobjects::Metaobject::annotatedElement")
+            ) {
+                const annotated = t.annotates.at(0) ?? t.owner();
+                return annotated.metaclass ? [annotated.metaclass] : [];
+            }
+
+            if (isMetaclassFeature(t)) {
+                if (feature.is(Expression)) continue;
+                // TODO: reflection
+                return [];
+            }
+
+            // need to find the corresponding feature in `t` which can be
+            // evaluated
+            const target = t.features
+                .map((member) => member.element())
+                .find((f) => f?.allTypes(Redefinition).includes(feature));
+
+            if (target) {
+                const value = target.value?.element();
+                if (value) return this.evaluate(value, t);
+            }
+        }
 
         const value = feature.value?.element();
         if (value) {
@@ -236,9 +342,9 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     }
 
     @evaluates(ElementReference)
-    evaluateReference(ref: ElementReferenceMeta): ElementMeta[] | undefined {
+    evaluateReference(ref: ElementReferenceMeta): ElementMeta[] {
         const target = ref.to.target;
-        if (!target) return undefined;
+        if (!target) throw new Error("No linked reference");
         return [target];
     }
 }

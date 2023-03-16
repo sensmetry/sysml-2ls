@@ -23,6 +23,7 @@ import { FlowConnectionUsageMeta } from "./flow-connection-usage";
 @metamodelOf(SuccessionFlowConnectionUsage, {
     base: "Connections::successionFlowConnections",
     subperformance: "Performances::Performance::subtransfersBefore",
+    message: "Connections::successionFlowConnections",
 })
 export class SuccessionFlowConnectionUsageMeta extends Mixin(
     FlowConnectionUsageMeta,

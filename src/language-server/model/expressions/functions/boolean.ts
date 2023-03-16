@@ -27,56 +27,50 @@ import {
 const PACKAGE = "DataFunctions";
 
 abstract class BooleanFunction extends BuiltinFunction {
-    protected unary(x: boolean): ExpressionResult | undefined {
-        return;
+    protected unary(x: boolean): ExpressionResult {
+        throw new Error("Unary function is not implemented");
     }
 
-    protected binary(x: boolean, y: boolean): ExpressionResult | undefined {
-        return;
+    protected binary(x: boolean, y: boolean): ExpressionResult {
+        throw new Error("Binary function is not implemented");
     }
 
     override call(
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const x = evaluator.asBoolean(expression, 0, target);
+        if (expression.args.length === 1) return [this.unary(x)];
         const y = evaluator.asBoolean(expression, 1, target);
-        if (x === undefined) return;
-        const result =
-            expression.args.length === 1
-                ? this.unary(x)
-                : y === undefined
-                ? undefined
-                : this.binary(x, y);
-        return result !== undefined ? [result] : undefined;
+        return [this.binary(x, y)];
     }
 }
 
 @functionFor(PACKAGE, "'&'")
 export class AndFunction extends BooleanFunction {
-    protected override binary(x: boolean, y: boolean): ExpressionResult | undefined {
+    protected override binary(x: boolean, y: boolean): ExpressionResult {
         return x && y;
     }
 }
 
 @functionFor(PACKAGE, "'|'")
 export class OrFunction extends BooleanFunction {
-    protected override binary(x: boolean, y: boolean): ExpressionResult | undefined {
+    protected override binary(x: boolean, y: boolean): ExpressionResult {
         return x || y;
     }
 }
 
 @functionFor(PACKAGE, "'not'")
 export class NotFunction extends BooleanFunction {
-    protected override unary(x: boolean): ExpressionResult | undefined {
+    protected override unary(x: boolean): ExpressionResult {
         return !x;
     }
 }
 
 @functionFor(PACKAGE, "'xor'")
 export class XorFunction extends BooleanFunction {
-    protected override binary(x: boolean, y: boolean): ExpressionResult | undefined {
+    protected override binary(x: boolean, y: boolean): ExpressionResult {
         return x !== y;
     }
 }

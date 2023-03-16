@@ -47,14 +47,22 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     }
 
     override returnType(): string | TypeMeta | undefined {
+        const result = this.resultParameter();
+        if (result) return result.element()?.returnType();
+
+        const returns = this.returnParameter();
+        if (returns) return returns.element();
+
         if (this.operator === "'as'" || this.operator === "'meta'") {
             // cast operators should be treated as its type arguments
             return typeArgument(this);
         }
-        if (this.operator === "'['") {
-            // TODO: indexing with a feature (like SI::mm) should probably
-            // return args[1]
+        if (this.operator === "'#'") {
             return typeOf(this.args[0]);
+        }
+        if (this.operator === "'['") {
+            // this is not used for indexing but setting units
+            return typeOf(this.args[1]);
         }
         return super.returnType();
     }

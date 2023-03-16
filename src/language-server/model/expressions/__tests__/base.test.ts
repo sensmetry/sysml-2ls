@@ -14,10 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { services, parseKerML, NO_ERRORS, sanitizeTree } from "../../../../testing";
-import { FeatureMeta } from "../../KerML";
-
-const Evaluator = services.shared.modelLevelExpressionEvaluator;
+import { expectEvaluationResult } from "./util";
 
 test.concurrent.each([
     ["Cast", "B as A", [{ qualifiedName: "B" }]],
@@ -46,22 +43,54 @@ test.concurrent.each([
     ["Is type", "C istype A", [true]],
     ["Is type", "A istype B", [false]],
     // Yay for 1-based indexing.............
-    ["Indexing", "(B meta M)[1]", [{ qualifiedName: "B::Meta" }]],
-    ["Indexing", "(B meta M)[2]", [{ qualifiedName: "B::Meta2" }]],
+    ["Indexing", "(B meta M)#(1)", [{ qualifiedName: "B::Meta" }]],
+    ["Indexing", "(B meta M)#(2)", [{ qualifiedName: "B::Meta2" }]],
     ["Sequence", "(1,2,3,4)", [1, 2, 3, 4]],
     ["Sequence", "(1,2,3,A)", [1, 2, 3, { qualifiedName: "A" }]],
-])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[] | undefined) => {
-    const result = await parseKerML(
-        `feature a = ${body}; feature A; feature B : A { @Meta: M; @Meta2: M; } feature C : B; metaclass M;`
-    );
-    expect(result).toMatchObject(NO_ERRORS);
+])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[]) => {
+    await expectEvaluationResult({
+        text: `feature A; feature B : A { @Meta: M; @Meta2: M; } feature C : B; metaclass M; feature a = ${body};`,
+        langId: "kerml",
+        result: expected,
+    });
+});
 
-    const feature = result.value.members[0].element?.$meta as FeatureMeta;
-    const expression = feature.value?.element();
-    expect(expression).not.toBeUndefined();
-    if (!expression) return;
+test.concurrent.each([
+    ["1,2", [2]],
+    ["1,1", [1]],
+    ["1,3", [3]],
+    ["2,3", [6]],
+    ["2,4", expect.stringContaining("out of bounds")],
+    ["3,2", expect.stringContaining("out of bounds")],
+])("Multi-dimensional indexing with (%s)", async (index, expected) => {
+    await expectEvaluationResult({
+        text: `
+        package Collections {
+            datatype Collection {
+                feature elements[*];
+            }
+            datatype Array :> Collection {
+                feature dimensions[*];
+            }
+        }
 
-    const exprResult = Evaluator.evaluate(expression, feature);
-    if (expected) expect(sanitizeTree(exprResult)).toMatchObject(expected);
-    else expect(sanitizeTree(exprResult)).toBeUndefined();
+        feature array : Collections::Array {
+            :>> dimensions = (2, 3);
+            :>> elements = (
+                1, 2, 3,
+                4, 5, 6
+            );
+        }
+
+        feature a = array#(${index});
+    `,
+        langId: "kerml",
+        ...(Array.isArray(expected)
+            ? { result: expected }
+            : {
+                  error: {
+                      message: expected,
+                  },
+              }),
+    });
 });

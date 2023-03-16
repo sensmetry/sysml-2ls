@@ -17,9 +17,9 @@
 import { ElementMeta, InvocationExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
-    ExpressionResult,
     ModelLevelExpressionEvaluator,
     functionFor,
+    ExpressionResult,
 } from "../util";
 
 const PACKAGE = "StringFunctions";
@@ -30,14 +30,16 @@ export class SubstringFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const str = evaluator.asString(expression, 0, target);
         const lo = evaluator.asNumber(expression, 1, target);
         const hi = evaluator.asNumber(expression, 2, target);
 
-        if (str === undefined || lo === undefined || hi === undefined) return;
         // 1-based indexing?????
-        if (lo < 1 || hi > str.length || lo > hi + 1) return undefined;
+        if (lo < 1) throw new Error(`Start ${lo} is out bounds`);
+        if (hi > str.length)
+            throw new Error(`End ${hi} is out bounds for string of size ${str.length}`);
+        if (lo > hi + 1) throw new Error("Start is beyond end");
         return [str.substring(lo - 1, hi)];
     }
 }
@@ -48,10 +50,8 @@ export class StringLengthFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const str = evaluator.asString(expression, 0, target);
-
-        if (str === undefined) return;
         return [str.length];
     }
 }

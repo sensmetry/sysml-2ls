@@ -41,7 +41,7 @@ export class StateUsageMeta extends ActionUsageMeta {
     }
 
     isSubstate(): boolean {
-        return this.owner().isAny([StateDefinition, StateUsage]);
+        return this.isNonEntryExitComposite() && this.owner().isAny([StateDefinition, StateUsage]);
     }
 
     override ast(): StateUsage | undefined {

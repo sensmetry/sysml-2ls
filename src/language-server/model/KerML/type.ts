@@ -30,6 +30,7 @@ import {
     NamespaceMeta,
     NonNullRelationship,
     ResultExpressionMembershipMeta,
+    ReturnParameterMembershipMeta,
     SpecializationMeta,
     TargetType,
 } from "./_internal";
@@ -59,6 +60,7 @@ export class TypeMeta extends NamespaceMeta {
      * Result member
      */
     result: ResultExpressionMembershipMeta | undefined;
+    returns: ReturnParameterMembershipMeta | undefined;
 
     constructor(elementId: ElementID, parent: ModelContainer<Type>) {
         super(elementId, parent);
@@ -326,16 +328,15 @@ export class TypeMeta extends NamespaceMeta {
      * @returns owned or inherited result parameter if one exists, otherwise undefined
      */
     resultParameter(): ResultExpressionMembershipMeta | undefined {
-        if (this.result) return this.result;
-        for (const specialization of this.allSpecializations()) {
-            const result = specialization.element()?.result;
-            if (result) {
-                this.result = result;
-                return result;
-            }
-        }
+        return (this.result ??= this.allTypes()
+            .map((t) => t.result)
+            .find((r) => r));
+    }
 
-        return;
+    returnParameter(): ReturnParameterMembershipMeta | undefined {
+        return (this.returns ??= this.allTypes()
+            .map((t) => t.returns)
+            .find((r) => r));
     }
 
     /**

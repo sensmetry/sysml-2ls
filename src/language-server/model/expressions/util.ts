@@ -23,6 +23,7 @@ import {
     Type,
 } from "../../generated/ast";
 import * as meta from "../KerML";
+import { ElementMeta, FeatureMeta, TypeMeta } from "../KerML";
 import { BasicMetamodel, isMetamodel } from "../metamodel";
 import { concatNames } from "../naming";
 
@@ -42,13 +43,12 @@ export abstract class BuiltinFunction {
      * @param expression invocation expression matching this builtin function
      * @param target evaluation context
      * @param evaluator evaluator instance
-     * @return result if successful evaluation, undefined otherwise
      */
     abstract call(
         expression: meta.InvocationExpressionMeta,
         target: meta.ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined;
+    ): ExpressionResult[];
 }
 
 export interface ModelLevelExpressionEvaluator {
@@ -56,9 +56,23 @@ export interface ModelLevelExpressionEvaluator {
      * Try evaluate the {@link expression}
      * @param expression Expression to evaluate
      * @param target evaluation context
-     * @return result if successful evaluation, undefined otherwise
      */
-    evaluate(expression: Evaluable, target: meta.ElementMeta): ExpressionResult[] | undefined;
+    evaluate(expression: Evaluable, target: meta.ElementMeta): ExpressionResult[];
+
+    /**
+     * Try evaluating a chain of features
+     * @param features
+     * @param type evaluation context
+     */
+    evaluateFeatureChain(features: FeatureMeta[], type: TypeMeta): ExpressionResult[];
+
+    /**
+     * Find library type by its fully qualified name
+     * @param qualifiedName fully qualified name (`::` scope separators)
+     * @param context Optional context to look for type in, if not provided
+     * global index is used
+     */
+    libraryType(qualifiedName: string, context?: ElementMeta): TypeMeta | undefined;
 
     /**
      * Try evaluate the {@link expression} argument at {@link index}, i.e.
@@ -66,13 +80,12 @@ export interface ModelLevelExpressionEvaluator {
      * @param expression invocation expression that owns arguments
      * @param index argument index
      * @param target evaluation context
-     * @return result if successful evaluation, undefined otherwise
      */
     evaluateArgument(
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): ExpressionResult[] | undefined;
+    ): ExpressionResult[];
 
     /**
      * Try evaluate the {@link expression} argument at {@link index} as a
@@ -80,39 +93,36 @@ export interface ModelLevelExpressionEvaluator {
      * @param expression invocation expression that owns arguments
      * @param index argument index
      * @param target evaluation context
-     * @return boolean if successful evaluation, undefined otherwise
      */
     asBoolean(
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): boolean | undefined;
+    ): boolean;
 
     /**
      * Try evaluate the {@link expression} argument at {@link index} as a string
      * @param expression invocation expression that owns arguments
      * @param index argument index
      * @param target evaluation context
-     * @return string if successful evaluation, undefined otherwise
      */
     asString(
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): string | undefined;
+    ): string;
 
     /**
      * Try evaluate the {@link expression} argument at {@link index} as a number
      * @param expression invocation expression that owns arguments
      * @param index argument index
      * @param target evaluation context
-     * @return number if successful evaluation, undefined otherwise
      */
     asNumber(
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): number | undefined;
+    ): number;
 
     /**
      * Try evaluate the {@link expression} argument at {@link index} as a single
@@ -120,20 +130,19 @@ export interface ModelLevelExpressionEvaluator {
      * @param expression invocation expression that owns arguments
      * @param index argument index
      * @param target evaluation context
-     * @return single result if successful evaluation, undefined otherwise
      */
     asArgument(
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): ExpressionResult | undefined;
+    ): ExpressionResult | null;
 
     /**
      * Try compare two expression results {@link left} and {@link right}
      * @return if {@link left} and {@link right} can be compared, true if they
-     * are equal and false otherwise, otherwise undefined
+     * are equal and false otherwise
      */
-    equal(left?: ExpressionResult, right?: ExpressionResult): boolean | undefined;
+    equal(left?: ExpressionResult | null, right?: ExpressionResult | null): boolean;
 }
 
 export const BUILTIN_FUNCTIONS: Record<string, BuiltinFunction> = {};
@@ -252,9 +261,7 @@ export function isMetaclassFeature(element: meta.ElementMeta): boolean {
  * @returns the return type or its fully qualified name if one was inferred,
  * undefined otherwise
  */
-export function resultType(
-    value: ExpressionResult | undefined
-): meta.TypeMeta | string | undefined {
+export function resultType(value: ExpressionResult): meta.TypeMeta | string | undefined {
     if (typeof value === "boolean") return "ScalarValues::Boolean";
     if (typeof value === "string") return "ScalarValues::String";
     if (typeof value === "number")
@@ -271,9 +278,7 @@ export function resultType(
  * @returns return type or its fully qualified name for each result type, or
  * undefined if any were not found
  */
-export function typeFor(
-    result: ExpressionResult[] | undefined
-): (meta.TypeMeta | string)[] | undefined {
+export function typeFor(result: ExpressionResult[]): (meta.TypeMeta | string)[] | undefined {
     if (!result || result.length === 0) return;
     const types: (meta.TypeMeta | string)[] = [];
     for (const value of result) {

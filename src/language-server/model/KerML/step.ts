@@ -42,9 +42,9 @@ export class StepMeta extends FeatureMeta {
     }
 
     override defaultSupertype(): string {
-        if (this.isOwnedPerformance()) return "ownedPerformance";
-        if (this.isSubperformance()) return "subperformance";
-        if (this.isEnclosedPerformance()) return "enclosedPerformance";
+        if (this.isStructureOwnedComposite()) return "ownedPerformance";
+        if (this.isBehaviorOwnedComposite()) return "subperformance";
+        if (this.isBehaviorOwned()) return "enclosedPerformance";
         if (this.isIncomingTransfer()) return "incomingTransfer";
         return "base";
     }

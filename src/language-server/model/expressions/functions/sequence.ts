@@ -17,9 +17,9 @@
 import { ElementMeta, InvocationExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
-    ExpressionResult,
     ModelLevelExpressionEvaluator,
     functionFor,
+    ExpressionResult,
 } from "../util";
 
 const PACKAGE = "SequenceFunctions";
@@ -30,10 +30,9 @@ export class IncludesFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
         const value = evaluator.asArgument(expression, 1, target);
-        if (values === undefined || value === undefined) return;
         return [values.some((v) => evaluator.equal(v, value))];
     }
 }
@@ -44,9 +43,8 @@ export class IsEmptyFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        if (values === undefined) return;
         return [values.length === 0];
     }
 }
@@ -57,9 +55,8 @@ export class NotEmptyFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        if (values === undefined) return;
         return [values.length !== 0];
     }
 }
@@ -70,9 +67,8 @@ export class SizeFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] | undefined {
+    ): ExpressionResult[] {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        if (values === undefined) return;
         return [values.length];
     }
 }

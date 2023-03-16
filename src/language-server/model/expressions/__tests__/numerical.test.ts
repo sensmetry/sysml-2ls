@@ -14,10 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { services, parseKerML, NO_ERRORS } from "../../../../testing";
-import { FeatureMeta } from "../../KerML";
+import { expectEvaluationResult } from "./util";
 
-const Evaluator = services.shared.modelLevelExpressionEvaluator;
 const PACKAGE = `
 package NumericalFunctions {
     abstract function product;
@@ -31,14 +29,13 @@ test.concurrent.each([
     ["Sum", "NumericalFunctions::sum((1,2,3,4))", [10]],
     ["Sum", "NumericalFunctions::sum(4)", [4]],
 ])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[]) => {
-    const result = await parseKerML(`feature a = ${body};` + PACKAGE, {
-        ignoreMetamodelErrors: true,
+    await expectEvaluationResult({
+        text:
+            PACKAGE +
+            `
+        in feature a = ${body};
+        `,
+        langId: "kerml",
+        result: expected,
     });
-    expect(result).toMatchObject(NO_ERRORS);
-
-    const feature = result.value.members[0].element?.$meta as FeatureMeta;
-    const expression = feature.value?.element();
-    expect(expression).not.toBeUndefined();
-    if (!expression) return;
-    expect(Evaluator.evaluate(expression, feature)).toMatchObject(expected);
 });

@@ -1054,6 +1054,14 @@ export class SysMLFormatter extends AbstractFormatter {
 
             case "[": {
                 this.formatBraces(formatter, "[", "]", formatter.node(node.operands[1])).prepend(
+                    Options.oneSpace
+                );
+                break;
+            }
+
+            case "#": {
+                operator.prepend(Options.noSpace);
+                this.formatBraces(formatter, "(", ")", formatter.node(node.operands[1])).prepend(
                     Options.noSpace
                 );
                 break;

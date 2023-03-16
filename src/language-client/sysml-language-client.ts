@@ -120,7 +120,7 @@ export abstract class SysMLClientExtender {
      */
     protected get stdlibRepoZipUrl(): string {
         //  TODO: download only a folder somehow (~35 times less data used)
-        return "https://github.com/Systems-Modeling/SysML-v2-Release/archive/refs/tags/2022-12.zip";
+        return "https://github.com/Systems-Modeling/SysML-v2-Release/archive/refs/tags/2023-02.zip";
     }
 
     /**

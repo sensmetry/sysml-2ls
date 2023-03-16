@@ -1206,9 +1206,9 @@ AssignmentNode returns AssignmentActionUsage:
 fragment AssignmentNodeDeclaration:
     ActionNodeUsageDeclaration? 'assign' 
     // TODO: seems like https://github.com/langium/chevrotain-allstar/issues/1
-	// members+=AssignmentTargetMember
-	members+=FeatureChainMember ':=' 
-	members+=NodeParameterMember
+    // members+=AssignmentTargetMember
+    members+=FeatureChainMember ':=' 
+    members+=NodeParameterMember
 ;
 
 AssignmentTargetMember returns ParameterMembership:
@@ -1218,7 +1218,7 @@ AssignmentTargetMember returns ParameterMembership:
 TargetParameter returns ReferenceUsage:
     ( value=TargetBinding '.' )?
     // TODO: empty rule
-	members+=TargetFeatureMember
+    members+=TargetFeatureMember
 ;
 
 TargetFeatureMember returns FeatureMembership:
@@ -1258,9 +1258,9 @@ ExpressionParameterMember returns ParameterMembership:
 
 IfNode returns IfActionUsage:
     ActionNodePrefix 
-	'if' members+=ExpressionParameterMember
-	members+=ActionBodyParameterMember
-	( 'else' members+=( ActionBodyParameterMember | IfNodeParameterMember ) )?
+    'if' members+=ExpressionParameterMember
+    members+=ActionBodyParameterMember
+    ( 'else' members+=( ActionBodyParameterMember | IfNodeParameterMember ) )?
 ;
 
 ActionBodyParameterMember returns ParameterMembership:
@@ -1277,19 +1277,19 @@ IfNodeParameterMember returns ParameterMembership:
 
 WhileLoopNode returns WhileLoopActionUsage:
     ActionNodePrefix
-	( 'while' members+=ExpressionParameterMember
+    ( 'while' members+=ExpressionParameterMember
     // TODO: empty rule
-	| 'loop' members+=EmptyParameterMember
-	)
-	members+=ActionBodyParameterMember
-	( 'until' members+=ExpressionParameterMember ';' )?
+    | 'loop' members+=EmptyParameterMember
+    )
+    members+=ActionBodyParameterMember
+    ( 'until' members+=ExpressionParameterMember ';' )?
 ;
 
 ForLoopNode returns ForLoopActionUsage:
     ActionNodePrefix
-	'for' members+=ForVariableDeclarationMember
-	'in' members+=NodeParameterMember
-	members+=ActionBodyParameterMember
+    'for' members+=ForVariableDeclarationMember
+    'in' members+=NodeParameterMember
+    members+=ActionBodyParameterMember
 ;
 
 ForVariableDeclarationMember returns FeatureMembership:
@@ -1352,14 +1352,14 @@ ActionTargetSuccession returns Usage:
 
 TargetSuccession returns SuccessionAsUsage:
     'then' members+=MultiplicitySourceEndMember 
-	members+=ConnectorEndMember
+    members+=ConnectorEndMember
 ;
 
 GuardedTargetSuccession returns TransitionUsage:
     // TODO: empty rule
     /* members += EmptyParameterMember */
     members+=GuardExpressionMember
-	'then' members+=TransitionSuccessionMember
+    'then' members+=TransitionSuccessionMember
 ;
 
 DefaultTargetSuccession returns TransitionUsage:
@@ -1370,12 +1370,12 @@ DefaultTargetSuccession returns TransitionUsage:
 
 GuardedSuccession returns TransitionUsage:
     ( 'succession' UsageDeclaration )? 'first'
-	members+=TransitionSourceMember 
+    members+=TransitionSourceMember 
     // TODO: empty rule
-	/* members+=EmptyParameterMember */
-	members+=GuardExpressionMember
-	'then' members+=TransitionSuccessionMember
-	UsageBody
+    /* members+=EmptyParameterMember */
+    members+=GuardExpressionMember
+    'then' members+=TransitionSuccessionMember
+    UsageBody
 ;
 
 // States
@@ -1427,9 +1427,9 @@ ExitActionMember returns StateSubactionMembership:
 
 EntryTransitionMember returns FeatureMembership:
     Visibility? 
-	( element=GuardedTargetSuccession 
-	| 'then' element=TransitionSuccession 
-	) ';'
+    ( element=GuardedTargetSuccession 
+    | 'then' element=TransitionSuccession 
+    ) ';'
 ;
 
 StateActionUsage returns ActionUsage:
@@ -1473,15 +1473,15 @@ ExhibitStateUsage returns ExhibitStateUsage:
 
 TransitionUsage returns TransitionUsage:
     'transition' ( UsageDeclaration? 'first' )? 
-	members+=TransitionSourceMember
+    members+=TransitionSourceMember
     // TODO: empty rule
-	/* members+=EmptyParameterMember */
+    /* members+=EmptyParameterMember */
     // TODO: empty rule
-	( /* members+=EmptyParameterMember */ members+=TriggerActionMember )?
-	( members+=GuardExpressionMember )?
-	( members+=EffectBehaviorMember )?
-	'then' members+=TransitionSuccessionMember
-	ActionBody
+    ( /* members+=EmptyParameterMember */ members+=TriggerActionMember )?
+    ( members+=GuardExpressionMember )?
+    ( members+=EffectBehaviorMember )?
+    'then' members+=TransitionSuccessionMember
+    ActionBody
 ;
 
 TargetTransitionUsage returns TransitionUsage:
@@ -1489,25 +1489,25 @@ TargetTransitionUsage returns TransitionUsage:
     /* members+=EmptyParameterMember */
     ( 'transition'
     // TODO: empty rule
-	  ( /* members+=EmptyParameterMember  */
-	    members+=TriggerActionMember )?
-	  ( members+=GuardExpressionMember )?
-	  ( members+=EffectBehaviorMember )?
+      ( /* members+=EmptyParameterMember  */
+        members+=TriggerActionMember )?
+      ( members+=GuardExpressionMember )?
+      ( members+=EffectBehaviorMember )?
     // TODO: empty rule
-	| /* members+=EmptyParameterMember */ 
-	  members+=TriggerActionMember
-	  ( members+=GuardExpressionMember )?
-	  ( members+=EffectBehaviorMember )?
-	| members+=GuardExpressionMember
-	  ( members+=EffectBehaviorMember )?
-	)?
-	'then' members+=TransitionSuccessionMember
-	ActionBody
+    | /* members+=EmptyParameterMember */ 
+      members+=TriggerActionMember
+      ( members+=GuardExpressionMember )?
+      ( members+=EffectBehaviorMember )?
+    | members+=GuardExpressionMember
+      ( members+=EffectBehaviorMember )?
+    )?
+    'then' members+=TransitionSuccessionMember
+    ActionBody
 ;
 
 TransitionSourceMember returns Membership:
     reference=FeatureReference
-	| {OwningMembership} element=OwnedFeatureChain
+    | {OwningMembership} element=OwnedFeatureChain
 ;
 
 TriggerActionMember returns TransitionFeatureMembership:
@@ -1630,7 +1630,7 @@ SubjectUsage returns ReferenceUsage:
 
 RequirementConstraintMember returns RequirementConstraintMembership:
     Visibility? kind=RequirementConstraintKind 
-	element=RequirementConstraintUsage
+    element=RequirementConstraintUsage
 ;
 
 RequirementConstraintUsage returns ConstraintUsage:
@@ -1835,9 +1835,9 @@ fragment ViewBodyItems:
 
 fragment ViewBodyItem:
     DefinitionBodyItem
-	| filters+=ElementFilterMember
-	| imports+=Expose
-	| members+=ViewRenderingMember
+    | filters+=ElementFilterMember
+    | imports+=Expose
+    | members+=ViewRenderingMember
 ;
 
 fragment ExposePrefix:
@@ -1845,7 +1845,7 @@ fragment ExposePrefix:
 
 Expose returns Expose:
     ExposePrefix ImportedReference (element=FilterPackage)?
-	RelationshipBody
+    RelationshipBody
 ;
 
 // Viewpoints
@@ -2022,7 +2022,7 @@ UnaryExpression returns Expression:
 // Extent Expressions
 
 ExtentExpression returns Expression:
-    {OperatorExpression} operator='all' result=TypeResultMember
+    {OperatorExpression} operator='all' members+=TypeResultMember
     | PrimaryExpression
 ;
 
@@ -2031,7 +2031,8 @@ ExtentExpression returns Expression:
 PrimaryExpression returns Expression:
     BaseExpression
     ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
-    (   ( {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
+    (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
+        | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
         | {OperatorExpression.operands+=current} '->' typeRelationships+=ReferenceTyping 
             ( members+=ExpressionBodyMember
             | members+=FunctionReferenceMember

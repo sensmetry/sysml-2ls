@@ -1362,19 +1362,36 @@ part x = if 1
                 );
             });
 
-            describe("indexing expressions", () => {
+            describe("quantities expressions", () => {
                 describe("should format single line expressions", () => {
-                    testFormatting("part x  =  A  [  0  ] ;", "part x = A[0];");
+                    testFormatting("part x  =  A  [  mm  ] ;", "part x = A [mm];");
                 });
 
                 describe("should format multi-line expressions", () => {
                     testFormatting(
-                        "part x  =  A  [  A.\nx  ] ;",
+                        "part x  =  A  [  A.\nmm  ] ;",
                         `
-part x = A[
+part x = A [
+        A.
+            mm
+    ];`
+                    );
+                });
+            });
+
+            describe("indexing expressions", () => {
+                describe("should format single line expressions", () => {
+                    testFormatting("part x  =  A  #  (  0  ) ;", "part x = A#(0);");
+                });
+
+                describe("should format multi-line expressions", () => {
+                    testFormatting(
+                        "part x  =  A  #(  A.\nx  ) ;",
+                        `
+part x = A#(
         A.
             x
-    ];`
+    );`
                     );
                 });
             });

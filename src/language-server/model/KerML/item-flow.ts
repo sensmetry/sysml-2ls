@@ -21,7 +21,7 @@ import { ConnectorMeta, StepMeta } from "./_internal";
 
 export const ImplicitItemFlows = {
     base: "Transfers::flowTransfers",
-    enclosedPerformance: "Performances::Performance::enclosedTransfers",
+    enclosedPerformance: "Performances::Performance::enclosedPerformances",
     subperformance: "Performances::Performance::subperformances",
     ownedPerformance: "Objects::Object::ownedPerformances",
 };
@@ -42,9 +42,9 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
 
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
-        if (this.isOwnedPerformance()) supertypes.push("ownedPerformance");
-        if (this.isSubperformance()) supertypes.push("subperformance");
-        if (this.isEnclosedPerformance()) supertypes.push("enclosedPerformance");
+        if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
+        if (this.isBehaviorOwnedComposite()) supertypes.push("subperformance");
+        if (this.isBehaviorOwned()) supertypes.push("enclosedPerformance");
 
         return supertypes;
     }

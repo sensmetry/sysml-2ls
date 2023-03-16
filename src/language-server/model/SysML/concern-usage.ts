@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ConcernUsage } from "../../generated/ast";
+import { ConcernUsage, FramedConcernMembership } from "../../generated/ast";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { RequirementUsageMeta } from "./requirement-usage";
 
@@ -33,6 +33,12 @@ export class ConcernUsageMeta extends RequirementUsageMeta {
 
     override parent(): ModelContainer<ConcernUsage> {
         return this._parent;
+    }
+
+    override requirementConstraintSupertype(): string | undefined {
+        return this.parent().is(FramedConcernMembership)
+            ? "subrequirement"
+            : super.requirementConstraintKind();
     }
 }
 

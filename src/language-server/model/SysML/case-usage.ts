@@ -41,7 +41,7 @@ export class CaseUsageMeta extends CalculationUsageMeta {
 
     isSubcase(): boolean {
         const parent = this.owner();
-        return parent.isAny([CaseDefinition, CaseUsage]);
+        return this.isNonEntryExitComposite() && parent.isAny([CaseDefinition, CaseUsage]);
     }
 }
 
