@@ -4,6 +4,13 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## main
+
+### Fixed
+
+- Standard library pop up showing on every extension activation after updating
+  compatible standard library
+
 ## 0.3.1
 
 ### Changed
