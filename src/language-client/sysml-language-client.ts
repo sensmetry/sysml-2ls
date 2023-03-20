@@ -145,6 +145,7 @@ export abstract class SysMLClientExtender {
 
         if (config?.stdlibUrl !== this.stdlibRepoZipUrl) {
             await this.maybeUpdateDownloadedStdlib();
+            if (config) config.stdlibUrl = this.stdlibRepoZipUrl;
         }
 
         if (!config) config = this.config;
