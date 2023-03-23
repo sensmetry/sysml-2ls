@@ -32,7 +32,7 @@ abstract class ConditionalLogicalFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const first = evaluator.asBoolean(expression, 0, target);
         if (this.test(first)) return [this.result()];
         const second = evaluator.asBoolean(expression, 1, target);
@@ -79,7 +79,7 @@ export class ConditionalFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const test = evaluator.asBoolean(expression, 0, target);
         return evaluator.evaluateArgument(expression, test ? 1 : 2, target);
     }
@@ -100,7 +100,7 @@ export class NullCoalescingFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
         if (values.length === 0) return evaluator.evaluateArgument(expression, 1, target);
         return values;

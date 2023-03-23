@@ -14,19 +14,24 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { stream, ValidationAcceptor } from "langium";
+import { MultiMap, Properties, ValidationAcceptor } from "langium";
 import {
     Type,
-    isAssociation,
     Subsetting,
     Feature,
     Relationship,
     Unioning,
     Intersecting,
     Differencing,
-    isSubsetting,
     isFeatureChaining,
+    Connector,
+    Redefinition,
+    Element,
+    Namespace,
+    ReferenceUsage,
+    OwningMembership,
 } from "../../generated/ast";
+import { MembershipMeta } from "../../model";
 import { validateKerML } from "./kerml-validation-registry";
 
 /**
@@ -51,67 +56,63 @@ export class KerMLValidator {
         }
     }
 
-    protected validateSubsettingMultiplicities(
-        feature: Feature,
-        subsetted: Iterable<Feature>,
-        accept: ValidationAcceptor
-    ): void {
-        return;
+    @validateKerML(Subsetting)
+    checkSubsettingMultiplicities(subsetting: Subsetting, accept: ValidationAcceptor): void {
+        const feature = subsetting.$meta.source().ast() as Feature | undefined;
+        if (!feature) return;
 
-        // TODO: need to also skip checks for unity multiplications, blocked by
-        // expression evaluation
-        if (isAssociation(feature.$container)) {
+        if (feature.$meta.owner().is(Connector)) {
             // association features have multiplicity 1..1 implicitly,
             // multiplicity works differently
             return;
         }
-        const ordered = feature.isOrdered;
         const nonunique = feature.isNonunique;
+        const bounds = feature.$meta.multiplicity?.element()?.bounds;
+        const end = feature.$meta.isEnd;
 
-        for (const sub of subsetted) {
-            if (sub.isOrdered && !ordered) {
-                accept(
-                    "error",
-                    `Subsetting feature must be ordered as subsetted feature ${sub.$meta.qualifiedName} is ordered`,
-                    { node: feature }
-                );
-            }
-            if (!sub.isNonunique && nonunique) {
-                accept(
-                    "error",
-                    `Subsetting feature must be unique as subsetted feature ${sub.$meta.qualifiedName} is unique`,
-                    { node: feature }
-                );
-            }
-
-            // TODO: `feature` multiplicity bounds both should be less or equal
-            // to the `feature.subsets` multiplicity bounds TODO: blocked by
-            // expression evaluation
+        const sub = subsetting.$meta.element();
+        if (!sub) return;
+        if (sub.owner().is(Connector)) return;
+        if (!sub.isNonUnique && nonunique) {
+            accept(
+                "error",
+                `Subsetting feature must be unique as subsetted feature ${sub.qualifiedName} is unique`,
+                { node: feature }
+            );
         }
-    }
 
-    @validateKerML(Feature)
-    checkSubsettedMultiplicities(feature: Feature, accept: ValidationAcceptor): void {
-        this.validateSubsettingMultiplicities(
-            feature,
-            stream(feature.typeRelationships)
-                .filter((r) => isSubsetting(r))
-                .map(
-                    (subsetting) =>
-                        (subsetting as Subsetting).reference?.$meta.to.target as Feature | undefined
-                )
-                .nonNullable(),
-            accept
-        );
-    }
+        if (!bounds) return;
+        // only need to check bounds if either both are ends or neither are ends
+        if (end !== sub.isEnd) return;
 
-    @validateKerML(Subsetting)
-    checkSubsettingMultiplicities(subsetting: Subsetting, accept: ValidationAcceptor): void {
-        const feature = subsetting.source?.$meta.to.target?.ast() ?? subsetting.$container;
-        const subsetted = subsetting.reference?.$meta.to.target?.ast();
-        if (!feature || !subsetted) return;
-        // Langium doesn't allow overriding interface properties but Subsetting always references features
-        this.validateSubsettingMultiplicities(feature as Feature, [subsetted as Feature], accept);
+        const subBounds = sub.multiplicity?.element()?.bounds;
+        if (!subBounds) return;
+
+        if (subsetting.$meta.is(Redefinition) && !end) {
+            if (
+                bounds.lower !== undefined &&
+                subBounds.lower !== undefined &&
+                bounds.lower < subBounds.lower
+            ) {
+                accept(
+                    "warning",
+                    `Multiplicity lower bound (${bounds.lower}) should be at least as large as the redefined feature lower bound (${subBounds.lower})`,
+                    { node: feature, property: "multiplicity" }
+                );
+            }
+        }
+
+        if (
+            bounds.upper !== undefined &&
+            subBounds.upper !== undefined &&
+            bounds.upper > subBounds.upper
+        ) {
+            accept(
+                "warning",
+                `Multiplicity upper bound (${bounds.upper}) should not be larger than the subsetted feature upper bound (${subBounds.upper})`,
+                { node: feature, property: "multiplicity" }
+            );
+        }
     }
 
     @validateKerML(Feature)
@@ -121,6 +122,37 @@ export class KerMLValidator {
             accept("error", "Feature chain must be a chain of 2 or more features", {
                 node: chainings[0],
             });
+        }
+    }
+
+    @validateKerML(Namespace)
+    checkUniqueNames(element: Namespace, accept: ValidationAcceptor): void {
+        const names = new MultiMap<string, [MembershipMeta, Properties<Element>]>();
+
+        // for performance reasons, only check direct members
+        for (const member of element.$meta.members) {
+            // skip non-owning memberships that are not aliases
+            if (!member.is(OwningMembership) && !member.isAlias()) continue;
+            // skip over automatically named reference usages
+            if (member.element()?.is(ReferenceUsage)) continue;
+            const name = member.name;
+            if (name) names.add(name, [member, "declaredName"]);
+
+            const short = member.shortName;
+            if (short && short !== name) names.add(short, [member, "declaredShortName"]);
+        }
+
+        for (const [name, members] of names.entriesGroupedByKey()) {
+            if (members.length < 2) continue;
+            for (const [member, property] of members) {
+                const node = member.isAlias() ? member.ast() : member.element()?.ast();
+                if (!node) continue;
+
+                accept("error", `Duplicate member name ${name}`, {
+                    node,
+                    property,
+                });
+            }
         }
     }
 }

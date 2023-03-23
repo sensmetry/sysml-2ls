@@ -111,5 +111,5 @@ test("unnamed redefining features implicitly have the same name as the redefined
     expect(result).toMatchObject(NO_ERRORS);
     expect(
         childrenNames(result.value.namespaceMembers[1].element, Visibility.private)
-    ).toStrictEqual(["B::x", "B", "A"]);
+    ).toStrictEqual(["B::x"]);
 });

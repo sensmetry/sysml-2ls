@@ -31,6 +31,8 @@ import {
 
 @metamodelOf(Element, "abstract")
 export abstract class ElementMeta extends BasicMetamodel<Element> {
+    members: MembershipMeta[] = [];
+
     /**
      * Namespace members
      */
@@ -127,6 +129,7 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
         this.elements.length = 0;
         this.comments.length = 0;
         this.docs.length = 0;
+        this.members.length = 0;
         this.collectChildrenNodes(node);
         delete this.metaclass;
     }

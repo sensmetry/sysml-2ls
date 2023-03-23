@@ -16,17 +16,30 @@
 
 import { MultiplicityRange } from "../../generated/ast";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { MultiplicityMeta } from "./_internal";
+import { ExpressionMeta, MultiplicityMeta, OwningMembershipMeta } from "./_internal";
 
 export const ImplicitMultiplicityRanges = {
     feature: "Base::naturals",
     classifier: "Base::naturals",
 };
 
+export interface Bounds {
+    lower?: number;
+    upper?: number;
+}
+
 @metamodelOf(MultiplicityRange, ImplicitMultiplicityRanges)
 export class MultiplicityRangeMeta extends MultiplicityMeta {
+    range?: OwningMembershipMeta<ExpressionMeta>;
+
+    bounds: Bounds | undefined = undefined;
+
     constructor(id: ElementID, parent: ModelContainer<MultiplicityRange>) {
         super(id, parent);
+    }
+
+    override initialize(node: MultiplicityRange): void {
+        this.range = node.range?.$meta as OwningMembershipMeta<ExpressionMeta>;
     }
 
     override ast(): MultiplicityRange | undefined {

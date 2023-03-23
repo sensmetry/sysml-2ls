@@ -24,7 +24,7 @@ const N1 = `namespace N1 {
 }
 `;
 const N4 = `namespace N4 {
-    class A;
+    class AA;
     class B;
     namespace M {
         class C;

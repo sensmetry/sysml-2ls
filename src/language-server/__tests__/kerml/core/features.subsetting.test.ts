@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { withQualifiedName, qualifiedTypeReference, anything } from "../../../../testing";
+import { withQualifiedName, qualifiedTypeReference } from "../../../../testing";
 import { Subsetting } from "../../../generated/ast";
 
 test.concurrent.each(["subsets", ":>"])(
@@ -66,24 +66,5 @@ test.concurrent.each(["specialization", ""])(
                 },
             ],
         });
-    }
-);
-
-// TODO: enable once feature multiplicity validation is fixed
-test.skip.each(["subsets a;", "; subset b :> a;"])(
-    "unordered feature subsetting ordered feature issues a diagnostic",
-    async (suffix: string) => {
-        return expect(`
-    feature a[*] ordered;
-    feature b[*] ${suffix}`).toParseKerML({}, { diagnostics: anything(1) });
-    }
-);
-
-test.skip.each(["subsets a;", "; subset b :> a;"])(
-    "nonunique feature subsetting unique feature issues a diagnostic",
-    async (suffix: string) => {
-        return expect(`
-    feature a[*];
-    feature b[*] nonunique ${suffix}`).toParseKerML({}, { diagnostics: anything(1) });
     }
 );

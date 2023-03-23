@@ -30,7 +30,7 @@ export class ProductFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
 
         let result = 1;
@@ -49,7 +49,7 @@ export class SumFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
 
         let result = 0;

@@ -30,7 +30,7 @@ export class SubstringFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const str = evaluator.asString(expression, 0, target);
         const lo = evaluator.asNumber(expression, 1, target);
         const hi = evaluator.asNumber(expression, 2, target);
@@ -50,7 +50,7 @@ export class StringLengthFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const str = evaluator.asString(expression, 0, target);
         return [str.length];
     }

@@ -16,4 +16,5 @@
 
 export * from "./evaluator";
 export * from "./functions";
+export * from "./range";
 export * from "./util";

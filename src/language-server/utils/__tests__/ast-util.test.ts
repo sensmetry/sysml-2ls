@@ -122,8 +122,6 @@ test.concurrent.each(["specializes", "conjugates"])(
             "B::x",
             "B::y",
             "B::z",
-            "B",
-            "A",
             "A::a",
             "A::b",
         ]);
@@ -176,7 +174,6 @@ test("implicitly inherited members are visible", async () => {
         "A::a",
         "A::b",
         "A::c",
-        "A",
         "Base::Anything::x",
         "Base::Anything::y",
     ]);
@@ -236,5 +233,5 @@ test("circular specializations are resolved without infinite loops", async () =>
     `);
     expect(result).toMatchObject(NO_ERRORS);
     const a = result.value.namespaceMembers[0].element as Type;
-    expect(directScopeNames(a)).toEqual(["A::a", "A::b", "A::c", "A", "B", "B::x", "B::y"]);
+    expect(directScopeNames(a)).toEqual(["A::a", "A::b", "A::c", "B::x", "B::y"]);
 });

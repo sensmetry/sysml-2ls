@@ -26,10 +26,12 @@ import * as meta from "../KerML";
 import { ElementMeta, FeatureMeta, TypeMeta } from "../KerML";
 import { BasicMetamodel, isMetamodel } from "../metamodel";
 import { concatNames } from "../naming";
+import { RangeGenerator } from "./range";
 
 // TODO: we may need to add a range generator type as well for extent
 // expressions, generating a large extent upfront may crash the server otherwise
-export type ExpressionResult = BasicMetamodel | number | boolean | string;
+export type ExpressionResultValue = BasicMetamodel | number | boolean | string;
+export type ExpressionResult = ExpressionResultValue[] | RangeGenerator;
 export type ExpressionLike = meta.InvocationExpressionMeta["args"][0];
 export type Evaluable = meta.ExpressionMeta | meta.ElementMeta;
 
@@ -48,7 +50,7 @@ export abstract class BuiltinFunction {
         expression: meta.InvocationExpressionMeta,
         target: meta.ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[];
+    ): ExpressionResult;
 }
 
 export interface ModelLevelExpressionEvaluator {
@@ -57,14 +59,14 @@ export interface ModelLevelExpressionEvaluator {
      * @param expression Expression to evaluate
      * @param target evaluation context
      */
-    evaluate(expression: Evaluable, target: meta.ElementMeta): ExpressionResult[];
+    evaluate(expression: Evaluable, target: meta.ElementMeta): ExpressionResult;
 
     /**
      * Try evaluating a chain of features
      * @param features
      * @param type evaluation context
      */
-    evaluateFeatureChain(features: FeatureMeta[], type: TypeMeta): ExpressionResult[];
+    evaluateFeatureChain(features: FeatureMeta[], type: TypeMeta): ExpressionResult;
 
     /**
      * Find library type by its fully qualified name
@@ -85,7 +87,7 @@ export interface ModelLevelExpressionEvaluator {
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): ExpressionResult[];
+    ): ExpressionResult;
 
     /**
      * Try evaluate the {@link expression} argument at {@link index} as a
@@ -135,14 +137,14 @@ export interface ModelLevelExpressionEvaluator {
         expression: meta.InvocationExpressionMeta,
         index: number,
         target: meta.ElementMeta
-    ): ExpressionResult | null;
+    ): ExpressionResultValue | null;
 
     /**
      * Try compare two expression results {@link left} and {@link right}
      * @return if {@link left} and {@link right} can be compared, true if they
      * are equal and false otherwise
      */
-    equal(left?: ExpressionResult | null, right?: ExpressionResult | null): boolean;
+    equal(left?: ExpressionResultValue | null, right?: ExpressionResultValue | null): boolean;
 }
 
 export const BUILTIN_FUNCTIONS: Record<string, BuiltinFunction> = {};
@@ -261,7 +263,11 @@ export function isMetaclassFeature(element: meta.ElementMeta): boolean {
  * @returns the return type or its fully qualified name if one was inferred,
  * undefined otherwise
  */
-export function resultType(value: ExpressionResult): meta.TypeMeta | string | undefined {
+export function resultType(value: number): "ScalarValues::Integer" | "ScalarValues::Rational";
+export function resultType(value: boolean): "ScalarValues::Boolean";
+export function resultType(value: string): "ScalarValues::String";
+export function resultType(value: ExpressionResultValue): meta.TypeMeta | string | undefined;
+export function resultType(value: ExpressionResultValue): meta.TypeMeta | string | undefined {
     if (typeof value === "boolean") return "ScalarValues::Boolean";
     if (typeof value === "string") return "ScalarValues::String";
     if (typeof value === "number")
@@ -278,7 +284,7 @@ export function resultType(value: ExpressionResult): meta.TypeMeta | string | un
  * @returns return type or its fully qualified name for each result type, or
  * undefined if any were not found
  */
-export function typeFor(result: ExpressionResult[]): (meta.TypeMeta | string)[] | undefined {
+export function typeFor(result: ExpressionResult): (meta.TypeMeta | string)[] | undefined {
     if (!result || result.length === 0) return;
     const types: (meta.TypeMeta | string)[] = [];
     for (const value of result) {
@@ -299,4 +305,19 @@ export function typeOf(arg: ExpressionLike): meta.TypeMeta | string | undefined 
     if (arg.value) return arg.value.element()?.returnType();
     if (arg.isAny([Expression, SysMLFunction])) return arg.returnType();
     return arg;
+}
+
+/**
+ * Expand the range generator to a full array or pass through
+ * @param values
+ * @returns
+ */
+export function normalize(values: ExpressionResult): ExpressionResultValue[] {
+    if (values instanceof RangeGenerator) {
+        // basic sanity check
+        if (values.length > 1e9) throw new Error(`Range too large: ${values.length}`);
+        return values.toArray();
+    }
+
+    return values;
 }

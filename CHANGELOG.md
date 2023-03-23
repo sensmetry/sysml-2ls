@@ -6,6 +6,10 @@
 
 ## main
 
+### Added
+
+- Subsetting multiplicities and unique names in direct scope validations
+
 ### Fixed
 
 - `allocate` is not indented an additional time if the element starts with

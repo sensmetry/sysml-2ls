@@ -36,6 +36,12 @@ export interface ExpressionError {
     stack: ElementMeta[];
 }
 
+export function isExpressionError(
+    item: ExpressionResult | ExpressionError | null | undefined
+): item is ExpressionError {
+    return Boolean(item && "message" in item);
+}
+
 export class SysMLExpressionEvaluator {
     protected readonly services: SysMLSharedServices;
     protected readonly evaluators: Map<string, EvaluatorFunction>;
@@ -45,7 +51,7 @@ export class SysMLExpressionEvaluator {
         this.evaluators = defaultEvaluators();
     }
 
-    evaluate(expression: Evaluable, target: ElementMeta): ExpressionResult[] | ExpressionError {
+    evaluate(expression: Evaluable, target: ElementMeta): ExpressionResult | ExpressionError {
         // we create new evaluators for each evaluation so that in case of
         // errors we can find the element that caused it
         const evaluator = new BuiltinFunctionEvaluator(this.services, this.evaluators);
