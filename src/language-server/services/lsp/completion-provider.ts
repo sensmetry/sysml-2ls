@@ -38,6 +38,7 @@ import {
     InlineExpression,
     isElementReference,
     isFeature,
+    Membership,
     MetadataAccessExpression,
 } from "../../generated/ast";
 import {
@@ -501,10 +502,16 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
     protected override createReferenceCompletionItem(
         nodeDescription: SysMLNodeDescription
     ): CompletionValueItem {
+        const node = nodeDescription.node?.$meta;
+        if (node?.is(Membership)) nodeDescription = node.element()?.description ?? nodeDescription;
         const item = super.createReferenceCompletionItem(nodeDescription);
 
-        if (nodeDescription.node) {
-            item.labelDetails = { description: nodeDescription.node.$meta.qualifiedName };
+        if (node) {
+            item.labelDetails = {
+                description: node.is(Membership)
+                    ? node.element()?.qualifiedName
+                    : node.qualifiedName,
+            };
         }
 
         return item;

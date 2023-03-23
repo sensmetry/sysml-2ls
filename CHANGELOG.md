@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Qualified names in suggestions shown from the membership node instead of the
+  suggested element
 - Standard library pop up showing on every extension activation after updating
   compatible standard library
 
