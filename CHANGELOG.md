@@ -6,6 +6,10 @@
 
 ## main
 
+### Added
+
+- Subsetting multiplicities and unique names in direct scope validations
+
 ### Fixed
 
 - Qualified names in suggestions shown from the membership node instead of the

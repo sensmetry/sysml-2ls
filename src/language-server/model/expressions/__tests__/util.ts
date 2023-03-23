@@ -24,13 +24,14 @@ import {
     services,
 } from "../../../../testing";
 import { ElementMeta, FeatureMeta } from "../../KerML";
-import { ExpressionResult } from "../util";
+import { RangeGenerator } from "../range";
+import { ExpressionResultValue } from "../util";
 
 type EvaluationCase = {
     text: string;
     langId?: "kerml" | "sysml";
 } & (
-    | { result: DeepPartial<ExpressionResult>[] | unknown[] }
+    | { result: DeepPartial<ExpressionResultValue>[] | unknown[] | RangeGenerator }
     | {
           error: {
               message?: unknown;

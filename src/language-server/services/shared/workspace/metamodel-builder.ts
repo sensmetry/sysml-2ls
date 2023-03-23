@@ -69,6 +69,8 @@ import {
     ReferenceUsage,
     EndFeatureMembership,
     Membership,
+    MultiplicityRange,
+    LiteralInfinity,
 } from "../../../generated/ast";
 import {
     BasicMetamodel,
@@ -85,6 +87,7 @@ import {
     MembershipMeta,
     ElementMeta,
     SpecializationKeys,
+    Bounds,
 } from "../../../model";
 import { SysMLError } from "../../sysml-validation";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
@@ -104,7 +107,7 @@ import { AstParent, AstPropertiesFor, streamAst } from "../../../utils/ast-util"
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { URI } from "vscode-uri";
 import { ModelUtil } from "../model-utils";
-import { SysMLExpressionEvaluator } from "../evaluator";
+import { isExpressionError, SysMLExpressionEvaluator } from "../evaluator";
 
 const MetaclassPackages = [
     "KerML::Root::",
@@ -560,7 +563,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 const expr = value.ast();
                 if (expr) this.buildNode(expr, document);
                 const result = this.evaluator.evaluate(value, baseType);
-                if ("message" in result) {
+                if (isExpressionError(result)) {
                     this.metamodelErrors.add(document.uriString, {
                         message: result.message,
                         node: result.stack.map((e) => e.ast()).find((a) => a) ?? node,
@@ -996,6 +999,59 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             const source = this.linker(document.uri).linkReference(node.source, document);
             if (source) node.$meta.setSource(source);
         }
+    }
+
+    @builder(MultiplicityRange)
+    lazilyEvaluateMultiplicityBounds(node: MultiplicityRange, _document: LangiumDocument): void {
+        const expr = node.$meta.range?.element();
+        const setUndefined = (): undefined => {
+            Object.defineProperty(node.$meta, "bounds", { value: undefined, writable: true });
+            return;
+        };
+        if (!expr) {
+            setUndefined();
+            return;
+        }
+
+        const evaluator = this.evaluator;
+        Object.defineProperty(node.$meta, "bounds", {
+            get(): Bounds | undefined {
+                const range = expr ? evaluator.evaluate(expr, node.$meta.owner()) : undefined;
+                if (!range || isExpressionError(range)) {
+                    return setUndefined();
+                }
+
+                const lower = range.at(0);
+                if (lower === undefined) return setUndefined();
+                const bounds: Bounds = {};
+                let defaultUpper: number | undefined;
+                if (typeof lower === "number") {
+                    bounds.lower = lower;
+                    defaultUpper = lower;
+                } else if (typeof lower === "object" && lower.is(LiteralInfinity)) {
+                    bounds.lower = 0;
+                    defaultUpper = Number.MAX_SAFE_INTEGER;
+                }
+
+                Object.defineProperty(node.$meta, "bounds", {
+                    value: bounds,
+                    writable: true,
+                    configurable: true,
+                });
+
+                if (range.length < 2) {
+                    bounds.upper = defaultUpper;
+                    return bounds;
+                }
+
+                const upper = range.at(-1);
+                if (typeof upper === "number") bounds.upper = upper;
+                else if (typeof upper === "object" && upper.is(LiteralInfinity))
+                    bounds.upper = Number.MAX_SAFE_INTEGER;
+                return bounds;
+            },
+            configurable: true,
+        });
     }
 
     /**

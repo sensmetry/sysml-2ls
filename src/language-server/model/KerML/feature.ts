@@ -19,6 +19,7 @@ import {
     Behavior,
     Class,
     Connector,
+    EndFeatureMembership,
     Feature,
     Redefinition,
     ReferenceSubsetting,
@@ -88,6 +89,9 @@ export class FeatureMeta extends TypeMeta {
 
     chainings: FeatureChainingMeta[] = [];
 
+    isOrdered = false;
+    isNonUnique = false;
+
     get chainingFeatures(): FeatureMeta[] {
         return this.chainings
             .map((chaining) => chaining.element())
@@ -109,14 +113,16 @@ export class FeatureMeta extends TypeMeta {
         this.isPortion = !!node.isPortion;
         this.isReadonly = !!node.isReadOnly;
         this.isDerived = !!node.isDerived;
-        this.isEnd =
-            !!node.isEnd ||
-            (node.$container.$meta.is(Connector) && node.$containerProperty === "ends");
+        this.isEnd = !!node.isEnd || this.parent().is(EndFeatureMembership);
+
+        this.isOrdered = node.isOrdered;
+        this.isNonUnique = node.isNonunique;
     }
 
     override reset(node: Feature): void {
         this.featuredBy.clear();
         if (node.value) this.value = node.value.$meta;
+        this.isOrdered = node.isOrdered;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -259,6 +265,10 @@ export class FeatureMeta extends TypeMeta {
 
     override addSpecialization<T extends SpecializationType>(specialization: T): void {
         super.addSpecialization(specialization);
+
+        if (!this.isOrdered && specialization.is(Subsetting)) {
+            if (specialization.element()?.isOrdered) this.isOrdered = true;
+        }
 
         if (this.name || this.shortName) return;
         const namingFeature = this.namingFeature();

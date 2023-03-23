@@ -74,6 +74,7 @@ export class NamespaceMeta extends ElementMeta {
 
     protected override collectChildren(node: Namespace): void {
         node.annotatingMembers.forEach((a) => {
+            this.members.push(a.$meta);
             if (!a.element) return;
 
             const element = a.element as AnnotatingElement;
@@ -86,12 +87,15 @@ export class NamespaceMeta extends ElementMeta {
         });
 
         node.namespaceMembers.forEach((n) => {
+            this.members.push(n.$meta);
             this.elements.push(n.$meta as MembershipMeta<NamespaceMeta>);
         });
         node.relationshipMembers.forEach((r) => {
+            this.members.push(r.$meta);
             this.relationships.push(r.$meta as MembershipMeta<RelationshipMeta>);
         });
         node.members.forEach((m) => {
+            this.members.push(m.$meta);
             this.features.push(m.$meta as MembershipMeta<FeatureMeta>);
         });
     }

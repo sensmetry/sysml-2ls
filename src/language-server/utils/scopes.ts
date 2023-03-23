@@ -51,7 +51,7 @@ export abstract class SysMLScope implements Scope {
     getAllExportedElements(): Stream<MembershipMeta> {
         return this.getAllScopes()
             .flatMap((scope) => scope.getAllLocalElements())
-            .distinct((e) => e.name);
+            .distinct();
     }
 
     getAllElements(): Stream<SysMLNodeDescription> {
@@ -201,13 +201,7 @@ export class ElementScope extends SysMLScope {
     }
 
     protected override getAllLocalElements(): Stream<MembershipMeta> {
-        const elements = stream(this.element.children.values()).filter((d) => this.isVisible(d));
-
-        if (this.options.inherited.visibility >= Visibility.private) {
-            const parent = this.element.parent();
-            if (parent?.is(Membership)) return elements.concat([parent]);
-        }
-        return elements;
+        return stream(this.element.members).filter((d) => this.isVisible(d));
     }
 
     /**
@@ -387,17 +381,6 @@ export class TypeScope extends NamespaceScope {
             const specialized = specialization.element();
             if (!specialized || specializations.has(specialized)) continue;
             specializations.add(specialized);
-
-            if (
-                this.options.inherited.visibility >= Visibility.private &&
-                !specialization.isImplied
-            ) {
-                // seems to be needed as removing this results in linking errors
-                // TODO: pull in both names or just the one used when specifying
-                // specialization?
-                const parent = specialized.parent();
-                if (parent.is(Membership)) scopes.push(new SimpleScope([parent]));
-            }
 
             // TODO: add mapped object caches of elements in scope and skip this
             // this will recursively stream other inherited and imported elements

@@ -20,6 +20,7 @@ import { ElementMeta, OperatorExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
+    ExpressionResultValue,
     ExpressionResult,
     functionFor,
 } from "../util";
@@ -27,11 +28,11 @@ import {
 const PACKAGE = "DataFunctions";
 
 abstract class BooleanFunction extends BuiltinFunction {
-    protected unary(x: boolean): ExpressionResult {
+    protected unary(x: boolean): ExpressionResultValue {
         throw new Error("Unary function is not implemented");
     }
 
-    protected binary(x: boolean, y: boolean): ExpressionResult {
+    protected binary(x: boolean, y: boolean): ExpressionResultValue {
         throw new Error("Binary function is not implemented");
     }
 
@@ -39,7 +40,7 @@ abstract class BooleanFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const x = evaluator.asBoolean(expression, 0, target);
         if (expression.args.length === 1) return [this.unary(x)];
         const y = evaluator.asBoolean(expression, 1, target);
@@ -49,28 +50,28 @@ abstract class BooleanFunction extends BuiltinFunction {
 
 @functionFor(PACKAGE, "'&'")
 export class AndFunction extends BooleanFunction {
-    protected override binary(x: boolean, y: boolean): ExpressionResult {
+    protected override binary(x: boolean, y: boolean): ExpressionResultValue {
         return x && y;
     }
 }
 
 @functionFor(PACKAGE, "'|'")
 export class OrFunction extends BooleanFunction {
-    protected override binary(x: boolean, y: boolean): ExpressionResult {
+    protected override binary(x: boolean, y: boolean): ExpressionResultValue {
         return x || y;
     }
 }
 
 @functionFor(PACKAGE, "'not'")
 export class NotFunction extends BooleanFunction {
-    protected override unary(x: boolean): ExpressionResult {
+    protected override unary(x: boolean): ExpressionResultValue {
         return !x;
     }
 }
 
 @functionFor(PACKAGE, "'xor'")
 export class XorFunction extends BooleanFunction {
-    protected override binary(x: boolean, y: boolean): ExpressionResult {
+    protected override binary(x: boolean, y: boolean): ExpressionResultValue {
         return x !== y;
     }
 }

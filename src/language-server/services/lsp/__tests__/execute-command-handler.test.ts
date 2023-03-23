@@ -112,14 +112,14 @@ const EditorCommands = [
     {
         command: "sysml.children",
         position: { line: 1, character: 3 },
-        expected: ["x", "y", "z", "v", "B", "A", "a", "b"].map((v) =>
+        expected: ["x", "y", "z", "v", "a", "b"].map((v) =>
             expect.stringMatching(new RegExp(`^${v}`))
         ),
     },
     {
         command: "sysml.scope",
         position: { line: 1, character: 3 },
-        expected: ["x", "y", "z", "v", "B", "A", "a", "b", "C"].map((v) =>
+        expected: ["x", "y", "z", "v", "a", "b", "A", "B", "C"].map((v) =>
             expect.stringMatching(new RegExp(`^${v}`))
         ),
     },

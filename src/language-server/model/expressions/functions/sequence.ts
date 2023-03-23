@@ -30,7 +30,7 @@ export class IncludesFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
         const value = evaluator.asArgument(expression, 1, target);
         return [values.some((v) => evaluator.equal(v, value))];
@@ -43,7 +43,7 @@ export class IsEmptyFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
         return [values.length === 0];
     }
@@ -55,7 +55,7 @@ export class NotEmptyFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
         return [values.length !== 0];
     }
@@ -67,7 +67,7 @@ export class SizeFunction extends BuiltinFunction {
         expression: InvocationExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
         return [values.length];
     }

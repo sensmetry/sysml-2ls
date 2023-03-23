@@ -16,7 +16,8 @@
 
 import { Type } from "langium/lib/grammar/generated/ast";
 import { Feature } from "../../../generated/ast";
-import { ElementMeta, FeatureMeta, OperatorExpressionMeta } from "../../KerML";
+import { ElementMeta, FeatureMeta, OperatorExpressionMeta, TypeMeta } from "../../KerML";
+import { RangeGenerator } from "../range";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
@@ -25,9 +26,17 @@ import {
     hasType,
     isType,
     typeArgument,
+    resultType,
+    normalize,
 } from "../util";
 
 const PACKAGE = "BaseFunctions";
+
+function getTypeArgument(expression: OperatorExpressionMeta): TypeMeta {
+    const type = typeArgument(expression);
+    if (!type) throw new Error("Error computing type argument");
+    return type;
+}
 
 @functionFor(PACKAGE, ["'as'", "'meta'"])
 export class AsFunction extends BuiltinFunction {
@@ -35,11 +44,13 @@ export class AsFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
-        const type = typeArgument(expression);
-        if (!type) throw new Error("Error computing type argument");
-
+    ): ExpressionResult {
+        const type = getTypeArgument(expression);
         const values = evaluator.evaluateArgument(expression, 0, target);
+        if (values instanceof RangeGenerator) {
+            if (type.conforms(resultType(0))) return values;
+            return [];
+        }
         return values.filter((v) => isType(v, type));
     }
 }
@@ -50,9 +61,8 @@ export class AtFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
-        const type = typeArgument(expression);
-        if (!type) throw new Error("Error computing type argument");
+    ): ExpressionResult {
+        const type = getTypeArgument(expression);
         const values = evaluator.evaluateArgument(expression, 0, target);
         return [values.some((v) => isType(v, type))];
     }
@@ -64,7 +74,7 @@ export class EqualsFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const x = evaluator.asArgument(expression, 0, target);
         const y = evaluator.asArgument(expression, 1, target);
 
@@ -79,9 +89,8 @@ export class HasTypeFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
-        const type = typeArgument(expression);
-        if (!type) throw new Error("Error computing type argument");
+    ): ExpressionResult {
+        const type = getTypeArgument(expression);
         const values = evaluator.evaluateArgument(expression, 0, target);
         return [values.some((v) => hasType(v, type))];
     }
@@ -89,8 +98,9 @@ export class HasTypeFunction extends BuiltinFunction {
 
 @functionFor(PACKAGE, "'#'")
 export class IndexFunction extends BuiltinFunction {
-    protected isCollection(values: ExpressionResult[], name: string): boolean {
+    protected isCollection(values: ExpressionResult, name: string): boolean {
         return (
+            !(values instanceof RangeGenerator) &&
             values.length === 1 &&
             typeof values[0] === "object" &&
             values[0].is(Type) &&
@@ -101,7 +111,7 @@ export class IndexFunction extends BuiltinFunction {
     /**
      * Index any array
      */
-    protected indexSequence(items: ExpressionResult[], index: number): ExpressionResult[] {
+    protected indexSequence(items: ExpressionResult, index: number): ExpressionResult {
         const value = items.at(index - 1);
         if (value === undefined)
             throw new Error(`Index ${index} out of bounds for sequence of size ${items.length}`);
@@ -119,7 +129,7 @@ export class IndexFunction extends BuiltinFunction {
         collection: FeatureMeta,
         index: number,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const elementsFeature = evaluator.libraryType(
             "Collections::Collection::elements",
             collection
@@ -139,9 +149,9 @@ export class IndexFunction extends BuiltinFunction {
      */
     protected indexArray(
         array: FeatureMeta,
-        indices: ExpressionResult[],
+        indices: ExpressionResult,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const dimensionsFeature = evaluator.libraryType("Collections::Array::dimensions", array);
         if (!dimensionsFeature?.is(Feature))
             throw new Error("Feature 'Collections::Array::dimensions' not found");
@@ -154,8 +164,8 @@ export class IndexFunction extends BuiltinFunction {
 
         let index = 1;
         for (let i = 0; i < dimensions.length; ++i) {
-            const dim = dimensions[i];
-            const offset = indices[i];
+            const dim = dimensions.at(i);
+            const offset = indices.at(i);
 
             if (typeof dim !== "number") throw new Error(`Dimension at index ${i} is not a number`);
             if (typeof offset !== "number") throw new Error(`Index at index ${i} is not a number`);
@@ -171,19 +181,19 @@ export class IndexFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
         const indices = evaluator.evaluateArgument(expression, 1, target);
 
         if (this.isCollection(values, "Collections::Array")) {
-            return this.indexArray(values[0] as FeatureMeta, indices, evaluator);
+            return this.indexArray(values.at(0) as FeatureMeta, indices, evaluator);
         }
 
         if (indices.length === 1) {
-            if (typeof indices[0] !== "number") throw new Error("Index is not a number");
-            const index = indices[0];
+            const index = indices.at(0);
+            if (typeof index !== "number") throw new Error("Index is not a number");
             if (this.isCollection(values, "Collections::OrderedCollection")) {
-                return this.indexCollection(values[0] as FeatureMeta, index, evaluator);
+                return this.indexCollection(values.at(0) as FeatureMeta, index, evaluator);
             }
             return this.indexSequence(values, index);
         }
@@ -198,9 +208,8 @@ export class IsTypeFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
-        const type = typeArgument(expression);
-        if (!type) throw new Error("No type argument found");
+    ): ExpressionResult {
+        const type = getTypeArgument(expression);
         const values = evaluator.evaluateArgument(expression, 0, target);
         return [values.every((v) => isType(v, type))];
     }
@@ -212,9 +221,9 @@ export class ListConcatFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
-        const values = evaluator.evaluateArgument(expression, 0, target);
-        const extra = evaluator.evaluateArgument(expression, 1, target);
+    ): ExpressionResult {
+        const values = normalize(evaluator.evaluateArgument(expression, 0, target));
+        const extra = normalize(evaluator.evaluateArgument(expression, 1, target));
         return values.concat(...extra);
     }
 }
@@ -225,7 +234,7 @@ export class NotEqualsFunction extends BuiltinFunction {
         expression: OperatorExpressionMeta,
         target: ElementMeta,
         evaluator: ModelLevelExpressionEvaluator
-    ): ExpressionResult[] {
+    ): ExpressionResult {
         const x = evaluator.asArgument(expression, 0, target);
         const y = evaluator.asArgument(expression, 1, target);
 

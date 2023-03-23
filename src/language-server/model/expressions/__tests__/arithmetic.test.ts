@@ -16,6 +16,7 @@
 
 /* eslint-disable quotes */
 import { LiteralInfinity } from "../../../generated/ast";
+import { RangeGenerator } from "../range";
 import { expectEvaluationResult } from "./util";
 
 test.concurrent.each([
@@ -56,10 +57,14 @@ test.concurrent.each([
     ["String addition", '"s1" + "s2"', ["s1s2"]],
     ["Exponentiation", "2 ** 3", [8]],
     ["Exponentiation", "2 ^ 3", [8]],
-])("%s (%s) can be evaluated", async (_: string, body: string, expected: unknown[]) => {
-    await expectEvaluationResult({
-        text: `in feature a = ${body};`,
-        langId: "kerml",
-        result: expected,
-    });
-});
+    ["Range", "0..3", new RangeGenerator({ start: 0, stop: 3 })],
+])(
+    "%s (%s) can be evaluated",
+    async (_: string, body: string, expected: unknown[] | RangeGenerator) => {
+        await expectEvaluationResult({
+            text: `in feature a = ${body};`,
+            langId: "kerml",
+            result: expected,
+        });
+    }
+);

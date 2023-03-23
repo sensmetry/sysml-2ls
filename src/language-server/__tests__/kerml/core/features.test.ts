@@ -89,11 +89,7 @@ test("features without subsetting, redefinition and conjugation relationships su
     );
     expect(result).toMatchObject(NO_ERRORS);
     expect(childrenNames(result.value.members[0].element, Visibility.private)).toEqual([
-        "person",
-        "Person", // from typing
-        "Base::Anything", // from Person
         "Base::things::that", // from things
-        "Base::things",
     ]);
     expect(sanitizeTree(result.value.members[0].element, undefined, "include $meta")).toMatchObject(
         {

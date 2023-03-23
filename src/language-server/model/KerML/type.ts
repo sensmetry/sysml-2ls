@@ -27,8 +27,10 @@ import {
     FeatureMeta,
     MembershipMeta,
     MetadataFeatureMeta,
+    MultiplicityRangeMeta,
     NamespaceMeta,
     NonNullRelationship,
+    OwningMembershipMeta,
     ResultExpressionMembershipMeta,
     ReturnParameterMembershipMeta,
     SpecializationMeta,
@@ -62,12 +64,18 @@ export class TypeMeta extends NamespaceMeta {
     result: ResultExpressionMembershipMeta | undefined;
     returns: ReturnParameterMembershipMeta | undefined;
 
+    multiplicity?: OwningMembershipMeta<MultiplicityRangeMeta>;
+
     constructor(elementId: ElementID, parent: ModelContainer<Type>) {
         super(elementId, parent);
     }
 
     override initialize(node: Type): void {
         this.isAbstract = !!node.isAbstract;
+        if (node.multiplicity) {
+            this.multiplicity = node.multiplicity
+                .$meta as OwningMembershipMeta<MultiplicityRangeMeta>;
+        }
     }
 
     /**
