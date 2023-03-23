@@ -1979,4 +1979,22 @@ ${type} def R {
             });
         });
     });
+
+    describe("allocate is correctly indented when the node starts with it", () => {
+        testFormatting(
+            `
+    part A {doc /*
+* doc
+        */ allocate A to A;
+    }`,
+            `
+part A {
+    doc /*
+         * doc
+         */
+    allocate A
+        to A;
+}`
+        );
+    });
 });

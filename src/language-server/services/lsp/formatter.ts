@@ -859,7 +859,10 @@ export class SysMLFormatter extends AbstractFormatter {
             // binary
             const from = formatter.keyword(keywords[0]);
             if (from.nodes.length === 0) formatter.node(ends[0]).prepend(Options.indent);
-            else from.prepend(Options.indent).append(Options.oneSpace);
+            else {
+                if (node.$cstNode?.offset !== from.nodes[0].offset) from.prepend(Options.indent);
+                from.append(Options.oneSpace);
+            }
             formatter.keyword(keywords[1]).prepend(Options.indent).append(Options.oneSpace);
             formatter.nodes(...ends).prepend(highPriority(Options.oneSpace));
         } else {
