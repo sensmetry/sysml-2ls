@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- `allocate` is not indented an additional time if the element starts with
+  `allocate`
 - Qualified names in suggestions shown from the membership node instead of the
   suggested element
 - Standard library pop up showing on every extension activation after updating
