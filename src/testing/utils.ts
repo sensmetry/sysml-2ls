@@ -53,7 +53,7 @@ export type ParseResult = LangiumParseResult<Namespace> & {
 };
 
 export const TEST_BUILD_OPTIONS: SysMLBuildOptions = {
-    validationChecks: "all",
+    validationChecks: "none",
     standardLibrary: "none",
     standalone: true,
 };

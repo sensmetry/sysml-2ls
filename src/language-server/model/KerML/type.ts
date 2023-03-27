@@ -138,14 +138,14 @@ export class TypeMeta extends NamespaceMeta {
         const visited = new Set<unknown>();
         const self = new SpecializationMeta(-1, this);
         self.setElement(this);
-        return new TreeStreamImpl<SpecializationType<K | undefined>>(
+        const tree = new TreeStreamImpl<SpecializationType<K | undefined>>(
             self as NonNullRelationship<typeof self>,
             // avoid circular specializations, there probably should be a
             // warning
             (s) =>
                 s
                     .element()
-                    ?.specializations(kind)
+                    ?.specializations()
                     .filter((s) => {
                         if (visited.has(s.element())) return false;
                         visited.add(s.element());
@@ -155,6 +155,9 @@ export class TypeMeta extends NamespaceMeta {
                 includeRoot: false,
             }
         );
+
+        if (!kind) return tree;
+        return tree.filter((s) => s.is(kind));
     }
 
     /**
@@ -197,21 +200,11 @@ export class TypeMeta extends NamespaceMeta {
         kind?: K,
         includeSelf = false
     ): Stream<NonNullable<TargetType<SpecializationType<K | undefined>> | TypeMeta>> {
-        const visited = new Set<unknown>();
-        return new TreeStreamImpl<
-            NonNullable<TargetType<SpecializationType<K | undefined>> | TypeMeta>
-        >(
-            this,
-            (s) =>
-                s?.types(kind).filter((type) => {
-                    if (visited.has(type)) return false;
-                    visited.add(type);
-                    return true;
-                }) ?? [],
-            {
-                includeRoot: includeSelf,
-            }
-        );
+        const tree = this.allSpecializations(kind)
+            .map((s) => s.element())
+            .nonNullable();
+        if (includeSelf) return stream([this]).concat(tree);
+        return tree;
     }
 
     /**

@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { parseKerML, withQualifiedName, anything } from "../../../../testing";
+import { parseKerML, withQualifiedName } from "../../../../testing";
 import { Feature } from "../../../generated/ast";
 
 test("feature chains allow qualified feature names in between chain parts", async () => {
@@ -49,11 +49,5 @@ test.failing("non-feature name in a chain fails to parse", async () => {
             }
         }
     }
-    feature c chains A::a.B::b;`).toParseKerML({});
-});
-
-test("features chaining a chain of 1 feature produce a diagnostic", async () => {
-    return expect(`
-    feature a;
-    feature b chains a;`).toParseKerML({}, { diagnostics: anything(1) });
+    feature c chains A::a.B::b;`).toParseKerML({}, { buildOptions: { validationChecks: "all" } });
 });

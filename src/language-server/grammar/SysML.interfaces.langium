@@ -185,7 +185,11 @@ interface WhileLoopActionUsage extends LoopActionUsage {
 interface ForLoopActionUsage extends LoopActionUsage {
 }
 
-interface SendActionUsage extends ActionUsage {}
+interface SendActionUsage extends ActionUsage {
+    payload: ParameterMembership;
+    sender?: ParameterMembership;
+    receiver?: ParameterMembership;
+}
 
 interface ControlNode extends ActionUsage {}
 

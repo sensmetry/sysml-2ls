@@ -18,9 +18,11 @@ import {
     Association,
     Behavior,
     Class,
+    Conjugation,
     Connector,
     EndFeatureMembership,
     Feature,
+    FeatureTyping,
     Redefinition,
     ReferenceSubsetting,
     ResultExpressionMembership,
@@ -33,6 +35,7 @@ import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { FeatureChainingMeta, FeatureValueMeta, TypeMeta } from "./_internal";
 import { SpecializationType } from "../containers";
 import { SysMLType } from "../../services/sysml-ast-reflection";
+import { EMPTY_STREAM, stream, Stream } from "langium";
 
 export const ImplicitFeatures = {
     base: "Base::things",
@@ -99,6 +102,8 @@ export class FeatureMeta extends TypeMeta {
     }
 
     value?: FeatureValueMeta;
+
+    protected typings: undefined | TypeMeta[] = undefined;
 
     constructor(elementId: ElementID, parent: ModelContainer<Feature>) {
         super(elementId, parent);
@@ -246,7 +251,7 @@ export class FeatureMeta extends TypeMeta {
     }
 
     basicFeature(): FeatureMeta {
-        return this.chainings.at(0)?.element() ?? this;
+        return this.chainings.at(-1)?.element() ?? this;
     }
 
     isIgnoredParameter(): boolean {
@@ -266,6 +271,8 @@ export class FeatureMeta extends TypeMeta {
     override addSpecialization<T extends SpecializationType>(specialization: T): void {
         super.addSpecialization(specialization);
 
+        this.typings = undefined;
+
         if (!this.isOrdered && specialization.is(Subsetting)) {
             if (specialization.element()?.isOrdered) this.isOrdered = true;
         }
@@ -280,6 +287,42 @@ export class FeatureMeta extends TypeMeta {
 
     override specializationKind(): SysMLType {
         return Subsetting;
+    }
+
+    allTypings(): TypeMeta[] {
+        if (!this.typings) return this.collectTypings();
+        return this.typings;
+    }
+
+    private collectTypings(): TypeMeta[] {
+        const types = this.collectInheritedTypes(new Set()).distinct().toArray();
+        this.typings = types.filter((t) => types.every((type) => type === t || !type.conforms(t)));
+        return this.typings;
+    }
+
+    private collectDirectTypes(visited: Set<FeatureMeta>): Stream<TypeMeta> {
+        const types = this.types(FeatureTyping);
+
+        const lastChaining = this.chainingFeatures.at(-1);
+        if (lastChaining) {
+            return types.concat(lastChaining.collectInheritedTypes(visited));
+        }
+
+        return types;
+    }
+
+    private collectInheritedTypes(visited: Set<FeatureMeta>): Stream<TypeMeta> {
+        if (visited.has(this)) return EMPTY_STREAM;
+        visited.add(this);
+
+        return stream(
+            this.collectDirectTypes(visited),
+            ...([Conjugation, Subsetting] as const).map((kind) =>
+                this.types(kind)
+                    .filter((t) => t.is(Feature))
+                    .flatMap((f) => (f as FeatureMeta).collectInheritedTypes(visited))
+            )
+        );
     }
 }
 

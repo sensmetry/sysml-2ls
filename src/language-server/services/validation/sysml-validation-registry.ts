@@ -14,17 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ValidationRegistry } from "langium";
 import { SysMLServices } from "../services";
-import { ValidationRules } from "./kerml-validation-registry";
+import { BaseValidationRegistry, ValidationRules } from "./validation-registry";
 
 /**
  * Registry for validation checks.
  */
-export class SysMLValidationRegistry extends ValidationRegistry {
+export class SysMLValidationRegistry extends BaseValidationRegistry {
     constructor(services: SysMLServices) {
         super(services);
         const validator = services.validation.SysMLValidator;
-        this.register(ValidationRules.sysml, validator);
+        this.registerBoundRules(ValidationRules.sysml, validator);
     }
 }

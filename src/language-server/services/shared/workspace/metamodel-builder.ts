@@ -71,6 +71,10 @@ import {
     Membership,
     MultiplicityRange,
     LiteralInfinity,
+    EnumerationUsage,
+    EnumerationDefinition,
+    OccurrenceUsage,
+    OccurrenceDefinition,
 } from "../../../generated/ast";
 import {
     BasicMetamodel,
@@ -88,6 +92,7 @@ import {
     ElementMeta,
     SpecializationKeys,
     Bounds,
+    SubsettingMeta,
 } from "../../../model";
 import { SysMLError } from "../../sysml-validation";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
@@ -621,7 +626,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit classifier relationships
      */
-    @builder(Classifier)
+    @builder(Classifier, 10)
     addClassifierImplicits(node: Classifier, document: LangiumDocument): void {
         // implicit
         if (node.$meta.specializations().some((r) => r.is(Specialization) && !r.isImplied)) return;
@@ -631,7 +636,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit feature relationships
      */
-    @builder(Feature)
+    @builder(Feature, 10)
     addFeatureImplicits(node: Feature, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
@@ -699,7 +704,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit definition relationships
      */
-    @builder(Definition)
+    @builder(Definition, 15)
     addDefinitionImplicits(node: Definition, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
@@ -722,7 +727,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     /**
      * Setup implicit usage relationships
      */
-    @builder(Usage)
+    @builder(Usage, 15)
     addUsageImplicits(node: Usage, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
 
@@ -1052,6 +1057,39 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             },
             configurable: true,
         });
+    }
+
+    @builder(EnumerationUsage, 5)
+    addImplicitEnumerationTyping(node: EnumerationUsage, _document: LangiumDocument): void {
+        const owner = node.$meta.owner();
+        if (
+            owner.is(EnumerationDefinition) &&
+            node.$meta.specializations(FeatureTyping).length === 0
+        ) {
+            const typing = new FeatureTypingMeta(this.util.createId(), node.$meta);
+            typing.isImplied = true;
+            typing.setElement(owner);
+            node.$meta.addSpecialization(typing);
+        }
+    }
+
+    @builder(OccurrenceUsage, 5)
+    addImplicitOccurrenceUsageTyping(node: OccurrenceUsage, _document: LangiumDocument): void {
+        const meta = node.$meta;
+        if (!meta.portionKind || meta.specializations(FeatureTyping).length !== 0) return;
+
+        const owner = meta.owner();
+        let spec: SpecializationMeta | undefined;
+        if (owner.is(OccurrenceDefinition)) {
+            spec = new FeatureTypingMeta(this.util.createId(), meta);
+        } else if (owner.is(OccurrenceUsage)) {
+            spec = new SubsettingMeta(this.util.createId(), meta);
+        }
+
+        if (!spec) return;
+        spec.isImplied = true;
+        spec.setElement(owner as TypeMeta);
+        meta.addSpecialization(spec);
     }
 
     /**

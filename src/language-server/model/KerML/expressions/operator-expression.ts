@@ -62,7 +62,12 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
         }
         if (this.operator === "'['") {
             // this is not used for indexing but setting units
-            return typeOf(this.args[1]);
+
+            // Cannot use the argument to infer exact type so use base type, the
+            // argument is a unit while the full expression should be typed by
+            // quantity value. Maybe in the future we will generate mapping
+            // between units and quantities to help with this
+            return "Quantities::ScalarQuantityValue";
         }
         return super.returnType();
     }

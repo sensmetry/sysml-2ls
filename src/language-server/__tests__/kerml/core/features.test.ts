@@ -122,7 +122,7 @@ test.concurrent.each([
 test.failing("conjugating feature with a non-feature issues a warning", async () => {
     return expect(`
     classifier A;
-    feature a ~ A;`).toParseKerML({});
+    feature a ~ A;`).toParseKerML({}, { buildOptions: { validationChecks: "all" } });
 });
 
 test("feature multiplicity can be specified after identification", async () => {

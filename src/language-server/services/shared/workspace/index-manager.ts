@@ -323,4 +323,11 @@ export class SysMLIndexManager extends DefaultIndexManager {
     protected getLanguageId(uri: URI): string {
         return Utils.extname(uri).toLowerCase();
     }
+
+    conforms(left: string | TypeMeta, type: string | TypeMeta): boolean {
+        if (typeof left === "string") left = this.findType(left) ?? left;
+        if (typeof left === "string")
+            return left === (typeof type === "string" ? type : type.qualifiedName);
+        return left.conforms(type);
+    }
 }

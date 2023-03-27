@@ -853,7 +853,7 @@ ItemFeature returns ItemFeature:
 ;
 
 fragment ItemFeatureSpecializationPart:
-    ( FeatureSpecialization )+ MultiplicityPart? FeatureSpecialization*
+    FeatureSpecialization+ (MultiplicityPart FeatureSpecialization*)?
     | MultiplicityPart FeatureSpecialization+
 ;
 

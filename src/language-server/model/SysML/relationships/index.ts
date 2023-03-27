@@ -23,6 +23,7 @@ export * from "./namespace-expose";
 export * from "./objective-membership";
 export * from "./port-conjugation";
 export * from "./requirement-constraint-membership";
+export * from "./requirement-verification-membership";
 export * from "./stakeholder-membership";
 export * from "./state-subaction-membership";
 export * from "./subject-membership";

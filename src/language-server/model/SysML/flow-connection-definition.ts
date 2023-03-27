@@ -22,12 +22,13 @@ import { ActionDefinitionMeta } from "./action-definition";
 import { ConnectionDefinitionMeta } from "./connection-definition";
 
 @metamodelOf(FlowConnectionDefinition, {
+    base: "Connections::Connection",
     binary: "Connections::MessageConnection",
 })
 export class FlowConnectionDefinitionMeta extends Mixin(
-    ConnectionDefinitionMeta,
+    InteractionMeta,
     ActionDefinitionMeta,
-    InteractionMeta
+    ConnectionDefinitionMeta
 ) {
     constructor(id: ElementID, parent: ModelContainer<FlowConnectionDefinition>) {
         super(id, parent);

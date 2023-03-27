@@ -109,7 +109,7 @@ export const SysMLModule: Module<SysMLServices, PartialSysMLDefaultServices & Sy
     {
         validation: {
             ValidationRegistry: (services) => new SysMLValidationRegistry(services),
-            SysMLValidator: () => new SysMLValidator(),
+            SysMLValidator: (services) => new SysMLValidator(services.shared),
         },
     };
 
@@ -117,7 +117,7 @@ export const KerMLModule: Module<KerMLServices, PartialSysMLDefaultServices & Ke
     {
         validation: {
             ValidationRegistry: (services) => new KerMLValidationRegistry(services),
-            KerMLValidator: () => new KerMLValidator(),
+            KerMLValidator: (services) => new KerMLValidator(services.shared),
         },
     };
 

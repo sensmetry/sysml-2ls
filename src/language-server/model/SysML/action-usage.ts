@@ -32,7 +32,7 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     guard: "Actions::TransitionAction::guard",
     effect: "Actions::TransitionAction::effect",
 })
-export class ActionUsageMeta extends Mixin(OccurrenceUsageMeta, StepMeta) {
+export class ActionUsageMeta extends Mixin(StepMeta, OccurrenceUsageMeta) {
     isParallel = false;
 
     constructor(id: ElementID, parent: ModelContainer<ActionUsage>) {

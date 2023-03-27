@@ -26,7 +26,7 @@ export const ImplicitAssociationStructures = {
 };
 
 @metamodelOf(AssociationStructure, ImplicitAssociationStructures)
-export class AssociationStructMeta extends Mixin(AssociationMeta, StructureMeta) {
+export class AssociationStructMeta extends Mixin(StructureMeta, AssociationMeta) {
     constructor(elementId: ElementID, parent: ModelContainer<AssociationStructure>) {
         super(elementId, parent);
     }

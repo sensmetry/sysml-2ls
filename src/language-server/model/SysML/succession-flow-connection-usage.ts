@@ -26,8 +26,8 @@ import { FlowConnectionUsageMeta } from "./flow-connection-usage";
     message: "Connections::successionFlowConnections",
 })
 export class SuccessionFlowConnectionUsageMeta extends Mixin(
-    FlowConnectionUsageMeta,
-    SuccessionItemFlowMeta
+    SuccessionItemFlowMeta,
+    FlowConnectionUsageMeta
 ) {
     constructor(id: ElementID, parent: ModelContainer<SuccessionFlowConnectionUsage>) {
         super(id, parent);

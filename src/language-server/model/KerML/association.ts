@@ -14,11 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { stream } from "langium";
 import { Mixin } from "ts-mixer";
-import { Association, EndFeatureMembership } from "../../generated/ast";
+import { Association } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ConnectorMixin } from "../mixins/connector";
 import { ClassifierMeta, RelationshipMeta } from "./_internal";
 
 export const ImplicitAssociations = {
@@ -28,9 +28,7 @@ export const ImplicitAssociations = {
 
 @metamodelOf(Association, ImplicitAssociations)
 // Note: inherited methods are override by the last class inside `Mixin`
-export class AssociationMeta extends Mixin(RelationshipMeta, ClassifierMeta) {
-    // cached end counts
-    private localEnds: number | undefined = undefined;
+export class AssociationMeta extends Mixin(ConnectorMixin, RelationshipMeta, ClassifierMeta) {
     private baseEnds: number | undefined = undefined;
 
     constructor(elementId: ElementID, parent: ModelContainer<Association>) {
@@ -72,25 +70,10 @@ export class AssociationMeta extends Mixin(RelationshipMeta, ClassifierMeta) {
     }
 
     /**
-     * @returns Number of directly owned end features
-     */
-    ownedEnds(): number {
-        if (this.localEnds === undefined) {
-            this.localEnds = stream(this.features)
-                .map((m) => m.element())
-                .nonNullable()
-                .filter((f) => f.isEnd || f.parent().is(EndFeatureMembership))
-                .count();
-        }
-
-        return this.localEnds;
-    }
-
-    /**
      * @returns Total number of ends including inherited ones
      */
     totalEnds(): number {
-        return Math.max(this.ownedEnds(), this.inheritedEnds());
+        return Math.max(this.ownedEnds().length, this.inheritedEnds());
     }
 
     /**

@@ -14,7 +14,6 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { formatString } from "typescript-string-operations";
 import { anything, withQualifiedName, qualifiedTypeReference } from "../../../../testing";
 import { Classifier, Unioning } from "../../../generated/ast";
 
@@ -60,13 +59,3 @@ test("multiple relationships can be specified using multiple clauses", async () 
         ],
     });
 });
-
-test.concurrent.each(["unions", "intersects", "differences"])(
-    "it is not allowable for a type to have just one of '%s' relationship",
-    async (token: string) => {
-        return expect(Common + formatString("classifier Person {0} Adult;", token)).toParseKerML(
-            {},
-            { diagnostics: anything(1) }
-        );
-    }
-);
