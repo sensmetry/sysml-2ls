@@ -190,14 +190,8 @@ export class ElementScope extends SysMLScope {
 
     protected override getLocalElement(name: string): MembershipMeta | undefined {
         const candidate = this.element.children.get(name);
-
         if (candidate && this.isVisible(candidate)) return candidate;
-        if (this.options.inherited.visibility < Visibility.private) return;
-
-        const parent = this.element.parent();
-        if (!parent?.is(Membership)) return undefined;
-        if (name === this.element.name || name === this.element.shortName) return parent;
-        return undefined;
+        return;
     }
 
     protected override getAllLocalElements(): Stream<MembershipMeta> {

@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { SendActionUsage } from "../../generated/ast";
+import { ParameterMembershipMeta } from "../KerML";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
@@ -23,6 +24,10 @@ import { ActionUsageMeta } from "./action-usage";
     subaction: "Actions::Action::sendSubactions",
 })
 export class SendActionUsageMeta extends ActionUsageMeta {
+    payload?: ParameterMembershipMeta;
+    sender?: ParameterMembershipMeta;
+    receiver?: ParameterMembershipMeta;
+
     constructor(id: ElementID, parent: ModelContainer<SendActionUsage>) {
         super(id, parent);
     }
@@ -33,6 +38,20 @@ export class SendActionUsageMeta extends ActionUsageMeta {
 
     override parent(): ModelContainer<SendActionUsage> {
         return this._parent;
+    }
+
+    override initialize(node: SendActionUsage): void {
+        this.payload = node.payload.$meta;
+        this.sender = node.sender?.$meta;
+        this.receiver = node.receiver?.$meta;
+    }
+
+    override collectChildren(node: SendActionUsage): void {
+        this.members.push(node.payload.$meta);
+        if (node.sender) this.members.push(node.sender.$meta);
+        if (node.receiver) this.members.push(node.receiver.$meta);
+
+        super.collectChildren(node);
     }
 }
 

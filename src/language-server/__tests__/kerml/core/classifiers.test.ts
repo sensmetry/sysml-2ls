@@ -27,6 +27,7 @@ describe.each(["specializes", "conjugates"])(
                 {},
                 {
                     diagnostics: [defaultLinkingErrorTo("A")],
+                    buildOptions: { validationChecks: "all", standardLibrary: "none" },
                 }
             );
         });

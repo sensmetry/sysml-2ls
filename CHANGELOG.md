@@ -8,6 +8,7 @@
 
 ### Added
 
+- SysML validations
 - Subsetting multiplicities and unique names in direct scope validations
 
 ### Fixed

@@ -14,5 +14,25 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * from "./connector";
-export * from "./function";
+import { stream } from "langium";
+import { EndFeatureMembership } from "../../generated/ast";
+import { ElementMeta, FeatureMeta } from "../KerML/_internal";
+
+export class ConnectorMixin {
+    protected localEnds: FeatureMeta[] | undefined = undefined;
+
+    /**
+     * @returns Number of directly owned end features
+     */
+    ownedEnds(this: ElementMeta & ConnectorMixin): FeatureMeta[] {
+        if (this.localEnds === undefined) {
+            this.localEnds = stream(this.features)
+                .map((m) => m.element())
+                .nonNullable()
+                .filter((f) => f.isEnd || f.parent().is(EndFeatureMembership))
+                .toArray();
+        }
+
+        return this.localEnds;
+    }
+}

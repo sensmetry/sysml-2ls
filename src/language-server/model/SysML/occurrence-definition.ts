@@ -23,7 +23,7 @@ import { DefinitionMeta } from "./definition";
 @metamodelOf(OccurrenceDefinition, {
     base: "Occurrences::Occurrence",
 })
-export class OccurrenceDefinitionMeta extends Mixin(DefinitionMeta, ClassMeta) {
+export class OccurrenceDefinitionMeta extends Mixin(ClassMeta, DefinitionMeta) {
     constructor(id: ElementID, parent: ModelContainer<OccurrenceDefinition>) {
         super(id, parent);
     }

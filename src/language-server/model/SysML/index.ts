@@ -76,7 +76,6 @@ export * from "./rendering-definition";
 export * from "./rendering-usage";
 export * from "./requirement-definition";
 export * from "./requirement-usage";
-export * from "./requirement-verification-usage";
 export * from "./satisfy-requirement-usage";
 export * from "./send-action-usage";
 export * from "./state-definition";

@@ -1299,10 +1299,8 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.actionUsage(node, formatter);
         formatter.keyword("send").prepend(Options.indent).append(Options.oneSpace);
-        if (node.members.length >= 2) {
-            formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
-            formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
-        }
+        if (node.sender) formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
+        if (node.receiver) formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
     }
 
     @formatter(ast.AssignmentActionUsage) assignmentActionUsage(

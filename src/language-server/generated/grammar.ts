@@ -7399,20 +7399,25 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "cardinality": "+"
               },
               {
-                "$type": "RuleCall",
-                "rule": {
-                  "$ref": "#/rules@72"
-                },
-                "arguments": [],
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "RuleCall",
+                    "rule": {
+                      "$ref": "#/rules@72"
+                    },
+                    "arguments": []
+                  },
+                  {
+                    "$type": "RuleCall",
+                    "rule": {
+                      "$ref": "#/rules@73"
+                    },
+                    "arguments": [],
+                    "cardinality": "*"
+                  }
+                ],
                 "cardinality": "?"
-              },
-              {
-                "$type": "RuleCall",
-                "rule": {
-                  "$ref": "#/rules@73"
-                },
-                "arguments": [],
-                "cardinality": "*"
               }
             ]
           },
@@ -23899,8 +23904,8 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "members",
-            "operator": "+=",
+            "feature": "payload",
+            "operator": "=",
             "terminal": {
               "$type": "RuleCall",
               "rule": {
@@ -23918,8 +23923,8 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "members",
-                "operator": "+=",
+                "feature": "sender",
+                "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
@@ -23940,8 +23945,8 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "members",
-                "operator": "+=",
+                "feature": "receiver",
+                "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
@@ -37070,13 +37075,47 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
     },
     {
       "$type": "Interface",
+      "attributes": [
+        {
+          "$type": "TypeAttribute",
+          "name": "payload",
+          "type": {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@64"
+            }
+          },
+          "isOptional": false
+        },
+        {
+          "$type": "TypeAttribute",
+          "name": "sender",
+          "isOptional": true,
+          "type": {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@64"
+            }
+          }
+        },
+        {
+          "$type": "TypeAttribute",
+          "name": "receiver",
+          "isOptional": true,
+          "type": {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@64"
+            }
+          }
+        }
+      ],
       "name": "SendActionUsage",
       "superTypes": [
         {
           "$ref": "#/interfaces@103"
         }
-      ],
-      "attributes": []
+      ]
     },
     {
       "$type": "Interface",

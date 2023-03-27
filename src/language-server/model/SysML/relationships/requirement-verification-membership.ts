@@ -14,10 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { RequirementVerificationMembership } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { RequirementConstraintMembershipMeta } from "./relationships/requirement-constraint-membership";
-import { RequirementUsageMeta } from "./requirement-usage";
+import {
+    ObjectiveMembership,
+    RequirementUsage,
+    RequirementVerificationMembership,
+    VerificationCaseDefinition,
+    VerificationCaseUsage,
+} from "../../../generated/ast";
+import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { RequirementConstraintMembershipMeta } from "./requirement-constraint-membership";
+import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(RequirementVerificationMembership)
 export class RequirementVerificationMembershipMeta<
@@ -34,9 +40,16 @@ export class RequirementVerificationMembershipMeta<
     override parent(): ModelContainer<RequirementVerificationMembership> {
         return this._parent;
     }
+
+    isLegalVerification(): boolean {
+        let owner = this.owner();
+        if (!owner.is(RequirementUsage) || !owner.parent().is(ObjectiveMembership)) return false;
+        owner = owner.owner();
+        return owner.isAny([VerificationCaseDefinition, VerificationCaseUsage]);
+    }
 }
 
-declare module "../../generated/ast" {
+declare module "../../../generated/ast" {
     interface RequirementVerificationMembership {
         $meta: RequirementVerificationMembershipMeta;
     }

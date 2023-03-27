@@ -24,7 +24,7 @@ import { ActionUsageMeta } from "./action-usage";
     base: "Calculations::calculations",
     subcalculation: "Calculations::Calculation::subcalculations",
 })
-export class CalculationUsageMeta extends Mixin(ActionUsageMeta, ExpressionMeta) {
+export class CalculationUsageMeta extends Mixin(ExpressionMeta, ActionUsageMeta) {
     constructor(id: ElementID, parent: ModelContainer<CalculationUsage>) {
         super(id, parent);
     }

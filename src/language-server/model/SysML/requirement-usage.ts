@@ -15,12 +15,9 @@
  ********************************************************************************/
 
 import {
-    ObjectiveMembership,
     RequirementDefinition,
     RequirementUsage,
     RequirementVerificationMembership,
-    VerificationCaseDefinition,
-    VerificationCaseUsage,
 } from "../../generated/ast";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
 import { ConstraintUsageMeta } from "./constraint-usage";
@@ -41,11 +38,7 @@ export class RequirementUsageMeta extends ConstraintUsageMeta {
 
     isVerifiedRequirement(): boolean {
         const parent = this.parent();
-        if (!parent.is(RequirementVerificationMembership)) return false;
-
-        const owner = this.owner();
-        if (!owner.is(RequirementUsage) || !owner.parent().is(ObjectiveMembership)) return false;
-        return owner.owner().isAny([VerificationCaseDefinition, VerificationCaseUsage]);
+        return parent.is(RequirementVerificationMembership) && parent.isLegalVerification();
     }
 
     isSubrequirement(): boolean {

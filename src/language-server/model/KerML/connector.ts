@@ -17,6 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { Connector, EndFeatureMembership, Feature } from "../../generated/ast";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { ConnectorMixin } from "../mixins/connector";
 import { FeatureMembershipMeta, FeatureMeta, RelationshipMeta } from "./_internal";
 
 export const ImplicitConnectors = {
@@ -27,7 +28,7 @@ export const ImplicitConnectors = {
 };
 
 @metamodelOf(Connector, ImplicitConnectors)
-export class ConnectorMeta extends Mixin(RelationshipMeta, FeatureMeta) {
+export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, FeatureMeta) {
     /**
      * Owned connector ends
      */
@@ -66,6 +67,7 @@ export class ConnectorMeta extends Mixin(RelationshipMeta, FeatureMeta) {
 
     override reset(node: Connector): void {
         this.initialize(node);
+        this.localEnds = undefined;
     }
 }
 

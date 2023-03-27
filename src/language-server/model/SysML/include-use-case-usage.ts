@@ -27,10 +27,11 @@ import { PerformActionUsageMeta } from "./perform-action-usage";
 import { UseCaseUsageMeta } from "./use-case-usage";
 
 @metamodelOf(IncludeUseCaseUsage, {
+    base: "UseCases::useCases",
     subUseCase: "UseCases::UseCase::includedUseCases",
     performedAction: "Parts::Part::performedActions",
 })
-export class IncludeUseCaseUsageMeta extends Mixin(UseCaseUsageMeta, PerformActionUsageMeta) {
+export class IncludeUseCaseUsageMeta extends Mixin(PerformActionUsageMeta, UseCaseUsageMeta) {
     constructor(id: ElementID, parent: ModelContainer<IncludeUseCaseUsage>) {
         super(id, parent);
     }

@@ -1176,15 +1176,9 @@ SendNode returns SendActionUsage:
 ;
 
 fragment SendNodeDeclaration:
-    ActionNodeUsageDeclaration? 'send' members+=NodeParameterMember 
-    ( 'via' members+=NodeParameterMember 
-    // TODO: empty rule
-    /* | members+=EmptyParameterMember
-    ) */ )?
-    ( 'to' members+=NodeParameterMember
-    // TODO: empty rule
-    /* | members+=EmptyParameterMember	
-    ) */ )?
+    ActionNodeUsageDeclaration? 'send' payload=NodeParameterMember 
+    ( 'via' sender=NodeParameterMember  )?
+    ( 'to' receiver=NodeParameterMember )?
 ;
 
 NodeParameterMember returns ParameterMembership:
