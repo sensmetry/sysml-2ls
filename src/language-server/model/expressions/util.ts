@@ -188,7 +188,7 @@ export function builtinFunction(fn: meta.FunctionMeta | string): BuiltinFunction
  * @returns true if corresponding builtin function exists and is model level
  * evaluable, false otherwise
  */
-export function isModelLevelEvaluable(fn: meta.FunctionMeta): boolean {
+export function isModelLevelEvaluable(fn: meta.FunctionMeta | string): boolean {
     return builtinFunction(fn)?.isModelLevelEvaluable === true;
 }
 

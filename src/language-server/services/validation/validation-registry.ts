@@ -58,7 +58,7 @@ export function validateKerML<K extends SysMLType>(
     type: K,
     options: { sysml?: boolean; bounds?: SysMLType[] } = {}
 ) {
-    return validate(type, true, options.sysml ?? false, options.bounds ?? []);
+    return validate(type, true, options.sysml ?? true, options.bounds ?? []);
 }
 
 // useless/long return type for decorator factory

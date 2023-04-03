@@ -45,6 +45,7 @@ export async function expectEvaluationResult(test: EvaluationCase): Promise<void
         ignoreMetamodelErrors: true,
         standalone: true,
         standardLibrary: "local",
+        validationChecks: "none",
     });
     expect(result).toMatchObject(NO_ERRORS);
 

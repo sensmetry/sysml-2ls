@@ -37,4 +37,8 @@ export class LiteralExpressionMeta extends ExpressionMeta {
     override parent(): ModelContainer<LiteralExpression> {
         return this._parent;
     }
+
+    override isModelLevelEvaluable(): boolean {
+        return true;
+    }
 }

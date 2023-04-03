@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { defaultLinkingErrorTo } from "../../../../testing";
+import { anything, defaultLinkingErrorTo } from "../../../../testing";
 
 describe.each(["specializes", "conjugates"])(
     "classifiers can only specialize other classifiers with '%s'",
@@ -26,7 +26,7 @@ describe.each(["specializes", "conjugates"])(
             ).toParseKerML(
                 {},
                 {
-                    diagnostics: [defaultLinkingErrorTo("A")],
+                    diagnostics: [defaultLinkingErrorTo("A"), ...anything(1)],
                     buildOptions: { validationChecks: "all", standardLibrary: "none" },
                 }
             );

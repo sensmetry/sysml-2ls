@@ -160,6 +160,7 @@ test("implicitly inherited members are visible", async () => {
             standardLibrary: "local",
             ignoreMetamodelErrors: true,
             standalone: true,
+            validationChecks: "none",
         }
     );
     expect(result).toMatchObject(NO_ERRORS);

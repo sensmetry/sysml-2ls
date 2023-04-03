@@ -85,7 +85,12 @@ test("features without subsetting, redefinition and conjugation relationships su
     classifier Person;
     abstract feature person : Person;
     `,
-        { standardLibrary: "local", ignoreMetamodelErrors: true, standalone: true }
+        {
+            standardLibrary: "local",
+            ignoreMetamodelErrors: true,
+            standalone: true,
+            validationChecks: "none",
+        }
     );
     expect(result).toMatchObject(NO_ERRORS);
     expect(childrenNames(result.value.members[0].element, Visibility.private)).toEqual([

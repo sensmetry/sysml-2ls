@@ -38,14 +38,14 @@ export class InvocationExpressionMeta extends ExpressionMeta {
         return this._parent;
     }
 
-    protected invokes(): TypeMeta | undefined {
+    invokes(): TypeMeta | undefined {
         return this.types().head();
     }
 
     /**
      * @returns fully qualified name of the invoked function
      */
-    getFunction(): string | undefined {
+    override getFunction(): string | undefined {
         return this.invokes()?.qualifiedName;
     }
 

@@ -28,7 +28,7 @@ export abstract class AnnotatingElementMeta extends ElementMeta {
 
     override initialize(node: AnnotatingElement): void {
         if (isTextualRepresentation(node) || node.about.length === 0) {
-            this.annotates.push(node.$container.$meta);
+            this.annotates.push(this.owner());
         }
     }
 

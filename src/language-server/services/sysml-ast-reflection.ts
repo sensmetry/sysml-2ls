@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, Mutable, stream, TypeMetaData } from "langium";
+import { AstNode, CstNode, Mutable, stream, TypeMetaData } from "langium";
 import * as ast from "../generated/ast";
 import { typeIndex } from "../model/types";
 import { AstContainer, AstParent, AstPropertiesFor } from "../utils/ast-util";
@@ -124,6 +124,14 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
         P extends AstPropertiesFor<SysMLInterface<V>, T>
     >(type: V, values: ConstructParams<SysMLInterface<V>, T, P>): SysMLInterface<V> {
         const partialNode = { $type: type, ...values };
+
+        // if there's a CST node, modify it to point to the created node
+        if (values.$cstNode) {
+            const cstNode = shallowClone(values.$cstNode);
+            (cstNode as Mutable<CstNode>).element = partialNode as AstNode;
+            (partialNode as Mutable<AstNode>).$cstNode = cstNode;
+            (cstNode as AutoCstNode).$implicit = true;
+        }
         this.assignMandatoryProperties(partialNode);
         return this.assignNode(partialNode as unknown as SysMLInterface<V>, values);
     }
@@ -192,3 +200,16 @@ export type ConstructParams<
     P extends AstPropertiesFor<V, T>
 > = Omit<Partial<V>, "$type" | "$container" | "$containerProperty" | "$containerIndex"> &
     AstContainer<V, T, P>;
+
+// https://stackoverflow.com/a/43533066/20107711
+function shallowClone<T>(obj: T): T {
+    return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj));
+}
+
+interface AutoCstNode extends CstNode {
+    $implicit: true;
+}
+
+export function isProgrammaticNode(node: AstNode): boolean {
+    return !node.$cstNode || "$implicit" in node.$cstNode;
+}

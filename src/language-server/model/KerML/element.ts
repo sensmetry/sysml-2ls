@@ -15,8 +15,10 @@
  ********************************************************************************/
 
 import { Stream, stream } from "langium";
-import { Element, Membership, MetadataFeature } from "../../generated/ast";
+import { Element, Feature, Membership, MetadataFeature } from "../../generated/ast";
 import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
+import { SysMLTypeList } from "../../services/sysml-ast-reflection";
+import { KeysMatching } from "../../utils/common";
 import { BasicMetamodel, ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { computeQualifiedName, Name } from "../naming";
 import {
@@ -227,21 +229,38 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
      * @param value new name
      */
     private updateName(name: Name, value: string): void {
-        const parent = this.parent();
-        const basicParent = parent?.is(Membership) ? parent : undefined;
-        const owner = basicParent?.parent() as ElementMeta | undefined;
+        const owner = this.owner();
         // remove this child
         if (name.sanitized && owner) owner.children.delete(name.sanitized);
 
         // update names
         name.set(value);
-        this.qualifiedName = computeQualifiedName(this, parent);
+        this.qualifiedName = computeQualifiedName(this, owner);
 
         if (name.sanitized && name.sanitized.length > 0) {
-            if (owner && !owner.children.has(name.sanitized)) {
-                owner.children.set(name.sanitized, basicParent as MembershipMeta);
+            const membership = this.parent();
+            if (owner && !owner.children.has(name.sanitized) && membership.is(Membership)) {
+                owner.children.set(name.sanitized, membership);
             }
         }
+    }
+
+    featuresByMembership<K extends KeysMatching<SysMLTypeList, Membership>>(
+        kind: K
+    ): Stream<FeatureMeta> {
+        return stream(this.features)
+            .filter((m) => m.is(kind))
+            .map((m) => m.element())
+            .nonNullable();
+    }
+
+    featuresMatching<K extends KeysMatching<SysMLTypeList, Feature>>(
+        kind: K
+    ): Stream<SysMLTypeList[K]["$meta"]> {
+        return stream(this.features)
+            .map((m) => m.element())
+            .nonNullable()
+            .filter((f) => f.is(kind)) as Stream<SysMLTypeList[K]["$meta"]>;
     }
 }
 

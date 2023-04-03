@@ -14,14 +14,20 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Stream } from "langium";
 import {
+    AcceptActionUsage,
     ActionDefinition,
     ActionUsage,
+    ParameterMembership,
     StateDefinition,
     StateUsage,
+    TransitionFeatureMembership,
     TransitionUsage,
 } from "../../generated/ast";
+import { FeatureMeta } from "../KerML/_internal";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { AcceptActionUsageMeta } from "./accept-action-usage";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(TransitionUsage, {
@@ -58,6 +64,26 @@ export class TransitionUsageMeta extends ActionUsageMeta {
 
     override parent(): ModelContainer<TransitionUsage> {
         return this._parent;
+    }
+
+    payloadParameter(): FeatureMeta | undefined {
+        return this.featuresByMembership(ParameterMembership).tail(1).head();
+    }
+
+    triggerActions(): Stream<AcceptActionUsageMeta> {
+        return this.featuresMatching(AcceptActionUsage);
+    }
+
+    accepterPayloadParameter(): FeatureMeta | undefined {
+        return this.triggerActions().head()?.ownedParameters().head();
+    }
+
+    transitionLinkFeature(): FeatureMeta | undefined {
+        return this.ownedFeatureMemberships()
+            .filter((m) => !m.isAny([TransitionFeatureMembership, ParameterMembership]))
+            .map((m) => m.element())
+            .nonNullable()
+            .head();
     }
 }
 

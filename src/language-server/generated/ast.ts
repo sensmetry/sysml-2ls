@@ -175,7 +175,7 @@ export function isElement(item: unknown): item is Element {
 }
 
 export interface ElementReference extends AstNode {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'ElementReference' | 'FeatureReference' | 'MembershipReference' | 'MetaclassReference' | 'NamespaceReference' | 'TypeReference';
     parts: Array<Reference<Element>>
 }
@@ -235,7 +235,7 @@ export function isRelationship(item: unknown): item is Relationship {
 }
 
 export interface MembershipReference extends ElementReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'MembershipReference';
 }
 
@@ -246,7 +246,7 @@ export function isMembershipReference(item: unknown): item is MembershipReferenc
 }
 
 export interface NamespaceReference extends ElementReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'FeatureReference' | 'MetaclassReference' | 'NamespaceReference' | 'TypeReference';
 }
 
@@ -308,7 +308,6 @@ export function isType(item: unknown): item is Type {
 export interface Annotation extends Relationship {
     readonly $container: AnnotatingElement | Element | Expression | Feature | FeatureReferenceExpression | Multiplicity | Namespace | OperatorExpression | Relationship | SendActionUsage | SysMLFunction | Type;
     readonly $type: 'Annotation';
-    annotatedElement?: ElementReference
 }
 
 export const Annotation = 'Annotation';
@@ -477,7 +476,7 @@ export function isUnioning(item: unknown): item is Unioning {
 }
 
 export interface TypeReference extends NamespaceReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'FeatureReference' | 'MetaclassReference' | 'TypeReference';
 }
 
@@ -753,7 +752,7 @@ export function isSubtype(item: unknown): item is Subtype {
 }
 
 export interface ClassifierReference extends TypeReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'ClassifierReference' | 'ConjugatedPortReference' | 'MetaclassReference';
 }
 
@@ -764,7 +763,7 @@ export function isClassifierReference(item: unknown): item is ClassifierReferenc
 }
 
 export interface FeatureReference extends TypeReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'FeatureReference';
 }
 
@@ -1139,7 +1138,7 @@ export function isReferenceSubsetting(item: unknown): item is ReferenceSubsettin
 }
 
 export interface ConjugatedPortReference extends ClassifierReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'ConjugatedPortReference';
 }
 
@@ -1150,7 +1149,7 @@ export function isConjugatedPortReference(item: unknown): item is ConjugatedPort
 }
 
 export interface MetaclassReference extends ClassifierReference {
-    readonly $container: Annotation | Dependency | MetadataAccessExpression | Relationship;
+    readonly $container: Dependency | MetadataAccessExpression | Relationship;
     readonly $type: 'MetaclassReference';
 }
 

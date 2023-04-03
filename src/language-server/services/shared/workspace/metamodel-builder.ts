@@ -71,10 +71,16 @@ import {
     Membership,
     MultiplicityRange,
     LiteralInfinity,
-    EnumerationUsage,
-    EnumerationDefinition,
     OccurrenceUsage,
     OccurrenceDefinition,
+    Multiplicity,
+    FeatureValue,
+    ItemFlowEnd,
+    OwningMembership,
+    FeatureMembership,
+    VariantMembership,
+    SuccessionAsUsage,
+    ReferenceSubsetting,
 } from "../../../generated/ast";
 import {
     BasicMetamodel,
@@ -93,6 +99,11 @@ import {
     SpecializationKeys,
     Bounds,
     SubsettingMeta,
+    RedefinitionMeta,
+    ExpressionMeta,
+    UsageMeta,
+    ReferenceSubsettingMeta,
+    Metamodel,
 } from "../../../model";
 import { SysMLError } from "../../sysml-validation";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
@@ -282,8 +293,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             return;
         }
 
-        const target = ref.$meta.to.target?.ast();
-        if (target) this.preLinkNode(target, getDocument(target));
+        const target = ref.$meta.to.target;
+        if (target) this.preLinkModel(target);
     }
 
     getMetamodelErrors(document: LangiumDocument<AstNode>): readonly SysMLError[] {
@@ -401,6 +412,11 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 `< ${node.$meta.qualifiedName} [${node.$type}]`
             );
         }
+    }
+
+    protected preLinkModel(model: Metamodel, document?: LangiumDocument): void {
+        const node = model.ast();
+        if (node) this.preLinkNode(node, document);
     }
 
     /**
@@ -521,11 +537,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             const description = imp.element();
             if (!description) continue; // failed to link
 
-            const target = description.ast();
-            if (!target) continue; // nothing to resolve
-
             // link dependant namespaces recursively
-            this.preLinkNode(target, getDocument(target));
+            this.preLinkModel(description);
         }
     }
 
@@ -598,11 +611,11 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         node.chains.forEach((f) => this.preLinkNode(f, document));
         let source: ElementMeta | undefined = node.$meta.source();
         if (!node.reference) {
-            node.$meta.setElement(node.chains.at(-1)?.$meta.chainings.at(-1)?.element());
+            node.$meta.setElement(node.chains.at(-1)?.$meta);
         }
         if (!node.source && node.chains.length === (node.reference ? 1 : 2)) {
+            node.$meta.setSource(node.chains[0].$meta);
             source = node.chains[0].$meta.chainings.at(-1)?.element();
-            if (source) node.$meta.setSource(source);
         }
 
         if (!source?.is(Type)) return;
@@ -620,7 +633,13 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
     @builder(FeatureChaining)
     linkFeatureChaining(node: FeatureChaining, _document: LangiumDocument): void {
-        (node.$container.$meta as FeatureMeta).chainings.push(node.$meta);
+        const owner = node.$container.$meta as FeatureMeta;
+        if (owner.chainings.length === 0) {
+            owner.featuredBy.length = 0;
+            const target = node.$meta.element();
+            if (target) owner.featuredBy.push(...target.featuredBy);
+        }
+        owner.chainings.push(node.$meta);
     }
 
     /**
@@ -628,8 +647,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      */
     @builder(Classifier, 10)
     addClassifierImplicits(node: Classifier, document: LangiumDocument): void {
-        // implicit
-        if (node.$meta.specializations().some((r) => r.is(Specialization) && !r.isImplied)) return;
+        // seems the written spec is wrong and implicit supertypes are always added
+        // if (node.$meta.specializations().some((r) => r.is(Specialization) && !r.isImplied)) return;
         this.addImplicits(node, document, isType);
     }
 
@@ -639,25 +658,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     @builder(Feature, 10)
     addFeatureImplicits(node: Feature, document: LangiumDocument): void {
         if (document.buildOptions?.standardLibrary === "none") return;
-
-        // implicit
-        if (
-            !node.typeRelationships.some((r) => r.$meta.is(TypeFeaturing)) &&
-            !isType(node.$container)
-        ) {
-            const anything = this.findLibraryElement(
-                node,
-                "Base::Anything",
-                document,
-                isType,
-                "Could not find implicit featuring type"
-            );
-            if (anything) {
-                node.$meta.featuredBy.add(anything.$meta);
-                // TODO: featuredBy should add this node as child
-            }
-        }
-
         if (node.typeRelationships.some((r) => r.$meta.isAny([Subsetting, Conjugation]))) return;
 
         // no explicit specializations
@@ -677,28 +677,24 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             )
             .iterator();
 
-        stream(node.$meta.features)
-            .filter((member) => member.is(EndFeatureMembership) || member.element()?.isEnd)
-            .map((f) => f.element())
-            .nonNullable()
-            .forEach((end) => {
-                const ast = end.ast();
-                if (
-                    (ast && ast.typeRelationships.some((r) => r.$meta.is(Redefinition))) ||
-                    (!ast && end.specializations(Redefinition).length > 0)
-                )
-                    return; // no implicit end redefinition
-                const base = baseEndIterator.next();
-                if (base.done) return;
+        stream(node.$meta.ownedEnds()).forEach((end) => {
+            const ast = end.ast();
+            if (
+                (ast && ast.typeRelationships.some((r) => r.$meta.is(Redefinition))) ||
+                (!ast && end.specializations(Redefinition).length > 0)
+            )
+                return; // no implicit end redefinition
+            const base = baseEndIterator.next();
+            if (base.done) return;
 
-                // not prelinking the child elements to hide implicit
-                // redefinitions
-                const specialization = this.constructMetamodel(Redefinition, end);
-                specialization.isImplied = true;
-                specialization.setElement(base.value.element());
-                end.addSpecialization(specialization);
-                return;
-            });
+            // not prelinking the child elements to hide implicit
+            // redefinitions
+            const specialization = this.constructMetamodel(Redefinition, end);
+            specialization.isImplied = true;
+            specialization.setElement(base.value.element());
+            end.addSpecialization(specialization);
+            return;
+        });
     }
 
     /**
@@ -761,28 +757,23 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         if (baseActions.length === 0) return; // no action typings
 
-        const isParameter = (f: FeatureMeta): boolean => f.direction !== "none";
         const ownedParameters = stream(action.$meta.features)
             .map((member) => member.element())
             .nonNullable()
-            .filter(isParameter);
+            .filter((f) => f.isParameter)
+            .filter((f) => !f.isIgnoredParameter());
         const baseParameterIterators = baseActions.map((action) =>
             stream(action.element()?.features ?? [])
                 .map((member) => member.element())
                 .nonNullable()
-                .filter(isParameter)
+                .filter((f) => f.isParameter)
+                .filter((f) => !f.isIgnoredParameter())
                 .iterator()
         );
 
         for (const parameter of ownedParameters) {
-            const node = parameter.ast();
-            let explicit: boolean;
-            if (node) {
-                this.preLinkNode(node, document);
-                explicit = node.typeRelationships.some((r) => r.$meta.is(Redefinition));
-            } else {
-                explicit = parameter.specializations(Redefinition).length > 0;
-            }
+            this.preLinkModel(parameter, document);
+            const explicit = parameter.specializations(Redefinition).length > 0;
 
             // can't continue if redefines explicitly, have to advance iterators
             for (const baseIter of baseParameterIterators) {
@@ -917,7 +908,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     linkComment(node: Comment, document: LangiumDocument): void {
         const linker = this.linker(document.uri);
         node.about.forEach((ref) => {
-            const target = ref.annotatedElement;
+            const target = ref.reference;
             if (!target) return;
             const element = linker.linkReference(target, document);
             if (element) {
@@ -934,7 +925,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     linkMetadata(node: MetadataFeature, document: LangiumDocument): void {
         const linker = this.linker(document.uri);
         node.about.forEach((ref) => {
-            const target = ref.annotatedElement;
+            const target = ref.reference;
             if (!target) return;
             const element = linker.linkReference(target, document);
             if (element) {
@@ -1059,17 +1050,23 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         });
     }
 
-    @builder(EnumerationUsage, 5)
-    addImplicitEnumerationTyping(node: EnumerationUsage, _document: LangiumDocument): void {
+    @builder(VariantMembership, 5)
+    addImplicitVariantSpecialization(node: VariantMembership, _document: LangiumDocument): void {
         const owner = node.$meta.owner();
+        const element = node.$meta.finalElement();
         if (
-            owner.is(EnumerationDefinition) &&
-            node.$meta.specializations(FeatureTyping).length === 0
+            element &&
+            owner.isAny([Usage, Definition]) &&
+            owner.isVariation &&
+            element.specializations(FeatureTyping).length === 0
         ) {
-            const typing = new FeatureTypingMeta(this.util.createId(), node.$meta);
-            typing.isImplied = true;
-            typing.setElement(owner);
-            node.$meta.addSpecialization(typing);
+            const specialization = owner.is(Usage)
+                ? new SubsettingMeta(this.util.createId(), element)
+                : new FeatureTypingMeta(this.util.createId(), element);
+            specialization.isImplied = true;
+            // safe cast because if owner is definition, then specialization is feature typing
+            specialization.setElement(owner as UsageMeta);
+            element.addSpecialization(specialization);
         }
     }
 
@@ -1090,6 +1087,188 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         spec.isImplied = true;
         spec.setElement(owner as TypeMeta);
         meta.addSpecialization(spec);
+    }
+
+    @builder(Connector)
+    addImplicitConnectorFeaturingType(node: Connector): void {
+        if (node.$meta.owningType || node.$meta.featuredBy.length > 0) return;
+        const context = node.$meta.contextType();
+        if (!context) return;
+        node.$meta.featuredBy.push(context);
+    }
+
+    @builder(Multiplicity)
+    addImplicitFeaturingType(node: Multiplicity | Expression): void {
+        if (node.$meta.featuredBy.length > 0) return;
+        const owner = node.$meta.owner();
+        if (!owner.is(Feature)) return;
+        node.$meta.featuredBy.push(...owner.featuredBy);
+    }
+
+    @builder(Expression)
+    addImplicitExpressionFeaturingType(node: Expression): void {
+        if (node.$meta.owner().is(Multiplicity) || node.$meta.parent().is(FeatureValue))
+            this.addImplicitFeaturingType(node);
+    }
+
+    @builder(TypeFeaturing)
+    addExplicitTypeFeaturing(node: TypeFeaturing): void {
+        const target = node.$meta.element();
+        if (!target) return;
+        (node.$meta.source() as FeatureMeta)?.featuredBy.push(target);
+    }
+
+    @builder(Connector)
+    addConnectorEndSubsettings(node: Connector, document: LangiumDocument): void {
+        for (const end of node.$meta.connectorEnds()) {
+            const expression = stream(end.features)
+                .filter((m) => m.is(FeatureMembership))
+                .map((m) => m.element())
+                .filter((e) => e?.is(Expression))
+                .nonNullable()
+                .head() as ExpressionMeta | undefined;
+            if (!expression) continue;
+
+            const exprAst = expression.ast();
+            if (exprAst) this.buildNode(exprAst, document);
+
+            const result = expression.resultParameter()?.element();
+            if (!result) continue;
+            const subsetting = new SubsettingMeta(this.util.createId(), end);
+            subsetting.isImplied = true;
+            subsetting.setElement(result);
+            end.addSpecialization(subsetting);
+        }
+    }
+
+    @builder(ItemFlowEnd)
+    addItemFlowEndSubsetting(node: ItemFlowEnd, document: LangiumDocument): void {
+        const meta = node.$meta;
+        if (meta.specializations(Subsetting).some((s) => !s.isImplied)) return;
+        const feature = meta.features.find((m) => m.is(OwningMembership))?.element();
+        if (!feature) return;
+
+        // child feature would not have been setup yet, do it now
+        this.preLinkModel(feature, document);
+
+        feature
+            .types(Redefinition)
+            .limit(1)
+            .map((t) => t.owner())
+            .filter((t) => t.is(Feature))
+            .forEach((f) => {
+                const subsetting = new SubsettingMeta(this.util.createId(), meta);
+                subsetting.isImplied = true;
+                subsetting.setElement(f as FeatureMeta);
+                meta.addSpecialization(subsetting);
+            });
+    }
+
+    @builder(ItemFlowEnd)
+    addItemFlowEndMemberRedefinition(node: ItemFlowEnd, document: LangiumDocument): void {
+        const meta = node.$meta;
+        const owner = meta.owner();
+        if (!owner.is(Feature)) return;
+
+        const feature = meta.features.find((m) => m.is(OwningMembership))?.element();
+        if (!feature) return;
+
+        const index = owner.features
+            .filter((m) => m.is(EndFeatureMembership) || m.element()?.isEnd)
+            .indexOf(meta.parent() as MembershipMeta<FeatureMeta>);
+        if (index !== 0 && index !== 1) return;
+
+        const implicitName = implicitIndex.get(
+            node.$type,
+            index === 0 ? "sourceOutput" : "targetInput"
+        );
+        if (!implicitName) return;
+        const implicit = this.findLibraryElement(
+            node,
+            implicitName,
+            document,
+            isFeature,
+            "Could not find implicit item flow end redefinition"
+        );
+        if (!implicit) return;
+
+        const redef = new RedefinitionMeta(this.util.createId(), feature);
+        redef.isImplied = true;
+        redef.setElement(implicit.$meta);
+        feature.addSpecialization(redef);
+    }
+
+    @builder(TransitionUsage)
+    setupTransitionUsageReferenceUsageMembers(
+        node: TransitionUsage,
+        document: LangiumDocument
+    ): void {
+        const meta = node.$meta;
+
+        // setup transition link
+        {
+            const link = meta.transitionLinkFeature();
+            if (link?.is(ReferenceUsage)) {
+                const target = this.findLibraryElement(
+                    node,
+                    "TransitionPerformances::TransitionPerformance::transitionLink",
+                    document,
+                    isFeature,
+                    "Could not find implicit transition link feature"
+                )?.$meta;
+
+                if (target) {
+                    const redef = new RedefinitionMeta(this.util.createId(), link);
+                    redef.isImplied = true;
+                    redef.setElement(target);
+                    link.addSpecialization(redef);
+                }
+            }
+        }
+
+        // setup accepter payload parameter
+        {
+            const payload = meta.payloadParameter();
+            const parameter = meta.accepterPayloadParameter();
+            if (payload?.is(ReferenceUsage) && parameter) {
+                const subsetting = new SubsettingMeta(this.util.createId(), payload);
+                subsetting.isImplied = true;
+                subsetting.setElement(parameter);
+                payload.addSpecialization(subsetting);
+                if (parameter.name) payload.setName(parameter.name);
+            }
+        }
+    }
+
+    // executed first so that featuring context can be computed
+    @builder(SuccessionAsUsage, -10000)
+    setupSuccessionAsUsageEnds(node: SuccessionAsUsage, document: LangiumDocument): void {
+        const ends = node.$meta.connectorEnds();
+
+        for (const [index, getter] of [
+            // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+            [0, () => node.$meta.previousFeature((model) => this.preLinkModel(model, document))],
+            [1, node.$meta.targetFeature],
+        ] as const) {
+            const end = ends.at(index);
+            if (!end) continue;
+            this.preLinkModel(end, document);
+
+            const references = end.specializations().some((r) => r.is(ReferenceSubsetting));
+            if (references) continue;
+
+            const member = getter.call(node.$meta);
+            if (!member) continue;
+            this.preLinkModel(member, document);
+            const feature = member?.element();
+            if (feature) {
+                this.preLinkModel(feature, document);
+                const subsetting = new ReferenceSubsettingMeta(this.util.createId(), end);
+                subsetting.isImplied = true;
+                subsetting.setElement(feature);
+                end.addSpecialization(subsetting);
+            }
+        }
     }
 
     /**

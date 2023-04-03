@@ -16,9 +16,9 @@
 
 import {
     Expression,
+    FeatureMembership,
     FeatureReferenceExpression,
     SysMLFunction,
-    TypeReference,
 } from "../../../generated/ast";
 import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
 import { ExpressionMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../_internal";
@@ -45,10 +45,13 @@ export class FeatureReferenceExpressionMeta extends ExpressionMeta {
 
     override returnType(): TypeMeta | string | undefined {
         const expr = this.expression?.element();
-        if (!expr) return;
-        if (expr.is(TypeReference)) return expr.to.target;
+        if (!expr || !this.expression?.is(FeatureMembership)) return expr;
         if (expr.isAny([Expression, SysMLFunction])) return expr.returnType();
         return expr;
+    }
+
+    override isModelLevelEvaluable(): boolean {
+        return true;
     }
 }
 

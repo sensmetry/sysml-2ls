@@ -164,20 +164,24 @@ function validate(docs: LangiumDocument[], exportDiagnostics = false, ignoreKnow
     let count = 0;
     let expected = 0;
     console.warn("Found validation errors!");
-    const print = (d: Diagnostic): void =>
+    const print = (document: LangiumDocument | undefined, d: Diagnostic): void =>
         console.info(
-            `  Line ${d.range.start.line}|${d.range.start.character}: ${d.message} (${d.code})`
+            `  Line ${d.range.start.line}|${d.range.start.character}: ${d.message} (${
+                d.code
+            }) [${document?.textDocument.getText(d.range)}]`
         );
 
+    const documents = Object.fromEntries(docs.map((doc) => [doc.uriString, doc]));
     for (const [doc, diagnostics] of entries) {
         const docpath = path.join(__dirname, doc);
         const uri = URI.file(docpath);
+        const document = documents[uri.toString()];
         console.info(`${uri.toString()} had ${diagnostics.found.length} diagnostics:`);
-        diagnostics.found.forEach(print);
+        diagnostics.found.forEach((d) => print(document, d));
 
         if (diagnostics.expected.length > 0) {
             console.info(` Also expected ${diagnostics.expected.length} other diagnostics:`);
-            diagnostics.expected.forEach(print);
+            diagnostics.expected.forEach((d) => print(document, d));
             expected += diagnostics.expected.length;
         }
 
@@ -194,6 +198,7 @@ async function run(exportDiagnostics = false, ignoreKnown = false): Promise<numb
     const submodule = findSubmodule();
     const services = createSysMLServices(SysMLNodeFileSystem, {
         standardLibrary: false,
+        standardLibraryPath: Utils.joinPath(submodule, "sysml.library").path,
         skipWorkspaceInit: true,
     });
     const docs = await collectDocuments(submodule, services.shared);

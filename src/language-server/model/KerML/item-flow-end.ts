@@ -19,8 +19,8 @@ import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { FeatureMeta } from "./_internal";
 
 export const ImplicitItemFlowEnds = {
-    sourceOutput: "Transfers::Transfer::source::sourceOutput", // TODO
-    targetInput: "Transfers::Transfer::target::targetInput", // TODO
+    sourceOutput: "Transfers::Transfer::source::sourceOutput",
+    targetInput: "Transfers::Transfer::target::targetInput",
 };
 
 @metamodelOf(ItemFlowEnd, ImplicitItemFlowEnds)

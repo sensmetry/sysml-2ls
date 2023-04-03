@@ -372,7 +372,7 @@ export class TypeScope extends NamespaceScope {
             // unless the cache was not empty on the initial call, it will contain
             // only the general classes use a suffixed name for duplicate resolution
             // so that it doesn't clash with parent and imported scopes
-            const specialized = specialization.element();
+            const specialized = specialization.finalElement();
             if (!specialized || specializations.has(specialized)) continue;
             specializations.add(specialized);
 

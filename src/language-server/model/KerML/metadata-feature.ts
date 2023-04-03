@@ -26,7 +26,7 @@ export const ImplicitMetadataFeatures = {
 };
 
 @metamodelOf(MetadataFeature, ImplicitMetadataFeatures)
-export class MetadataFeatureMeta extends Mixin(FeatureMeta, AnnotatingElementMeta) {
+export class MetadataFeatureMeta extends Mixin(AnnotatingElementMeta, FeatureMeta) {
     constructor(id: ElementID, parent: ModelContainer<MetadataFeature>) {
         super(id, parent);
     }

@@ -52,7 +52,7 @@ import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { MetamodelBuilder } from "../shared/workspace/metamodel-builder";
 import { CancellationToken } from "vscode-languageserver";
 import { getPreviousNode } from "../../utils/cst-util";
-import { ElementMeta, ElementReferenceMeta, Metamodel } from "../../model";
+import { ElementMeta, ElementReferenceMeta, FeatureMeta, Metamodel } from "../../model";
 import { SysMLType } from "../sysml-ast-reflection";
 
 export class SysMLScopeProvider extends DefaultScopeProvider {
@@ -143,7 +143,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
         owner: Metamodel | undefined,
         document?: LangiumDocument,
         aliasResolver = DEFAULT_ALIAS_RESOLVER
-    ): ScopeStream | undefined {
+    ): SysMLScope | undefined {
         while (owner?.is(InlineExpression)) {
             // unwrap all the expressions to get the real parent
             owner = owner.owner();
@@ -170,10 +170,20 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             if (owner.nodeType() !== Subsetting && owner.nodeType() !== FeatureInverting) {
                 skip = owner.source();
             }
+
+            const parent = owner.parent();
+            if (parent.parent()?.is(ParameterMembership)) {
+                const outer = parent.owner();
+                if (outer?.is(InvocationExpression) && (parent as FeatureMeta).value)
+                    // resolution of type relationships in an invocation
+                    // argument should be done in the invoked function scope
+                    return this.localScope(outer.invokes() ?? outer, undefined, aliasResolver);
+            }
+
             // source == parent if this relationship is a part of declaration,
             // in that case skip the owner since specialization itself makes no
             // sense
-            owner = owner.source() === owner.parent() ? owner.parent().owner() : owner.parent();
+            owner = owner.source() === parent ? parent.owner() : parent;
 
             if (skip?.parent()?.is(EndFeatureMembership)) {
                 // connector ends cannot reference connector scope

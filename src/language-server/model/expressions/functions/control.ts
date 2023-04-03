@@ -14,12 +14,15 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ElementMeta, OperatorExpressionMeta } from "../../KerML";
+import { Feature, Type } from "../../../generated/ast";
+import { ElementMeta, FeatureMeta, OperatorExpressionMeta } from "../../KerML";
+import { RangeGenerator } from "../range";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
     ExpressionResult,
     functionFor,
+    normalize,
 } from "../util";
 
 const PACKAGE = "ControlFunctions";
@@ -85,14 +88,34 @@ export class ConditionalFunction extends BuiltinFunction {
     }
 }
 
-// @functionFor(PACKAGE, "'.'")
-// export class DotFunction extends BuiltinFunction {
-//     override call(expression: OperatorExpression, target: Element, evaluator: ModelLevelExpressionEvaluator): ResultType[] {
-//         const values = evaluator.evaluate(expression.left, target);
-//         if (!values) return [expression];
+@functionFor(PACKAGE, "'.'")
+export class DotFunction extends BuiltinFunction {
+    override call(
+        expression: OperatorExpressionMeta,
+        target: ElementMeta,
+        evaluator: ModelLevelExpressionEvaluator
+    ): ExpressionResult {
+        const values = evaluator.evaluateArgument(expression, 0, target);
+        const targetFeature = expression.args.at(1);
+        if (!targetFeature) throw new Error("Missing target feature");
 
-//     }
-// }
+        // nothing to evaluate, everything is a number
+        if (values instanceof RangeGenerator) return [];
+
+        if (!target.is(Type)) throw new Error("Cannot evaluate feature chain for non-type targets");
+        return (
+            values.filter(
+                (value) => typeof value === "object" && value.is(Feature)
+            ) as FeatureMeta[]
+        ).flatMap((value) => {
+            const chaining = [value];
+            if (targetFeature.chainingFeatures.length > 0)
+                chaining.push(...targetFeature.chainingFeatures);
+            else chaining.push(targetFeature);
+            return normalize(evaluator.evaluateFeatureChain(chaining, target));
+        });
+    }
+}
 
 @functionFor(PACKAGE, "'??'")
 export class NullCoalescingFunction extends BuiltinFunction {

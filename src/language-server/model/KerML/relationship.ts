@@ -18,6 +18,7 @@ import {
     AnnotatingElement,
     Comment,
     Documentation,
+    Feature,
     Membership,
     MetadataFeature,
     Relationship,
@@ -25,7 +26,7 @@ import {
 import { Visibility } from "../../utils/scope-util";
 import { getVisibility } from "../enums";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { CommentMeta, DocumentationMeta, ElementMeta } from "./_internal";
+import { CommentMeta, DocumentationMeta, ElementMeta, FeatureMeta } from "./_internal";
 
 export type NonNullRelationship<
     R extends RelationshipMeta = RelationshipMeta,
@@ -116,6 +117,17 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
         });
 
         // TODO: do something with other elements
+    }
+
+    /**
+     * @returns final target of this relationship after following any existing
+     * chaining features
+     */
+    finalElement(): T | FeatureMeta | undefined {
+        const target = this.element();
+        return target?.is(Feature) && target.chainings.length > 0
+            ? target.chainings.at(-1)?.element()
+            : target;
     }
 }
 

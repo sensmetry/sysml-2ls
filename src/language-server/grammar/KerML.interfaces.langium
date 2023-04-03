@@ -30,7 +30,6 @@ type NonOwnerType =
 // Annotations
 
 interface Annotation extends Relationship {
-    annotatedElement?: ElementReference;
 }
 
 interface AnnotatingElement extends Element {

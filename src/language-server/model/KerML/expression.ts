@@ -16,9 +16,10 @@
 
 import { Mixin } from "ts-mixer";
 import { Expression } from "../../generated/ast";
+import { isModelLevelEvaluable } from "../expressions/util";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { StepMeta, TypeMeta } from "./_internal";
+import { FunctionMeta, StepMeta, TypeMeta } from "./_internal";
 
 export const ImplicitExpressions = {
     base: "Performances::evaluations",
@@ -65,6 +66,15 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
      */
     returnType(): TypeMeta | string | undefined {
         return this.getReturnType(this);
+    }
+
+    getFunction(): FunctionMeta | string | undefined {
+        return this.qualifiedName;
+    }
+
+    isModelLevelEvaluable(): boolean {
+        const fn = this.getFunction();
+        return fn ? isModelLevelEvaluable(fn) : false;
     }
 }
 
