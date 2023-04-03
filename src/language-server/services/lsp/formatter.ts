@@ -18,6 +18,7 @@ import {
     AbstractFormatter,
     AstNode,
     CstNode,
+    findLeafNodeAtOffset,
     Formatting,
     FormattingAction,
     FormattingContext,
@@ -26,6 +27,7 @@ import {
     LangiumDocument,
     NodeFormatter,
     Properties,
+    stream,
     streamAllContents,
 } from "langium";
 import { TextualAnnotatingMeta, typeIndex, TypeMap } from "../../model";
@@ -65,6 +67,7 @@ const Options = {
     noSpace: Formatting.noSpace(),
     oneSpace: Formatting.oneSpace(),
     indent: Formatting.indent(),
+    twoIndents: { options: {}, moves: [{ tabs: 2 }] },
     noIndent: Formatting.noIndent(),
     noLines: Formatting.newLines(0),
     newLine: Formatting.newLine(),
@@ -76,6 +79,7 @@ const Options = {
     spaceOrLine: Formatting.fit(Formatting.newLine(), Formatting.oneSpace()),
     noSpaceOrIndent: Formatting.fit(Formatting.indent(), Formatting.noSpace()),
     noSpaceOrLine: Formatting.fit(Formatting.indent(), Formatting.noSpace()),
+    indentedOneSpace: addIndent(Formatting.oneSpace(), 1),
 } satisfies Record<string, FormattingAction>;
 // satisfies here so that the type checker can know if the property exists
 
@@ -87,6 +91,7 @@ function highPriority(action: { moves: FormattingMove[] }): FormattingAction {
 }
 
 function addIndent(action: FormattingAction, indent: number): FormattingAction {
+    if (indent === 0) return action;
     return {
         options: action.options,
         moves: action.moves.map((move) => {
@@ -98,6 +103,10 @@ function addIndent(action: FormattingAction, indent: number): FormattingAction {
     };
 }
 
+function startsWith(node: AstNode, region: FormattingRegion): boolean {
+    return region.nodes.at(0)?.offset === node.$cstNode?.offset;
+}
+
 function prependIfNotStartsWith(
     keyword: string,
     node: AstNode,
@@ -105,7 +114,7 @@ function prependIfNotStartsWith(
     action = Options.indent
 ): FormattingRegion {
     const region = formatter.keyword(keyword);
-    if (region.nodes.at(0)?.offset !== node.$cstNode?.offset) {
+    if (!startsWith(node, region)) {
         region.prepend(action);
     }
     return region;
@@ -169,7 +178,7 @@ export class SysMLFormatter extends AbstractFormatter {
                     formatter.cst([node]).prepend(Options.uptoTwoIndents);
                 } else {
                     // previous element a kind of prefix
-                    formatter.cst([node]).prepend(Options.oneSpace);
+                    formatter.cst([node]).prepend(Options.indentedOneSpace);
                 }
             }
         });
@@ -236,7 +245,7 @@ export class SysMLFormatter extends AbstractFormatter {
 
         if (node.declaredName && (prependNames || node.declaredShortName)) {
             const region = formatter.property("declaredName");
-            if (region.nodes[0].offset !== node.$cstNode?.offset)
+            if (!startsWith(node, region))
                 region.prepend(node.declaredShortName ? Options.spaceOrIndent : Options.oneSpace);
         }
 
@@ -287,7 +296,13 @@ export class SysMLFormatter extends AbstractFormatter {
             "keyword" in prefix
                 ? formatter.keyword(prefix.keyword)
                 : formatter.property(prefix.property);
-        region.append(Options.oneSpace);
+
+        // if the prefix is also the only cst node in this element, don't add a
+        // space
+        if (region.nodes.length === 0) return;
+        let next = getNextNode(region.nodes.at(-1) as CstNode, true);
+        if (next) next = findLeafNodeAtOffset(next, next.offset);
+        if (next?.text !== ";") region.append(Options.oneSpace);
     }
 
     @formatter(ast.StateSubactionMembership) stateSubactionMembership(
@@ -508,7 +523,9 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.TextualRepresentation>
     ): void {
         this.element(node, formatter);
-        formatter.keyword("language").prepend(Options.spaceOrIndent).append(Options.oneSpace);
+        prependIfNotStartsWith("language", node, formatter, Options.spaceOrIndent).append(
+            Options.oneSpace
+        );
         formatter.property("body").prepend(Options.indent);
     }
 
@@ -546,7 +563,7 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.element(node, formatter);
 
-        formatter.keyword("dependency").prepend(Options.spaceOrIndent);
+        prependIfNotStartsWith("dependency", node, formatter, Options.spaceOrIndent);
         this.formatList(node, "client", formatter, {
             keyword: "from",
             indent: true,
@@ -670,11 +687,12 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.FeatureValue>
     ): void {
         const equal = formatter.keyword(node.isInitial ? ":=" : "=");
-        equal.prepend(Options.oneSpace);
+        if (!startsWith(node.$container, equal)) equal.prepend(Options.oneSpace);
         if (node.isDefault) {
             formatter.keyword("default").prepend(Options.oneSpace);
         }
 
+        if (startsWith(node.$container, equal)) return;
         if (node.element && node.element.$cstNode?.offset !== node.$cstNode?.offset)
             formatter
                 .node(node.element)
@@ -873,9 +891,10 @@ export class SysMLFormatter extends AbstractFormatter {
         if (braceOpen.nodes.length === 0) {
             // binary
             const from = formatter.keyword(keywords[0]);
-            if (from.nodes.length === 0) formatter.node(ends[0]).prepend(Options.indent);
-            else {
-                if (node.$cstNode?.offset !== from.nodes[0].offset) from.prepend(Options.indent);
+            if (from.nodes.length === 0) {
+                if (ends.length > 0) formatter.node(ends[0]).prepend(Options.indent);
+            } else {
+                if (!startsWith(node, from)) from.prepend(Options.indent);
                 from.append(Options.oneSpace);
             }
             formatter.keyword(keywords[1]).prepend(Options.indent).append(Options.oneSpace);
@@ -914,8 +933,7 @@ export class SysMLFormatter extends AbstractFormatter {
         if (first.nodes.length === 0 && bind.nodes.length === 0) return;
         let start = 0;
         if (first.nodes.length > 0) {
-            if (node.$cstNode?.offset !== first.nodes[0].offset)
-                first.prepend(Options.spaceOrIndent);
+            if (!startsWith(node, first)) first.prepend(Options.spaceOrIndent);
             first.append(Options.oneSpace);
         } else {
             formatter.node(ends[0]).prepend(highPriority(Options.spaceOrIndent));
@@ -1005,7 +1023,7 @@ export class SysMLFormatter extends AbstractFormatter {
             this.indentChildren(node, formatter);
         }
 
-        if (node.result) {
+        if (node.result && node.result.$cstNode?.offset !== node.$cstNode?.offset) {
             formatter.node(node.result).prepend(Options.indent);
         }
     }
@@ -1082,6 +1100,14 @@ export class SysMLFormatter extends AbstractFormatter {
                 this.formatBraces(formatter, "(", ")", formatter.node(node.operands[1])).prepend(
                     Options.noSpace
                 );
+                break;
+            }
+
+            case "@": {
+                const selfRef = isProgrammaticNode(node.operands[0]);
+                const op = formatter.keyword("@");
+                op.append(selfRef ? Options.noSpace : Options.oneSpace);
+                if (!selfRef) op.prepend(Options.spaceOrLine);
                 break;
             }
 
@@ -1166,7 +1192,7 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.InvocationExpression>
     ): void {
         if (node.$cstNode?.text.startsWith("(")) {
-            this.formatBraces(formatter, "(", ")").append(Options.newLine);
+            this.formatBraces(formatter, "(", ")");
         }
 
         this.formatArgList(node, formatter);
@@ -1300,7 +1326,8 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.AcceptActionUsage>
     ): void {
         this.actionUsage(node, formatter);
-        formatter.keyword("accept").prepend(Options.indent).append(Options.oneSpace);
+
+        prependIfNotStartsWith("accept", node, formatter).append(Options.oneSpace);
         formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
     }
 
@@ -1308,7 +1335,12 @@ export class SysMLFormatter extends AbstractFormatter {
         node: ast.TriggerInvocationExpression,
         formatter: NodeFormatter<ast.TriggerInvocationExpression>
     ): void {
-        formatter.property("kind").prepend(Options.oneSpace).append(Options.oneSpace);
+        const kind = formatter.property("kind");
+        kind.append(Options.oneSpace);
+        // expression -> feature value -> owner
+        if (!startsWith(node.$container.$container, kind)) {
+            kind.prepend(Options.oneSpace);
+        }
     }
 
     @formatter(ast.SendActionUsage) sendActionUsage(
@@ -1316,9 +1348,13 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.SendActionUsage>
     ): void {
         this.actionUsage(node, formatter);
-        formatter.keyword("send").prepend(Options.indent).append(Options.oneSpace);
-        if (node.sender) formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
-        if (node.receiver) formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
+        prependIfNotStartsWith("send", node, formatter).append(Options.oneSpace);
+        if (node.sender) {
+            formatter.keyword("via").prepend(Options.indent).append(Options.oneSpace);
+        }
+        if (node.receiver) {
+            formatter.keyword("to").prepend(Options.indent).append(Options.oneSpace);
+        }
     }
 
     @formatter(ast.AssignmentActionUsage) assignmentActionUsage(
@@ -1329,17 +1365,34 @@ export class SysMLFormatter extends AbstractFormatter {
         this.formatBinding(node, formatter, [node.members[0], node.members[1]], "assign", ":=");
     }
 
+    protected formatControlFlow(
+        node: ast.Namespace,
+        formatter: NodeFormatter<ast.Element>,
+        ...keywords: string[]
+    ): void {
+        const kw = stream(keywords)
+            .map((k) => formatter.keyword(k))
+            .find((r) => r.nodes.length > 0);
+        if (!kw) return;
+
+        // if the node including its parent starts with the keyword, don't add
+        // additional indents
+        const startsKw = startsWith(node.$container, kw);
+        if (!startsKw) kw.prepend(Options.indent);
+
+        formatter
+            .nodes(...node.members.filter((m) => !isProgrammaticNode(m)))
+            .prepend(startsKw ? Options.oneSpace : Options.indentedOneSpace);
+    }
+
     @formatter(ast.IfActionUsage) ifActionUsage(
         node: ast.IfActionUsage,
         formatter: NodeFormatter<ast.IfActionUsage>
     ): void {
         this.usage(node, formatter);
-        formatter.keyword("if").prepend(Options.indent).append(Options.oneSpace);
-        formatter.node(node.members[1]).prepend(highPriority(addIndent(Options.indent, 1)));
-        if (node.members.length > 2) {
-            formatter.keyword("else").prepend(Options.indent);
-            formatter.node(node.members[2]).prepend(highPriority(addIndent(Options.oneSpace, 2)));
-        }
+
+        this.formatControlFlow(node, formatter, "if");
+        if (node.members.length > 2) formatter.keyword("else").prepend(Options.oneSpace);
     }
 
     @formatter(ast.WhileLoopActionUsage) whileLoopActionUsage(
@@ -1348,18 +1401,8 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.usage(node, formatter);
 
-        const whileKw = formatter.keyword("while");
-        if (whileKw.nodes.length > 0) {
-            whileKw.prepend(Options.indent);
-            formatter.node(node.members[0]).prepend(addIndent(Options.oneSpace, 1));
-        } else {
-            formatter.keyword("loop").prepend(Options.indent);
-        }
-        formatter.node(node.members[1]).prepend(highPriority(addIndent(Options.indent, 1)));
-        if (node.members.length > 2) {
-            formatter.keyword("until").prepend(Options.indent);
-            formatter.node(node.members[2]).prepend(highPriority(addIndent(Options.oneSpace, 2)));
-        }
+        this.formatControlFlow(node, formatter, "while", "loop");
+        if (node.members.length > 2) formatter.keyword("until").prepend(Options.oneSpace);
     }
 
     @formatter(ast.ForLoopActionUsage) forLoopActionUsage(
@@ -1368,11 +1411,8 @@ export class SysMLFormatter extends AbstractFormatter {
     ): void {
         this.usage(node, formatter);
 
-        formatter.keyword("for").prepend(Options.indent);
-        formatter.node(node.members[0]).prepend(highPriority(addIndent(Options.oneSpace, 1)));
+        this.formatControlFlow(node, formatter, "for");
         formatter.keyword("in").prepend(Options.spaceOrIndent);
-        formatter.node(node.members[1]).prepend(addIndent(Options.oneSpace, 1));
-        formatter.node(node.members[2]).prepend(highPriority(addIndent(Options.indent, 1)));
     }
 
     @formatter(ast.SuccessionAsUsage) successionAsUsage(
@@ -1403,10 +1443,8 @@ export class SysMLFormatter extends AbstractFormatter {
             if (kwRegion.nodes.length === 0) return;
             const child = getNextNode(kwRegion.nodes[0], false)?.element;
             if (!child) return;
-            kwRegion.prepend(Options.indent);
-            const action =
-                kwRegion.nodes.length > 0 ? addIndent(Options.oneSpace, 1) : Options.indent;
-            formatter.node(child).prepend(highPriority(action));
+            if (!startsWith(node, kwRegion)) kwRegion.prepend(Options.indent);
+            formatter.node(child).prepend(highPriority(addIndent(Options.oneSpace, 1)));
         };
 
         formatProp("first");
@@ -1414,8 +1452,21 @@ export class SysMLFormatter extends AbstractFormatter {
         formatProp("else");
 
         formatter
-            .nodes(...node.members.filter((m) => m.$meta.is(ast.TransitionFeatureMembership)))
+            .nodes(
+                ...node.members.filter(
+                    (m) =>
+                        m.$cstNode?.offset !== node.$cstNode?.offset &&
+                        m.$meta.is(ast.TransitionFeatureMembership)
+                )
+            )
             .prepend(Options.indent);
+
+        // indent the member after guard transition member ('if')
+        const index = node.members.findIndex(
+            (m) => m.$meta.is(ast.TransitionFeatureMembership) && m.$meta.kind === "guard"
+        );
+        if (index < 0 || index >= node.members.length) return;
+        formatter.node(node.members[index + 1]).prepend(Options.twoIndents);
     }
 
     @formatter(ast.ActionUsage) actionUsage(
@@ -1504,6 +1555,57 @@ export class SysMLFormatter extends AbstractFormatter {
         this.useCaseUsage(node, formatter);
 
         formatter.keyword("include").append(Options.oneSpace);
+    }
+
+    protected indentSuccessionMembers(
+        node: ast.Namespace,
+        formatter: NodeFormatter<ast.Namespace>,
+        type: SysMLType
+    ): void {
+        const owner = node.$container.$container;
+        let index = node.$container.$childIndex;
+        const previous = (owner.$children.at(index - 1) as ast.Relationship).$meta.element();
+        if (!previous?.is(ast.SuccessionAsUsage)) return;
+
+        const getNext = (): ast.Element | undefined => {
+            return (owner.$children.at(++index) as ast.Relationship)?.$meta.element()?.ast();
+        };
+
+        for (;;) {
+            let next = getNext();
+            if (!next?.$meta.is(type)) return;
+            formatter.node(next).prepend(highPriority(Options.twoIndents));
+
+            // While the current AST node is an empty succession, skip the next
+            // node since they would be formatted right after the empty
+            // succession, no indentation needed. An empty succession doesn't
+            // end in either ';' or '}'
+            while (next?.$cstNode && !/(\}|;)$/.test(next.$cstNode.text)) {
+                next = getNext();
+            }
+        }
+    }
+
+    @formatter(ast.ForkNode) forkNode(
+        node: ast.ForkNode,
+        formatter: NodeFormatter<ast.ForkNode>
+    ): void {
+        this.actionUsage(node, formatter);
+
+        // indent all following successions to show more clearly that they can
+        // be executed in parallel
+        this.indentSuccessionMembers(node, formatter, ast.SuccessionAsUsage);
+    }
+
+    @formatter(ast.DecisionNode) decisionNode(
+        node: ast.DecisionNode,
+        formatter: NodeFormatter<ast.DecisionNode>
+    ): void {
+        this.actionUsage(node, formatter);
+
+        // indent all following transitions to show more clearly that they are
+        // dependent on this decision
+        this.indentSuccessionMembers(node, formatter, ast.TransitionUsage);
     }
 
     protected override isNecessary(): boolean {
@@ -1683,7 +1785,11 @@ export class SysMLFormatter extends AbstractFormatter {
         const edits = super.createTextEdit(a, b, formatting, context);
 
         if (b.text.startsWith("/*") && b.range.start.line !== b.range.end.line) {
-            const edit = this.rewriteMultilineCommentBody(b, a, context);
+            // looks like b.element may not actually refer to the comment, use
+            // leaf node instead
+            const comment = findLeafNodeAtOffset(b, b.offset);
+            if (!comment) return edits;
+            const edit = this.rewriteMultilineCommentBody(comment, a, context);
             if (edit) edits.push(edit);
         }
 
@@ -1834,7 +1940,7 @@ export class SysMLFormatter extends AbstractFormatter {
                     // only prepend if the list doesn't start at the same position as the owning node
                     region.prepend(initial);
                 } else {
-                    region.prepend(Options.spaceOrLine);
+                    region.prepend(Options.spaceOrIndent);
                 }
                 return;
             }

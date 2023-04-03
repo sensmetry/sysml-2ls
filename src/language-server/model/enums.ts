@@ -104,7 +104,7 @@ export function getTransitionFeatureKind(
         case "do":
             return "effect";
         case "if":
-            return "trigger";
+            return "guard";
         default:
             assertUnreachable(node.kind);
     }

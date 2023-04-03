@@ -628,6 +628,29 @@ part def P {
                 );
             });
         });
+
+        describe("Multiple comments are formatted correctly", () => {
+            testFormatting(
+                `
+            package P {
+                /* first
+                */
+    
+                /* second
+                */
+            }`,
+                `
+package P {
+    /*
+     * first
+     */
+
+    /*
+     * second
+     */
+}`
+            );
+        });
     });
 
     describe("should format textual representations", () => {
@@ -1441,6 +1464,34 @@ part x = A
                     testFormatting(`part x =  ${op}  A ;`, `part x = ${op}${space}A;`);
                 });
             });
+
+            describe("meta classification operator '@' is formatted", () => {
+                testFormatting(
+                    `
+                package P {
+                    filter @ Safety and Safety::isMandatory;
+                    import a::*[ @ Safety];
+                }`,
+                    `
+package P {
+    filter @Safety and Safety::isMandatory;
+    import a::*[@Safety];
+}`
+                );
+            });
+
+            describe("parenthesised expressions", () => {
+                testFormatting(
+                    `
+                item transformation {
+                    :>> elements = ( Translation((1, 1,1 )[datum]) );
+                }`,
+                    `
+item transformation {
+    :>> elements = (Translation((1, 1, 1) [datum]));
+}`
+                );
+            });
         });
     });
 
@@ -1511,15 +1562,34 @@ metadata Meta : M {
         });
 
         describe("should format enumeration definition", () => {
-            testFormatting(
-                "enum def Color {R;G;B;}",
-                `
+            describe("named values", () => {
+                testFormatting(
+                    "enum def Color {R;G;B;}",
+                    `
 enum def Color {
     R;
     G;
     B;
 }`
-            );
+                );
+            });
+
+            describe("unnamed values", () => {
+                testFormatting(
+                    `
+    enum def SizeChoice :> Size {
+        = 60.0;
+        = 70.0;
+        = 80.0;
+    }`,
+                    `
+enum def SizeChoice :> Size {
+    = 60.0;
+    = 70.0;
+    = 80.0;
+}`
+                );
+            });
         });
 
         describe("should format extended definition", () => {
@@ -1591,6 +1661,110 @@ private ${type}
         });
     });
 
+    describe("Successions formatting", () => {
+        describe("action nodes", () => {
+            testFormatting(
+                `
+        action a1 {
+            first start;
+            then    send    S()   via A     to b;
+            then    accept     when    b.f;
+            then    decide;
+                if true
+                    then m;
+                else done;
+        }`,
+                `
+action a1 {
+    first start;
+    then send S()
+        via A
+        to b;
+    then accept when b.f;
+    then decide;
+        if true
+            then m;
+        else done;
+}`
+            );
+        });
+
+        describe("simple succession", () => {
+            testFormatting(
+                `
+        action def ControlNodeTest {
+            action   A1;
+            then   J;
+            
+
+            then B1;
+        }`,
+                `
+action def ControlNodeTest {
+    action A1;
+    then J;
+
+    then B1;
+}`
+            );
+        });
+
+        describe("succession to action body", () => {
+            testFormatting(
+                `
+            action def TakePicture {
+                in item scene : Scene;
+                out item picture : Picture;
+        
+                action focus : Focus {
+                    in item scene = TakePicture::scene;
+                    out item image;
+                }
+        
+                flow from focus.image to shoot.image;
+        
+                then action shoot : Shoot {
+                    in item;
+                    out item picture = TakePicture::picture;
+                }
+            }`,
+                `
+action def TakePicture {
+    in item scene : Scene;
+    out item picture : Picture;
+
+    action focus : Focus {
+        in item scene = TakePicture::scene;
+        out item image;
+    }
+
+    flow from focus.image to shoot.image;
+
+    then action shoot : Shoot {
+        in item;
+        out item picture = TakePicture::picture;
+    }
+}`
+            );
+        });
+
+        describe("transition usage", () => {
+            testFormatting(
+                `
+                action A {
+            first focus 
+                if focus.image.isWellFocused then shoot;
+                }`,
+                `
+action A {
+    first focus
+        if focus.image.isWellFocused
+        then shoot;
+}`
+            );
+        });
+    });
+
     describe(`${ast.ConnectionUsage} formatting`, () => {
         describe("should format single line nodes", () => {
             testFormatting(
@@ -1629,6 +1803,40 @@ private connect (
 private connection
     connect a
     to x;`
+            );
+        });
+
+        describe("should not break formatting with a leading element", () => {
+            testFormatting(
+                `
+            part P {}
+            connect A.B to C.D;
+            connect A.B to C.D;
+            `,
+                `
+part P {}
+connect A.B
+    to C.D;
+connect A.B
+    to C.D;
+            `
+            );
+        });
+
+        describe("should not break formatting with a leading comment", () => {
+            testFormatting(
+                `
+            // comment
+            connect A.B to C.D;
+            connect A.B to C.D;
+            `,
+                `
+// comment
+connect A.B
+    to C.D;
+connect A.B
+    to C.D;
+            `
             );
         });
     });
@@ -1748,13 +1956,11 @@ action A {
                 `
 action A {
     public action
-        if true
-            action {
-                action Sub;
-            }
-        else action {
-                action Sub;
-            }
+        if true action {
+            action Sub;
+        } else action {
+            action Sub;
+        }
 }`
             );
         });
@@ -1769,11 +1975,9 @@ action A {
         while (
             1 + 1
             > 0
-        )
-            action {
-                action Sub;
-            }
-        until false;
+        ) action {
+            action Sub;
+        } until false;
 }`
                 );
             });
@@ -1784,11 +1988,63 @@ action A {
                     `
 action A {
     private action W
-        loop
-            action {
-                action Sub;
+        loop action {
+            action Sub;
+        } until false;
+}`
+                );
+            });
+
+            describe("plain 'loop' formatting", () => {
+                testFormatting(
+                    `
+                action 'provide power' : 'Provide Power' {
+                    loop {
+                                accept engineStart : EngineStart;
+                                then action {
+                                    action 'generate torque' : 'Generate Torque' {
+                                        in fuelCmd = 'provide power'::fuelCmd;
+                                        out engineTorque : Torque;
+                                    }
+                                }
+                                then action
+                                    accept engineOff : EngineOff;
+                            }
+            }`,
+                    `
+action 'provide power' : 'Provide Power' {
+    loop {
+        accept engineStart : EngineStart;
+        then action {
+            action 'generate torque' : 'Generate Torque' {
+                in fuelCmd = 'provide power'::fuelCmd;
+                out engineTorque : Torque;
             }
-        until false;
+        }
+        then action
+            accept engineOff : EngineOff;
+    }
+}`
+                );
+            });
+
+            describe("plain 'loop' until formatting", () => {
+                testFormatting(
+                    `
+                action def ChargeBattery {
+                    loop action charging {
+                        action monitor : MonitorBattery {
+                            out charge;
+                        }
+                    } until charging.monitor.charge >= 100;
+                }`,
+                    `
+action def ChargeBattery {
+    loop action charging {
+        action monitor : MonitorBattery {
+            out charge;
+        }
+    } until charging.monitor.charge >= 100;
 }`
                 );
             });
@@ -1801,10 +2057,34 @@ action A {
                     `
 action A {
     private action L
-        for i : Integer in List
-            action {
-                action Sub;
-            }
+        for i : Integer in List action {
+            action Sub;
+        }
+}`
+                );
+            });
+
+            describe("plain 'for' loop", () => {
+                testFormatting(
+                    `
+                action def ComputeMotion {          
+                    for i in 1..powerProfile->size() {
+                        perform action dynamics : StraightLineDynamics {
+                            in power = powerProfile#(i);
+                            out x_out;
+                        }
+                        then assign position := dynamics.x_out;
+                    }
+                }`,
+                    `
+action def ComputeMotion {
+    for i in 1..powerProfile->size() {
+        perform action dynamics : StraightLineDynamics {
+            in power = powerProfile#(i);
+            out x_out;
+        }
+        then assign position := dynamics.x_out;
+    }
 }`
                 );
             });
@@ -1824,6 +2104,76 @@ action A {
                 });
             }
         );
+
+        describe("forked successions", () => {
+            testFormatting(
+                `
+            action def Brake {
+                action TurnOn;
+                
+                then fork;
+                    then monitorBrakePedal;
+                    then monitorTraction;
+                    then braking;
+                    then action A;
+                
+                action monitorBrakePedal : MonitorBrakePedal;
+                then joinNode;
+                
+                action monitorTraction : MonitorTraction;
+                then joinNode;
+
+                action braking : Braking;
+                then joinNode;
+                
+                join joinNode;
+                then done;
+            }`,
+                `
+action def Brake {
+    action TurnOn;
+
+    then fork;
+        then monitorBrakePedal;
+        then monitorTraction;
+        then braking;
+        then action A;
+
+    action monitorBrakePedal : MonitorBrakePedal;
+    then joinNode;
+
+    action monitorTraction : MonitorTraction;
+    then joinNode;
+
+    action braking : Braking;
+    then joinNode;
+
+    join joinNode;
+    then done;
+}`
+            );
+        });
+
+        describe("decision transitions", () => {
+            testFormatting(
+                `
+            action a1 {
+                first start;
+                then decide;
+                if true
+                    then m;
+                    else done;
+            }`,
+                `
+action a1 {
+    first start;
+    then decide;
+        if true
+            then m;
+        else done;
+}`
+            );
+        });
     });
 
     describe(`${ast.TransitionUsage} formatting`, () => {
@@ -1832,8 +2182,7 @@ action A {
                 "action A { private    if  true   then   A ; }",
                 `
 action A {
-    private
-        if true
+    private if true
         then A;
 }`
             );
@@ -1844,8 +2193,7 @@ action A {
                 "action A { private    else    A   ; }",
                 `
 action A {
-    private
-        else A;
+    private else A;
 }`
             );
         });
@@ -1861,7 +2209,7 @@ state def S {
         first A
         accept B
         if false
-        do action AA {}
+            do action AA {}
         then C {}
 }`
             );
@@ -1875,6 +2223,18 @@ state def S {
                 `
 state def S {
     public ${kw} action {}
+}`
+            );
+        });
+
+        describe("empty 'entry' formatting", () => {
+            testFormatting(
+                "action A { state S { entry ; } }",
+                `
+action A {
+    state S {
+        entry;
+    }
 }`
             );
         });
