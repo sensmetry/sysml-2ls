@@ -4,7 +4,7 @@
 
 <!-- Include links to comparison to the previous version -->
 
-## main
+## 0.4.0
 
 ### Added
 
