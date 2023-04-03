@@ -90,7 +90,9 @@ function fixOperatorExpression(expr: OperatorExpression, services: SysMLDefaultS
 }
 
 function addLoopMember(node: WhileLoopActionUsage, services: SysMLDefaultServices): void {
-    if (node.members.length !== 3) {
+    // if there was `until`, the node would end with `;`, easy check here
+    const expected = 2 + (node.$cstNode?.text.endsWith(";") ? 1 : 0);
+    if (node.members.length !== expected) {
         const reflection = services.shared.AstReflection;
         const membership = reflection.createNode(ParameterMembership, {
             $container: node,

@@ -14,6 +14,9 @@
 
 ### Fixed
 
+- Whitespace issues in some formatting cases
+- Excessive indentation in some formatting cases
+- Formatter replacing all comment bodies in a scope with the first one
 - Bugs discovered while adding validations
 - `allocate` is not indented an additional time if the element starts with
   `allocate`
