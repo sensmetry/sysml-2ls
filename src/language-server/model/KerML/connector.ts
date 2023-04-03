@@ -14,11 +14,13 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { stream } from "langium";
 import { Mixin } from "ts-mixer";
-import { Connector, EndFeatureMembership, Feature } from "../../generated/ast";
+import { Connector, ReferenceSubsetting } from "../../generated/ast";
+import { SpecializationType } from "../containers";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
-import { FeatureMembershipMeta, FeatureMeta, RelationshipMeta } from "./_internal";
+import { FeatureMeta, RelationshipMeta, TypeMeta } from "./_internal";
 
 export const ImplicitConnectors = {
     base: "Links::links",
@@ -29,32 +31,16 @@ export const ImplicitConnectors = {
 
 @metamodelOf(Connector, ImplicitConnectors)
 export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, FeatureMeta) {
-    /**
-     * Owned connector ends
-     */
-    ends: FeatureMembershipMeta[] = [];
-
     constructor(id: ElementID, parent: ModelContainer<Connector>) {
         super(id, parent);
     }
 
-    override initialize(node: Connector): void {
-        this.ends = node.members
-            .filter(
-                (m) =>
-                    m.element && (m.$meta.is(EndFeatureMembership) || (m.element as Feature)?.isEnd)
-            )
-            .map((m) => m.$meta as FeatureMembershipMeta);
-    }
-
     override defaultSupertype(): string {
-        const ends = this.ends.length;
-
         if (this.hasStructureType()) {
-            return ends === 2 ? "binaryObject" : "object";
+            return this.isBinary() ? "binaryObject" : "object";
         }
 
-        return ends === 2 ? "binary" : "base";
+        return this.isBinary() ? "binary" : "base";
     }
 
     override ast(): Connector | undefined {
@@ -65,9 +51,58 @@ export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, Featu
         return this._parent;
     }
 
-    override reset(node: Connector): void {
-        this.initialize(node);
-        this.localEnds = undefined;
+    override reset(_node: Connector): void {
+        this.resetEnds();
+    }
+
+    override addSpecialization<T extends SpecializationType>(specialization: T): void {
+        this.resetEnds();
+        super.addSpecialization(specialization);
+    }
+
+    contextType(): TypeMeta | undefined {
+        let commonFeaturingTypes: TypeMeta[] | undefined;
+        for (const related of this.relatedFeatures()) {
+            const featurings = related.allFeaturingTypes();
+            if (!commonFeaturingTypes) {
+                commonFeaturingTypes = featurings;
+                continue;
+            }
+
+            commonFeaturingTypes = commonFeaturingTypes
+                .map((type) => {
+                    const subtype = featurings.find((t) => t.conforms(type));
+                    // replace with a subtype if one exists
+                    if (subtype) return subtype;
+                    // remove if there are no common types
+                    if (featurings.every((t) => !type.conforms(t))) return undefined;
+                    // no change
+                    return type;
+                })
+                .filter((t) => t) as TypeMeta[];
+        }
+
+        return commonFeaturingTypes?.at(0);
+    }
+
+    /**
+     * @returns end features of this connector
+     */
+    connectorEnds(): FeatureMeta[] {
+        return this.ownedEnds();
+    }
+
+    /**
+     * @returns features related by this connector
+     */
+    relatedFeatures(): FeatureMeta[] {
+        // related features are the reference subsettings of the connector ends
+        // by the spec, there shouldn't be more than 1 reference subsetting
+        return stream(this.ends())
+            .map((end) => end.specializations(ReferenceSubsetting).at(0))
+            .map((sub) => sub?.element())
+            .nonNullable()
+            .toArray() as FeatureMeta[];
     }
 }
 

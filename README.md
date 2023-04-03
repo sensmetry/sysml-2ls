@@ -19,7 +19,8 @@ This extension provides:
 - folding,
 - document symbols,
 - renaming,
-- documentation on hover.
+- documentation on hover,
+- semantic validation.
 
 _SysIDE_ is built and maintained by [Sensmetry](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission & safety critical systems.
 

@@ -19,11 +19,14 @@ import { createParser } from "langium/lib/parser/parser-builder-base";
 import { CstNodeBuilder } from "langium/lib/parser/cst-node-builder";
 import {
     ConjugatedPortDefinition,
+    EndFeatureMembership,
     Expose,
     Feature,
     FeatureReferenceExpression,
     Import,
     isConjugatedPortDefinition,
+    isEndFeatureMembership,
+    Membership,
     MembershipExpose,
     MembershipImport,
     MembershipReference,
@@ -36,7 +39,11 @@ import {
     ParameterMembership,
     PortConjugation,
     PortDefinition,
+    ReferenceUsage,
     ReturnParameterMembership,
+    SuccessionAsUsage,
+    TransitionFeatureMembership,
+    TransitionUsage,
     TypeReference,
     Usage,
     WhileLoopActionUsage,
@@ -48,6 +55,7 @@ import { isRuleCall } from "langium/lib/grammar/generated/ast";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { erase } from "../../utils/common";
 import { DefaultReference } from "../references/linker";
+import { sanitizeName } from "../../model";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -150,6 +158,10 @@ function createConjugatedPort(node: PortDefinition, services: SysMLDefaultServic
         $containerProperty: "element",
     });
 
+    if (node.declaredName) conjugated.declaredName = `'~${sanitizeName(node.declaredName)}'`;
+    if (node.declaredShortName)
+        conjugated.declaredShortName = `'~${sanitizeName(node.declaredShortName)}'`;
+
     const conjugation = reflection.createNode(PortConjugation, {
         $container: conjugated,
         $containerProperty: "typeRelationships",
@@ -168,6 +180,81 @@ function createConjugatedPort(node: PortDefinition, services: SysMLDefaultServic
         ref: node,
         _ref: node,
     });
+}
+
+function createEmptyParametersInTransitionUsage(
+    node: TransitionUsage,
+    services: SysMLDefaultServices
+): void {
+    const hasSourceTransitionMember =
+        node.members[0].$type === Membership ||
+        (node.members[0].$type === OwningMembership && node.members[0].element?.$type === Feature);
+
+    // insert the first empty reference usage, always after source transition member if one exists
+    const reflection = services.shared.AstReflection;
+    {
+        const membership = reflection.createNode(ParameterMembership, {
+            $container: node,
+            $containerProperty: "members",
+            $containerIndex: hasSourceTransitionMember ? 1 : 0,
+        });
+
+        reflection.createNode(ReferenceUsage, {
+            $container: membership,
+            $containerProperty: "element",
+        });
+    }
+
+    // also insert one parameter before accept usage if one exists
+    const index = node.members.findIndex(
+        (m) =>
+            m.$type === TransitionFeatureMembership &&
+            (m as TransitionFeatureMembership).kind === "accept"
+    );
+    if (index < 0) return;
+
+    {
+        const membership = reflection.createNode(ParameterMembership, {
+            $container: node,
+            $containerProperty: "members",
+            $containerIndex: index,
+        });
+
+        reflection.createNode(ReferenceUsage, {
+            $container: membership,
+            $containerProperty: "element",
+        });
+    }
+}
+
+function createMissingEndsInSuccessionAsUsage(
+    node: SuccessionAsUsage,
+    services: SysMLDefaultServices
+): void {
+    // `members` may not have been created yet so it may be undefined
+    const ends = (node.members as Membership[] | undefined)?.filter(isEndFeatureMembership).length;
+    if (ends !== undefined && ends >= 2) return;
+
+    const reflection = services.shared.AstReflection;
+    // NB: adding CST nodes to the owning element for better validation
+    // locations
+    if (ends === undefined) node.members = [];
+
+    // ends === 0 or ends === undefined -> EmptySuccessionMember rule
+    // ends === 1 -> missing MultiplicitySourceEndMember
+    for (const index of [0, 1].slice(0, 2 - (ends ?? 0))) {
+        const member = reflection.createNode(EndFeatureMembership, {
+            $container: node,
+            $containerProperty: "members",
+            $containerIndex: index,
+            $cstNode: node.$cstNode,
+        });
+        reflection.createNode(Feature, {
+            $container: member,
+            $containerProperty: "element",
+            $cstNode: node.$cstNode,
+        });
+    }
 }
 
 type ProcessingFunction<T extends AstNode = AstNode> = (
@@ -195,6 +282,8 @@ export class SysMLCstNodeBuilder extends CstNodeBuilder {
             WhileLoopActionUsage: addLoopMember,
             Import: finalizeImport,
             PortDefinition: createConjugatedPort,
+            TransitionUsage: createEmptyParametersInTransitionUsage,
+            SuccessionAsUsage: createMissingEndsInSuccessionAsUsage,
         };
 
         this.postprocessingMap = typeIndex.expandToDerivedTypes(

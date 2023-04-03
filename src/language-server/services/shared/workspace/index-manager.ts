@@ -26,7 +26,7 @@ import {
 import { CancellationToken } from "vscode-languageserver";
 import { URI, Utils } from "vscode-uri";
 import { Type, isElement, Namespace, Membership } from "../../../generated/ast";
-import { ElementMeta, MembershipMeta, TypeMeta } from "../../../model";
+import { ElementMeta, MembershipMeta, sanitizeName, TypeMeta } from "../../../model";
 import { streamAst } from "../../../utils/ast-util";
 import { makeScope, ScopeStream } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
@@ -211,7 +211,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         // if not undefined, the description was found in the cache
         if (description !== undefined) return description ?? undefined;
 
-        let parts = qualifiedName.split("::");
+        let parts = qualifiedName.split("::").map((name) => sanitizeName(name));
         let children: Map<string, MembershipMeta<ElementMeta>> | undefined;
         const root = parts[0];
         parts = parts.slice(1);
@@ -325,6 +325,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
     }
 
     conforms(left: string | TypeMeta, type: string | TypeMeta): boolean {
+        if (left === type) return true;
         if (typeof left === "string") left = this.findType(left) ?? left;
         if (typeof left === "string")
             return left === (typeof type === "string" ? type : type.qualifiedName);

@@ -30,7 +30,7 @@ import {
 } from "langium";
 import { TextualAnnotatingMeta, typeIndex, TypeMap } from "../../model";
 import * as ast from "../../generated/ast";
-import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
+import { isProgrammaticNode, SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { FormattingOptions, Range, TextEdit } from "vscode-languageserver";
 import { KeysMatching } from "../../utils/common";
 import { linesDiff } from "../../utils/ast-util";
@@ -97,6 +97,20 @@ function addIndent(action: FormattingAction, indent: number): FormattingAction {
         }),
     };
 }
+
+function prependIfNotStartsWith(
+    keyword: string,
+    node: AstNode,
+    formatter: NodeFormatter<AstNode>,
+    action = Options.indent
+): FormattingRegion {
+    const region = formatter.keyword(keyword);
+    if (region.nodes.at(0)?.offset !== node.$cstNode?.offset) {
+        region.prepend(action);
+    }
+    return region;
+}
+
 export class SysMLFormatter extends AbstractFormatter {
     /**
      * Map of AST node types to formatting functions that apply to that type
@@ -117,6 +131,7 @@ export class SysMLFormatter extends AbstractFormatter {
      * @param node AST node to format
      */
     protected format(node: AstNode): void {
+        if (isProgrammaticNode(node)) return;
         const formatting = this.formattings.get(node.$type);
         if (!formatting) return;
         const formatter = this.getNodeFormatter(node);
@@ -1232,7 +1247,10 @@ export class SysMLFormatter extends AbstractFormatter {
 
         const connection = formatter.keyword("connection");
         if (connection.nodes.length > 0) connection.append(Options.oneSpace);
-        else formatter.keyword("connect").prepend(Options.oneSpace);
+        else {
+            // don't add space if connection already starts with `connect`
+            prependIfNotStartsWith("connect", node, formatter, Options.oneSpace);
+        }
     }
 
     @formatter(ast.InterfaceUsage) interfaceUsage(
@@ -1362,10 +1380,12 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.SuccessionAsUsage>
     ): void {
         if (node.$cstNode?.text.startsWith("then")) {
-            if (node.members.length === 0) return;
-            formatter.node(node.members[0]).prepend(Options.oneSpace);
-            if (node.members.length === 1) return;
-            formatter.node(node.members[1]).prepend(Options.spaceOrIndent);
+            formatter.node(node).prepend(Options.uptoTwoIndents);
+            const members = node.members.filter((m) => !isProgrammaticNode(m));
+            if (members.length === 0) return;
+            formatter.node(members[0]).prepend(Options.oneSpace);
+            if (members.length === 1) return;
+            formatter.node(members[1]).prepend(Options.spaceOrIndent);
             return;
         }
         this.usagePart(node, formatter);

@@ -688,7 +688,11 @@ exports[`namespaces can have comments: toParseKerML 1`] = `
                 "about": [
                   {
                     "$type": "Annotation",
-                    "annotatedElement": {
+                    "annotations": [],
+                    "chains": [],
+                    "elements": [],
+                    "prefixes": [],
+                    "reference": {
                       "$type": "ElementReference",
                       "parts": [
                         {
@@ -710,10 +714,6 @@ exports[`namespaces can have comments: toParseKerML 1`] = `
                         },
                       ],
                     },
-                    "annotations": [],
-                    "chains": [],
-                    "elements": [],
-                    "prefixes": [],
                   },
                 ],
                 "body": "/* comment about A */",

@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { ItemFlow } from "../../generated/ast";
+import { ItemFlow, ItemFlowEnd } from "../../generated/ast";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { ConnectorMeta, StepMeta } from "./_internal";
+import { ConnectorMeta, ItemFlowEndMeta, StepMeta } from "./_internal";
 
 export const ImplicitItemFlows = {
     base: "Transfers::flowTransfers",
@@ -51,6 +51,13 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
 
     override defaultSupertype(): string {
         return "base";
+    }
+
+    /**
+     * @returns owned item flow ends of this item flow
+     */
+    itemFlowEnds(): ItemFlowEndMeta[] {
+        return this.ownedEnds().filter((f) => f.is(ItemFlowEnd)) as ItemFlowEndMeta[];
     }
 }
 

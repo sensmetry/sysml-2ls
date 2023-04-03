@@ -26,10 +26,8 @@ import { CancellationToken } from "vscode-languageserver";
 import {
     isTransparentElement,
     isLibraryPackage,
-    isAcceptActionUsage,
     isElement,
     Element,
-    ParameterMembership,
     Membership,
     isMembership,
 } from "../../generated/ast";
@@ -178,13 +176,6 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
     ): Iterable<MembershipMeta> | undefined {
         // transparent elements export their scopes to parents
         if (isTransparentElement(element)) return exports;
-
-        // accept action usages export their parameters, needed to resolve a
-        // linking error in some SysML examples
-        if (isAcceptActionUsage(element))
-            return stream(element.members)
-                .map((m) => m.$meta)
-                .filter((m) => m.is(ParameterMembership));
         return;
     }
 }

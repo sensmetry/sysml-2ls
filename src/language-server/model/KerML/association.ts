@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
+import { SpecializationType } from "..";
 import { Association } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
@@ -29,8 +30,6 @@ export const ImplicitAssociations = {
 @metamodelOf(Association, ImplicitAssociations)
 // Note: inherited methods are override by the last class inside `Mixin`
 export class AssociationMeta extends Mixin(ConnectorMixin, RelationshipMeta, ClassifierMeta) {
-    private baseEnds: number | undefined = undefined;
-
     constructor(elementId: ElementID, parent: ModelContainer<Association>) {
         super(elementId, parent);
     }
@@ -52,35 +51,12 @@ export class AssociationMeta extends Mixin(ConnectorMixin, RelationshipMeta, Cla
     }
 
     override reset(_: Association): void {
-        this.localEnds = undefined;
-        this.baseEnds = undefined;
+        this.resetEnds();
     }
 
-    /**
-     * @returns Total number of ends from inherited types
-     */
-    inheritedEnds(): number {
-        if (this.baseEnds === undefined) {
-            this.baseEnds = this.typesMatching(Association).reduce((count, assoc) => {
-                return Math.max(count, assoc.totalEnds());
-            }, 0);
-        }
-
-        return this.baseEnds;
-    }
-
-    /**
-     * @returns Total number of ends including inherited ones
-     */
-    totalEnds(): number {
-        return Math.max(this.ownedEnds().length, this.inheritedEnds());
-    }
-
-    /**
-     * Whether this Association is binary
-     */
-    isBinary(): boolean {
-        return this.totalEnds() === 2;
+    override addSpecialization<T extends SpecializationType>(specialization: T): void {
+        this.resetEnds();
+        super.addSpecialization(specialization);
     }
 }
 

@@ -39,3 +39,16 @@ test.concurrent.each([
         result: expected,
     });
 });
+
+test("Feature chain expressions can be evaluated", async () => {
+    await expectEvaluationResult({
+        text: `
+            feature a {
+                feature b = 42;
+            }
+            feature c = a.b;
+        `,
+        langId: "kerml",
+        result: [42],
+    });
+});

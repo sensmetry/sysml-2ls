@@ -8,11 +8,13 @@
 
 ### Added
 
+- KerML validations
 - SysML validations
 - Subsetting multiplicities and unique names in direct scope validations
 
 ### Fixed
 
+- Bugs discovered while adding validations
 - `allocate` is not indented an additional time if the element starts with
   `allocate`
 - Qualified names in suggestions shown from the membership node instead of the

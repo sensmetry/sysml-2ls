@@ -14,25 +14,45 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { stream } from "langium";
-import { EndFeatureMembership } from "../../generated/ast";
-import { ElementMeta, FeatureMeta } from "../KerML/_internal";
+import { Association, EndFeatureMembership } from "../../generated/ast";
+import { ElementMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
+import { PositionalFeaturesBase } from "./positional-features";
+
+const Filter: (f: MembershipMeta<FeatureMeta>) => boolean = (f) =>
+    Boolean(f.element()?.isEnd || f.is(EndFeatureMembership));
+const Types: ((t: TypeMeta) => boolean) | undefined = (t) => t.is(Association);
 
 export class ConnectorMixin {
-    protected localEnds: FeatureMeta[] | undefined = undefined;
-
+    private readonly endsCache = new PositionalFeaturesBase();
     /**
-     * @returns Number of directly owned end features
+     * @returns directly owned end features
      */
     ownedEnds(this: ElementMeta & ConnectorMixin): FeatureMeta[] {
-        if (this.localEnds === undefined) {
-            this.localEnds = stream(this.features)
-                .map((m) => m.element())
-                .nonNullable()
-                .filter((f) => f.isEnd || f.parent().is(EndFeatureMembership))
-                .toArray();
-        }
+        return this.endsCache.owned(this, Filter);
+    }
 
-        return this.localEnds;
+    /**
+     * @returns directly owned and inherited end features
+     */
+    ends(this: TypeMeta & ConnectorMixin): FeatureMeta[] {
+        return this.endsCache.all(this, Filter, Types);
+    }
+
+    protected resetEnds(): void {
+        this.endsCache.clearCaches();
+    }
+
+    /**
+     * @returns Total number of ends including inherited ones
+     */
+    totalEnds(this: TypeMeta & ConnectorMixin): number {
+        return this.ends().length;
+    }
+
+    /**
+     * Whether this Association/Connector is binary
+     */
+    isBinary(this: TypeMeta & ConnectorMixin): boolean {
+        return this.totalEnds() === 2;
     }
 }

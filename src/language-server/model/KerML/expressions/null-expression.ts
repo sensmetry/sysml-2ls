@@ -41,6 +41,10 @@ export class NullExpressionMeta extends ExpressionMeta {
     override returnType(): string | TypeMeta | undefined {
         return undefined;
     }
+
+    override isModelLevelEvaluable(): boolean {
+        return true;
+    }
 }
 
 declare module "../../../generated/ast" {

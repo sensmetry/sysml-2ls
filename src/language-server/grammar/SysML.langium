@@ -695,8 +695,7 @@ EmptySuccessionMember returns FeatureMembership:
 ;
 
 EmptySuccession returns SuccessionAsUsage:
-    'then' members+=MultiplicitySourceEndMember
-    // TODO: empty rule
+    'then' (members+=MultiplicitySourceEndMember)?
     /* members+=EmptyTargetEndMember */
 ;
 
@@ -705,16 +704,19 @@ MultiplicitySourceEndMember returns EndFeatureMembership:
 ;
 
 MultiplicitySourceEnd returns Feature:
-    {Feature} ( multiplicity=OwnedMultiplicity )?
+    multiplicity=OwnedMultiplicity
 ;
 
-EmptyTargetEndMember returns EndFeatureMembership:
-    element=EmptyTargetEnd
-;
+// rules that can match empty strings don't always work in langium, commenting
+// out to show that they are handled in code instead
 
-EmptyTargetEnd returns Feature:
-    {Feature}
-;
+// EmptyTargetEndMember returns EndFeatureMembership:
+//     element=EmptyTargetEnd
+// ;
+
+// EmptyTargetEnd returns Feature:
+//     {Feature}
+// ;
 
 // Items
 // ===================================================================================================
@@ -899,10 +901,8 @@ fragment PayloadFeature:
     | multiplicity=OwnedMultiplicity typeRelationships+=OwnedFeatureTyping
 ;
 
-// TODO: optimize
 fragment PayloadFeatureSpecializationPart:
-    FeatureSpecialization+
-    | FeatureSpecialization+ MultiplicityPart FeatureSpecialization*
+    FeatureSpecialization+ (MultiplicityPart FeatureSpecialization*)?
     | MultiplicityPart FeatureSpecialization+
 ;
 
@@ -1272,8 +1272,7 @@ IfNodeParameterMember returns ParameterMembership:
 WhileLoopNode returns WhileLoopActionUsage:
     ActionNodePrefix
     ( 'while' members+=ExpressionParameterMember
-    // TODO: empty rule
-    | 'loop' members+=EmptyParameterMember
+    | 'loop' /* members+=EmptyParameterMember */
     )
     members+=ActionBodyParameterMember
     ( 'until' members+=ExpressionParameterMember ';' )?
@@ -1345,19 +1344,17 @@ ActionTargetSuccession returns Usage:
 ;
 
 TargetSuccession returns SuccessionAsUsage:
-    'then' members+=MultiplicitySourceEndMember 
+    'then' ( members+=MultiplicitySourceEndMember )?
     members+=ConnectorEndMember
 ;
 
 GuardedTargetSuccession returns TransitionUsage:
-    // TODO: empty rule
     /* members += EmptyParameterMember */
     members+=GuardExpressionMember
     'then' members+=TransitionSuccessionMember
 ;
 
 DefaultTargetSuccession returns TransitionUsage:
-    // TODO: empty rule
     /* members += EmptyParameterMember */
     'else' members+=TransitionSuccessionMember
 ;
@@ -1365,7 +1362,6 @@ DefaultTargetSuccession returns TransitionUsage:
 GuardedSuccession returns TransitionUsage:
     ( 'succession' UsageDeclaration )? 'first'
     members+=TransitionSourceMember 
-    // TODO: empty rule
     /* members+=EmptyParameterMember */
     members+=GuardExpressionMember
     'then' members+=TransitionSuccessionMember
@@ -1468,9 +1464,7 @@ ExhibitStateUsage returns ExhibitStateUsage:
 TransitionUsage returns TransitionUsage:
     'transition' ( UsageDeclaration? 'first' )? 
     members+=TransitionSourceMember
-    // TODO: empty rule
     /* members+=EmptyParameterMember */
-    // TODO: empty rule
     ( /* members+=EmptyParameterMember */ members+=TriggerActionMember )?
     ( members+=GuardExpressionMember )?
     ( members+=EffectBehaviorMember )?
@@ -1479,15 +1473,12 @@ TransitionUsage returns TransitionUsage:
 ;
 
 TargetTransitionUsage returns TransitionUsage:
-    // TODO: empty rule
     /* members+=EmptyParameterMember */
     ( 'transition'
-    // TODO: empty rule
       ( /* members+=EmptyParameterMember  */
         members+=TriggerActionMember )?
       ( members+=GuardExpressionMember )?
       ( members+=EffectBehaviorMember )?
-    // TODO: empty rule
     | /* members+=EmptyParameterMember */ 
       members+=TriggerActionMember
       ( members+=GuardExpressionMember )?

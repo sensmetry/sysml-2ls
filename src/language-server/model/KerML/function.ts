@@ -16,6 +16,7 @@
 
 import { Mixin } from "ts-mixer";
 import { SysMLFunction } from "../../generated/ast";
+import { isModelLevelEvaluable } from "../expressions/util";
 import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
 import { BehaviorMeta, TypeMeta } from "./_internal";
@@ -52,6 +53,10 @@ export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
      */
     returnType(): TypeMeta | string | undefined {
         return this.getReturnType(this);
+    }
+
+    isModelLevelEvaluable(): boolean {
+        return isModelLevelEvaluable(this.qualifiedName);
     }
 }
 

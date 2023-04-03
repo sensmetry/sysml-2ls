@@ -16,3 +16,5 @@
 
 export * from "./connector";
 export * from "./function";
+export * from "./input-parameters";
+export * from "./positional-features";

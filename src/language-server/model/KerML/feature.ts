@@ -22,13 +22,16 @@ import {
     Connector,
     EndFeatureMembership,
     Feature,
+    FeatureMembership,
     FeatureTyping,
+    ParameterMembership,
     Redefinition,
     ReferenceSubsetting,
-    ResultExpressionMembership,
+    ReturnParameterMembership,
     Step,
     Structure,
     Subsetting,
+    Type,
 } from "../../generated/ast";
 import { FeatureDirectionKind, getFeatureDirectionKind, TypeClassifier } from "../enums";
 import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
@@ -58,7 +61,7 @@ export class FeatureMeta extends TypeMeta {
     /**
      * Featuring types
      */
-    readonly featuredBy = new Set<TypeMeta>();
+    readonly featuredBy: TypeMeta[] = [];
 
     /**
      * Feature direction
@@ -104,28 +107,44 @@ export class FeatureMeta extends TypeMeta {
     value?: FeatureValueMeta;
 
     protected typings: undefined | TypeMeta[] = undefined;
+    protected _owningType: TypeMeta | undefined;
 
     constructor(elementId: ElementID, parent: ModelContainer<Feature>) {
         super(elementId, parent);
+
+        const owner = parent.parent();
+        if (parent.is(FeatureMembership) && owner?.is(Type)) {
+            this._owningType = owner;
+            this.featuredBy.push(owner);
+        }
+    }
+
+    get owningType(): TypeMeta | undefined {
+        return this._owningType;
     }
 
     override initialize(node: Feature): void {
         this.value = undefined;
-        this.reset(node);
+        FeatureMeta.prototype.reset.call(this, node);
 
         this.direction = getFeatureDirectionKind(node.direction);
-        this.isComposite = !!node.isComposite;
         this.isPortion = !!node.isPortion;
+        this.isComposite = !!node.isComposite || this.isPortion;
         this.isReadonly = !!node.isReadOnly;
         this.isDerived = !!node.isDerived;
         this.isEnd = !!node.isEnd || this.parent().is(EndFeatureMembership);
 
         this.isOrdered = node.isOrdered;
         this.isNonUnique = node.isNonunique;
+
+        if (this.direction === "none" && this.parent().is(ParameterMembership)) {
+            this.direction = this.parent().is(ReturnParameterMembership) ? "out" : "in";
+        }
     }
 
     override reset(node: Feature): void {
-        this.featuredBy.clear();
+        this.featuredBy.length = 0;
+        if (this._owningType) this.featuredBy.push(this._owningType);
         if (node.value) this.value = node.value.$meta;
         this.isOrdered = node.isOrdered;
     }
@@ -260,12 +279,11 @@ export class FeatureMeta extends TypeMeta {
 
     get isParameter(): boolean {
         // parameter if direction was specified explicitly
-        const parent = this.owner();
-        return parent.isAny([Behavior, Step]) && this.direction !== "none";
+        return this.direction !== "none" && this.owner().isAny([Behavior, Step]);
     }
 
     get isResultParameter(): boolean {
-        return this.parent().is(ResultExpressionMembership);
+        return this.parent().is(ReturnParameterMembership);
     }
 
     override addSpecialization<T extends SpecializationType>(specialization: T): void {
@@ -323,6 +341,37 @@ export class FeatureMeta extends TypeMeta {
                     .flatMap((f) => (f as FeatureMeta).collectInheritedTypes(visited))
             )
         );
+    }
+
+    allFeaturingTypes(): TypeMeta[] {
+        // no real queue in TS/JS...
+        let queue: FeatureMeta[] = [this];
+        const types = new Set<TypeMeta>();
+
+        while (queue.length > 0) {
+            const next: FeatureMeta[] = [];
+            for (const feature of queue) {
+                for (const type of feature.featuredBy) {
+                    if (types.has(type)) continue;
+                    types.add(type);
+                    if (type.is(Feature)) next.push(type);
+                }
+            }
+
+            queue = next;
+        }
+
+        return Array.from(types);
+    }
+
+    isFeaturedBy(type: TypeMeta): boolean {
+        return this.featuredBy.some(
+            (t) => t.conforms(type) || (t.is(Feature) && t.isFeaturedBy(type))
+        );
+    }
+
+    override ownedParameters(): Stream<FeatureMeta> {
+        return TypeMeta.prototype.ownedParameters.call(this.basicFeature());
     }
 }
 

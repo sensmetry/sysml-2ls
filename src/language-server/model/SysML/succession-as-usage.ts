@@ -14,10 +14,23 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { stream } from "langium";
 import { Mixin } from "ts-mixer";
-import { SuccessionAsUsage } from "../../generated/ast";
+import {
+    ActionDefinition,
+    ActionUsage,
+    Connector,
+    Feature,
+    FeatureMembership,
+    ItemFlow,
+    SuccessionAsUsage,
+    TransitionFeatureMembership,
+    TransitionUsage,
+    Type,
+} from "../../generated/ast";
+import { FeatureMembershipMeta, FeatureMeta, MembershipMeta } from "../KerML";
 import { SuccessionMeta } from "../KerML/succession";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf, ElementID, ModelContainer, Metamodel } from "../metamodel";
 import { ConnectorAsUsageMeta } from "./connector-as-usage";
 
 @metamodelOf(SuccessionAsUsage, {
@@ -35,6 +48,52 @@ export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Successio
 
     override parent(): ModelContainer<SuccessionAsUsage> {
         return this._parent;
+    }
+
+    targetFeature(): FeatureMembershipMeta | undefined {
+        const owner = this.owner();
+        if (!owner.is(Type)) return;
+
+        const parent = this.parent();
+        const index = owner.features.findIndex((m) => m === parent);
+        if (index >= owner.features.length) return;
+        return stream(owner.features.slice(index + 1))
+            .filter((m) => m.is(FeatureMembership))
+            .head() as FeatureMembershipMeta | undefined;
+    }
+
+    private static findPreviousFeature(
+        feature: FeatureMeta,
+        linker?: (model: Metamodel) => void
+    ): MembershipMeta<FeatureMeta> | undefined {
+        const owner = feature.owner();
+        if (!owner.is(Type)) return;
+
+        const parent = feature.parent();
+        let index = owner.features.findIndex((m) => m === parent);
+        while (--index >= 0) {
+            const membership = owner.features[index];
+            if (membership.is(TransitionFeatureMembership)) continue;
+
+            linker?.call(undefined, membership);
+            const element = membership.element();
+            if (!element) continue;
+            if (
+                !element.isParameter &&
+                !element.is(TransitionUsage) &&
+                (!element.is(Connector) ||
+                    (!owner.isAny([ActionDefinition, ActionUsage]) && element.is(ItemFlow)))
+            )
+                return membership;
+        }
+
+        return owner.is(Feature)
+            ? SuccessionAsUsageMeta.findPreviousFeature(owner, linker)
+            : undefined;
+    }
+
+    previousFeature(linker?: (model: Metamodel) => void): MembershipMeta<FeatureMeta> | undefined {
+        return SuccessionAsUsageMeta.findPreviousFeature(this, linker);
     }
 }
 

@@ -125,7 +125,7 @@ fragment MultiplicityProperties:
 /* Annotations */
 
 Annotation returns Annotation:
-    annotatedElement=ElementReference
+    reference=ElementReference
 ;
 
 // Comments and documentation
