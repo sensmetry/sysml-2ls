@@ -98,6 +98,7 @@ export class NamespaceMeta extends ElementMeta {
             this.members.push(m.$meta);
             this.features.push(m.$meta as MembershipMeta<FeatureMeta>);
         });
+        node.aliases.forEach((a) => this.members.push(a.$meta));
     }
 }
 

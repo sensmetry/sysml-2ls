@@ -225,6 +225,20 @@ part c : a { :>>| }
             },
         },
     },
+    {
+        text: `
+    part def 'My part';
+    alias AliasedPart for 'My part'
+    part def Part2 :> A|{
+        part foo;
+    }`,
+        expected: {
+            label: "AliasedPart",
+            textEdit: {
+                newText: "AliasedPart",
+            },
+        },
+    },
 ];
 
 const failing_test_table: Case[] = [
