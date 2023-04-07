@@ -17,6 +17,7 @@
 import { LangiumDocument, MaybePromise } from "langium";
 import { Disposable, HoverParams } from "vscode-languageserver";
 import { erase } from "../utils/common";
+import { SysMLConfig } from "./config";
 
 interface Callback<T extends unknown[], Return> {
     /**
@@ -116,8 +117,20 @@ export class Event<T extends unknown[], Return> extends BaseEvent<T, Return> {
     }
 }
 
-export class SharedEvents {}
+export class SharedEvents {
+    /**
+     * Event emitted when the language server configuration changes with (old,
+     * new) config parameters
+     */
+    readonly onConfigurationChanged = new Event<[SysMLConfig, SysMLConfig], void>();
+}
 
+export type LanguageConfig = Record<string, unknown>;
 export class LanguageEvents {
     readonly onHoverRequest = new AsyncEvent<[LangiumDocument, HoverParams], string | undefined>();
+    /**
+     * Event emitted when a language configuration changes with (old, new)
+     * config parameters
+     */
+    readonly onConfigurationChanged = new Event<[LanguageConfig, LanguageConfig], void>();
 }

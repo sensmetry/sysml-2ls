@@ -18,17 +18,30 @@ import { DeepPartial, DefaultConfigurationProvider } from "langium";
 import { DidChangeConfigurationNotification } from "vscode-languageserver";
 import { backtrackToDirname, mergeWithPartial } from "../../../utils/common";
 import { SysMLConfig } from "../../config";
-import { SysMLSharedServices } from "../../services";
+import { LanguageConfig, LanguageEvents, SharedEvents } from "../../events";
+import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
 
 export const SETTINGS_KEY = "sysml";
 
 export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
-    readonly defaultConfig: SysMLConfig;
+    protected readonly services: SysMLSharedServices;
+    protected readonly configChanged: SharedEvents["onConfigurationChanged"];
+    protected readonly languageConfigChanged: Record<
+        string,
+        LanguageEvents["onConfigurationChanged"]
+    >;
 
     constructor(services: SysMLSharedServices) {
         super(services);
 
-        this.defaultConfig = services.config;
+        this.services = services;
+        this.configChanged = services.Events.onConfigurationChanged;
+        this.languageConfigChanged = Object.fromEntries(
+            services.ServiceRegistry.all.map((services) => [
+                this.toSectionName(services.LanguageMetaData.languageId),
+                (services as SysMLDefaultServices).Events.onConfigurationChanged,
+            ])
+        );
         this.settings[SETTINGS_KEY] = services.config;
         services.lsp.LanguageServer.onInitialized((_params) => {
             services.lsp.Connection?.client.register(DidChangeConfigurationNotification.type, {
@@ -70,21 +83,25 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
     }
 
     protected override updateSectionConfiguration(section: string, configuration: unknown): void {
+        const old = this.settings[section];
         if (section === SETTINGS_KEY) {
             // don't change the config if none was received
             if (!configuration) return;
             // not all settings may be exposed through package.json so get those
             // settings values from the default config
-            super.updateSectionConfiguration(
-                section,
-                mergeWithPartial<SysMLConfig>(
-                    this.defaultConfig,
-                    configuration as DeepPartial<SysMLConfig>
-                )
+
+            const updated = mergeWithPartial<SysMLConfig>(
+                this.services.config,
+                configuration as DeepPartial<SysMLConfig>
             );
+
+            super.updateSectionConfiguration(section, updated);
+            this.configChanged.emit(old as SysMLConfig, updated);
         } else {
             super.updateSectionConfiguration(section, configuration);
         }
+
+        this.languageConfigChanged[section]?.emit(old, configuration as LanguageConfig);
     }
 
     private _extensionDir: string | undefined | null;
