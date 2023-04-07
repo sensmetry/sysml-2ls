@@ -28,6 +28,15 @@ import {
     Expression,
     Step,
     InlineExpression,
+    Multiplicity,
+    Subsetting,
+    Redefinition,
+    ReferenceSubsetting,
+    MultiplicityRange,
+    Documentation,
+    MetadataFeature,
+    MetadataUsage,
+    TextualRepresentation,
 } from "../../generated/ast";
 import { typeIndex } from "../types";
 
@@ -50,6 +59,24 @@ test.concurrent.each([
     ],
 ])("type inheritance is sorted in inheritance order: %s", (type: string, expected: string[]) => {
     expect(Array.from(typeIndex.getInheritanceChain(type))).toStrictEqual(expected);
+});
+
+test.concurrent.each([
+    [
+        AnnotatingElement,
+        [
+            Comment,
+            Documentation,
+            MetadataFeature,
+            MetadataUsage,
+            TextualAnnotatingElement,
+            TextualRepresentation,
+        ],
+    ],
+    [Multiplicity, [MultiplicityRange]],
+    [Subsetting, [Redefinition, ReferenceSubsetting]],
+])("%s have subtypes computed", (supertype, subtypes) => {
+    expect(subtypes).toEqual(expect.arrayContaining(Array.from(typeIndex.getSubtypes(supertype))));
 });
 
 test("map values are propagated to unset subtypes with `expandToDerivedTypes`", () => {

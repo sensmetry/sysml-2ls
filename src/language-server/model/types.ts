@@ -55,6 +55,7 @@ const NON_TYPES = new Set<string>([
 class TypesIndex<S = SysMLTypeList> {
     protected readonly base: AstReflection;
     protected readonly supertypes = new Map<string, Set<string>>();
+    protected readonly subtypes = new Map<string, Set<string>>();
     protected readonly types: Keys<S>[];
 
     constructor() {
@@ -84,7 +85,13 @@ class TypesIndex<S = SysMLTypeList> {
             this.mergeTypes(types, this.sortTypes(relationships));
             // insert union types immediately after the last matching subtype
             this.mergeTypes(types, this.sortTypes(unions));
-            this.supertypes.set(type, new Set(types));
+
+            const supertypes = new Set(types);
+            this.supertypes.set(type, supertypes);
+
+            supertypes.forEach((supertype) => {
+                this.getSubtypes(supertype).add(type as Keys<S>);
+            });
         }
 
         this.types = this.base.getAllTypes().filter((s) => !NON_TYPES.has(s)) as Keys<S>[];
@@ -130,6 +137,15 @@ class TypesIndex<S = SysMLTypeList> {
      */
     getInheritanceChain(type: string): Set<Keys<S>> {
         return (this.supertypes.get(type) ?? new Set<string>()) as Set<Keys<S>>;
+    }
+
+    getSubtypes(type: string): Set<Keys<S>> {
+        let subtypes = this.subtypes.get(type);
+        if (!subtypes) {
+            subtypes = new Set();
+            this.subtypes.set(type, subtypes);
+        }
+        return subtypes as Set<Keys<S>>;
     }
 
     /**

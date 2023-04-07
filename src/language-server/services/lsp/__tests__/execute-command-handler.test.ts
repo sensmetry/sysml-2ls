@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LangiumDocument, ParseResult } from "langium";
-import { CancellationToken, TextDocumentIdentifier } from "vscode-languageserver";
+import { CancellationToken, Disposable, TextDocumentIdentifier } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import { parseKerML, parseSysML, services, TEST_BUILD_OPTIONS } from "../../../../testing";
 import { RegisterTextEditorCommandsRequest } from "../../../../common/protocol-extensions";
@@ -186,4 +186,51 @@ describe("editor commands can be executed", () => {
             expect(mockLock).toHaveBeenCalledTimes(1);
         }
     );
+});
+
+describe("Custom commands", () => {
+    function testRegister(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        register: (name: string, command: any, thisObj?: ThisParameterType<unknown>) => Disposable
+    ): void {
+        const command = "my custom command";
+        let handler: SysMLExecuteCommandHandler;
+        const fn = jest.fn(function (this: unknown) {
+            return this;
+        });
+        const self = { $hello: "world" };
+        let disposable: Disposable;
+
+        beforeEach(() => {
+            handler = new SysMLExecuteCommandHandler(services.shared);
+            disposable = register.call(handler, command, fn, self);
+        });
+
+        test("commands can be registered", () => {
+            expect(handler.commands).toEqual(expect.arrayContaining([command]));
+        });
+
+        test("commands can be removed", () => {
+            disposable.dispose();
+            expect(handler.commands).not.toEqual(expect.arrayContaining([command]));
+        });
+
+        test("commands can be execute", async () => {
+            await handler.executeCommand(command, [0], CancellationToken.None);
+            expect(fn).toHaveBeenCalledTimes(1);
+            expect(fn).toHaveLastReturnedWith(self);
+        });
+    }
+
+    describe("editor commands can be registered and executed", () => {
+        testRegister(SysMLExecuteCommandHandler.prototype.registerEditorCommand);
+    });
+
+    describe("document commands can be registered and executed", () => {
+        testRegister(SysMLExecuteCommandHandler.prototype.registerDocumentCommand);
+    });
+
+    describe("simple commands can be registered and executed", () => {
+        testRegister(SysMLExecuteCommandHandler.prototype.registerSimpleCommand);
+    });
 });

@@ -25,7 +25,7 @@ import {
     ServiceRegistry,
     stream,
 } from "langium";
-import { CancellationToken, Connection } from "vscode-languageserver";
+import { CancellationToken, Connection, Disposable } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import { UriComponents } from "vscode-uri/lib/umd/uri";
 import {
@@ -84,6 +84,17 @@ function addCommand(
     map.set(name + ".console", withConsole(fn));
 }
 
+function wrapEditorCommand<T>(
+    name: string,
+    command: EditorCommand<T>,
+    thisObj?: ThisParameterType<unknown>
+): ExecuteCommandFunction {
+    return function (this: unknown, args, cancelToken) {
+        if (args.length > 0) return command.call(thisObj ?? this, args[0], cancelToken);
+        else throw new Error(`No arguments provided for ${name}`);
+    };
+}
+
 /**
  * Register an editor command. Use:
  * ```ts
@@ -101,14 +112,17 @@ function editorCommand(name: string) {
     ): void {
         const fn = descriptor.value;
         if (!fn) return;
-        addCommand(
-            TEXT_EDITOR_FUNCTIONS,
-            name,
-            function (this: SysMLExecuteCommandHandler, args, cancelToken) {
-                if (args.length > 0) return fn.call(this, args[0], cancelToken);
-                else throw new Error(`No arguments provided for ${name}`);
-            }
-        );
+        addCommand(TEXT_EDITOR_FUNCTIONS, name, wrapEditorCommand(name, fn));
+    };
+}
+
+function wrapSimpleCommand<T>(
+    name: string,
+    command: SimpleCommand<T>,
+    thisObj?: ThisParameterType<unknown>
+): ExecuteCommandFunction {
+    return function (this: unknown, _args, cancelToken) {
+        return command.call(thisObj ?? this, cancelToken);
     };
 }
 
@@ -129,13 +143,18 @@ function simpleCommand(name: string) {
     ): void => {
         const fn = descriptor.value;
         if (!fn) return;
-        addCommand(
-            SIMPLE_COMMANDS,
-            name,
-            function (this: SysMLExecuteCommandHandler, _args, cancelToken) {
-                return fn.call(this, cancelToken);
-            }
-        );
+        addCommand(SIMPLE_COMMANDS, name, wrapSimpleCommand(name, fn));
+    };
+}
+
+function wrapDocumentCommand<T>(
+    name: string,
+    command: DocumentCommand<T>,
+    thisObj?: ThisParameterType<unknown>
+): ExecuteCommandFunction {
+    return function (this: unknown, args, cancelToken) {
+        if (args.length > 0) return command.call(thisObj ?? this, args[0], cancelToken);
+        else throw new Error(`No arguments provided for ${name}`);
     };
 }
 
@@ -156,14 +175,7 @@ function documentCommand(name: string) {
     ): void => {
         const fn = descriptor.value;
         if (!fn) return;
-        addCommand(
-            DOCUMENT_COMMANDS,
-            name,
-            function (this: SysMLExecuteCommandHandler, args, cancelToken) {
-                if (args.length > 0) return fn.call(this, args[0], cancelToken);
-                else throw new Error(`No arguments provided for ${name}`);
-            }
-        );
+        addCommand(DOCUMENT_COMMANDS, name, wrapDocumentCommand(name, fn));
     };
 }
 
@@ -189,6 +201,72 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
             this.connection?.sendRequest(RegisterTextEditorCommandsRequest.type, {
                 commands: Array.from(TEXT_EDITOR_FUNCTIONS.keys()),
             });
+        });
+    }
+
+    /**
+     * Register a custom command with the first {@link RegisterTextEditorCommandsRequest.Parameters} argument
+     * @param name command name, should be unique
+     * @param command command that will be executed
+     * @param thisObj `this` that will be used to execute `command`
+     * @returns a Disposable that will unregister the command
+     */
+    registerEditorCommand<T>(
+        name: string,
+        command: EditorCommand<T>,
+        thisObj: ThisParameterType<unknown> = this
+    ): Disposable {
+        return this.registerCustomCommand(name, command, wrapEditorCommand, thisObj);
+    }
+
+    /**
+     * Register a custom command with no argument
+     * @param name command name, should be unique
+     * @param command command that will be executed
+     * @param thisObj `this` that will be used to execute `command`
+     * @returns a Disposable that will unregister the command
+     */
+    registerSimpleCommand<T>(
+        name: string,
+        command: SimpleCommand<T>,
+        thisObj: ThisParameterType<unknown> = this
+    ): Disposable {
+        return this.registerCustomCommand(name, command, wrapSimpleCommand, thisObj);
+    }
+
+    /**
+     * Register a custom command with the first {@link UriComponents} argument,
+     * this is the default argument that is passed by default by the IDE, at
+     * least by VS Code.
+     * @param name command name, should be unique
+     * @param command command that will be executed
+     * @param thisObj `this` that will be used to execute `command`
+     * @returns a Disposable that will unregister the command
+     */
+    registerDocumentCommand<T>(
+        name: string,
+        command: DocumentCommand<T>,
+        thisObj: ThisParameterType<unknown> = this
+    ): Disposable {
+        return this.registerCustomCommand(name, command, wrapDocumentCommand, thisObj);
+    }
+
+    protected registerCustomCommand<T>(
+        name: string,
+        command: T,
+        wrapper: (
+            name: string,
+            command: T,
+            thisObj?: ThisParameterType<unknown>
+        ) => ExecuteCommandFunction,
+        thisObj?: ThisParameterType<unknown>
+    ): Disposable {
+        const wrapped = wrapper(name, command, thisObj);
+        this.registeredCommands.set(name, wrapped);
+
+        return Disposable.create(() => {
+            const current = this.registeredCommands.get(name);
+            if (current === wrapped) this.registeredCommands.delete(name);
         });
     }
 
@@ -371,7 +449,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
 
     override async executeCommand(
         name: string,
-        args: [],
+        args: unknown[],
         cancelToken: CancellationToken
     ): Promise<unknown> {
         const command = this.registeredCommands.get(name);
