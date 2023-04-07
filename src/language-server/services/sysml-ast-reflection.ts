@@ -192,6 +192,14 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
         }
         return child;
     }
+
+    getSubtypes(type: string): ReadonlySet<string> {
+        return typeIndex.getSubtypes(type);
+    }
+
+    getSupertypes(type: string): ReadonlySet<string> {
+        return typeIndex.getInheritanceChain(type);
+    }
 }
 
 export type ConstructParams<
