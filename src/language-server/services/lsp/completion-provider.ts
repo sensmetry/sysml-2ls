@@ -38,7 +38,6 @@ import {
     InlineExpression,
     isElementReference,
     isFeature,
-    Membership,
     MetadataAccessExpression,
 } from "../../generated/ast";
 import {
@@ -53,7 +52,7 @@ import { BuildProgress } from "../shared/workspace/documents";
 import { SysMLScopeProvider } from "../references/scope-provider";
 import { ScopeStream, SysMLScope } from "../../utils/scopes";
 import { asyncWaitWhile } from "../../utils/common";
-import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
+import { MembershipMeta } from "../../model";
 
 const ALPHA_NUM = /[a-zA-z\d_]/;
 const NON_ALPHA_NUM = /[^a-zA-z\d_\s]/;
@@ -212,7 +211,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
             if ((!startQuote && !endQuote) || value.textEdit)
                 return this.fillCompletionItem(textDocument, offset, value);
 
-            const label = this.getLabel(value);
+            const label = value.label;
             if (!label) return;
 
             let start = tokenStart;
@@ -398,16 +397,17 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
 
             const visited = new Set<string>();
             const collect = (s: SysMLScope, index: number): void => {
-                s.getAllElements().forEach((e) => {
-                    if (visited.has(e.name)) return;
-                    visited.add(e.name);
+                s.getAllExportedElements().forEach((e) => {
+                    [e.name, e.shortName].forEach((name) => {
+                        if (!name) return;
+                        if (visited.has(name)) return;
+                        visited.add(name);
 
-                    if (this.filterCrossReference(e)) {
-                        const item = this.createReferenceCompletionItem(e);
+                        const item = this.createMemberCompletionItem(e, name);
                         // length 4 should be more than enough (10k numbers)
                         item.sortText = index.toString().padStart(4, "0");
                         acceptor(item);
-                    }
+                    });
                 });
             };
 
@@ -499,40 +499,18 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         });
     }
 
-    protected override createReferenceCompletionItem(
-        nodeDescription: SysMLNodeDescription
+    protected createMemberCompletionItem(
+        member: MembershipMeta,
+        name: string
     ): CompletionValueItem {
-        const node = nodeDescription.node?.$meta;
-        if (node?.is(Membership)) nodeDescription = node.element()?.description ?? nodeDescription;
-        const item = super.createReferenceCompletionItem(nodeDescription);
-
-        if (node) {
-            item.labelDetails = {
-                description: node.is(Membership)
-                    ? node.element()?.qualifiedName
-                    : node.qualifiedName,
-            };
-        }
-
-        return item;
-    }
-
-    /**
-     * Get a label for completion item
-     */
-    protected getLabel(value: CompletionValueItem): string | undefined {
-        if (typeof value.label === "string") {
-            return value.label;
-        }
-
-        if ("node" in value) {
-            return this.nameProvider.getName(value.node);
-        }
-
-        if ("nodeDescription" in value) {
-            return value.nodeDescription.name;
-        }
-
-        return;
+        return {
+            label: name,
+            kind: CompletionItemKind.Reference,
+            detail: member.element()?.nodeType(),
+            sortText: "0",
+            labelDetails: {
+                description: member.element()?.qualifiedName,
+            },
+        };
     }
 }

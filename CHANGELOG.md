@@ -4,6 +4,12 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## main
+
+### Fixed
+
+- Alias members not showing up in completion suggestions
+
 ## 0.4.0
 
 ### Added
