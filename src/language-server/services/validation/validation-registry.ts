@@ -16,9 +16,8 @@
 
 import { AstNode, MultiMap, ValidationCheck, ValidationRegistry } from "langium";
 import { Disposable } from "vscode-languageserver";
-import { typeIndex, TypeMap } from "../../model";
+import { typeIndex } from "../../model";
 import { KeysMatching } from "../../utils/common";
-import { SysMLDefaultServices } from "../services";
 import { SysMLAstReflection, SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 
 type Check<T extends AstNode = AstNode> = { rule: ValidationCheck<T>; bounds: SysMLType[] };
@@ -69,22 +68,16 @@ export function validateSysML<K extends SysMLType>(type: K, bounds: SysMLType[] 
     return validate(type, false, true, bounds);
 }
 
-// @ts-expect-error ignore private member override
 export class BaseValidationRegistry extends ValidationRegistry {
-    protected override readonly reflection: SysMLAstReflection;
-
-    constructor(services: SysMLDefaultServices) {
-        super(services);
-        this.reflection = services.shared.AstReflection;
-    }
-
     protected registerBoundRules(rules: Rules, thisObj: unknown): void {
-        const expanded = typeIndex.expandAndMerge(rules as TypeMap<SysMLType, Check[]>);
-
-        for (const [type, checks] of expanded.entries()) {
+        for (const [type, checks] of Object.entries(rules)) {
             for (const check of checks) {
-                if (check.bounds.some((t) => this["reflection"].isSubtype(type, t))) continue;
-                this.checks.add(type, this.wrapValidationException(check.rule, thisObj));
+                const wrapped = this.wrapValidationException((check as Check).rule, thisObj);
+                this.checks.add(type, wrapped);
+                this.astReflection.getSubtypes(type).forEach((subtype) => {
+                    if (check.bounds.some((t) => this.astReflection.isSubtype(subtype, t))) return;
+                    this.checks.add(subtype, wrapped);
+                });
             }
         }
     }
@@ -116,7 +109,7 @@ export class BaseValidationRegistry extends ValidationRegistry {
 
     protected override doRegister(type: string, check: ValidationCheck): void {
         this.checks.add(type, check);
-        for (const subtype of this.reflection.getSubtypes(type)) {
+        for (const subtype of this.astReflection.getSubtypes(type)) {
             this.checks.add(subtype, check);
         }
     }
@@ -125,5 +118,9 @@ export class BaseValidationRegistry extends ValidationRegistry {
     // returns `any` type
     protected get checks(): MultiMap<string, ValidationCheck> {
         return this["validationChecks"];
+    }
+
+    protected get astReflection(): SysMLAstReflection {
+        return this["reflection"];
     }
 }

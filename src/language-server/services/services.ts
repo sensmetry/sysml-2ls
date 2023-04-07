@@ -37,6 +37,7 @@ import { LanguageEvents, SharedEvents } from "./events";
 import { ExtensionManager } from "./shared/extension-manager";
 import { ModelUtil } from "./shared/model-utils";
 import { SysMLExpressionEvaluator } from "./shared/evaluator";
+import { BaseValidationRegistry } from "./validation/validation-registry";
 
 export type SysMLAddedSharedServices = {
     workspace: {
@@ -78,6 +79,9 @@ export type SysMLDefaultAddedServices = {
     };
     workspace: {
         AstNodeDescriptionProvider: SysMLNodeDescriptionProvider;
+    };
+    validation: {
+        ValidationRegistry: BaseValidationRegistry;
     };
     shared: SysMLSharedServices;
     Events: LanguageEvents;
