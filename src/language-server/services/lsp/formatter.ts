@@ -607,7 +607,7 @@ export class SysMLFormatter extends AbstractFormatter {
                     "featured",
                     "by",
                     "chains",
-                ].concat(ast.isUsage(node) ? ["defined", ":"] : ["conjugates", "~", "typed"]),
+                ].concat(ast.isUsage(node) ? ["defined"] : ["conjugates", "~", "typed"]),
             });
         }
 
@@ -1911,10 +1911,19 @@ export class SysMLFormatter extends AbstractFormatter {
                         : options.indent === undefined
                         ? Options.spaceOrIndent
                         : Options.oneSpace;
-                    if (node.$cstNode?.text.startsWith(kw.nodes[0].text)) {
+
+                    // keywords may not be ordered so have to check all
+                    // nodes if one starts at the node offset
+                    const offset = node.$cstNode?.offset;
+                    const index =
+                        offset === undefined
+                            ? undefined
+                            : kw.nodes.findIndex((cst) => cst.offset === offset);
+                    if (index !== undefined && index >= 0) {
                         // don't need to prepend anything if the element starts with
-                        // the keyword already
-                        kw.slice(1).prepend(action);
+                        // a keyword already
+                        const nodes = [...kw.nodes.slice(0, index), ...kw.nodes.slice(index + 1)];
+                        formatter.cst(nodes).prepend(action);
                     } else {
                         kw.prepend(action);
                     }
@@ -1936,7 +1945,9 @@ export class SysMLFormatter extends AbstractFormatter {
         items.forEach((item, i) => {
             const region = formatter.node(item);
             if (i === 0) {
-                if (item.$cstNode?.offset !== node.$cstNode?.offset) {
+                if (startsWith(node, region)) {
+                    region.prepend(addIndent(Options.noSpace, 1));
+                } else if (item.$cstNode?.offset !== node.$cstNode?.offset) {
                     // only prepend if the list doesn't start at the same position as the owning node
                     region.prepend(initial);
                 } else {
