@@ -113,13 +113,8 @@ import { implicitIndex } from "../../../model/implicits";
 import { TransitionFeatureKind } from "../../../model/enums";
 import { NonNullReference, SysMLLinker } from "../../references/linker";
 import { KeysMatching, Statistics } from "../../../utils/common";
-import {
-    ConstructParams,
-    SysMLAstReflection,
-    SysMLType,
-    SysMLTypeList,
-} from "../../sysml-ast-reflection";
-import { AstParent, AstPropertiesFor, streamAst } from "../../../utils/ast-util";
+import { SysMLAstReflection, SysMLType, SysMLTypeList } from "../../sysml-ast-reflection";
+import { streamAst } from "../../../utils/ast-util";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { URI } from "vscode-uri";
 import { ModelUtil } from "../model-utils";
@@ -479,31 +474,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             },
             configurable: true,
         });
-    }
-
-    /**
-     * Construct a valid AST node at runtime
-     * @param properties partial properties matching the AST node
-     * @param type type name of the AST node
-     * @param document document the constructed node will belong to
-     * @returns Constructed and valid AST node with metamodel constructed and initialized
-     */
-    construct<
-        V extends SysMLType,
-        T extends AstParent<SysMLTypeList[V]>,
-        P extends AstPropertiesFor<SysMLTypeList[V], T>
-    >(
-        type: V,
-        properties: ConstructParams<SysMLTypeList[V], T, P>,
-        document: LangiumDocument
-    ): SysMLTypeList[V] {
-        const node = this.astReflection.createNode(type, properties);
-        this.addMeta(node, document);
-        // valid document implies that parsed nodes have had $meta assigned so
-        // initialize is safe to call
-        // cast for better TSC performance...
-        (node as AstNode).$meta?.initializeFromAst(node);
-        return node;
     }
 
     /**
