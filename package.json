@@ -329,7 +329,7 @@
         "install-hooks": "esbuild ./.githooks/pre-commit.ts --outfile=.git/hooks/pre-commit --bundle --format=cjs --platform=node",
         "esbuild": "pnpm run esbuild-base --sourcemap",
         "watch": "pnpm run esbuild-base --sourcemap --watch",
-        "tstrace": "tsc -p tsconfig.json --generateTrace trace",
+        "tstrace": "tsc -p tsconfig.json --noEmit --generateTrace trace",
         "typecheck": "tsc -p tsconfig.json --noEmit",
         "typecheck:watch": "pnpm run typecheck --watch",
         "index": "pnpx tsx ./scripts/generate-model-index.ts",

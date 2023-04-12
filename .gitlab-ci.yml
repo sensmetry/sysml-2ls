@@ -25,6 +25,7 @@ stages:
 build:
   stage: build
   script:
+    - pnpm run typecheck
     - pnpm run esbuild-base
 
 test:
