@@ -118,7 +118,7 @@ import { streamAst } from "../../../utils/ast-util";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { URI } from "vscode-uri";
 import { ModelUtil } from "../model-utils";
-import { isExpressionError, SysMLExpressionEvaluator } from "../evaluator";
+import { isExpressionError, SysMLExpressionEvaluator, validationLocation } from "../evaluator";
 
 const MetaclassPackages = [
     "KerML::Root::",
@@ -554,7 +554,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 if (isExpressionError(result)) {
                     this.metamodelErrors.add(document.uriString, {
                         message: result.message,
-                        node: result.stack.map((e) => e.ast()).find((a) => a) ?? node,
+                        node: validationLocation(result) ?? node,
                     });
                     continue;
                 }

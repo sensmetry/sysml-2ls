@@ -223,6 +223,24 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
     }
 
     /**
+     * @param types types or their fully qualified names to check for
+     * conformance
+     * @returns the first value in `types` that `this` conforms to and the
+     * corresponding type or `undefined` if `this` does not conform to any
+     * `types`
+     */
+    firstConforming<T extends string | TypeMeta>(types: T[]): [T, TypeMeta] | undefined {
+        for (const type of this.allTypes(undefined, true)) {
+            const result = types.find((t) =>
+                typeof t === "string" ? type.qualifiedName === t : type === t
+            );
+            if (result) return [result, type];
+        }
+
+        return;
+    }
+
+    /**
      * @param is type assertion predicate
      * @param kind specialization kind filter
      * @returns Stream of direct specializations that satisfy {@link is}
