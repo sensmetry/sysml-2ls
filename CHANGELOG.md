@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Fixed type relationships sometimes indented an additional time in unnamed types
 - Alias members not showing up in completion suggestions
 
 ## 0.4.0

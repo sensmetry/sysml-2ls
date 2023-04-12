@@ -2357,4 +2357,14 @@ part A {
 }`
         );
     });
+
+    describe("unnamed features starting with feature typing aren't indented twice", () => {
+        testFormatting(
+            "part p : P { : A :>> a; }",
+            `
+part p : P {
+    : A :>> a;
+}`
+        );
+    });
 });
