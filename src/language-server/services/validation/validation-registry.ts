@@ -72,12 +72,12 @@ export class BaseValidationRegistry extends ValidationRegistry {
     protected registerBoundRules(rules: Rules, thisObj: unknown): void {
         for (const [type, checks] of Object.entries(rules)) {
             for (const check of checks) {
-                const wrapped = this.wrapValidationException((check as Check).rule, thisObj);
-                this.checks.add(type, wrapped);
-                this.astReflection.getSubtypes(type).forEach((subtype) => {
-                    if (check.bounds.some((t) => this.astReflection.isSubtype(subtype, t))) return;
-                    this.checks.add(subtype, wrapped);
-                });
+                this.registerValidationRule(
+                    type as SysMLType,
+                    check.rule as ValidationCheck,
+                    thisObj,
+                    check.bounds
+                );
             }
         }
     }
@@ -87,23 +87,28 @@ export class BaseValidationRegistry extends ValidationRegistry {
      * @param type element type this rule is for
      * @param check validation check for `type`
      * @param thisObj `this` parameter the `check` will be invoked with
+     * @param bounds upper type bounds `check` applies to
      * @returns a `Disposable` object that removes `check` from this registry
      */
     registerValidationRule<K extends SysMLType>(
         type: K,
         check: ValidationCheck<SysMLTypeList[K]>,
-        thisObj: ThisParameterType<unknown> = this
+        thisObj: ThisParameterType<unknown> = this,
+        bounds: readonly SysMLType[] = []
     ): Disposable {
-        const types = [type as SysMLType].concat(Array.from(typeIndex.getSubtypes(type)));
+        const types = [type as SysMLType].concat(
+            Array.from(typeIndex.getSubtypes(type)).filter(
+                (subtype) => !bounds.some((bound) => this.astReflection.isSubtype(subtype, bound))
+            )
+        );
 
-        const checks = types.map((type) => {
-            const wrapped = this.wrapValidationException(check as ValidationCheck, thisObj);
+        const wrapped = this.wrapValidationException(check as ValidationCheck, thisObj);
+        types.forEach((type) => {
             this.checks.add(type, wrapped);
-            return wrapped;
         });
 
         return Disposable.create(() => {
-            types.forEach((type, index) => this.checks.delete(type, checks[index]));
+            types.forEach((type) => this.checks.delete(type, wrapped));
         });
     }
 
