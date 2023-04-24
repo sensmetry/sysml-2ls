@@ -69,20 +69,29 @@ let options = {
     plugins: [BuildWatcher, LLStarAmbiguityReport],
 };
 
-/** @type {Record<string, () => esbuild.BuildOptions>} */
+/** @type {Record<string, (entries: string[]) => esbuild.BuildOptions>} */
 let builds = {
-    node: () => ({
+    node: (entries) => ({
         ...options,
         platform: "node",
         format: "cjs",
 
-        entryPoints: ["./src/extension.js", "./src/language-server/main.ts", "./src/cli/index.ts"],
+        entryPoints: entries,
     }),
 };
 
 const program = new Command();
 program
-    .addArgument(new Argument("<TARGET>", "Build target").choices(Object.keys(builds)))
+    .addArgument(
+        new Argument("<TARGET>", "Build target").choices(Object.keys(builds)).argRequired()
+    )
+    .addArgument(
+        (() => {
+            const arg = new Argument("<entry>", "entry point").argRequired();
+            arg.variadic = true;
+            return arg;
+        })()
+    )
     .option("--watch", "Run in watch mode", false)
     .option("--sourcemap", "Generate source maps", false)
     .option("--minify", "Minify generated files", false);
@@ -91,7 +100,7 @@ program.parse();
 const opts = program.opts();
 
 const ctx = await (opts.watch ? esbuild.context : esbuild.build)({
-    ...builds[program.args[0]](),
+    ...builds[program.args[0]](program.args.slice(1)),
     sourcemap: opts.sourcemap,
     minify: opts.minify,
 });

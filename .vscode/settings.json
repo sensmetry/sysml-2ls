@@ -41,6 +41,16 @@
         ],
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "[json]": {
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.suggest.insertMode": "replace",
+        "gitlens.codeLens.scopes": [
+            "document"
+        ],
+        "files.insertFinalNewline": true
+    },
     "debug.onTaskErrors": "debugAnyway",
     "jest.monitorLongRun": 30000,
     "jest.jestCommandLine": "pnpm run test --verbose=false",

@@ -1,0 +1,60 @@
+.vscode/**
+.vscode-test/**
+.gitignore
+.git-blame-ignore-revs
+.gitmodules
+.prettierrc
+.gitlab-ci.yml
+.VSCodeCounter
+.gitlab
+.github
+.swcrc
+.pnpm-store
+
+# CI artifacts
+release.env
+release.description
+
+# local testing files
+ast.json
+test.kerml
+test.sysml
+
+# tool configs
+jest.config.js
+langium-config.json
+**/tsconfig*.json
+**/.eslintrc.json
+
+# esbuild packs all dependencies into a single output file already, no need for
+# node_modules
+node_modules
+
+# source files
+src/**
+scripts/**
+**/*.map
+**/*.ts
+bin/**
+
+# build artefacts
+out/**
+lib/**
+*.tsbuildinfo
+!out/extension.js
+!out/language-server/main.js
+*.zip
+*.vsix
+
+# other files
+coverage
+# no reason to bundle docs as they will not be seen via the extension, image
+# links are replaced by links to the repo
+docs
+!docs/images/logo.png
+trace
+CONTRIBUTE.md
+CONTRIBUTING.md
+pnpm-lock.yaml
+SysML-v2-Release
+.README

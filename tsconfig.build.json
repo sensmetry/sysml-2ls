@@ -1,0 +1,30 @@
+{
+    "extends": "./tsconfig.json",
+    "files": [],
+    "references": [
+        {
+            "path": "packages/syside-protocol"
+        },
+        {
+            "path": "packages/syside-protocol/tsconfig.test.json"
+        },
+        {
+            "path": "packages/syside-languageclient"
+        },
+        {
+            "path": "packages/syside-languageclient/tsconfig.test.json"
+        },
+        {
+            "path": "packages/syside-languageserver"
+        },
+        {
+            "path": "packages/syside-languageserver/tsconfig.test.json"
+        },
+        {
+            "path": "packages/syside-cli"
+        },
+        {
+            "path": "packages/syside-cli/tsconfig.test.json"
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+packages:
+  - "packages/syside-languageserver"
+  - "packages/syside-cli"
+  - "packages/syside-languageclient"
+  - "packages/syside-protocol"
+  - "packages/syside-vscode"

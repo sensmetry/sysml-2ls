@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import Config from "../package.json";
 import fs from "fs-extra";
+import path from "path";
 
 const SEMVER = /^(\d+)\.(\d+)\.(\d+)$/;
 
@@ -17,6 +18,32 @@ function compareVersions(a: Version, b: Version): number {
     if (a[0] !== b[0]) return a[0] - b[0];
     if (a[1] !== b[1]) return a[1] - b[1];
     return a[2] - b[2];
+}
+
+async function bumpVersion(packageJson: string, version: string): Promise<void> {
+    fs.readJSON(packageJson, "utf-8").then((json) => {
+        json.version = version;
+        return fs.writeJSON(packageJson, json, { encoding: "utf-8", spaces: 4 });
+    });
+}
+
+async function collectSubpackages(): Promise<string[]> {
+    const root = path.resolve("packages");
+    return fs
+        .readdir(root, "utf-8")
+        .then((items) => items.map((item) => path.join(root, item)))
+        .then((items) =>
+            items.map((item) =>
+                fs.stat(item).then(
+                    (stat) => [item, stat] as const,
+                    /* ignore stat errors */
+                    () => [item, undefined] as const
+                )
+            )
+        )
+        .then((promises) => Promise.all(promises))
+        .then((items) => items.filter(([_, stat]) => stat?.isDirectory()))
+        .then((items) => items.map(([p]) => p));
 }
 
 async function main(): Promise<void> {
@@ -47,9 +74,17 @@ async function main(): Promise<void> {
         process.exit(1);
     }
 
-    // Update package.json
-    Config.version = version;
-    await fs.writeFile("package.json", JSON.stringify(Config, undefined, 4));
+    // Update package.json in workspace
+    await Promise.all([
+        bumpVersion("package.json", version),
+        collectSubpackages()
+            .then((paths) => paths.map((p) => path.join(p, "package.json")))
+            .then((paths) =>
+                paths.map((p) =>
+                    fs.exists(p).then((exists) => (exists ? bumpVersion(p, version) : null))
+                )
+            ),
+    ]);
 
     // Update changelog
     let changelog = await fs.readFile("CHANGELOG.md", "utf-8");

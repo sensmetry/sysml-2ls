@@ -1,0 +1,26 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "rootDir": "..",
+        "types": [
+            "jest"
+        ]
+    },
+    "references": [
+        {
+            "path": "tsconfig.json"
+        },
+        {
+            "path": "../syside-languageclient"
+        }
+    ],
+    "files": [
+        "../syside-vscode/package.json",
+        "scripts/expected-diagnostics.json",
+    ],
+    "include": [
+        "src/**/*.ts",
+        // "scripts/**/*.ts",
+    ]
+}

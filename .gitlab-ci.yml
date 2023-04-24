@@ -1,7 +1,7 @@
 variables:
   PACKAGE_NAME: sensmetry.sysml-2ls
   EXTENSION_NAME: $PACKAGE_NAME-${CI_COMMIT_SHORT_SHA}
-  EXTENSION_PATH: $EXTENSION_NAME.vsix
+  EXTENSION_PATH: $CI_PROJECT_DIR/$EXTENSION_NAME.vsix
 
 default:
   image: node:19.2
@@ -25,8 +25,18 @@ stages:
 build:
   stage: build
   script:
-    - pnpm run typecheck
-    - pnpm run esbuild-base
+    - pnpm run lint
+    - pnpm run build
+  artifacts:
+    # seems like gitlab doesn't pass untracked artifacts to the next stage by
+    # default, use a short expiration time since they should only be available
+    # for the next stage
+    untracked: true
+    expire_in: 5 mins
+    exclude:
+      - node_modules/**/*
+      - packages/**/node_modules/**/*
+      - .pnpm-store/**/*
 
 test:
   stage: test
@@ -44,18 +54,10 @@ test:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
 
-lint:
-  stage: test
-  script:
-    - pnpm run lint
-
 validate:
   stage: test
   script:
-    - git clone -n --shallow-exclude=2022-12 https://github.com/Systems-Modeling/SysML-v2-Release.git
-    - cd SysML-v2-Release
-    - git checkout tags/2023-02
-    - cd ..
+    - pnpm run prepare-validation
     - pnpm run run-validation
 
 .package-template:

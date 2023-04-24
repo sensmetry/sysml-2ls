@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+try {
+    // prefer esbuild packaged module for better performance
+    require("../out/main");
+} catch (e) {
+    if (!(e instanceof Error) || !e.message.startsWith("Cannot find module")) throw e;
+    require("../lib/main");
+}

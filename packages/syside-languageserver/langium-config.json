@@ -1,0 +1,30 @@
+{
+    "projectName": "SysML",
+    "languages": [
+        {
+            "id": "kerml",
+            "grammar": "src/grammar/KerML.langium",
+            "fileExtensions": [
+                ".kerml"
+            ],
+            "textMate": {
+                "out": "syntaxes/kerml.tmLanguage.json"
+            }
+        },
+        {
+            "id": "sysml",
+            "grammar": "src/grammar/SysML.langium",
+            "fileExtensions": [
+                ".sysml"
+            ],
+            "textMate": {
+                "out": "syntaxes/sysml.tmLanguage.json"
+            }
+        }
+    ],
+    "out": "src/generated",
+    "chevrotainParserConfig": {
+        "recoveryEnabled": true,
+        "nodeLocationTracking": "none"
+    }
+}
