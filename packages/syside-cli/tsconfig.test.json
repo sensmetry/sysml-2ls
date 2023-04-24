@@ -1,0 +1,19 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "rootDir": "src",
+        "types": [
+            "jest",
+            "node"
+        ]
+    },
+    "references": [
+        {
+            "path": "tsconfig.json"
+        }
+    ],
+    "include": [
+        "src/*.ts",
+    ]
+}

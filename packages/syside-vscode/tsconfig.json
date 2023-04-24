@@ -1,0 +1,27 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "outDir": "lib"
+    },
+    "files": [
+        "package.json"
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "lib",
+        "node_modules",
+        "__test__",
+        "__tests__"
+    ],
+    "references": [
+        {
+            "path": "../syside-protocol"
+        },
+        {
+            "path": "../syside-languageclient"
+        }
+    ]
+}

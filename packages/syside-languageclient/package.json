@@ -1,0 +1,46 @@
+{
+    "name": "syside-languageclient",
+    "displayName": "SysIDE Language Client Extensions",
+    "description": "Language client extensions for SysIDE.",
+    "publisher": "Sensmetry",
+    "author": {
+        "name": "Sensmetry",
+        "url": "https://sensmetry.com/",
+        "email": "opensource@sensmetry.com"
+    },
+    "version": "0.4.1",
+    "preview": true,
+    "repository": {
+        "url": "https://gitlab.com/sensmetry/public/sysml-2ls",
+        "type": "git",
+        "directory": "packages/syside-languageclient"
+    },
+    "bugs": {
+        "url": "https://gitlab.com/sensmetry/public/sysml-2ls/-/issues"
+    },
+    "files": [
+        "lib",
+        "src"
+    ],
+    "main": "./lib/index.js",
+    "scripts": {
+        "lint": "eslint src --ext ts --max-warnings 0",
+        "clean": "shx rm -rf out lib coverage *.tsbuildinfo",
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "test": "jest --passWithNoTests",
+        "prepack": "pnpm clean && pnpm build",
+        "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+        "index": "node ../../scripts/generate-index.mjs src"
+    },
+    "dependencies": {
+        "fs-extra": "^11.1.0",
+        "syside-protocol": "workspace:~",
+        "vscode-languageserver": "~8.0.2",
+        "yauzl": "^2.10.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.1",
+        "@types/yauzl": "^2.10.0"
+    }
+}

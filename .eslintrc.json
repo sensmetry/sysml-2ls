@@ -46,6 +46,8 @@
         "@typescript-eslint/explicit-function-return-type": "warn"
     },
     "ignorePatterns": [
-        "src/language-server/generated/**"
+        "**/generated/**",
+        "**/lib/**",
+        "**/out/**"
     ]
 }

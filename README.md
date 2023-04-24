@@ -96,7 +96,7 @@ See [docs/known_limitations.md](docs/known_limitations.md).
   definition.
   <!-- Langium generator is broken until `addSuperPropertiesInternal`
   is fixed (not using the set parameter). -->
-- Run `pnpm run esbuild` to compile all TypeScript code.
+- Run `pnpm run build` to compile all TypeScript code.
 
 ### Make changes
 

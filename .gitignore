@@ -134,9 +134,7 @@ dist
 /*.sysml
 ast.json
 
-# local grammar reference files from the pilot implementation
-src/language-server/grammar/reference
-.VSCodeCounter/**
+.VSCodeCounter
 
 # packaged extension artefacts (.vsix can be renamed to .zip to view the bundled files)
 *.zip
@@ -154,3 +152,10 @@ SysML-v2-Release
 release.description
 .npmrc
 .pnpm-store/
+
+# Build artefacts
+out/
+lib/
+
+# mac stuff
+.DS_Store

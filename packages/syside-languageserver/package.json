@@ -1,0 +1,72 @@
+{
+    "name": "syside-languageserver",
+    "displayName": "SysIDE",
+    "description": "SysML v2 language server.",
+    "publisher": "Sensmetry",
+    "author": {
+        "name": "Sensmetry",
+        "url": "https://sensmetry.com/",
+        "email": "opensource@sensmetry.com"
+    },
+    "version": "0.4.1",
+    "keywords": [
+        "SysML",
+        "KerML",
+        "SysML-v2"
+    ],
+    "preview": true,
+    "repository": {
+        "url": "https://gitlab.com/sensmetry/public/sysml-2ls",
+        "type": "git",
+        "directory": "packages/syside-languageserver"
+    },
+    "bugs": {
+        "url": "https://gitlab.com/sensmetry/public/sysml-2ls/-/issues"
+    },
+    "files": [
+        "bin",
+        "out",
+        "lib",
+        "src"
+    ],
+    "bin": {
+        "syside": "./bin/syside-languageserver"
+    },
+    "main": "./lib/index.js",
+    "scripts": {
+        "lint": "eslint src --ext ts --max-warnings 0",
+        "clean": "shx rm -rf out lib coverage *.tsbuildinfo",
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "test": "jest",
+        "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+        "index": "node ../../scripts/generate-index.mjs src/model src/testing src/node src/services src/utils",
+        "prepack": "pnpm clean && pnpm build && pnpm esbuild --minify && mv README.md .README && cp ../../README.md README.md",
+        "postpack": "mv .README README.md",
+        "langium:generate": "langium generate",
+        "langium:watch": "langium generate --watch",
+        "esbuild-base": "node ../../scripts/build.mjs node src/main.ts",
+        "esbuild": "pnpm run esbuild-base --sourcemap",
+        "esbuild:watch": "pnpm run esbuild-base --sourcemap --watch",
+        "prepare-validation": "node ./scripts/clone-sysml-release.mjs",
+        "run-validation": "pnpx tsx ./scripts/run-validation.ts",
+        "grammar": "pnpx tsx ./scripts/generate.ts",
+        "grammar:generate": "pnpx tsx ./scripts/generate.ts generate",
+        "grammar:watch": "pnpx tsx ./scripts/generate.ts generate --watch"
+    },
+    "dependencies": {
+        "chevrotain": "^9.1.0",
+        "langium": "^1.1.0",
+        "syside-protocol": "workspace:~",
+        "ts-mixer": "^6.0.3",
+        "vscode-languageserver": "~8.0.2",
+        "vscode-languageserver-textdocument": "~1.0.8",
+        "vscode-uri": "~3.0.7"
+    },
+    "devDependencies": {
+        "chalk": "^5.2.0",
+        "langium-cli": "^1.1.0",
+        "syside-languageclient": "workspace:~",
+        "typescript-string-operations": "^1.5.0"
+    }
+}

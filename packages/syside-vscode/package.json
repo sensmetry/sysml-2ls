@@ -1,0 +1,354 @@
+{
+    "name": "sysml-2ls",
+    "displayName": "SysIDE",
+    "description": "SysML v2 language support in VS Code.",
+    "publisher": "Sensmetry",
+    "author": {
+        "name": "Sensmetry",
+        "url": "https://sensmetry.com/",
+        "email": "opensource@sensmetry.com"
+    },
+    "version": "0.4.1",
+    "icon": "icons/logo.png",
+    "engines": {
+        "vscode": "^1.56.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Other",
+        "Formatters",
+        "Linters"
+    ],
+    "keywords": [
+        "SysML",
+        "KerML",
+        "SysML-v2"
+    ],
+    "preview": true,
+    "extensionKind": [
+        "workspace"
+    ],
+    "repository": {
+        "url": "https://gitlab.com/sensmetry/public/sysml-2ls",
+        "type": "git",
+        "directory": "packages/syside-vscode"
+    },
+    "bugs": {
+        "url": "https://gitlab.com/sensmetry/public/sysml-2ls/-/issues"
+    },
+    "contributes": {
+        "languages": [
+            {
+                "id": "kerml",
+                "aliases": [
+                    "KerML"
+                ],
+                "extensions": [
+                    ".kerml"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "sysml",
+                "aliases": [
+                    "SysML"
+                ],
+                "extensions": [
+                    ".sysml"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "kerml",
+                "scopeName": "source.kerml",
+                "path": "./syntaxes/kerml.tmLanguage.json"
+            },
+            {
+                "language": "sysml",
+                "scopeName": "source.sysml",
+                "path": "./syntaxes/sysml.tmLanguage.json"
+            },
+            {
+                "path": "./syntaxes/sysml.md.tmLanguage.json",
+                "scopeName": "markdown.sysml.codeblock",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.sysml": "sysml"
+                }
+            },
+            {
+                "path": "./syntaxes/kerml.md.tmLanguage.json",
+                "scopeName": "markdown.kerml.codeblock",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.kerml": "kerml"
+                }
+            }
+        ],
+        "semanticTokenTypes": [
+            {
+                "id": "annotation",
+                "superType": "relationship",
+                "description": "Annotation"
+            },
+            {
+                "id": "annotationBody",
+                "superType": "string",
+                "description": "Annotation body"
+            },
+            {
+                "id": "relationship",
+                "superType": "modifier",
+                "description": "Relationship element"
+            },
+            {
+                "id": "metaclass",
+                "superType": "struct",
+                "description": "Metaclass element"
+            }
+        ],
+        "semanticTokenModifiers": [],
+        "commands": [
+            {
+                "command": "sysml.dumpAst.console",
+                "shortTitle": "Dump AST of the current selection",
+                "title": "SysML: Dump AST of the current selection in the active text editor"
+            },
+            {
+                "command": "sysml.dumpMeta.console",
+                "shortTitle": "Dump Meta of the current selection",
+                "title": "SysML: Dump Meta of the current selection in the active text editor"
+            },
+            {
+                "command": "sysml.updateDocument",
+                "shortTitle": "Update current document",
+                "title": "SysML: Update current document"
+            },
+            {
+                "command": "sysml.mro.console",
+                "shortTitle": "Get MRO of the current node",
+                "title": "SysML: Get MRO of the current node"
+            },
+            {
+                "command": "sysml.children.console",
+                "shortTitle": "Get children of the current node",
+                "title": "SysML: Get all direct, inherited and imported children of the current node"
+            },
+            {
+                "command": "sysml.scope.console",
+                "shortTitle": "Get elements in scope of the current node",
+                "title": "SysML: Get all elements in scope of the current node"
+            },
+            {
+                "command": "sysml.evaluate.console",
+                "shortTitle": "Evaluate the selected expression",
+                "title": "SysML: Evaluate the selected expression or feature value"
+            },
+            {
+                "command": "sysml.allCommands.console",
+                "shortTitle": "Get all available language server commands",
+                "title": "SysML: Get all available language server commands"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "submenu": "sysml.commands"
+                }
+            ],
+            "sysml.commands": [
+                {
+                    "command": "sysml.dumpAst.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.dumpMeta.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.updateDocument",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.mro.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.children.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.scope.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.evaluate.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "sysml.allCommands.console",
+                    "group": "SysML",
+                    "when": "editorLangId =~ /(ker|sys)ml/"
+                }
+            ]
+        },
+        "submenus": [
+            {
+                "id": "sysml.commands",
+                "label": "SysML"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "SysIDE configuration",
+            "properties": {
+                "sysml.trace.server": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Traces the communication between VS Code and the language server."
+                },
+                "sysml.standardLibrary": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "If false, skip parsing the standard library"
+                },
+                "sysml.standardLibraryPath": {
+                    "scope": "window",
+                    "type": [
+                        "null",
+                        "string"
+                    ],
+                    "default": null,
+                    "description": "Standard library import path, if not set uses the bundled standard library path"
+                },
+                "sysml.logStatistics": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Log build times"
+                },
+                "sysml.defaultBuildOptions.validationChecks": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "all"
+                    ],
+                    "default": "all",
+                    "description": "Which validation checks are enabled for files"
+                },
+                "sysml.defaultBuildOptions.ignoreMetamodelErrors": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Ignore errors due to invalid metamodel such as when not using a standard library"
+                },
+                "sysml.defaultBuildOptions.standardLibrary": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "standard",
+                        "local"
+                    ],
+                    "enumDescriptions": [
+                        "skip setting up relationships to the standard library elements",
+                        "use default standard library",
+                        "use standard library elements from the document locally, useful for testing"
+                    ],
+                    "default": "standard",
+                    "description": "Source of standard library elements"
+                },
+                "sysml.debug.scopeInLinkingErrors": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Display elements in scope in linking errors"
+                },
+                "sysml.debug.stacktraceInLinkingErrors": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Display stacktrace in linking errors if an error was thrown"
+                },
+                "sysml.debug.linkingTrace": {
+                    "scope": "window",
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show trace of linking order"
+                },
+                "sysml.plugins": {
+                    "scope": "window",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string",
+                        "description": "Path to a .js script or directory of .js scripts"
+                    },
+                    "description": "Additional plugin paths (.js scripts or directories with .js scripts) that will be loaded on server start-up"
+                }
+            }
+        }
+    },
+    "activationEvents": [
+        "onLanguage:kerml",
+        "onLanguage:sysml"
+    ],
+    "files": [
+        "out",
+        "src"
+    ],
+    "main": "./out/extension.js",
+    "scripts": {
+        "lint": "eslint src --ext ts --max-warnings 0",
+        "clean": "shx rm -rf out *.tsbuildinfo",
+        "build": "pnpm run typecheck && pnpm run esbuild",
+        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"pnpm run typecheck -w\" \"pnpm run esbuild:watch\"",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "vscode:prepublish": "pnpm run clean && node ./scripts/prepublish.mjs",
+        "vscode:package": "node ./scripts/package.mjs",
+        "vscode:publish": "node ./scripts/publish.mjs",
+        "ovsx:publish": "ovsx publish",
+        "esbuild-base": "node ../../scripts/build.mjs node src/extension.ts",
+        "esbuild": "pnpm run esbuild-base --sourcemap",
+        "esbuild:watch": "pnpm run esbuild-base --sourcemap --watch"
+    },
+    "dependencies": {
+        "fs-extra": "^11.1.0",
+        "syside-protocol": "workspace:~",
+        "syside-languageclient": "workspace:~",
+        "vscode-languageclient": "~8.0.2",
+        "vscode-languageserver": "~8.0.2"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.1",
+        "@types/vscode": "^1.56.0",
+        "@vscode/vsce": "^2.17.0",
+        "ovsx": "^0.8.0"
+    },
+    "vsce": {
+        "dependencies": false,
+        "gitlabBranch": "main",
+        "githubBranch": "main"
+    }
+}

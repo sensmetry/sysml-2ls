@@ -4,6 +4,12 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## main
+
+### Chores
+
+- Organized sources into workspace with dependant packages
+
 ## 0.4.1
 
 ### Fixed
