@@ -13,6 +13,6 @@ module.exports = {
         // auto-generated
         "<rootDir>/src/generated",
         // server CLI entry point
-        "<rootDir>/src/main.ts",
+        "<rootDir>/src/node/main.ts",
     ],
 };

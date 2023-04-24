@@ -14,19 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { startLanguageServer } from "langium";
 import { createConnection, ProposedFeatures } from "vscode-languageserver/node";
-import { SysMLNodeFileSystem } from "./node/node-file-system-provider";
-import { createSysMLServices } from "./sysml-module";
+import { createSysMLServices } from "../sysml-module";
+import { createTransport, NodeLauncherOptions } from "./cli";
+import { SysMLNodeFileSystem } from "./node-file-system-provider";
+import { startServer as _startServer } from "../launch";
 
-// TODO: CLI args to customize functionality such as disabling or changing paths
-// to standard libraries
+export function startServer(options: NodeLauncherOptions): ReturnType<typeof createSysMLServices> {
+    const [input, output] = createTransport(options);
 
-// Create a connection to the client
-const connection = createConnection(ProposedFeatures.all);
+    // type inference breaks down for related tuple elements
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const connection = createConnection(ProposedFeatures.all, input as any, output as any);
 
-// Inject the shared services and language-specific services
-const { shared } = createSysMLServices({ connection, ...SysMLNodeFileSystem });
-
-// Start the language server with the shared services
-startLanguageServer(shared);
+    return _startServer(connection, SysMLNodeFileSystem, options);
+}

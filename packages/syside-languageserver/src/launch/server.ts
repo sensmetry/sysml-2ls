@@ -14,16 +14,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * as ast from "./generated/ast";
-export * from "./generated/grammar";
-export * from "./generated/module";
-export * from "./model";
-export * from "./sysml-module";
-export * from "./services";
-export * from "./utils";
-export * from "./launch";
-export * from "./version";
+import { startLanguageServer } from "langium";
+import type { Connection } from "vscode-languageserver";
+import { createSysMLServices, SharedModuleContext } from "../sysml-module";
+import type { LauncherOptions } from "./arg-parser";
 
-// exporting this for utility so that downstream packages don't have to add
-// langium as dependency
-export type { DeepPartial } from "langium";
+export function startServer(
+    connection: Connection,
+    context: Omit<SharedModuleContext, "connection">,
+    options: LauncherOptions
+): ReturnType<typeof createSysMLServices> {
+    // Inject the shared services and language-specific services
+    const services = createSysMLServices({ connection, ...context }, options);
+
+    // Start the language server with the shared services
+    startLanguageServer(services.shared);
+
+    return services;
+}

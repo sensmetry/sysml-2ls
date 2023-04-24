@@ -14,16 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * as ast from "./generated/ast";
-export * from "./generated/grammar";
-export * from "./generated/module";
-export * from "./model";
-export * from "./sysml-module";
-export * from "./services";
-export * from "./utils";
-export * from "./launch";
-export * from "./version";
+import { createArgParser, DefaultNodeLauncherOptions } from "./cli";
+import { startServer } from "./server";
 
-// exporting this for utility so that downstream packages don't have to add
-// langium as dependency
-export type { DeepPartial } from "langium";
+const options = createArgParser(DefaultNodeLauncherOptions).parse();
+
+startServer(options);

@@ -38,7 +38,7 @@ const Header = `
 
 `.trimStart();
 
-const IgnoredNames = new Set(["index.ts", "__tests__", "_internal.ts"]);
+const IgnoredNames = new Set(["index.ts", "__tests__", "_internal.ts", "main.ts"]);
 
 /**
  *
