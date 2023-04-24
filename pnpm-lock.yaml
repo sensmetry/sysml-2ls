@@ -86,6 +86,7 @@ importers:
     specifiers:
       chalk: ^5.2.0
       chevrotain: ^9.1.0
+      commander: ^10.0.1
       langium: ^1.1.0
       langium-cli: ^1.1.0
       syside-languageclient: workspace:~
@@ -97,6 +98,7 @@ importers:
       vscode-uri: ~3.0.7
     dependencies:
       chevrotain: 9.1.0
+      commander: 10.0.1
       langium: 1.1.0
       syside-protocol: link:../syside-protocol
       ts-mixer: 6.0.3

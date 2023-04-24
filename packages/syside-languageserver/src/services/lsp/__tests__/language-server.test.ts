@@ -39,12 +39,11 @@ import {
     StreamMessageReader,
     StreamMessageWriter,
 } from "vscode-languageserver/node";
-import { DeepPartial, startLanguageServer } from "langium";
+import { DeepPartial } from "langium";
 import { InitializeRequest } from "vscode-languageserver";
 import { ClientParams } from "../../../testing/server-initialize-params";
 import { Trace } from "vscode-languageserver";
 import { TEST_SERVER_OPTIONS } from "../../../testing";
-import { createSysMLServices } from "../../../sysml-module";
 import { asyncWaitWhile } from "../../../utils/common";
 import { SysMLConfig, DefaultSysMLConfig } from "../../config";
 import { SysMLSharedServices } from "../../services";
@@ -54,6 +53,7 @@ import { SUPPORTED_TRIGGER_CHARACTERS } from "../completion-provider";
 import { SysMLExecuteCommandHandler } from "../execute-command-handler";
 import { SysMLSemanticTokenTypes, SysMLSemanticTokenModifiers } from "../semantic-token-provider";
 import { ClientConfig, GenericLanguageClient, SysMLClientExtender } from "syside-languageclient";
+import { startServer } from "../../../launch/server";
 
 class NullLogger implements Logger {
     error(_message: string): void {}
@@ -138,13 +138,7 @@ async function getLanguageServices(): Promise<Services> {
     clientConnection.onRequest(RegistrationRequest.type, () => {});
 
     const connection = createConnection(ProposedFeatures.all, up, down);
-    const { shared } = createSysMLServices(
-        { connection, ...SysMLEmptyFileSystem },
-        TEST_SERVER_OPTIONS
-    );
-
-    // Start the language server with the shared services
-    startLanguageServer(shared);
+    const { shared } = startServer(connection, SysMLEmptyFileSystem, TEST_SERVER_OPTIONS);
 
     const services: Services = {
         server: connection,

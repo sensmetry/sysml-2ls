@@ -159,3 +159,6 @@ lib/
 
 # mac stuff
 .DS_Store
+
+# generated version files
+**/src/version.ts

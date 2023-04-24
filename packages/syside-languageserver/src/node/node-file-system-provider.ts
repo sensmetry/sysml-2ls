@@ -23,9 +23,10 @@ export class SysMLNodeFileSystemProvider
     implements SysMLFileSystemProvider
 {
     async exists(path: string): Promise<boolean> {
-        let exists = true;
-        await fs.promises.stat(path).catch(() => (exists = false));
-        return exists;
+        return fs.promises.stat(path).then(
+            /* resolved */ () => true,
+            /* rejected */ () => false
+        );
     }
 
     existsSync(path: string): boolean {
