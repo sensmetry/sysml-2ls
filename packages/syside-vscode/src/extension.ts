@@ -23,25 +23,141 @@ import {
     TransportKind,
 } from "vscode-languageclient/node";
 import { SysMLVSCodeClientExtender } from "./vscode";
+import { URI, Utils } from "vscode-uri";
+import { uriToFsPath } from "vscode-uri/lib/umd/uri";
+import { LanguageClientExtension, ServerConfig } from "syside-languageclient";
 
-let client: LanguageClient;
+type ClientExtension = LanguageClientExtension<vscode.ExtensionContext>;
+type Extension = {
+    id: string;
+    api: ClientExtension;
+};
+
+let data: {
+    client: LanguageClient;
+    extensions: Extension[];
+};
 
 // This function is called when the extension is activated.
 export async function activate(context: vscode.ExtensionContext): Promise<LanguageClient> {
-    client = await startLanguageClient(context);
-    return client;
+    data = await startLanguageClient(context);
+    return data.client;
 }
 
 // This function is called when the extension is deactivated.
 export async function deactivate(): Promise<void> {
-    if (client) {
-        return client.stop();
+    if (data) {
+        await runExtensions(data.extensions, "onDeactivate", data.client);
+        return data.client.stop();
     }
     return;
 }
 
-async function startLanguageClient(context: vscode.ExtensionContext): Promise<LanguageClient> {
-    const serverModule = context.asAbsolutePath(path.join("out", "language-server", "main"));
+interface ClientConfig {
+    extensions: string[];
+}
+
+async function collectExtensions(ids: string[]): Promise<Extension[]> {
+    return Promise.allSettled(
+        ids.map(async (id) => {
+            const extension = vscode.extensions.getExtension(id);
+            if (!extension) {
+                // not showing a message here since this would also be shown for
+                // uninstalled extensions
+                console.error(`No extension '${id}' found.`);
+                return;
+            }
+
+            if (!extension.isActive) await extension.activate();
+
+            const exported = extension.exports;
+            if (!LanguageClientExtension.is(exported)) {
+                vscode.window.showErrorMessage(`Extension '${id}' is invalid - bad exported type`);
+                return;
+            }
+
+            return <Extension>{ id, api: exported };
+        })
+    ).then((results) =>
+        results
+            .map((result, index) => {
+                if (result.status === "fulfilled") return result.value;
+
+                vscode.window.showErrorMessage(
+                    `Extension ${ids[index]} failed to activate: ${result.reason}`
+                );
+                return;
+            })
+            .filter((value): value is Extension => value !== undefined)
+    );
+}
+
+async function runExtensions<K extends keyof ClientExtension>(
+    extensions: Extension[],
+    method: K,
+    ...args: Parameters<ClientExtension[K]>
+): Promise<void> {
+    return Promise.allSettled(
+        extensions.map(({ api }) => {
+            api[method].call(
+                api,
+                // @ts-expect-error types checked in the signature
+                ...args
+            );
+        })
+    ).then((results) =>
+        results.forEach((result, index) => {
+            if (result.status === "rejected") {
+                vscode.window.showErrorMessage(
+                    `Error in ${extensions[index].id}.${method}: ${result.reason}`
+                );
+            }
+        })
+    );
+}
+
+async function startLanguageClient(context: vscode.ExtensionContext): Promise<typeof data> {
+    const config = vscode.workspace.getConfiguration("sysml");
+    const clientConfig: Partial<ClientConfig> = config.client;
+    const extensions = await collectExtensions(clientConfig.extensions ?? []);
+
+    // vscode config returns readonly proxy objects, convert to a JS object
+    // instead
+    const serverConfigProxy: Partial<ServerConfig> = config.server;
+    const releaseArgs = serverConfigProxy.args?.run ?? [];
+    const debugArgs = serverConfigProxy.args?.debug ?? releaseArgs;
+    const serverConfig: ServerConfig = {
+        args: {
+            run: releaseArgs,
+            debug: debugArgs,
+        },
+        path: serverConfigProxy.path ?? undefined,
+    };
+    await runExtensions(extensions, "onBeforeStart", context, serverConfig);
+
+    let serverModule: string;
+    if (serverConfig.path) {
+        serverModule = vscode.workspace.workspaceFolders?.at(0)
+            ? uriToFsPath(
+                  Utils.resolvePath(
+                      vscode.workspace.workspaceFolders.at(0)?.uri as URI,
+                      serverConfig.path
+                  ),
+                  true
+              )
+            : path.resolve(serverConfig.path);
+
+        console.info(
+            `Running custom SysIDE at ${serverModule} with ${JSON.stringify(
+                serverConfig.args,
+                null,
+                4
+            )}`
+        );
+    } else {
+        serverModule = context.asAbsolutePath(path.join("out", "language-server", "main"));
+    }
+
     // The debug options for the server --inspect=6009: runs the server in
     // Node's Inspector mode so VS Code can attach to the server for debugging.
     // By setting `process.env.DEBUG_BREAK` to a truthy value, the language
@@ -58,8 +174,17 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<La
     // If the extension is launched in debug mode then the debug server options
     // are used Otherwise the run options are used
     const serverOptions: ServerOptions = {
-        run: { module: serverModule, transport: TransportKind.ipc },
-        debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions },
+        run: {
+            module: serverModule,
+            transport: TransportKind.ipc,
+            args: serverConfig.args.run.map(String),
+        },
+        debug: {
+            module: serverModule,
+            transport: TransportKind.ipc,
+            options: debugOptions,
+            args: serverConfig.args.debug.map(String),
+        },
     };
 
     const sysmlWatcher = vscode.workspace.createFileSystemWatcher("**/*.sysml");
@@ -88,5 +213,6 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<La
     // commands registered in execute command handler seem to be automatically
     // registered with VSCode
 
-    return client;
+    await runExtensions(extensions, "onStarted", context, client);
+    return { client, extensions };
 }

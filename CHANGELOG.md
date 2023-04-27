@@ -8,6 +8,8 @@
 
 ### Chores
 
+- Added configuration options for custom server path and command line arguments
+  which may be used in the future
 - Organized sources into workspace with dependant packages
 
 ## 0.4.1

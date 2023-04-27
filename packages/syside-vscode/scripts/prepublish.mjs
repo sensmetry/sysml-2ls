@@ -1,4 +1,3 @@
-import fs from "fs-extra";
 /********************************************************************************
  * Copyright (c) 2022-2023 Sensmetry UAB and others
  *
@@ -15,13 +14,14 @@ import fs from "fs-extra";
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import fs from "fs-extra";
 import util from "util";
 import child_process from "child_process";
-import path from "path";
 
 const exec = util.promisify(child_process.exec);
 
 exec("pnpm run esbuild-base --minify")
+    .then(() => exec("pnpm run esbuild-base:server --minify"))
     .then(() =>
         Promise.all(
             [
@@ -32,16 +32,4 @@ exec("pnpm run esbuild-base --minify")
         )
     )
     .then(() => fs.copyFile("../../README.md", "README.md"))
-    .then(() => exec("pnpm run --dir ../syside-languageserver esbuild-base --minify"))
-    .then(() =>
-        Promise.all(
-            [["../syside-languageserver/out/main.js", "out/language-server/main.js"]].map(
-                async ([src, dst]) => {
-                    const dir = path.dirname(dst);
-                    if (!(await fs.exists(dir))) await fs.mkdir(dir);
-                    return fs.copyFile(src, dst);
-                }
-            )
-        )
-    )
     .then(() => fs.copy("../syside-languageserver/syntaxes", "syntaxes"));

@@ -128,12 +128,14 @@ importers:
       syside-protocol: workspace:~
       vscode-languageclient: ~8.0.2
       vscode-languageserver: ~8.0.2
+      vscode-uri: ~3.0.7
     dependencies:
       fs-extra: 11.1.1
       syside-languageclient: link:../syside-languageclient
       syside-protocol: link:../syside-protocol
       vscode-languageclient: 8.0.2
       vscode-languageserver: 8.0.2
+      vscode-uri: 3.0.7
     devDependencies:
       '@types/fs-extra': 11.0.1
       '@types/vscode': 1.77.0

@@ -19,10 +19,13 @@
 import { Argument, Command } from "commander";
 import * as esbuild from "esbuild";
 import * as fs from "node:fs";
+import { fileURLToPath } from "node:url";
+import process from "node:process";
+import path from "node:path";
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /** @type {esbuild.Plugin} */
-const BuildWatcher = {
+export const BuildWatcher = {
     name: "Build Watcher",
     setup(build) {
         build.onStart(() => {
@@ -37,7 +40,7 @@ const BuildWatcher = {
 };
 
 /** @type {esbuild.Plugin} */
-const LLStarAmbiguityReport = {
+export const LLStarAmbiguityReport = {
     name: "LLStarAmbiguityReport",
     setup(build) {
         build.onLoad({ filter: /langium-parser.js/ }, async (args) => {
@@ -61,7 +64,7 @@ const LLStarAmbiguityReport = {
 };
 
 /** @type {esbuild.BuildOptions} */
-let options = {
+export const Options = {
     bundle: true,
     external: ["vscode"],
     write: true,
@@ -70,42 +73,82 @@ let options = {
 };
 
 /** @type {Record<string, (entries: string[]) => esbuild.BuildOptions>} */
-let builds = {
+export const Builds = {
     node: (entries) => ({
-        ...options,
+        ...Options,
         platform: "node",
         format: "cjs",
 
         entryPoints: entries,
     }),
+
+    browser: (entries) => ({
+        ...Options,
+        platform: "browser",
+        format: "iife",
+
+        entryPoints: entries,
+    }),
 };
 
-const program = new Command();
-program
-    .addArgument(
-        new Argument("<TARGET>", "Build target").choices(Object.keys(builds)).argRequired()
-    )
-    .addArgument(
-        (() => {
-            const arg = new Argument("<entry>", "entry point").argRequired();
-            arg.variadic = true;
-            return arg;
-        })()
-    )
-    .option("--watch", "Run in watch mode", false)
-    .option("--sourcemap", "Generate source maps", false)
-    .option("--minify", "Minify generated files", false);
-program.parse();
+/**
+ *
+ * @param  {...esbuild.Plugin} plugins
+ */
+export async function run(...plugins) {
+    Options.plugins.push(...plugins);
 
-const opts = program.opts();
+    const program = new Command();
+    program
+        .addArgument(
+            new Argument("<TARGET>", "Build target").choices(Object.keys(Builds)).argRequired()
+        )
+        .addArgument(
+            (() => {
+                const arg = new Argument("<entry>", "entry point").argRequired();
+                arg.variadic = true;
+                return arg;
+            })()
+        )
+        .option("--watch", "Run in watch mode", false)
+        .option("--sourcemap", "Generate source maps", false)
+        .option("--minify", "Minify generated files", false)
+        .option("-o, --outdir <outdir>", "Output directory", "./out")
+        .option(
+            "-n, --name <name>",
+            "Output file name. Cannot use with more than one entry. Resolved relative to outdir"
+        );
+    program.parse();
 
-const ctx = await (opts.watch ? esbuild.context : esbuild.build)({
-    ...builds[program.args[0]](program.args.slice(1)),
-    sourcemap: opts.sourcemap,
-    minify: opts.minify,
-});
+    const opts = program.opts();
 
-if (opts.watch) {
-    await ctx.watch();
-    console.log("watching...");
+    if (opts.name && program.args.length > 2) {
+        throw new Error("Invalid file argument, cannot use with more than one entry");
+    }
+
+    /**
+     * @type {esbuild.BuildOptions}
+     */
+    const args = {
+        ...Builds[program.args[0]](program.args.slice(1)),
+        sourcemap: opts.sourcemap,
+        minify: opts.minify,
+        outdir: opts.outdir,
+    };
+
+    if (opts.name) {
+        args.outfile = path.resolve(args.outdir, opts.name);
+        args.outdir = undefined;
+    }
+
+    const ctx = await (opts.watch ? esbuild.context : esbuild.build)(args);
+
+    if (opts.watch) {
+        await ctx.watch();
+        console.log("watching...");
+    }
+}
+
+if (fileURLToPath(import.meta.url) === (await fs.promises.realpath(process.argv[1]))) {
+    run();
 }

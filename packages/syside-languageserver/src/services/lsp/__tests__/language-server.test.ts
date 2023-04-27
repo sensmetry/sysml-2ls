@@ -215,6 +215,10 @@ describe("package.json exports custom contributions", () => {
                 const parts = property.split(".");
                 expect(parts.length).toBeGreaterThanOrEqual(1);
                 expect(parts[0]).toEqual(SETTINGS_KEY);
+
+                // custom client/server config
+                if (parts.at(1) === "client" || parts.at(1) === "server") return;
+
                 let section: Record<string, unknown> = DefaultSysMLConfig;
                 for (const part of parts.slice(1)) {
                     expect(Object.keys(section)).toContain(part);
