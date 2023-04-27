@@ -22,6 +22,7 @@
         "build": "pnpm run prebuild && tsc -b tsconfig.build.json && pnpm run --dir packages/syside-vscode build",
         "watch": "pnpm run prebuild && concurrently -n tsc,vscode,esbuild -c blue,blue,yellow \"tsc -b tsconfig.build.json -w\" \"pnpm run --dir packages/syside-vscode typecheck:watch\" \"pnpm run --dir packages/syside-vscode watch\"",
         "build:clean": "pnpm run clean && pnpm run build",
+        "prepare": "pnpm run build",
         "test": "jest --passWithNoTests",
         "test:ci": "jest --config ./jest.config.js --passWithNoTests --collectCoverage --coverageDirectory=\"./coverage\" --ci --reporters=default --reporters=jest-junit --watchAll=false",
         "prepare-release": "pnpm tsx ./scripts/prepare-release.ts",

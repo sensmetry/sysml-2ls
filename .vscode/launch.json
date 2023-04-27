@@ -25,7 +25,7 @@
     "configurations": [
         {
             "name": "Debug KerML AST",
-            "program": "${workspaceFolder}/bin/cli",
+            "program": "${workspaceFolder}/packages/syside-cli/bin/cli",
             "args": [
                 "dump",
                 "${workspaceFolder}/test.kerml",
@@ -41,7 +41,7 @@
         },
         {
             "name": "Debug SysML AST",
-            "program": "${workspaceFolder}/bin/cli",
+            "program": "${workspaceFolder}/packages/syside-cli/bin/cli",
             "args": [
                 "dump",
                 "${workspaceFolder}/test.sysml",
@@ -75,7 +75,7 @@
             "type": "node",
             "request": "launch",
             "args": [
-                "${workspaceFolder}/scripts/run-validation.ts",
+                "${workspaceFolder}/packages/syside-languageserver/scripts/run-validation.ts",
             ],
             "runtimeArgs": [
                 "--loader",
@@ -89,7 +89,12 @@
             "type": "extensionHost",
             "request": "launch",
             "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}"
+                "--extensionDevelopmentPath=${workspaceFolder}/packages/syside-vscode"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/packages/*/out/*.js",
+                "${workspaceFolder}/packages/*/lib/*.js",
+                "!**/node_modules/**"
             ],
             "env": {
                 // same socket as attach port
@@ -102,7 +107,12 @@
             "type": "extensionHost",
             "request": "launch",
             "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}"
+                "--extensionDevelopmentPath=${workspaceFolder}/packages/syside-vscode"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/packages/*/out/*.js",
+                "${workspaceFolder}/packages/*/lib/*.js",
+                "!**/node_modules/**"
             ],
             "env": {
                 "DEBUG_BREAK": "true",
@@ -120,7 +130,7 @@
             ],
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceFolder}/out/**/*.js",
+                "${workspaceFolder}/packages/*/out/**/*.js",
                 "${workspaceFolder}/node_modules/langium"
             ]
         },

@@ -233,7 +233,7 @@
                     "description": "If false, skip parsing the standard library"
                 },
                 "sysml.standardLibraryPath": {
-                    "scope": "window",
+                    "scope": "machine-overridable",
                     "type": [
                         "null",
                         "string"
@@ -298,7 +298,7 @@
                     "description": "Show trace of linking order"
                 },
                 "sysml.plugins": {
-                    "scope": "window",
+                    "scope": "machine-overridable",
                     "type": "array",
                     "default": [],
                     "items": {
@@ -306,6 +306,48 @@
                         "description": "Path to a .js script or directory of .js scripts"
                     },
                     "description": "Additional plugin paths (.js scripts or directories with .js scripts) that will be loaded on server start-up"
+                },
+                "sysml.client.extensions": {
+                    "scope": "window",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string",
+                        "description": "VS Code extension identifier"
+                    },
+                    "description": "VS Code extensions that extend the language client"
+                },
+                "sysml.server.args.run": {
+                    "scope": "window",
+                    "type": "array",
+                    "items": {
+                        "type": [
+                            "integer",
+                            "string"
+                        ]
+                    },
+                    "default": [],
+                    "description": "Additional command line arguments to start the server"
+                },
+                "sysml.server.args.debug": {
+                    "scope": "window",
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "items": {
+                        "type": [
+                            "integer",
+                            "string"
+                        ]
+                    },
+                    "default": null,
+                    "description": "Additional command line arguments to start the server when in debug mode"
+                },
+                "sysml.server.path": {
+                    "scope": "machine-overridable",
+                    "type": "string",
+                    "description": "Path to the SysIDE launcher. Defaults to the bundled launcher"
                 }
             }
         }
@@ -330,15 +372,17 @@
         "vscode:publish": "node ./scripts/publish.mjs",
         "ovsx:publish": "ovsx publish",
         "esbuild-base": "node ../../scripts/build.mjs node src/extension.ts",
-        "esbuild": "pnpm run esbuild-base --sourcemap",
-        "esbuild:watch": "pnpm run esbuild-base --sourcemap --watch"
+        "esbuild-base:server": "pnpm --dir ../syside-languageserver run esbuild-base -o ../syside-vscode/out/language-server",
+        "esbuild": "pnpm run esbuild-base --sourcemap && pnpm run esbuild-base:server --sourcemap",
+        "esbuild:watch": "concurrently -n vscode,server -c blue,yellow \"pnpm run esbuild-base --sourcemap --watch\" \"pnpm run esbuild-base:server --sourcemap --watch\""
     },
     "dependencies": {
         "fs-extra": "^11.1.0",
-        "syside-protocol": "workspace:~",
         "syside-languageclient": "workspace:~",
+        "syside-protocol": "workspace:~",
         "vscode-languageclient": "~8.0.2",
-        "vscode-languageserver": "~8.0.2"
+        "vscode-languageserver": "~8.0.2",
+        "vscode-uri": "~3.0.7"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.1",
