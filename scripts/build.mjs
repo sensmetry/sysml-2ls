@@ -16,7 +16,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Argument, Command } from "commander";
+import { Argument, Command, Option } from "commander";
 import * as esbuild from "esbuild";
 import * as fs from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -111,7 +111,11 @@ export async function run(...plugins) {
             })()
         )
         .option("--watch", "Run in watch mode", false)
-        .option("--sourcemap", "Generate source maps", false)
+        .addOption(
+            new Option("--sourcemap [inline]", "Generate source maps")
+                .default(false)
+                .choices(["inline"])
+        )
         .option("--minify", "Minify generated files", false)
         .option("-o, --outdir <outdir>", "Output directory", "./out")
         .option(
