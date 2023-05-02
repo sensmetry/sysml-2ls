@@ -2,6 +2,9 @@ variables:
   PACKAGE_NAME: sensmetry.sysml-2ls
   EXTENSION_NAME: $PACKAGE_NAME-${CI_COMMIT_SHORT_SHA}
   EXTENSION_PATH: $CI_PROJECT_DIR/$EXTENSION_NAME.vsix
+  SERVER_FILENAME: syside-languageserver.js
+  SERVER_RELPATH: packages/syside-vscode/out/language-server/main.js
+  SERVER_PATH: $CI_PROJECT_DIR/$SERVER_RELPATH
 
 default:
   image: node:19.2
@@ -64,8 +67,10 @@ validate:
   stage: deploy
   script:
     - pnpm run vscode:package -o $EXTENSION_PATH
+    - cp $SERVER_PATH $SERVER_FILENAME
   artifacts:
     paths:
+      - $SERVER_FILENAME
       - $EXTENSION_PATH
     name: $EXTENSION_NAME
     expire_in: 1 mos
@@ -141,6 +146,7 @@ package:release:
     - git tag ${VERSION}
     # package the extension
     - pnpm run vscode:package -o $EXTENSION_PATH
+    - cp $SERVER_PATH $SERVER_FILENAME
     - echo PACKAGE_JOB_ID=$CI_JOB_ID >> release.env
     # push changes as the last command, prevent triggering pipeline again with
     # -o ci.skip
@@ -148,6 +154,7 @@ package:release:
     - git push gitlab_origin HEAD:main --tags -o ci.skip
   artifacts:
     paths:
+      - $SERVER_FILENAME
       - $EXTENSION_PATH
       - release.description
     name: $EXTENSION_NAME
@@ -166,6 +173,8 @@ package:release:
 publish:release:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   extends: .publish-template
+  variables:
+    ARTIFACTS_ROOT_URL: ${CI_SERVER_PROTOCOL}://${CI_SERVER_HOST}/${CI_PROJECT_PATH}/-/jobs/${PACKAGE_JOB_ID}/artifacts/raw
   before_script: []
   # cache is not needed, not running TS
   cache:
@@ -178,7 +187,9 @@ publish:release:
     assets:
       links:
         - name: $EXTENSION_FILENAME
-          url: ${CI_SERVER_PROTOCOL}://${CI_SERVER_HOST}/${CI_PROJECT_PATH}/-/jobs/${PACKAGE_JOB_ID}/artifacts/raw/$EXTENSION_PATH
+          url: $ARTIFACTS_ROOT_URL/$EXTENSION_PATH
+        - name: $SERVER_FILENAME
+          url: $ARTIFACTS_ROOT_URL/$SERVER_FILENAME
 
 publish:vscode:
   extends: .publish-template
