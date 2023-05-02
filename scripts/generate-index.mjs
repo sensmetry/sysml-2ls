@@ -63,7 +63,7 @@ async function generateIndex(p) {
     fs.writeFileSync(
         path.join(p, "index.ts"),
         Header +
-            modules.map((name) => `export * from "./${path.basename(name, ".ts")}";`).join("\n"),
+            modules.map((name) => `export * from "./${path.parse(name).name}";`).join("\n"),
         { flag: "w" }
     );
 }
