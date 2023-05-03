@@ -12,6 +12,9 @@ Release jobs expect CI variables for `release` environment:
   token](https://learn.microsoft.com/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate).
 - `OVSX_PAT` - Open VSX [personal access
   token](https://open-vsx.org/user-settings/tokens).
+- `GH_ACCESS_TOKEN` - personal access token for our [GitHub
+  mirror](https://github.com/sensmetry/sysml-2ls) with read and write access to
+  contents for pushing and creating releases through API.
 
 Personal access tokens expire so they will need to be recreated from time to
 time.

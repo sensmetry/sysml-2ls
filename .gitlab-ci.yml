@@ -139,7 +139,6 @@ package:release:
     # setup bot
     - git config user.email "${GITLAB_USER_EMAIL}"
     - git config user.name "${GITLAB_USER_NAME}"
-    - git remote add gitlab_origin https://gitlab-ci-token:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     # commit version changes
     - git add --all
     - git commit -m "Release $VERSION"
@@ -150,8 +149,13 @@ package:release:
     - echo PACKAGE_JOB_ID=$CI_JOB_ID >> release.env
     # push changes as the last command, prevent triggering pipeline again with
     # -o ci.skip
+    - git remote add gitlab_origin https://gitlab-ci-token:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - git push gitlab_origin HEAD:main -o ci.skip
     - git push gitlab_origin HEAD:main --tags -o ci.skip
+    # also push changes to our github mirror
+    - git remote add github_origin https://github-ci-token:${GH_ACCESS_TOKEN}@github.com/sensmetry/sysml-2ls.git
+    - git push github_origin HEAD:main -o ci.skip
+    - git push github_origin HEAD:main --tags -o ci.skip
   artifacts:
     paths:
       - $SERVER_FILENAME
@@ -190,6 +194,12 @@ publish:release:
           url: $ARTIFACTS_ROOT_URL/$EXTENSION_PATH
         - name: $SERVER_FILENAME
           url: $ARTIFACTS_ROOT_URL/$SERVER_FILENAME
+
+publish:github:
+  extends: .publish-template
+  script:
+    - echo "Creating and uploading release artifacts to GitHub mirror"
+    - node ./scripts/gh-release.mjs --pat ${GH_ACCESS_TOKEN} --tag ${VERSION} --notes ./release.description -a ${EXTENSION_FILENAME}=${EXTENSION_PATH} -a ${SERVER_FILENAME}
 
 publish:vscode:
   extends: .publish-template
