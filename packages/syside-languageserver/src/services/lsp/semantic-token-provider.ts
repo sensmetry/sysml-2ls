@@ -23,6 +23,7 @@ import {
     LangiumDocument,
     SemanticTokenAcceptor,
     DefaultSemanticTokenOptions,
+    isOperationCancelled,
 } from "langium";
 import {
     Element,
@@ -49,6 +50,7 @@ import {
     Connection,
     SemanticTokensRefreshRequest,
     SemanticTokensOptions,
+    ResponseError,
 } from "vscode-languageserver";
 import { SysMLDefaultServices } from "../services";
 import { TypeMap, typeIndex, ElementMeta } from "../../model";
@@ -478,9 +480,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
 
             return tokens;
         } catch (e) {
-            console.error(`Uncaught error while computing full semantic highlighting: ${e}`);
-            if (e instanceof Error) console.error(e.stack);
-            return { data: [] };
+            return onSemanticTokenError(e, "full");
         }
     }
 
@@ -492,9 +492,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         try {
             return super.semanticHighlightRange(document, params, cancelToken);
         } catch (e) {
-            console.error(`Uncaught error while computing semantic highlighting range: ${e}`);
-            if (e instanceof Error) console.error(e.stack);
-            return { data: [] };
+            return onSemanticTokenError(e, "range");
         }
     }
 
@@ -506,9 +504,18 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         try {
             return super.semanticHighlightDelta(document, params, cancelToken);
         } catch (e) {
-            console.error(`Uncaught error while computing semantic highlighting delta: ${e}`);
-            if (e instanceof Error) console.error(e.stack);
-            return { data: [] };
+            return onSemanticTokenError(e, "delta");
         }
     }
+}
+
+function onSemanticTokenError(e: unknown, kind: string): SemanticTokens {
+    // rethrowing `ResponseError` and `OperationCancelled` so that they show up
+    // in server trace
+    if (e instanceof ResponseError || isOperationCancelled(e)) throw e;
+
+    console.error(`Uncaught error while computing ${kind} semantic highlighting: ${String(e)}`);
+    if (e instanceof Error) console.error(e.stack);
+
+    return { data: [] };
 }

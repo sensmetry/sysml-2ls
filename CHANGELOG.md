@@ -6,6 +6,10 @@
 
 ## main
 
+### Fixed
+
+- False error when semantic token computation is cancelled [#8](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues/8)
+
 ### Chores
 
 - Added configuration options for custom server path and command line arguments
