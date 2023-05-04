@@ -107,7 +107,7 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
             dir = result;
         }
 
-        const content = await this.fileSystemProvider.readDirectory(URI.parse(dir));
+        const content = await this.fileSystemProvider.readDirectory(URI.file(dir));
 
         const collected: string[] = [];
         const fileExtensions = this.serviceRegistry.all.flatMap(
