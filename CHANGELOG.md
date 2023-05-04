@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Standard library always loaded from an equivalent path on the current drive on
+  Windows [#7](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues/7)
 - False error when semantic token computation is cancelled [#8](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues/8)
 
 ### Chores
