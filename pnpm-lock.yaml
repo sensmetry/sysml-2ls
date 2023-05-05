@@ -56,8 +56,8 @@ importers:
     specifiers:
       chalk: ^5.2.0
       commander: ^10.0.1
-      langium: ^1.1.0
-      syside-languageserver: workspace:~
+      langium: ^1.2.0
+      syside-languageserver: workspace:*
       vscode-languageserver: ~8.0.2
       vscode-uri: ~3.0.7
     dependencies:
@@ -66,7 +66,7 @@ importers:
       syside-languageserver: link:../syside-languageserver
       vscode-uri: 3.0.7
     devDependencies:
-      langium: 1.1.0
+      langium: 1.2.0
       vscode-languageserver: 8.0.2
 
   packages/syside-languageclient:
@@ -74,7 +74,7 @@ importers:
       '@types/fs-extra': ^11.0.1
       '@types/yauzl': ^2.10.0
       fs-extra: ^11.1.0
-      syside-protocol: workspace:~
+      syside-protocol: workspace:*
       vscode-languageserver: ~8.0.2
       yauzl: ^2.10.0
     dependencies:
@@ -91,10 +91,10 @@ importers:
       chalk: ^5.2.0
       chevrotain: ^9.1.0
       commander: ^10.0.1
-      langium: ^1.1.0
-      langium-cli: ^1.1.0
-      syside-languageclient: workspace:~
-      syside-protocol: workspace:~
+      langium: ^1.2.0
+      langium-cli: ^1.2.0
+      syside-languageclient: workspace:*
+      syside-protocol: workspace:*
       ts-mixer: ^6.0.3
       typescript-string-operations: ^1.5.0
       vscode-languageserver: ~8.0.2
@@ -103,7 +103,7 @@ importers:
     dependencies:
       chevrotain: 9.1.0
       commander: 10.0.1
-      langium: 1.1.0
+      langium: 1.2.0
       syside-protocol: link:../syside-protocol
       ts-mixer: 6.0.3
       vscode-languageserver: 8.0.2
@@ -111,7 +111,7 @@ importers:
       vscode-uri: 3.0.7
     devDependencies:
       chalk: 5.2.0
-      langium-cli: 1.1.0
+      langium-cli: 1.2.0
       syside-languageclient: link:../syside-languageclient
       typescript-string-operations: 1.5.0
 
@@ -128,8 +128,8 @@ importers:
       '@vscode/vsce': ^2.17.0
       fs-extra: ^11.1.0
       ovsx: ^0.8.0
-      syside-languageclient: workspace:~
-      syside-protocol: workspace:~
+      syside-languageclient: workspace:*
+      syside-protocol: workspace:*
       vscode-languageclient: ~8.0.2
       vscode-languageserver: ~8.0.2
       vscode-uri: ~3.0.7
@@ -3658,8 +3658,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /langium-cli/1.1.0:
-    resolution: {integrity: sha512-vnv037FHqXqMeNiNF90v47VrJGiJPzH721UIbbHcu6Nfx0C1UC6SmQhGHtZIDRovT5qJsiXRIPDTZYrIkm4KJQ==}
+  /langium-cli/1.2.0:
+    resolution: {integrity: sha512-DPyJUd4Hj8+OBNEcAQyJtW6e38+UPd758gTI7Ep0r/sDogrwJ/GJHx5nGA+r0ygpNcDPG+mS9Hw8Y05uCNNcoQ==}
     engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
@@ -3667,12 +3667,12 @@ packages:
       commander: 10.0.1
       fs-extra: 11.1.1
       jsonschema: 1.4.1
-      langium: 1.1.0
+      langium: 1.2.0
       lodash: 4.17.21
     dev: true
 
-  /langium/1.1.0:
-    resolution: {integrity: sha512-TsWY/DIOR73se9/YaMQZpvfFWWrhWP0FQS9MrpxWEnMJR0FoKVpMF1thPWXZexLSfyEm1pn2oYzCdW4KUBqXxA==}
+  /langium/1.2.0:
+    resolution: {integrity: sha512-jFSptpFljYo9ZTHrq/GZflMUXiKo5KBNtsaIJtnIzDm9zC2FxsxejEFAtNL09262RVQt+zFeF/2iLAShFTGitw==}
     engines: {node: '>=14.0.0'}
     dependencies:
       chevrotain: 10.4.2
