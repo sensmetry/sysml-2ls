@@ -159,4 +159,15 @@ describe("SysMLHoverProvider", () => {
         expect(errorMock).toHaveBeenCalledTimes(1);
         expect(errorMock).toHaveBeenCalledWith(expect.stringContaining(extra));
     });
+
+    it("should not fail on action generated nodes", async () => {
+        await testHover(
+            {
+                line: 0,
+                character: 26, // Action
+            },
+            expect.stringContaining("test"),
+            "state A { entry action Action { doc /* test */ }}"
+        );
+    });
 });

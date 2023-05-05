@@ -1422,19 +1422,30 @@ EntryTransitionMember returns FeatureMembership:
     ) ';'
 ;
 
+StateActionUsage_1 returns ActionUsage:
+    {ActionUsage} ';'
+;
+StateActionUsage_2 returns PerformActionUsage:
+    PerformActionUsageDeclaration ActionBody
+;
+StateActionUsage_3 returns AcceptActionUsage:
+    AcceptNodeDeclaration ActionBody
+;
+StateActionUsage_4 returns SendActionUsage:
+    SendNodeDeclaration ActionBody
+;
+StateActionUsage_5 returns AssignmentActionUsage:
+    AssignmentNodeDeclaration ActionBody
+;
+
+// expanded subrules explicitly with proper parser rules since actions generate
+// bad parse trees, same for EffectBehaviorUsage below
 StateActionUsage returns ActionUsage:
-    EmptyActionUsage ';' | PerformedActionUsage ActionBody
-;
-
-EmptyActionUsage returns ActionUsage:
-    {ActionUsage}
-;
-
-fragment PerformedActionUsage:
-    {PerformActionUsage} PerformActionUsageDeclaration 
-    | {AcceptActionUsage} AcceptNodeDeclaration 
-    | {SendActionUsage} SendNodeDeclaration
-    | {AssignmentActionUsage} AssignmentNodeDeclaration
+    StateActionUsage_1
+    | StateActionUsage_2
+    | StateActionUsage_3
+    | StateActionUsage_4
+    | StateActionUsage_5
 ;
 
 TransitionUsageMember returns FeatureMembership:
@@ -1511,8 +1522,31 @@ EffectBehaviorMember returns TransitionFeatureMembership:
     kind='do' element=EffectBehaviorUsage
 ;
 
+fragment EffectBehaviorUsageBody:
+    ( '{' ActionBodyItems '}' )?
+;
+EffectBehaviorUsage_1 returns ActionUsage:
+    {ActionUsage}
+;
+EffectBehaviorUsage_2 returns PerformActionUsage:
+    PerformActionUsageDeclaration EffectBehaviorUsageBody
+;
+EffectBehaviorUsage_3 returns AcceptActionUsage:
+    AcceptNodeDeclaration EffectBehaviorUsageBody
+;
+EffectBehaviorUsage_4 returns SendActionUsage:
+    SendNodeDeclaration EffectBehaviorUsageBody
+;
+EffectBehaviorUsage_5 returns AssignmentActionUsage:
+    AssignmentNodeDeclaration EffectBehaviorUsageBody
+;
+
 EffectBehaviorUsage returns ActionUsage:
-    EmptyActionUsage | PerformedActionUsage ( '{' ActionBodyItems '}' )?
+    EffectBehaviorUsage_1
+    | EffectBehaviorUsage_2
+    | EffectBehaviorUsage_3
+    | EffectBehaviorUsage_4
+    | EffectBehaviorUsage_5
 ;
 
 TransitionSuccessionMember returns OwningMembership:
