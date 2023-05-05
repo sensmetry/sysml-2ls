@@ -4,6 +4,13 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## main
+
+### Fixed
+
+- `StateActionUsage` and `EffectBehaviorUsage` parsing which resulted in bad
+  parse trees [#9](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues/9)
+
 ## 0.4.2
 
 ### Fixed

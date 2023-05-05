@@ -14,7 +14,15 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, CstNode, isAstNode, LangiumParser, Mutable, streamContents } from "langium";
+import {
+    AstNode,
+    CstNode,
+    isAstNode,
+    LangiumParser,
+    Mutable,
+    streamContents,
+    streamCst,
+} from "langium";
 import { createParser } from "langium/lib/parser/parser-builder-base";
 import { CstNodeBuilder } from "langium/lib/parser/cst-node-builder";
 import {
@@ -394,18 +402,33 @@ LangiumParser.prototype["assignWithoutOverride"] = function (
         const feature = source.$cstNode.feature;
         if (isRuleCall(feature) && feature.rule.ref && !feature.rule.ref.fragment) {
             // Merging `source` from a subrule into target, need to update the
-            // source CST node to point to the merged AST node instead.
-            Object.defineProperty(source.$cstNode, "element", {
-                get() {
-                    // lazy getter to handle cases where this subrule
-                    // multiple layers deep
-                    return target.$cstNode.element ?? target;
-                },
-                set(element: object) {
-                    Object.defineProperty(source.$cstNode, "element", element);
-                },
-                configurable: true,
-            });
+            // source and its children CST nodes to point to the merged AST node
+            // instead.
+            const iterator = streamCst(source.$cstNode).iterator();
+
+            let current = iterator.next();
+            while (!current.done) {
+                const node = current.value;
+                if (node.element === source) {
+                    // only need to update the matching element which is
+                    // currently being merged and skip any other children
+                    Object.defineProperty(node, "element", {
+                        get() {
+                            // lazy getter to handle cases where this subrule
+                            // multiple layers deep
+                            return target.$cstNode.element ?? target;
+                        },
+                        set(element: object) {
+                            Object.defineProperty(node, "element", element);
+                        },
+                        configurable: true,
+                    });
+                } else {
+                    iterator.prune();
+                }
+
+                current = iterator.next();
+            }
         }
     }
 
