@@ -378,8 +378,8 @@
     },
     "dependencies": {
         "fs-extra": "^11.1.0",
-        "syside-languageclient": "workspace:~",
-        "syside-protocol": "workspace:~",
+        "syside-languageclient": "workspace:*",
+        "syside-protocol": "workspace:*",
         "vscode-languageclient": "~8.0.2",
         "vscode-languageserver": "~8.0.2",
         "vscode-uri": "~3.0.7"

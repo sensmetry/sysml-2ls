@@ -11,6 +11,10 @@
 - `StateActionUsage` and `EffectBehaviorUsage` parsing which resulted in bad
   parse trees [#9](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues/9)
 
+### Chores
+
+- Updated Langium to 1.2.0
+
 ## 0.4.2
 
 ### Fixed

@@ -28,21 +28,7 @@ type Keys<T> = keyof T;
 
 // non-AST types, i.e. operators and enums
 const NON_TYPES = new Set<string>([
-    ast.ClassificationTestOperator,
-    ast.EqualityOperator,
-    ast.FeatureDirectionKind,
-    ast.ImportKind,
-    ast.ParameterKind,
-    ast.PortionKind,
-    ast.RelationalOperator,
-    ast.RequirementConstraintKind,
-    ast.RequirementKind,
-    ast.StateSubactionKind,
-    ast.TransitionFeatureKind,
     ast.TransparentElement,
-    ast.TriggerKind,
-    ast.UnaryOperator,
-    ast.VisibilityKind,
     ast.FeatureRelationship,
     ast.InlineExpression,
     ast.NonOwnerType,
