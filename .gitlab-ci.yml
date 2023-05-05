@@ -11,7 +11,7 @@ default:
   before_script:
     - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
     - pnpm config set store-dir .pnpm-store
-    - pnpm install
+    - pnpm install --ignore-scripts
   cache:
     key:
       files:
@@ -118,6 +118,7 @@ pages:
 .on-release-template:
   rules:
     - if: $VERSION && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  environment: release
   variables:
     EXTENSION_NAME: $PACKAGE_NAME-$VERSION
     EXTENSION_FILENAME: $EXTENSION_NAME.vsix
@@ -126,7 +127,6 @@ pages:
 
 package:release:
   stage: deploy
-  environment: release
   extends: .on-release-template
   script:
     - >
@@ -199,7 +199,7 @@ publish:release:
 publish:github:
   extends: .publish-template
   script:
-    - echo "Creating and uploading release artifacts to GitHub mirror"
+    - echo "Creating and uploading release artifacts to GitHub mirror for version $VERSION"
     - node ./scripts/gh-release.mjs --pat ${GH_ACCESS_TOKEN} --tag ${VERSION} --notes ./release.description -a ${EXTENSION_FILENAME}=${EXTENSION_PATH} -a ${SERVER_FILENAME}
 
 publish:vscode:
