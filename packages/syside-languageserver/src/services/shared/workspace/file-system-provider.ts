@@ -17,6 +17,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
 import { EmptyFileSystemProvider, FileSystemProvider } from "langium";
+import { URI } from "vscode-uri";
 
 /**
  * Extended {@link FileSystemProvider} that provides methods to check if path is valid
@@ -26,23 +27,23 @@ export interface SysMLFileSystemProvider extends FileSystemProvider {
      * Checks if the given path exists asynchronously
      * @return promise that resolves to true if path exists and false otherwise
      */
-    exists(path: string): Promise<boolean>;
+    exists(path: URI): Promise<boolean>;
 
     /**
      * Checks if the given path exists synchronously
      * @return true if path exists and false otherwise
      */
-    existsSync(path: string): boolean;
+    existsSync(path: URI): boolean;
 }
 
 export class SysMLEmptyFileSystemProvider
     extends EmptyFileSystemProvider
     implements SysMLFileSystemProvider
 {
-    async exists(path: string): Promise<boolean> {
+    async exists(path: URI): Promise<boolean> {
         return false;
     }
-    existsSync(path: string): boolean {
+    existsSync(path: URI): boolean {
         return false;
     }
 }

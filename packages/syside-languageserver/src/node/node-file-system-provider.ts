@@ -17,20 +17,21 @@
 import { NodeFileSystemProvider } from "langium/node";
 import { SysMLFileSystemProvider } from "../services/shared/workspace/file-system-provider";
 import fs from "fs";
+import { URI } from "vscode-uri";
 
 export class SysMLNodeFileSystemProvider
     extends NodeFileSystemProvider
     implements SysMLFileSystemProvider
 {
-    async exists(path: string): Promise<boolean> {
-        return fs.promises.stat(path).then(
+    async exists(path: URI): Promise<boolean> {
+        return fs.promises.stat(path.fsPath).then(
             /* resolved */ () => true,
             /* rejected */ () => false
         );
     }
 
-    existsSync(path: string): boolean {
-        return fs.existsSync(path);
+    existsSync(path: URI): boolean {
+        return fs.existsSync(path.fsPath);
     }
 }
 

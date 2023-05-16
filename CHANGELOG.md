@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- False positive standard library validation in some cases on Windows
 - Completion showing suggestions from the current element scope for type and
   feature relationships when completion is triggered by a related token
 

@@ -15,7 +15,9 @@
  ********************************************************************************/
 
 import { DeepPartial, DefaultConfigurationProvider } from "langium";
+import path from "path";
 import { DidChangeConfigurationNotification } from "vscode-languageserver";
+import { URI } from "vscode-uri";
 import { backtrackToDirname, mergeWithPartial } from "../../../utils/common";
 import { SysMLConfig } from "../../config";
 import { LanguageConfig, LanguageEvents, SharedEvents } from "../../events";
@@ -30,9 +32,12 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
         string,
         LanguageEvents["onConfigurationChanged"]
     >;
+    private _stdlibUri?: URI;
+    private _stdlibUriString?: string;
 
     constructor(services: SysMLSharedServices) {
         super(services);
+        this.updateStdlibPath(services.config);
 
         this.services = services;
         this.configChanged = services.Events.onConfigurationChanged;
@@ -96,12 +101,19 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
             );
 
             super.updateSectionConfiguration(section, updated);
+            this.updateStdlibPath(updated);
             this.configChanged.emit(old as SysMLConfig, updated);
         } else {
             super.updateSectionConfiguration(section, configuration);
         }
 
         this.languageConfigChanged[section]?.emit(old, configuration as LanguageConfig);
+    }
+
+    private updateStdlibPath(config: SysMLConfig): void {
+        const stdPath = config.standardLibraryPath;
+        this._stdlibUri = stdPath ? URI.file(path.resolve(stdPath)) : undefined;
+        this._stdlibUriString = this._stdlibUri?.toString();
     }
 
     private _extensionDir: string | undefined | null;
@@ -123,5 +135,19 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
      */
     get stdlibDir(): string | undefined {
         return this.get().standardLibraryPath;
+    }
+
+    /**
+     * Standard library directory URI
+     */
+    get stdlibUri(): URI | undefined {
+        return this._stdlibUri;
+    }
+
+    /**
+     * Standard library directory URI as string
+     */
+    get stdlibUriString(): string | undefined {
+        return this._stdlibUriString;
     }
 }

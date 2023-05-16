@@ -90,9 +90,9 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
         const config = this.config.get();
         if (!config.standardLibrary) return;
 
-        let dir = config.standardLibraryPath;
+        let dir = this.config.stdlibUri;
         if (!dir || !this.fileSystemProvider.existsSync(dir)) {
-            if (config.standardLibraryPath) {
+            if (dir) {
                 // path is set but it doesn't exist, maybe a user error?
                 this.connection?.sendRequest(ShowMessageRequest.type, {
                     type: MessageType.Error,
@@ -104,10 +104,10 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
             // no path set so request client to find one
             const result = await this.requestClientStdlibDir();
             if (!result) return;
-            dir = result;
+            dir = URI.file(result);
         }
 
-        const content = await this.fileSystemProvider.readDirectory(URI.file(dir));
+        const content = await this.fileSystemProvider.readDirectory(dir);
 
         const collected: string[] = [];
         const fileExtensions = this.serviceRegistry.all.flatMap(
