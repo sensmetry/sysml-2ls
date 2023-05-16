@@ -13,6 +13,12 @@
 
 ### Improvements
 
+- Global scopes are now cached in a single structure, and reference resolution
+  across documents will be done in constant time unless some documents in the
+  workspace contain public imports or unnamed features in root namespace. In
+  that case, reference resolution will fall back to iterating through those
+  documents if name was not resolved. While this does not improve performance
+  much on small projects, it should scale better
 - Improved reference resolution performance, should be more than twice as fast
   now
 

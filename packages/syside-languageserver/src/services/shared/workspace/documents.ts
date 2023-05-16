@@ -14,9 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, DefaultLangiumDocumentFactory, LangiumDocument, ParseResult } from "langium";
+import {
+    AstNode,
+    DefaultLangiumDocumentFactory,
+    DefaultLangiumDocuments,
+    LangiumDocument,
+    ParseResult,
+} from "langium";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import { streamAst } from "../../../utils";
 import { SysMLSharedServices } from "../../services";
 import { SysMLNodeDescription } from "./ast-descriptions";
 import { MetamodelBuilder } from "./metamodel-builder";
@@ -45,6 +52,17 @@ declare module "langium" {
          * Local document exports
          */
         exports: SysMLNodeDescription[];
+
+        /**
+         * Lazy cache of fully qualified element names to element descriptions
+         * locally in this document
+         */
+        namedElements: Map<string, SysMLNodeDescription | null>;
+
+        /**
+         * Flattened tree of parsed AST nodes in this document
+         */
+        astNodes: AstNode[];
     }
 }
 
@@ -80,8 +98,25 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
         doc.uriString = doc.uri.toString();
         doc.progress = BuildProgress.Created;
         doc.exports = [];
+        doc.namedElements = new Map();
+        doc.astNodes = streamAst(doc.parseResult.value).toArray();
 
         this.metamodelBuilder.onParsed(doc);
+        return doc;
+    }
+}
+
+export class SysMLDocuments extends DefaultLangiumDocuments {
+    override invalidateDocument(uri: URI): LangiumDocument<AstNode> | undefined {
+        const doc = super.invalidateDocument(uri);
+        if (doc) {
+            doc.progress = BuildProgress.Created;
+            doc.exports = [];
+            doc.namedElements.clear();
+            // no need to invalidate cached AST nodes since the document is not
+            // reparsed here
+        }
+
         return doc;
     }
 }

@@ -28,6 +28,7 @@ import { URI } from "vscode-uri";
 import { performance } from "perf_hooks";
 import { BuildProgress } from "./documents";
 import { SysMLConfigurationProvider } from "./configuration-provider";
+import { SysMLIndexManager } from "./index-manager";
 
 export type StandardLibrary = "none" | "standard" | "local";
 export interface SysMLBuildOptions extends BuildOptions {
@@ -67,6 +68,7 @@ export type DocumentPhaseListener = (document: LangiumDocument) => void;
 export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
     protected readonly statistics: Statistics;
     protected readonly config: SysMLConfigurationProvider;
+    protected override readonly indexManager: SysMLIndexManager;
     /**
      * Map of document URIs to times they were opened in ms
      */
@@ -89,6 +91,7 @@ export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
         super(services);
         this.statistics = services.statistics;
         this.config = services.workspace.ConfigurationProvider;
+        this.indexManager = services.workspace.IndexManager;
 
         const builder = services.workspace.MetamodelBuilder;
 
@@ -226,6 +229,8 @@ export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
         });
 
         if (changed.length === 0 && deleted.length === 0) return;
+
+        this.indexManager.invalidate(changed.concat(deleted));
         return super.update(changed, deleted, cancelToken);
     }
 

@@ -89,9 +89,13 @@ export abstract class SysMLScope implements Scope {
     }
 
     getAllElements(): Stream<SysMLNodeDescription> {
-        return this.getAllExportedElements()
-            .map(([_, e]) => e.description)
-            .nonNullable();
+        return (
+            this.getAllExportedElements()
+                // each membership may be exported with multiple names
+                .distinct(([_, m]) => m)
+                .map(([_, e]) => e.description)
+                .nonNullable()
+        );
     }
 
     getExportedElement(name: string): MembershipMeta | undefined {

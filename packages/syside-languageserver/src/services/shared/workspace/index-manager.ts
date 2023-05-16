@@ -24,11 +24,11 @@ import {
     Stream,
 } from "langium";
 import { CancellationToken } from "vscode-languageserver";
-import { URI, Utils } from "vscode-uri";
+import { URI } from "vscode-uri";
 import { Type, isElement, Namespace, Membership } from "../../../generated/ast";
 import { ElementMeta, NamedChild, sanitizeName, TypeMeta } from "../../../model";
-import { streamAst } from "../../../utils/ast-util";
-import { makeScope, ScopeStream } from "../../../utils/scopes";
+import { getLanguageId, GlobalScope } from "../../../utils/global-scope";
+import { makeScope, SysMLScope } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
 import { SysMLDefaultServices } from "../../services";
 import { SysMLNodeDescription } from "./ast-descriptions";
@@ -49,40 +49,16 @@ export class SysMLIndexManager extends DefaultIndexManager {
     protected override readonly globalScopeCache = new Map<string, SysMLNodeDescription[]>();
 
     /**
-     * Same as {@link globalElementsCache} but for each document if building
-     * with local standard library, e.g. testing TODO: store as a document
-     * member
-     */
-    protected readonly localElementsCache = new Map<
-        string,
-        Map<string, SysMLNodeDescription | null>
-    >();
-
-    /**
-     * Cache of full document AST
-     */
-    protected readonly documentNodesCache = new Map<string, AstNode[]>();
-
-    /**
      * Map of implicit model dependencies
      */
     protected readonly modelDependencies = new Map<string, Set<string>>();
 
-    /**
-     * Index per language id
-     * @see {@link simpleIndex}
-     */
-    protected readonly languageIndex = new Map<string, Map<string, SysMLNodeDescription[]>>();
+    protected readonly globalScope = new GlobalScope();
 
     override allElements(nodeType = ""): Stream<SysMLNodeDescription> {
-        // TODO: use getGlobalScope().getAllElements() instead
-
         // cannot cache global elements as they may have import statements which
         // are being resolved currently
-        if (nodeType.length === 0)
-            return this.getGlobalScope()
-                .getAllScopes()
-                .flatMap((scope) => scope.getAllElements());
+        if (nodeType.length === 0) return this.globalScope.getAllElements();
 
         // non-empty `nodeType` may only be used after linking
         const cached = this.globalScopeCache.get(nodeType);
@@ -90,9 +66,8 @@ export class SysMLIndexManager extends DefaultIndexManager {
             return stream(cached);
         } else {
             const elements = Array.from(
-                this.getGlobalScope()
-                    .getAllScopes()
-                    .flatMap((scope) => scope.getAllElements())
+                this.globalScope
+                    .getAllElements()
                     .filter((e) => this.astReflection.isSubtype(e.type, nodeType))
             );
             this.globalScopeCache.set(nodeType, elements);
@@ -106,25 +81,15 @@ export class SysMLIndexManager extends DefaultIndexManager {
     ): Promise<void> {
         const uri = document.uriString;
 
-        const id = this.getLanguageId(document.uri);
         // reset caches since they will likely change, unless the document is
         // built in standalone mode
         if (!document.buildOptions?.standalone) {
             this.globalScopeCache.clear();
             this.globalElementsCache.clear();
-            if (!this.languageIndex.has(id)) this.languageIndex.set(id, new Map());
-            this.languageIndex.get(id)?.delete(uri);
         }
 
         this.modelDependencies.delete(uri);
-        this.documentNodesCache.delete(uri);
-
-        const localCache = this.localElementsCache.get(uri);
-        if (localCache) {
-            localCache.clear();
-        } else {
-            this.localElementsCache.set(uri, new Map());
-        }
+        document.namedElements.clear();
 
         const services = this.serviceRegistry.getServices(document.uri) as SysMLDefaultServices;
         document.exports = await (
@@ -138,7 +103,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         if (!document.buildOptions?.standalone) {
             // only exporting to global scope if the document is not standalone
             this.simpleIndex.set(uri, document.exports);
-            this.languageIndex.get(id)?.set(uri, document.exports);
+            this.globalScope.collectDocument(document as LangiumDocument<Namespace>);
         }
 
         document.state = DocumentState.IndexedContent;
@@ -153,32 +118,14 @@ export class SysMLIndexManager extends DefaultIndexManager {
      * @param document document context
      * @returns the global scope
      */
-    getGlobalScope(document?: LangiumDocument<Namespace>): ScopeStream {
+    getGlobalScope(document?: LangiumDocument<Namespace>): SysMLScope {
         if (document?.buildOptions?.standalone) {
             // standalone documents use their own root scope as global scope
-            return new ScopeStream([makeScope(document.parseResult.value.$meta)]);
+            return makeScope(document.parseResult.value.$meta);
         }
 
-        let rootNamespaces: Stream<SysMLNodeDescription[]> = EMPTY_STREAM;
-
-        if (document) {
-            const id = this.getLanguageId(document.uri);
-            if (this.languageIndex.has(id))
-                rootNamespaces = stream(this.languageIndex.get(id)?.values() ?? EMPTY_STREAM);
-            const otherScopes = stream(this.languageIndex.entries())
-                .filter(([langId, _]) => langId !== id)
-                .flatMap(([_, values]) => values.values());
-            rootNamespaces = rootNamespaces.concat(otherScopes);
-        } else {
-            // first description in the root namespace
-            rootNamespaces = stream(this.simpleIndex.values());
-        }
-        return new ScopeStream(
-            rootNamespaces
-                .map((d) => d[0].node?.$meta)
-                .nonNullable()
-                .map((m) => makeScope(m))
-        );
+        if (!document) return this.globalScope;
+        return this.globalScope.wrapForLang(getLanguageId(document.uri));
     }
 
     /**
@@ -204,9 +151,8 @@ export class SysMLIndexManager extends DefaultIndexManager {
             document?.buildOptions?.standardLibrary === "local" ||
             document?.buildOptions?.standalone;
         const uri = document?.uriString;
-        const cache = local && uri ? this.localElementsCache.get(uri) : this.globalElementsCache;
+        const cache = local && uri ? document.namedElements : this.globalElementsCache;
 
-        if (!cache) return;
         let description = cache.get(qualifiedName);
         // if not undefined, the description was found in the cache
         if (description !== undefined) return description ?? undefined;
@@ -280,36 +226,22 @@ export class SysMLIndexManager extends DefaultIndexManager {
         return;
     }
 
-    /**
-     * Stream all document AST nodes
-     * @param document document
-     * @param reset whether to recompute the AST nodes
-     * @returns Array of {@link document} AST nodes
-     */
-    stream(document: LangiumDocument, reset = false): AstNode[] {
-        const uri = document.uri.toString();
-        let nodes: AstNode[] | undefined;
-        if (!reset) {
-            nodes = this.documentNodesCache.get(uri);
-            if (nodes) return nodes;
-        }
-
-        nodes = Array.from(streamAst(document.parseResult.value));
-        this.documentNodesCache.set(uri, nodes);
-        return nodes;
-    }
-
     override remove(uris: URI[]): void {
         // clear out caches associated with the document uri
         for (const uri of uris) {
             const uriString = uri.toString();
             this.simpleIndex.delete(uriString);
             this.referenceIndex.delete(uriString);
-            this.documentNodesCache.delete(uriString);
             this.modelDependencies.delete(uriString);
-            this.localElementsCache.delete(uriString);
-            this.languageIndex.get(this.getLanguageId(uri))?.delete(uriString);
         }
+    }
+
+    /**
+     * Invalidate indexes
+     * @param uris document URIs that should be invalidated in the index
+     */
+    invalidate(uris: URI[]): void {
+        this.globalScope.invalidateDocuments(uris);
     }
 
     protected override isAffected(document: LangiumDocument<AstNode>, changed: URI): boolean {
@@ -319,13 +251,6 @@ export class SysMLIndexManager extends DefaultIndexManager {
         const deps = this.modelDependencies.get(document.uri.toString());
         if (!deps) return false;
         return deps.has(changed.toString());
-    }
-
-    /**
-     * Get a language ID from a URI
-     */
-    protected getLanguageId(uri: URI): string {
-        return Utils.extname(uri).toLowerCase();
     }
 
     conforms(left: string | TypeMeta, type: string | TypeMeta): boolean {

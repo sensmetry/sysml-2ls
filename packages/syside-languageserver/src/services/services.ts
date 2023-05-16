@@ -21,7 +21,7 @@ import { SysMLParser } from "./parser/parser";
 import { SysMLConfig } from "./config";
 import { Statistics } from "../utils/common";
 import { SysMLLanguageServer } from "./lsp/language-server";
-import { SysMLDocumentFactory } from "./shared/workspace/documents";
+import { SysMLDocumentFactory, SysMLDocuments } from "./shared/workspace/documents";
 import { SysMLConfigurationProvider } from "./shared/workspace/configuration-provider";
 import { SysMLIndexManager } from "./shared/workspace/index-manager";
 import { SysMLScopeProvider } from "./references/scope-provider";
@@ -51,6 +51,7 @@ export type SysMLAddedSharedServices = {
         IndexManager: SysMLIndexManager;
         DocumentBuilder: SysMLDocumentBuilder;
         FileSystemProvider: SysMLFileSystemProvider;
+        LangiumDocuments: SysMLDocuments;
     };
     lsp: {
         LanguageServer: SysMLLanguageServer;
