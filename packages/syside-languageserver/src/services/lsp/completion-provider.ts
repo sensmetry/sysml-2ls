@@ -53,6 +53,7 @@ import { SysMLScopeProvider } from "../references/scope-provider";
 import { ScopeStream, SysMLScope } from "../../utils/scopes";
 import { asyncWaitWhile } from "../../utils/common";
 import { MembershipMeta } from "../../model";
+import { ScopeOptions } from "../../utils/scope-util";
 
 const ALPHA_NUM = /[a-zA-z\d_]/;
 const NON_ALPHA_NUM = /[^a-zA-z\d_\s]/;
@@ -61,20 +62,35 @@ const NODE_END_CHAR = /[{};]$/;
 // TODO: show docs in label details
 
 const SCOPE_TOKENS: readonly string[] = ["::", ".", "'", "''"] as const;
-const TRIGGER_KEYWORDS: readonly string[] = [
-    ...SCOPE_TOKENS,
-    "@",
-    "@@",
-    "#",
-    "->",
+const RELATIONSHIP_KEYWORDS: ReadonlySet<string> = new Set([
     ":",
     ":>>",
     ":>",
     "::>",
-] as const;
-export const SUPPORTED_TRIGGER_CHARACTERS: readonly string[] = stream(TRIGGER_KEYWORDS)
+    "specializes",
+    "subsets",
+    "redefines",
+    "references",
+    /* typed, featured, defined */ "by",
+    "conjugates",
+    /* disjoint */ "from",
+    "unions",
+    "intersects",
+    "differences",
+    "chains",
+    /* inverse */ "of",
+]);
+const TRIGGER_KEYWORDS: readonly string[] = ["@", "@@", "#", "->"] as const;
+export const SUPPORTED_TRIGGER_CHARACTERS: readonly string[] = stream(
+    SCOPE_TOKENS,
+    TRIGGER_KEYWORDS,
+    RELATIONSHIP_KEYWORDS
+)
     // only the last character triggers completion
     .map((v) => v.charAt(v.length - 1))
+    // filter out alpha numerical characters since completion is triggered
+    // automatically for them
+    .filter((c) => !ALPHA_NUM.test(c))
     .distinct()
     .toArray();
 
@@ -283,7 +299,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                     refAcceptor,
                     document,
                     cancelToken,
-                    node.element.parts.length - end
+                    { index: node.element.parts.length - end }
                 );
             }
 
@@ -306,6 +322,20 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                 });
                 if (item) items.push(item);
             }
+        } else if (RELATIONSHIP_KEYWORDS.has(token)) {
+            let element: AstNode | undefined;
+            if (/;|\{|\}/.test(node.text)) {
+                // the token starts the new element so we are already at the
+                // owning element
+                element = node.element;
+            } else {
+                // need to go back to the owning type
+                element = node.element.$container;
+            }
+            if (!element) return;
+            await this.computeScopeCompletion(element, refAcceptor, document, cancelToken, {
+                skip: node.element.$meta,
+            });
         } else if (TRIGGER_KEYWORDS.includes(token) || isElementReference(node.element)) {
             await this.computeScopeCompletion(node.element, refAcceptor, document, cancelToken);
         } else {
@@ -353,10 +383,11 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
         acceptor: CompletionAcceptor,
         document: LangiumDocument,
         token: CancellationToken,
-        index?: number
+        options?: ScopeOptions & { index?: number }
     ): Promise<void> {
         try {
             let scope: SysMLScope | undefined;
+            let index = options?.index;
             if (isElementReference(node)) {
                 if (index === undefined) {
                     // Compute autocompletion for the last reference by default
@@ -390,7 +421,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
                 const predicate = (): boolean => document.state < DocumentState.ComputedScopes;
                 await asyncWaitWhile(predicate, {}, token);
                 // completion for parent items
-                scope = this.scopeProvider.initialScope(node.$meta, document);
+                scope = this.scopeProvider.initialScope(node.$meta, document, options);
             }
 
             if (!scope) return;

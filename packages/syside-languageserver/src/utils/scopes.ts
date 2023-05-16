@@ -572,7 +572,15 @@ export function makeLinkingScope(
     }
 
     // global scope is a kind of parent
-    if (global && !options.skipParents) parentScopes = parentScopes.concat([global]);
+    if (global && !options.skipParents) {
+        // if in root namespace already, make sure the global scope also skips
+        // the provided skip element
+        if (root.parent() || !options.skip) parentScopes = parentScopes.concat([global]);
+        else
+            parentScopes = parentScopes.concat([
+                new FilteredScope(global, (d) => d.element() !== options.skip),
+            ]);
+    }
 
     const rootScope = makeScope(root, {
         aliasResolver: options.aliasResolver,
