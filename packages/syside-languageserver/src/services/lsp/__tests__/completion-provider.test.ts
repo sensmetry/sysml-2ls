@@ -27,6 +27,7 @@ import {
     TextDocumentIdentifier,
     CompletionTriggerKind,
     CompletionItem,
+    CompletionList,
 } from "vscode-languageserver";
 
 //eslint-disable-next-line @typescript-eslint/ban-types
@@ -262,7 +263,7 @@ const failing_test_table: Case[] = [
 ];
 
 // Builds a document, provides completion params.
-async function buildDocumentAndCompletionParams(description: Case): Promise<{
+async function buildDocumentAndCompletionParams(description: Omit<Case, "expected">): Promise<{
     document: LangiumDocument;
     completionParams: CompletionParams;
 }> {
@@ -315,3 +316,54 @@ test.failing.each(failing_test_table)(
     "invoked completion for label '$expected.label'",
     executeCompletionTestCase
 );
+
+async function getCompletion(
+    text: string,
+    triggerKind = CompletionTriggerKind.Invoked
+): Promise<CompletionList | undefined> {
+    const { document, completionParams } = await buildDocumentAndCompletionParams({
+        triggerKind,
+        text,
+    });
+
+    const provider = services.SysML.lsp.CompletionProvider;
+    return provider?.getCompletion(document, completionParams);
+}
+
+describe("Completion items", () => {
+    it.each([":", ":>", ":>>", "::>"])(
+        "should not suggest the type itself in type and feature relationship completion %s",
+        async (token) => {
+            const completion = await getCompletion(`
+                part def A;
+                part a : A;
+                part b ${token} |
+            `);
+
+            expect(completion?.items).toEqual(
+                [
+                    { labelDetails: { description: "A" } },
+                    { labelDetails: { description: "a" } },
+                ].map((i) => recursiveObjectContaining(i))
+            );
+        }
+    );
+
+    it.each([":", ":>", ":>>", "::>"])(
+        "should not suggest the type itself in type and feature relationship completion after another relationship %s",
+        async (token) => {
+            const completion = await getCompletion(`
+                part def A;
+                part a : A;
+                part b : A ${token} |
+            `);
+
+            expect(completion?.items).toEqual(
+                [
+                    { labelDetails: { description: "A" } },
+                    { labelDetails: { description: "a" } },
+                ].map((i) => recursiveObjectContaining(i))
+            );
+        }
+    );
+});

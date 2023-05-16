@@ -6,6 +6,11 @@
 
 ## main
 
+### Fixed
+
+- Completion showing suggestions from the current element scope for type and
+  feature relationships when completion is triggered by a related token
+
 ### Improvements
 
 - Improved reference resolution performance, should be more than twice as fast

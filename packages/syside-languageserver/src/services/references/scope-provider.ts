@@ -39,7 +39,11 @@ import {
     Subsetting,
     SysMLFunction,
 } from "../../generated/ast";
-import { CHILD_CONTENTS_OPTIONS, DEFAULT_ALIAS_RESOLVER } from "../../utils/scope-util";
+import {
+    CHILD_CONTENTS_OPTIONS,
+    DEFAULT_ALIAS_RESOLVER,
+    ScopeOptions,
+} from "../../utils/scope-util";
 import {
     SysMLScope,
     makeScope,
@@ -108,7 +112,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             if (context) {
                 parent = context;
             } else {
-                return this.initialScope(container.owner(), container.document, aliasResolver);
+                return this.initialScope(container.owner(), container.document, { aliasResolver });
             }
         } else {
             // even if the reference was discarded due to the wrong type,
@@ -142,8 +146,9 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     initialScope(
         owner: Metamodel | undefined,
         document?: LangiumDocument,
-        aliasResolver = DEFAULT_ALIAS_RESOLVER
+        options?: ScopeOptions
     ): SysMLScope | undefined {
+        options ??= { aliasResolver: DEFAULT_ALIAS_RESOLVER };
         while (owner?.is(InlineExpression)) {
             // unwrap all the expressions to get the real parent
             owner = owner.owner();
@@ -161,14 +166,13 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
         // of its declaration. However SysML adds more references that are
         // not used for scope resolution therefore we only skip if the
         // reference declares a specialization
-        let skip: Metamodel | undefined;
         if (owner?.isAny([Specialization, Conjugation])) {
             // TODO: not sure if this is right and specializations are
             // allowed to reference the declaring element but this fixes a
             // linking error in
             // SysML-v2-Release/sysml/src/examples/Individuals%20Examples/JohnIndividualExample.sysml
             if (owner.nodeType() !== Subsetting && owner.nodeType() !== FeatureInverting) {
-                skip = owner.source();
+                options.skip = owner.source();
             }
 
             const parent = owner.parent();
@@ -177,7 +181,11 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
                 if (outer?.is(InvocationExpression) && (parent as FeatureMeta).value)
                     // resolution of type relationships in an invocation
                     // argument should be done in the invoked function scope
-                    return this.localScope(outer.invokes() ?? outer, undefined, aliasResolver);
+                    return this.localScope(
+                        outer.invokes() ?? outer,
+                        undefined,
+                        options.aliasResolver
+                    );
             }
 
             // source == parent if this relationship is a part of declaration,
@@ -185,14 +193,14 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             // sense
             owner = owner.source() === parent ? parent.owner() : parent;
 
-            if (skip?.parent()?.is(EndFeatureMembership)) {
+            if (options.skip?.parent()?.is(EndFeatureMembership)) {
                 // connector ends cannot reference connector scope
                 owner = owner?.owner();
             }
         } else if (owner?.parent()?.is(ParameterMembership)) {
             if (owner.owner()?.is(InvocationExpression)) {
                 // invocation argument
-                return this.initialScope(owner.owner(), document, aliasResolver);
+                return this.initialScope(owner.owner(), document, options);
             }
         } else if (owner?.is(Membership)) {
             // skip the alias scope since resolution tries to follow aliases to
@@ -217,10 +225,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
 
         return makeLinkingScope(
             owner,
-            {
-                aliasResolver,
-                skip,
-            },
+            options,
             this.indexManager.getGlobalScope(document as LangiumDocument<Namespace> | undefined)
         );
     }
