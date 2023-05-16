@@ -26,7 +26,7 @@ import {
 import { CancellationToken } from "vscode-languageserver";
 import { URI, Utils } from "vscode-uri";
 import { Type, isElement, Namespace, Membership } from "../../../generated/ast";
-import { ElementMeta, MembershipMeta, sanitizeName, TypeMeta } from "../../../model";
+import { ElementMeta, NamedChild, sanitizeName, TypeMeta } from "../../../model";
 import { streamAst } from "../../../utils/ast-util";
 import { makeScope, ScopeStream } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
@@ -212,7 +212,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         if (description !== undefined) return description ?? undefined;
 
         let parts = qualifiedName.split("::").map((name) => sanitizeName(name));
-        let children: Map<string, MembershipMeta<ElementMeta>> | undefined;
+        let children: Map<string, NamedChild> | undefined;
         const root = parts[0];
         parts = parts.slice(1);
         let candidate = cache.get(root)?.node;
@@ -233,9 +233,13 @@ export class SysMLIndexManager extends DefaultIndexManager {
 
         // traverse the name chain
         for (const part of parts) {
-            let child: ElementMeta | undefined = children?.get(part);
-            if (child?.is(Membership)) child = child.element();
-            description = child?.description;
+            const child: NamedChild | undefined = children?.get(part);
+            if (typeof child === "string" || !child) continue;
+
+            let element: ElementMeta | undefined;
+            if (child.is(Membership)) element = child.element();
+            else element = child.element()?.element();
+            description = element?.description;
             if (!description || !description.node) break;
             children = description.node.$meta.children;
         }

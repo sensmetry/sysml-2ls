@@ -295,11 +295,28 @@ export class FeatureMeta extends TypeMeta {
             if (specialization.element()?.isOrdered) this.isOrdered = true;
         }
 
-        if (this.name || this.shortName) return;
-        const namingFeature = this.namingFeature();
-        if (namingFeature) {
-            if (namingFeature.name) this.setName(namingFeature.name);
-            if (namingFeature.shortName) this.setShortName(namingFeature.shortName);
+        if (!this.name && !this.shortName) {
+            const namingFeature = this.namingFeature();
+            if (namingFeature) {
+                if (namingFeature.name) this.setName(namingFeature.name);
+                if (namingFeature.shortName) this.setShortName(namingFeature.shortName);
+            }
+        }
+
+        if (specialization.is(Redefinition)) {
+            // add a tombstone to the owning type children to signify that the
+            // redefined feature is no longer accessible through it
+            const feature = specialization.finalElement();
+            const owner = this.owningType;
+            if (owner && feature) {
+                const addShadow = (name: string): void => {
+                    const existing = owner.children.get(name);
+                    if (!existing) owner.children.set(name, "shadow");
+                };
+
+                if (feature.name) addShadow(feature.name);
+                if (feature.shortName) addShadow(feature.shortName);
+            }
         }
     }
 

@@ -397,17 +397,14 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
 
             const visited = new Set<string>();
             const collect = (s: SysMLScope, index: number): void => {
-                s.getAllExportedElements().forEach((e) => {
-                    [e.name, e.shortName].forEach((name) => {
-                        if (!name) return;
-                        if (visited.has(name)) return;
-                        visited.add(name);
+                s.getAllExportedElements().forEach(([name, e]) => {
+                    if (visited.has(name)) return;
+                    visited.add(name);
 
-                        const item = this.createMemberCompletionItem(e, name);
-                        // length 4 should be more than enough (10k numbers)
-                        item.sortText = index.toString().padStart(4, "0");
-                        acceptor(item);
-                    });
+                    const item = this.createMemberCompletionItem(e, name);
+                    // length 4 should be more than enough (10k numbers)
+                    item.sortText = index.toString().padStart(4, "0");
+                    acceptor(item);
                 });
             };
 

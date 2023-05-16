@@ -18,6 +18,7 @@ import { formatString } from "typescript-string-operations";
 import { parseKerML, NO_ERRORS, sanitizeTree, anything } from "../../../testing";
 import { SysMLBuildOptions } from "../../../services/shared/workspace/document-builder";
 import { Feature, Subclassification, Subsetting, Type } from "../../../generated/ast";
+import { DocumentValidator } from "langium";
 
 const Base = `
 package {0} {
@@ -154,3 +155,47 @@ test.concurrent.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
         ]);
     }
 );
+
+test("Implicitly redefined features are hidden in the scope", async () => {
+    const result = await parseKerML(
+        `
+        library package Base {
+            abstract classifier Anything {}
+        }
+
+        library package Links {
+            private import Base::Anything;
+            abstract assoc Link specializes Anything {
+                readonly feature participant: Anything[2..*] nonunique ordered;
+            }
+            assoc all BinaryLink specializes Link {
+                readonly end feature source: Anything[0..*] subsets participant;
+                readonly end feature target: Anything[0..*] subsets participant;
+            }
+        }
+
+        library package Objects {
+            assoc struct BinaryLinkObject specializes Links::BinaryLink {}
+        }
+
+        interaction Transfer specializes Links::BinaryLink {      
+            end feature source: Base::Anything[0..*] redefines Links::BinaryLink::source {
+                out feature sourceOutput: Base::Anything[0..*];
+            }
+            end feature target: Base::Anything[0..*] redefines Links::BinaryLink::target {}
+            feature item: Base::Anything[1..*] {}
+        }
+
+        interaction FlowTransfer specializes Transfer {
+            connector sourceOutputLink: Objects::BinaryLinkObject[2] {	
+                end transferSource references source[1];
+                end transferPayload references item[2] subsets transferSource.sourceOutput;
+            }
+        }
+    `,
+        { ...BUILD_OPTIONS, validationChecks: "all" }
+    );
+    expect(
+        result.diagnostics.filter((d) => d.code === DocumentValidator.LinkingError)
+    ).toHaveLength(0);
+});

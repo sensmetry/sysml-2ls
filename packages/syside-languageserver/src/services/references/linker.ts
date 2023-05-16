@@ -410,6 +410,12 @@ export class SysMLLinker extends DefaultLinker {
         try {
             return this.getCandidateImp(refInfo);
         } catch (err) {
+            if (err === "unresolved reference") {
+                return <LinkingError>{
+                    ...refInfo,
+                    message: `Found an unresolved reference with name '${refInfo.reference.$refText}`,
+                };
+            }
             if (err instanceof Error) {
                 const linkingError: LinkingError = {
                     ...refInfo,

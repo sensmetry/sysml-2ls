@@ -31,6 +31,11 @@ export class MembershipImportMeta<T extends MembershipMeta = MembershipMeta> ext
     override parent(): ModelContainer<MembershipImport> {
         return this._parent;
     }
+
+    override importsNameOnly(): boolean {
+        // non-recursive only imports the name
+        return !this.isRecursive;
+    }
 }
 
 declare module "../../../generated/ast" {

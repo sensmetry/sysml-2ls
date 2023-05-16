@@ -45,6 +45,15 @@ export abstract class ImportMeta<T extends Importable = Importable> extends Rela
     override parent(): ModelContainer<Import> {
         return this._parent;
     }
+
+    /**
+     *
+     * @returns true if this import only imports a single name into a scope,
+     * false otherwise
+     */
+    importsNameOnly(): boolean {
+        return false;
+    }
 }
 
 declare module "../../../generated/ast" {
