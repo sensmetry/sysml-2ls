@@ -22,7 +22,6 @@ import {
     stream,
     ValidationAcceptor,
 } from "langium";
-import path from "path";
 import * as ast from "../../generated/ast";
 import {
     ExpressionMeta,
@@ -242,7 +241,7 @@ export class KerMLValidator {
             );
         };
 
-        const std = this.config.get().standardLibraryPath;
+        const std = this.config.stdlibUriString;
         if (!std) {
             emit();
             return;
@@ -256,8 +255,7 @@ export class KerMLValidator {
             return;
         }
 
-        const relative = path.relative(path.resolve(std), document.uri.path);
-        if (relative.startsWith("..")) {
+        if (!document.uriString.startsWith(std)) {
             emit();
         }
     }

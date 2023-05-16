@@ -14,25 +14,29 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { URI, Utils } from "vscode-uri";
 import { SysMLNodeFileSystem } from "../node-file-system-provider";
 
 const fs = SysMLNodeFileSystem.fileSystemProvider();
 
-describe.each([__dirname, __filename])("Node file system provider tests", (path) => {
-    it(`${path} exists sync`, () => {
-        expect(fs.existsSync(path)).toBeTruthy();
-    });
+describe.each([URI.file(__dirname), URI.file(__filename)])(
+    "Node file system provider tests",
+    (path) => {
+        it(`${path} exists sync`, () => {
+            expect(fs.existsSync(path)).toBeTruthy();
+        });
 
-    it(`${path} exists async`, async () => {
-        expect(fs.exists(path)).resolves.toBeTruthy();
-    });
+        it(`${path} exists async`, async () => {
+            expect(fs.exists(path)).resolves.toBeTruthy();
+        });
 
-    const bad = path + ".Hello, world!";
-    it(`${bad} does not exist sync`, () => {
-        expect(fs.existsSync(bad)).toBeFalsy();
-    });
+        const bad = Utils.joinPath(path, ".Hello, world!");
+        it(`${bad} does not exist sync`, () => {
+            expect(fs.existsSync(bad)).toBeFalsy();
+        });
 
-    it(`${bad} does not exist async`, () => {
-        expect(fs.exists(bad)).resolves.toBeFalsy();
-    });
-});
+        it(`${bad} does not exist async`, () => {
+            expect(fs.exists(bad)).resolves.toBeFalsy();
+        });
+    }
+);
