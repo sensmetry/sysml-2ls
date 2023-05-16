@@ -152,7 +152,7 @@ export class SysMLLinker extends DefaultLinker {
         this.importErrors.delete(document);
         await this.metamodelBuilder.preLink(undefined, document, cancelToken);
 
-        for (const node of this.indexManager.stream(document)) {
+        for (const node of document.astNodes) {
             await interruptAndCheck(cancelToken);
             this.linkNode(node, document);
         }
@@ -624,7 +624,7 @@ export class SysMLLinker extends DefaultLinker {
     override unlink(document: LangiumDocument<AstNode>): void {
         // also have to reset the resolved metamodels since they mostly depend
         // on the resolved references
-        this.indexManager.stream(document).forEach((node) => {
+        document.astNodes.forEach((node) => {
             node.$meta?.resetToAst(node);
             if (!isElement(node)) return;
 

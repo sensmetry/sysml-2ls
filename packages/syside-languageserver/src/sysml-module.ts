@@ -54,7 +54,7 @@ import { DefaultAstNodeLocator } from "langium/lib/workspace/ast-node-locator";
 import { SysMLNodeDescriptionProvider } from "./services/shared/workspace/ast-descriptions";
 import { SysMLExecuteCommandHandler } from "./services/lsp/execute-command-handler";
 import { SysMLWorkspaceManager } from "./services/shared/workspace/workspace-manager";
-import { SysMLDocumentFactory } from "./services/shared/workspace/documents";
+import { SysMLDocumentFactory, SysMLDocuments } from "./services/shared/workspace/documents";
 import { DefaultSysMLConfig, SysMLConfig } from "./services/config";
 import { mergeWithPartial, PartialKeys, Statistics } from "./utils/common";
 import { SysMLSemanticTokenProvider } from "./services/lsp/semantic-token-provider";
@@ -139,6 +139,7 @@ export const SysMLSharedModule: Module<
         WorkspaceManager: (services) => new SysMLWorkspaceManager(services),
         LangiumDocumentFactory: (services) => new SysMLDocumentFactory(services),
         ConfigurationProvider: (services) => new SysMLConfigurationProvider(services),
+        LangiumDocuments: (services) => new SysMLDocuments(services),
     },
     lsp: {
         ExecuteCommandHandler: (services) => new SysMLExecuteCommandHandler(services),

@@ -16,7 +16,12 @@
 
 import { createSysMLServices } from "../sysml-module";
 import { SysMLNodeFileSystem } from "../node/node-file-system-provider";
-import { DeepPartial, DocumentValidator, ParseResult as LangiumParseResult } from "langium";
+import {
+    DeepPartial,
+    DocumentValidator,
+    LangiumDocument,
+    ParseResult as LangiumParseResult,
+} from "langium";
 import { URI } from "vscode-uri";
 import { Element, Namespace } from "../../src/generated/ast";
 import { Diagnostic } from "vscode-languageserver";
@@ -61,10 +66,11 @@ export const TEST_BUILD_OPTIONS: SysMLBuildOptions = {
 async function buildDocument(
     text: string,
     uri: URI,
-    options: SysMLBuildOptions = TEST_BUILD_OPTIONS
-): Promise<ParseResult> {
+    options: SysMLBuildOptions & { document?: true } = TEST_BUILD_OPTIONS
+): Promise<ParseResult | LangiumDocument<Namespace>> {
     const document = factory.fromString<Namespace>(text, uri);
     await services.shared.workspace.DocumentBuilder.build([document], options);
+    if (options.document) return document;
     return {
         parserErrors: document.parseResult.parserErrors,
         lexerErrors: document.parseResult.lexerErrors,
@@ -75,15 +81,27 @@ async function buildDocument(
 
 export async function parseKerML(
     text: string,
-    options: SysMLBuildOptions = TEST_BUILD_OPTIONS
-): Promise<ParseResult> {
+    options: Partial<SysMLBuildOptions> & { document: true }
+): Promise<LangiumDocument<Namespace>>;
+export async function parseKerML(text: string, options?: SysMLBuildOptions): Promise<ParseResult>;
+
+export async function parseKerML(
+    text: string,
+    options: SysMLBuildOptions & { document?: true } = TEST_BUILD_OPTIONS
+): Promise<ParseResult | LangiumDocument<Namespace>> {
     return buildDocument(text, URI.file(generateString(16) + ".kerml"), options);
 }
 
 export async function parseSysML(
     text: string,
-    options: SysMLBuildOptions = TEST_BUILD_OPTIONS
-): Promise<ParseResult> {
+    options: Partial<SysMLBuildOptions> & { document: true }
+): Promise<LangiumDocument<Namespace>>;
+export async function parseSysML(text: string, options?: SysMLBuildOptions): Promise<ParseResult>;
+
+export async function parseSysML(
+    text: string,
+    options: SysMLBuildOptions & { document?: true } = TEST_BUILD_OPTIONS
+): Promise<ParseResult | LangiumDocument<Namespace>> {
     return buildDocument(text, URI.file(generateString(16) + ".sysml"), options);
 }
 

@@ -302,7 +302,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
     onParsed(document: LangiumDocument<AstNode>): void {
         // reset the cached nodes in case they are stale
-        const children = this.indexManager.stream(document, true);
+        const children = document.astNodes;
         for (const child of children) {
             this.addMeta(child, document);
         }
@@ -313,7 +313,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
     onChanged(document: LangiumDocument<AstNode>): void {
         const added: AstNode[] = [];
-        for (const child of this.indexManager.stream(document, true)) {
+        for (const child of document.astNodes) {
             const meta = child.$meta;
             if (meta) meta.resetToAst(child);
             else {
@@ -365,7 +365,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         this.metamodelErrors.delete(document.uri.toString());
 
-        for (const node of this.indexManager.stream(document)) {
+        for (const node of document.astNodes) {
             await interruptAndCheck(cancelToken);
             this.preLinkNode(node, document);
         }
