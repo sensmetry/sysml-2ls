@@ -104,6 +104,7 @@ import {
     UsageMeta,
     ReferenceSubsettingMeta,
     Metamodel,
+    sanitizeName,
 } from "../../../model";
 import { SysMLError } from "../../sysml-validation";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
@@ -206,7 +207,10 @@ function builder<K extends SysMLType>(type: K | K[], order = 0) {
     ): void {
         if (typeof type === "string") type = [type];
         type.forEach((t) => {
-            (Builders[t] ??= [] as NonNullable<typeof Builders[K]>).push([order, descriptor.value]);
+            (Builders[t] ??= [] as NonNullable<(typeof Builders)[K]>).push([
+                order,
+                descriptor.value,
+            ]);
         });
     };
 }
@@ -1239,6 +1243,20 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 end.addSpecialization(subsetting);
             }
         }
+    }
+
+    @builder(MembershipImport, 10000)
+    cacheImportedName(node: MembershipImport): void {
+        // element is imported by the name as it appears in text
+        let name = node.reference?.parts.at(-1)?.$refText;
+        if (!name) return;
+        name = sanitizeName(name);
+
+        const children = node.$meta.owner().children;
+
+        // don't replace existing names
+        if (children.has(name)) return;
+        children.set(name, node.$meta ?? "unresolved reference");
     }
 
     /**

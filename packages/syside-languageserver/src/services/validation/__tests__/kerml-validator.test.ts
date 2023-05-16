@@ -449,6 +449,20 @@ describe("Subsettings", () => {
         );
     });
 
+    test("redefining base type feature with the same name does not trigger validation", async () => {
+        return expectValidations(
+            `
+            class A {
+                feature a : A;
+            }
+            class B :> A {
+                feature a :>> a;
+            }`,
+            /redefinition, owner/,
+            0
+        );
+    });
+
     test("redefining package feature triggers validation", async () => {
         return expectValidations(
             `

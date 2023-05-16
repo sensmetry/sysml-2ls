@@ -166,7 +166,8 @@ function validate(docs: LangiumDocument[], exportDiagnostics = false, ignoreKnow
     console.warn("Found validation errors!");
     const print = (document: LangiumDocument | undefined, d: Diagnostic): void =>
         console.info(
-            `  Line ${d.range.start.line}|${d.range.start.character}: ${d.message} (${
+            // +1 for editor equivalent numbering
+            `  Line ${d.range.start.line + 1}|${d.range.start.character + 1}: ${d.message} (${
                 d.code
             }) [${document?.textDocument.getText(d.range)}]`
         );

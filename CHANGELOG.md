@@ -4,6 +4,13 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## main
+
+### Improvements
+
+- Improved reference resolution performance, should be more than twice as fast
+  now
+
 ## 0.4.3
 
 ### Fixed

@@ -367,7 +367,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
         // also return private children
         return makeLinkingScope(node)
             .getAllExportedElements()
-            .map((d) => `${d.name} [${d.element()?.qualifiedName}]`)
+            .map(([name, d]) => `${name} [${d.element()?.qualifiedName}]`)
             .toArray();
     }
 

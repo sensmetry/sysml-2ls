@@ -21,7 +21,7 @@ import { URI } from "vscode-uri";
 import { Element, Namespace } from "../../src/generated/ast";
 import { Diagnostic } from "vscode-languageserver";
 import { SysMLBuildOptions } from "../services/shared/workspace/document-builder";
-import { makeLinkingScope, makeScope } from "../utils/scopes";
+import { makeLinkingScope, makeScope, SysMLScope } from "../utils/scopes";
 import { SysMLConfig } from "../services/config";
 import { Visibility } from "../utils/scope-util";
 
@@ -112,28 +112,32 @@ export function defaultLinkingErrorTo(name: string): object {
     };
 }
 
+function collectNames(scope: SysMLScope): string[] {
+    return scope
+        .getAllExportedElements()
+        .map(([_, m]) => m)
+        .map((member) => member.element()?.qualifiedName)
+        .nonNullable()
+        .distinct()
+        .toArray();
+}
+
 export function childrenNames(
     namespace: Element | undefined,
     inherited = Visibility.public,
     imported = Visibility.public
 ): string[] {
     if (!namespace) return [];
-    return makeScope(namespace.$meta, {
-        inherited: { visibility: inherited, depth: 100000 },
-        imported: { visibility: imported, depth: 100000 },
-    })
-        .getAllExportedElements()
-        .map((member) => member.element()?.qualifiedName)
-        .nonNullable()
-        .toArray();
+    return collectNames(
+        makeScope(namespace.$meta, {
+            inherited: { visibility: inherited, depth: 100000 },
+            imported: { visibility: imported, depth: 100000 },
+        })
+    );
 }
 
 export function directScopeNames(namespace: Namespace): string[] {
-    return makeLinkingScope(namespace.$meta, { skipParents: true })
-        .getAllExportedElements()
-        .map((member) => member.element()?.qualifiedName)
-        .nonNullable()
-        .toArray();
+    return collectNames(makeLinkingScope(namespace.$meta, { skipParents: true }));
 }
 
 /**

@@ -15,7 +15,13 @@
  ********************************************************************************/
 
 import { Stream, stream } from "langium";
-import { Element, Feature, Membership, MetadataFeature } from "../../generated/ast";
+import {
+    Element,
+    Feature,
+    Membership,
+    MembershipImport,
+    MetadataFeature,
+} from "../../generated/ast";
 import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
 import { SysMLTypeList } from "../../services/sysml-ast-reflection";
 import { KeysMatching } from "../../utils/common";
@@ -29,7 +35,22 @@ import {
     MetadataFeatureMeta,
     NamespaceMeta,
     RelationshipMeta,
+    MembershipImportMeta,
 } from "./_internal";
+
+/**
+ * Types used in named children cache
+ *
+ * - `"unresolved reference"` refers to named imports not linked yet
+ * - `"shadow"` - names shadowed by this scope (i.e. redefinitions)
+ */
+export type NamedChild = MembershipMeta | MembershipImportMeta | "unresolved reference" | "shadow";
+
+export function namedMembership(
+    member: MembershipMeta | MembershipImportMeta
+): MembershipMeta | undefined {
+    return member.is(MembershipImport) ? member.element() : member;
+}
 
 @metamodelOf(Element, "abstract")
 export abstract class ElementMeta extends BasicMetamodel<Element> {
@@ -84,7 +105,7 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     /**
      * List of direct children
      */
-    readonly children = new Map<string, MembershipMeta>();
+    readonly children = new Map<string, NamedChild>();
 
     /**
      * Library metaclass of this element
@@ -231,7 +252,12 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     private updateName(name: Name, value: string): void {
         const owner = this.owner();
         // remove this child
-        if (name.sanitized && owner) owner.children.delete(name.sanitized);
+        if (name.sanitized && owner) {
+            // only remove this child if it is already cached with the old name
+            const cached = owner.children.get(name.sanitized);
+            const isCached = cached === this.parent() || cached === "shadow";
+            if (cached && isCached) owner.children.delete(name.sanitized);
+        }
 
         // update names
         name.set(value);
