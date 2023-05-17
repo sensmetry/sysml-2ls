@@ -14,21 +14,4 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import fs from "fs-extra";
-import util from "util";
-import child_process from "child_process";
-
-const exec = util.promisify(child_process.exec);
-
-exec("pnpm run esbuild-base --minify")
-    .then(() =>
-        Promise.all(
-            [
-                ["../../LICENSE", "LICENSE"],
-                ["../../CHANGELOG.md", "CHANGELOG.md"],
-                ["README.md", ".README"],
-            ].map(([src, dst]) => fs.copyFile(src, dst))
-        )
-    )
-    .then(() => fs.copyFile("../../README.md", "README.md"))
-    .then(() => fs.copy("../syside-languageserver/syntaxes", "syntaxes"));
+import "syside-languageserver/lib/node/main";

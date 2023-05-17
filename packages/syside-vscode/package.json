@@ -371,14 +371,14 @@
         "vscode:package": "node ./scripts/package.mjs",
         "vscode:publish": "node ./scripts/publish.mjs",
         "ovsx:publish": "ovsx publish",
-        "esbuild-base": "node ../../scripts/build.mjs node src/extension.ts",
-        "esbuild-base:server": "pnpm --dir ../syside-languageserver run esbuild-base -o ../syside-vscode/out/language-server",
-        "esbuild": "pnpm run esbuild-base --sourcemap && pnpm run esbuild-base:server --sourcemap",
-        "esbuild:watch": "concurrently -n vscode,server -c blue,yellow \"pnpm run esbuild-base --sourcemap --watch\" \"pnpm run esbuild-base:server --sourcemap --watch\""
+        "esbuild-base": "node ../../scripts/build.mjs node src/extension.ts src/language-server/main.ts",
+        "esbuild": "pnpm run esbuild-base --sourcemap",
+        "esbuild:watch": "pnpm run esbuild-base --sourcemap --watch"
     },
     "dependencies": {
         "fs-extra": "^11.1.0",
         "syside-languageclient": "workspace:*",
+        "syside-languageserver": "workspace:*",
         "syside-protocol": "workspace:*",
         "vscode-languageclient": "~8.0.2",
         "vscode-languageserver": "~8.0.2",

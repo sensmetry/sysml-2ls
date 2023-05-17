@@ -4,6 +4,12 @@
 
 <!-- Include links to comparison to the previous version -->
 
+## main
+
+### Improvements
+
+- Changed how language server is bundled, resulting in much better performance
+
 ## 0.5.0
 
 ### Fixed
