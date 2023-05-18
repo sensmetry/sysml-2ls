@@ -6,6 +6,8 @@
 
 ## main
 
+## 0.5.1
+
 ### Improvements
 
 - Changed how language server is bundled, resulting in much better performance
