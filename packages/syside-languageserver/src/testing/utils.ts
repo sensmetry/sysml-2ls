@@ -29,6 +29,7 @@ import { SysMLBuildOptions } from "../services/shared/workspace/document-builder
 import { makeLinkingScope, makeScope, SysMLScope } from "../utils/scopes";
 import { SysMLConfig } from "../services/config";
 import { Visibility } from "../utils/scope-util";
+import { expect } from "@jest/globals";
 
 export const TEST_SERVER_OPTIONS: DeepPartial<SysMLConfig> = {
     // don't parse the standard library
