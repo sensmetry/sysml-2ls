@@ -11,8 +11,7 @@
         "lib",
         "node_modules",
         "**/__test__",
-        "**/__tests__",
-        "**/testing"
+        "**/__tests__"
     ],
     "references": [
         {

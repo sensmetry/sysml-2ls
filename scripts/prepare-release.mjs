@@ -1,33 +1,73 @@
+#!/usr/bin/env node
+
+/********************************************************************************
+ * Copyright (c) 2022-2023 Sensmetry UAB and others
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
+
 import { Command } from "commander";
-import Config from "../package.json";
 import fs from "fs-extra";
 import path from "path";
+import process from "process";
 
 const SEMVER = /^(\d+)\.(\d+)\.(\d+)$/;
 
-type Version = [number, number, number];
+/**
+ * @typedef {[number, number, number]} Version
+ */
 
-function parseVersion(version: string): Version | undefined {
+/**
+ * @param {string} version
+ * @returns {Version | undefined}
+ */
+function parseVersion(version) {
     const matches = SEMVER.exec(version.trim());
     if (!matches) return;
 
     return [Number.parseInt(matches[1]), Number.parseInt(matches[2]), Number.parseInt(matches[3])];
 }
 
-function compareVersions(a: Version, b: Version): number {
+/**
+ *
+ * @param {Version} a
+ * @param {Version} b
+ * @returns {number}
+ */
+function compareVersions(a, b) {
     if (a[0] !== b[0]) return a[0] - b[0];
     if (a[1] !== b[1]) return a[1] - b[1];
     return a[2] - b[2];
 }
 
-async function bumpVersion(packageJson: string, version: string): Promise<void> {
+/**
+ *
+ * @param {string} packageJson
+ * @param {string} version
+ * @returns {Promise<void>}
+ */
+async function bumpVersion(packageJson, version) {
     fs.readJSON(packageJson, "utf-8").then((json) => {
         json.version = version;
         return fs.writeJSON(packageJson, json, { encoding: "utf-8", spaces: 4 });
     });
 }
 
-async function collectSubpackages(): Promise<string[]> {
+/**
+ *
+ * @returns {Promise<string[]>}
+ */
+async function collectSubpackages() {
     const root = path.resolve("packages");
     return fs
         .readdir(root, "utf-8")
@@ -35,9 +75,9 @@ async function collectSubpackages(): Promise<string[]> {
         .then((items) =>
             items.map((item) =>
                 fs.stat(item).then(
-                    (stat) => [item, stat] as const,
+                    (stat) => [item, stat],
                     /* ignore stat errors */
-                    () => [item, undefined] as const
+                    () => [item, undefined]
                 )
             )
         )
@@ -46,7 +86,11 @@ async function collectSubpackages(): Promise<string[]> {
         .then((items) => items.map(([p]) => p));
 }
 
-async function main(): Promise<void> {
+/**
+ *
+ * @returns {Promise<void>}
+ */
+async function main() {
     const program = new Command();
 
     program
@@ -68,9 +112,10 @@ async function main(): Promise<void> {
         process.exit(1);
     }
 
-    const lastVersion = parseVersion(Config.version);
+    const config = await fs.readJSON("package.json");
+    const lastVersion = parseVersion(config.version);
     if (lastVersion && compareVersions(newVersion, lastVersion) <= 0) {
-        console.error(`Expected a version greater than ${Config.version} but got ${version}`);
+        console.error(`Expected a version greater than ${config.version} but got ${version}`);
         process.exit(1);
     }
 
@@ -112,7 +157,7 @@ async function main(): Promise<void> {
         await fs.writeFile(options.out, latest);
     }
 
-    changelog = changelog.substring(0, current) + `## ${version}` + changelog.substring(currentEnd);
+    changelog = changelog.substring(0, current) + `## main\n\n## ${version}` + changelog.substring(currentEnd);
     await fs.writeFile("CHANGELOG.md", changelog);
 }
 
