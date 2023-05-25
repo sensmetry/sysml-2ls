@@ -137,15 +137,19 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<ty
 
     let serverModule: string;
     if (serverConfig.path) {
-        serverModule = vscode.workspace.workspaceFolders?.at(0)
-            ? uriToFsPath(
-                  Utils.resolvePath(
-                      vscode.workspace.workspaceFolders.at(0)?.uri as URI,
-                      serverConfig.path
-                  ),
-                  true
-              )
-            : path.resolve(serverConfig.path);
+        if (path.isAbsolute(serverConfig.path)) {
+            serverModule = serverConfig.path;
+        } else {
+            serverModule = vscode.workspace.workspaceFolders?.at(0)
+                ? uriToFsPath(
+                      Utils.resolvePath(
+                          vscode.workspace.workspaceFolders.at(0)?.uri as URI,
+                          serverConfig.path
+                      ),
+                      true
+                  )
+                : path.resolve(serverConfig.path);
+        }
 
         console.info(
             `Running custom SysIDE at ${serverModule} with ${JSON.stringify(
