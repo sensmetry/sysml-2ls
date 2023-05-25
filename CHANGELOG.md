@@ -6,6 +6,10 @@
 
 ## main
 
+### Fixed
+
+- Fixed resolving custom SysIDE path on Windows when it was absolute
+
 ## 0.5.1
 
 ### Improvements
