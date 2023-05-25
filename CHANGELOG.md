@@ -6,6 +6,8 @@
 
 ## main
 
+## 0.5.2
+
 ### Fixed
 
 - Fixed resolving custom SysIDE path on Windows when it was absolute
