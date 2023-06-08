@@ -16,23 +16,15 @@
 
 import { PortConjugation } from "../../../generated/ast";
 import { ConjugationMeta } from "../../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { PortDefinitionMeta } from "../port-definition";
 
 @metamodelOf(PortConjugation)
 export class PortConjugationMeta<
     T extends PortDefinitionMeta = PortDefinitionMeta
 > extends ConjugationMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<PortConjugation>) {
-        super(id, parent);
-    }
-
     override ast(): PortConjugation | undefined {
         return this._ast as PortConjugation;
-    }
-
-    override parent(): ModelContainer<PortConjugation> {
-        return this._parent;
     }
 }
 

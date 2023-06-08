@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { StateDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ActionDefinitionMeta } from "./action-definition";
 
 @metamodelOf(StateDefinition, {
@@ -24,24 +24,8 @@ import { ActionDefinitionMeta } from "./action-definition";
 export class StateDefinitionMeta extends ActionDefinitionMeta {
     isParallel = false;
 
-    constructor(id: ElementID, parent: ModelContainer<StateDefinition>) {
-        super(id, parent);
-    }
-
-    override initialize(node: StateDefinition): void {
-        this.isParallel = node.isParallel;
-    }
-
     override ast(): StateDefinition | undefined {
         return this._ast as StateDefinition;
-    }
-
-    override parent(): ModelContainer<StateDefinition> {
-        return this._parent;
-    }
-
-    override reset(node: StateDefinition): void {
-        this.initialize(node);
     }
 }
 

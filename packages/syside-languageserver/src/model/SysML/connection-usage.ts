@@ -16,7 +16,7 @@
 
 import { Mixin } from "ts-mixer";
 import { ConnectionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectorAsUsageMeta } from "./connector-as-usage";
 import { PartUsageMeta } from "./part-usage";
 
@@ -25,16 +25,8 @@ import { PartUsageMeta } from "./part-usage";
     binary: "Connections::binaryConnections",
 })
 export class ConnectionUsageMeta extends Mixin(PartUsageMeta, ConnectorAsUsageMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ConnectionUsage>) {
-        super(id, parent);
-    }
-
     override ast(): ConnectionUsage | undefined {
         return this._ast as ConnectionUsage;
-    }
-
-    override parent(): ModelContainer<ConnectionUsage> {
-        return this._parent;
     }
 }
 

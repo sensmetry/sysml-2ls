@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { ForkNode } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ControlNodeMeta } from "./control-node";
 
 @metamodelOf(ForkNode, {
     subaction: "Actions::Action::forks",
 })
 export class ForkNodeMeta extends ControlNodeMeta {
-    constructor(id: ElementID, parent: ModelContainer<ForkNode>) {
-        super(id, parent);
-    }
-
     override ast(): ForkNode | undefined {
         return this._ast as ForkNode;
-    }
-
-    override parent(): ModelContainer<ForkNode> {
-        return this._parent;
     }
 }
 

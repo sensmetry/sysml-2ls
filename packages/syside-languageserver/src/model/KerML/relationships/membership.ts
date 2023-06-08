@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Membership } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ElementMeta, RelationshipMeta } from "../_internal";
 
 @metamodelOf(Membership)
 export class MembershipMeta<T extends ElementMeta = ElementMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Membership>) {
-        super(id, parent);
-    }
-
     override ast(): Membership | undefined {
         return this._ast as Membership;
-    }
-
-    override parent(): ModelContainer<Membership> {
-        return this._parent;
     }
 
     override get name(): string | undefined {

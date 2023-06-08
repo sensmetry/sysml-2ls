@@ -20,38 +20,37 @@ import {
     FeatureReferenceExpression,
     SysMLFunction,
 } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
-import { ExpressionMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../_internal";
+import { metamodelOf } from "../../metamodel";
+import { ElementParts, ExpressionMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(FeatureReferenceExpression)
 export class FeatureReferenceExpressionMeta extends ExpressionMeta {
-    expression?: MembershipMeta<FeatureMeta>;
+    private _expression?: MembershipMeta<FeatureMeta> | undefined;
 
-    constructor(id: ElementID, parent: ModelContainer<FeatureReferenceExpression>) {
-        super(id, parent);
+    get expression(): MembershipMeta<FeatureMeta> | undefined {
+        return this._expression;
     }
-
-    override initialize(node: FeatureReferenceExpression): void {
-        this.expression = node.expression.$meta as MembershipMeta<FeatureMeta>;
+    setExpression(value: MembershipMeta<FeatureMeta>): this {
+        this._expression = value;
+        return this;
     }
 
     override ast(): FeatureReferenceExpression | undefined {
         return this._ast as FeatureReferenceExpression;
     }
-
-    override parent(): ModelContainer<FeatureReferenceExpression> {
-        return this._parent;
-    }
-
     override returnType(): TypeMeta | string | undefined {
         const expr = this.expression?.element();
         if (!expr || !this.expression?.is(FeatureMembership)) return expr;
-        if (expr.isAny([Expression, SysMLFunction])) return expr.returnType();
+        if (expr.isAny(Expression, SysMLFunction)) return expr.returnType();
         return expr;
     }
 
     override isModelLevelEvaluable(): boolean {
         return true;
+    }
+
+    override textualParts(): ElementParts {
+        return { expression: this.expression ? [this.expression] : [] };
     }
 }
 

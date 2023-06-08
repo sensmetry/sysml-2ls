@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Subtype } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { SpecializationMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(Subtype)
 export class SubtypeMeta<T extends TypeMeta = TypeMeta> extends SpecializationMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Subtype>) {
-        super(id, parent);
-    }
-
     override ast(): Subtype | undefined {
         return this._ast as Subtype;
-    }
-
-    override parent(): ModelContainer<Subtype> {
-        return this._parent;
     }
 }
 

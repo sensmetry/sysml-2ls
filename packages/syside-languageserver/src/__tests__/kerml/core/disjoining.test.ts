@@ -38,7 +38,8 @@ test("disjoining can be parsed", async () => {
         doc /* No Person can be their own parent. */
     }`
     ).toParseKerML({
-        relationshipMembers: [
+        children: [
+            ...anything(5),
             {
                 element: {
                     $type: Disjoining,
@@ -59,7 +60,7 @@ test("disjoining can be parsed", async () => {
                     $type: Disjoining,
                     source: qualifiedTypeReference("Person::parents"),
                     reference: qualifiedTypeReference("Person::children"),
-                    annotations: [
+                    elements: [
                         {
                             element: {
                                 $type: Documentation,
@@ -81,7 +82,8 @@ test("disjoining may be omitted without identifiers", async () => {
     disjoint Mammal from Mineral;
     disjoint Person::parents from Person::children;`
     ).toParseKerML({
-        relationshipMembers: [
+        children: [
+            ...anything(5),
             {
                 element: {
                     $type: Disjoining,
@@ -117,14 +119,16 @@ test("types can declare owned disjoinings", async () => {
     class Mammal2 :> Animal disjoint from Mineral;
     `
     ).toParseKerML({
-        namespaceMembers: [
+        children: [
             ...anything(6),
             {
                 element: {
                     $type: Class,
                     ...withQualifiedName("C"),
-                    typeRelationships: [
+                    heritage: [
                         { $type: Subclassification, reference: qualifiedTypeReference("Anything") },
+                    ],
+                    typeRelationships: [
                         { $type: Disjoining, reference: qualifiedTypeReference("A") },
                         { $type: Disjoining, reference: qualifiedTypeReference("B") },
                     ],
@@ -135,8 +139,10 @@ test("types can declare owned disjoinings", async () => {
                 element: {
                     $type: Class,
                     ...withQualifiedName("Mammal2"),
-                    typeRelationships: [
+                    heritage: [
                         { $type: Subclassification, reference: qualifiedTypeReference("Animal") },
+                    ],
+                    typeRelationships: [
                         { $type: Disjoining, reference: qualifiedTypeReference("Mineral") },
                     ],
                 },

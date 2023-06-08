@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { Class } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { TypeClassifier } from "../enums";
+import { metamodelOf } from "../metamodel";
 import { ClassifierMeta } from "./_internal";
 
 export const ImplicitClasses = {
@@ -24,16 +25,10 @@ export const ImplicitClasses = {
 
 @metamodelOf(Class, ImplicitClasses)
 export class ClassMeta extends ClassifierMeta {
-    constructor(id: ElementID, parent: ModelContainer<Class>) {
-        super(id, parent);
-    }
+    protected override _classifier = TypeClassifier.Class;
 
     override ast(): Class | undefined {
         return this._ast as Class;
-    }
-
-    override parent(): ModelContainer<Class> {
-        return this._parent;
     }
 }
 

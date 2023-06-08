@@ -159,14 +159,14 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             // if using `chains` notation, two levels up will be the feature
             // owner, otherwise 2 levels up is a type relationship which will be
             // handled by the next statement
-            owner = owner.owner().owner();
+            owner = owner.owner()?.owner();
         }
 
         // also skip the first scoping node as references are always a part
         // of its declaration. However SysML adds more references that are
         // not used for scope resolution therefore we only skip if the
         // reference declares a specialization
-        if (owner?.isAny([Specialization, Conjugation])) {
+        if (owner?.isAny(Specialization, Conjugation)) {
             // TODO: not sure if this is right and specializations are
             // allowed to reference the declaring element but this fixes a
             // linking error in
@@ -176,7 +176,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             }
 
             const parent = owner.parent();
-            if (parent.parent()?.is(ParameterMembership)) {
+            if (parent?.parent()?.is(ParameterMembership)) {
                 const outer = parent.owner();
                 if (outer?.is(InvocationExpression) && (parent as FeatureMeta).value)
                     // resolution of type relationships in an invocation
@@ -191,7 +191,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             // source == parent if this relationship is a part of declaration,
             // in that case skip the owner since specialization itself makes no
             // sense
-            owner = owner.source() === parent ? parent.owner() : parent;
+            owner = owner.source() === parent ? parent?.owner() : parent;
 
             if (options.skip?.parent()?.is(EndFeatureMembership)) {
                 // connector ends cannot reference connector scope
@@ -261,7 +261,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
     protected getElementTarget(node: Metamodel): ElementMeta | undefined | "error" {
         if (node.is(ElementReference)) {
             return node.to.target ?? "error";
-        } else if (node.isAny([InlineExpression, Expression, SysMLFunction])) {
+        } else if (node.isAny(InlineExpression, Expression, SysMLFunction)) {
             const target = node.returnType();
             return this.indexManager.findType(target) ?? "error";
         }

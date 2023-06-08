@@ -16,23 +16,15 @@
 
 import { ActorMembership } from "../../../generated/ast";
 import { ParameterMembershipMeta } from "../../KerML/relationships/parameter-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { PartUsageMeta } from "../part-usage";
 
 @metamodelOf(ActorMembership)
 export class ActorMembershipMeta<
     T extends PartUsageMeta = PartUsageMeta
 > extends ParameterMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ActorMembership>) {
-        super(id, parent);
-    }
-
     override ast(): ActorMembership | undefined {
         return this._ast as ActorMembership;
-    }
-
-    override parent(): ModelContainer<ActorMembership> {
-        return this._parent;
     }
 }
 

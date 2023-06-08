@@ -158,7 +158,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         if (description !== undefined) return description ?? undefined;
 
         let parts = qualifiedName.split("::").map((name) => sanitizeName(name));
-        let children: Map<string, NamedChild> | undefined;
+        let owner: ElementMeta | undefined;
         const root = parts[0];
         parts = parts.slice(1);
         let candidate = cache.get(root)?.node;
@@ -174,12 +174,12 @@ export class SysMLIndexManager extends DefaultIndexManager {
         }
 
         if (isElement(candidate)) {
-            children = candidate.$meta.children;
+            owner = candidate.$meta;
         }
 
         // traverse the name chain
         for (const part of parts) {
-            const child: NamedChild | undefined = children?.get(part);
+            const child: NamedChild | undefined = owner?.findMember(part);
             if (typeof child === "string" || !child) continue;
 
             let element: ElementMeta | undefined;
@@ -187,7 +187,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
             else element = child.element()?.element();
             description = element?.description;
             if (!description || !description.node) break;
-            children = description.node.$meta.children;
+            owner = description.node.$meta;
         }
 
         // cache the found element

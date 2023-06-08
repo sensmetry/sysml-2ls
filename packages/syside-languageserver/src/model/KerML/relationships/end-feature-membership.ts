@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { EndFeatureMembership } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMembershipMeta, FeatureMeta } from "../_internal";
 
 @metamodelOf(EndFeatureMembership)
 export class EndFeatureMembershipMeta<
     T extends FeatureMeta = FeatureMeta
 > extends FeatureMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<EndFeatureMembership>) {
-        super(id, parent);
-    }
-
     override ast(): EndFeatureMembership | undefined {
         return this._ast as EndFeatureMembership;
-    }
-
-    override parent(): ModelContainer<EndFeatureMembership> {
-        return this._parent;
     }
 }
 

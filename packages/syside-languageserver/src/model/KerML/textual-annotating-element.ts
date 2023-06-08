@@ -15,8 +15,7 @@
  ********************************************************************************/
 
 import { TextualAnnotatingElement } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { prettyAnnotationBody } from "../util";
+import { metamodelOf } from "../metamodel";
 import { AnnotatingElementMeta } from "./_internal";
 
 @metamodelOf(TextualAnnotatingElement, "abstract")
@@ -26,25 +25,8 @@ export abstract class TextualAnnotatingMeta extends AnnotatingElementMeta {
      */
     body = "";
 
-    constructor(elementId: ElementID, parent: ModelContainer<TextualAnnotatingElement>) {
-        super(elementId, parent);
-    }
-
-    override initialize(node: TextualAnnotatingElement): void {
-        // Body may fail to parse and be left undefined so check here
-        if (node.body as string | undefined) this.body = prettyAnnotationBody(node.body);
-    }
-
     override ast(): TextualAnnotatingElement | undefined {
         return this._ast as TextualAnnotatingElement;
-    }
-
-    override parent(): ModelContainer<TextualAnnotatingElement> {
-        return this._parent;
-    }
-
-    protected collectChildren(_node: TextualAnnotatingElement): void {
-        /* empty */
     }
 }
 

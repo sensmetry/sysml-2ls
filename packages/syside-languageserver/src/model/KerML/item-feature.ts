@@ -16,7 +16,7 @@
 
 import { ItemFeature, Redefinition } from "../../generated/ast";
 import { SysMLType } from "../../services/sysml-ast-reflection";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { FeatureMeta } from "./_internal";
 
 export const ItemFeatureImplicits = {
@@ -25,18 +25,9 @@ export const ItemFeatureImplicits = {
 
 @metamodelOf(ItemFeature, ItemFeatureImplicits)
 export class ItemFeatureMeta extends FeatureMeta {
-    constructor(id: ElementID, parent: ModelContainer<ItemFeature>) {
-        super(id, parent);
-    }
-
     override ast(): ItemFeature | undefined {
         return this._ast as ItemFeature;
     }
-
-    override parent(): ModelContainer<ItemFeature> {
-        return this._parent;
-    }
-
     override defaultSupertype(): string {
         return "payload";
     }

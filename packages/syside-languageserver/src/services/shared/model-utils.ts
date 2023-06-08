@@ -14,8 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Feature } from "../../generated/ast";
-import { ElementID, FeatureChainingMeta, FeatureMeta, ParentModel } from "../../model";
+import { ElementID, FeatureChainingMeta, FeatureMeta } from "../../model";
 
 class ElementIdProvider {
     private count = 0;
@@ -50,9 +49,9 @@ export class ModelUtil {
      * @returns {@link chained}
      */
     addChainingFeature(chained: FeatureMeta, chaining: FeatureMeta): FeatureMeta {
-        const relationship = new FeatureChainingMeta(this.createId(), chained);
+        const relationship = new FeatureChainingMeta(this.createId());
         relationship.setElement(chaining);
-        chained.chainings.push(relationship);
+        chained.addFeatureRelationship(relationship);
         return chained;
     }
 
@@ -62,8 +61,8 @@ export class ModelUtil {
      * @param features chaining features
      * @returns
      */
-    chainFeatures(parent: ParentModel<Feature>, ...features: FeatureMeta[]): FeatureMeta {
-        const chained = new FeatureMeta(this.createId(), parent);
+    chainFeatures(...features: FeatureMeta[]): FeatureMeta {
+        const chained = new FeatureMeta(this.createId());
         for (const feature of features) {
             const chaining = feature.chainingFeatures;
             if (chaining.length === 0) this.addChainingFeature(chained, feature);

@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { parseKerML, withQualifiedName } from "../../../testing";
+import { anything, parseKerML, withQualifiedName } from "../../../testing";
 import { Feature } from "../../../generated/ast";
 
 test("feature chains allow qualified feature names in between chain parts", async () => {
@@ -29,7 +29,8 @@ test("feature chains allow qualified feature names in between chain parts", asyn
     feature c chains A::a.B::b;`);
 
     expect(result).toParseKerML({
-        members: [
+        children: [
+            ...anything(1),
             {
                 element: {
                     $type: Feature,

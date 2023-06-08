@@ -17,7 +17,7 @@
 import { LangiumDocument } from "langium";
 import { ElementReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { BasicMetamodel, ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { BasicMetamodel, metamodelOf } from "../../metamodel";
 import { ElementMeta } from "../_internal";
 
 @metamodelOf(ElementReference)
@@ -43,31 +43,12 @@ export class ElementReferenceMeta extends BasicMetamodel<ElementReference> {
      */
     document: LangiumDocument | undefined;
 
-    constructor(id: ElementID, parent: ModelContainer<ElementReference>) {
-        super(id, parent);
-    }
-
-    override initialize(node: ElementReference): void {
-        this.text = node.text ?? node.$cstNode?.text ?? "";
-        this.found.length = node.parts.length;
-    }
-
-    override parent(): ModelContainer<ElementReference> {
-        return this._parent;
-    }
-
-    override owner(): ElementMeta {
-        // references can never be entry elements and cannot be nested
+    override owner(): ElementMeta | undefined {
         return this._owner as ElementMeta;
     }
 
     override ast(): ElementReference | undefined {
         return this._ast as ElementReference;
-    }
-
-    override reset(_: ElementReference): void {
-        this.to.reset();
-        this.found.fill(undefined);
     }
 }
 

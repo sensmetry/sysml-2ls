@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { BindingConnector } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectorMeta } from "./_internal";
 
 export const ImplicitBindingConnectors = {
@@ -24,16 +24,8 @@ export const ImplicitBindingConnectors = {
 
 @metamodelOf(BindingConnector, ImplicitBindingConnectors)
 export class BindingConnectorMeta extends ConnectorMeta {
-    constructor(id: ElementID, parent: ModelContainer<BindingConnector>) {
-        super(id, parent);
-    }
-
     override ast(): BindingConnector | undefined {
         return this._ast as BindingConnector;
-    }
-
-    override parent(): ModelContainer<BindingConnector> {
-        return this._parent;
     }
 }
 

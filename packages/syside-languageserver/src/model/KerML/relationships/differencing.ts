@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Differencing } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RelationshipMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(Differencing)
 export class DifferencingMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Differencing>) {
-        super(id, parent);
-    }
-
     override ast(): Differencing | undefined {
         return this._ast as Differencing;
-    }
-
-    override parent(): ModelContainer<Differencing> {
-        return this._parent;
     }
 }
 

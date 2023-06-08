@@ -15,26 +15,22 @@
  ********************************************************************************/
 
 import { EnumerationDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { enumerable } from "../../utils";
+import { metamodelOf } from "../metamodel";
 import { AttributeDefinitionMeta } from "./attribute-definition";
 
 @metamodelOf(EnumerationDefinition)
 export class EnumerationDefinitionMeta extends AttributeDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<EnumerationDefinition>) {
-        super(id, parent);
+    @enumerable
+    override get isVariation(): boolean {
+        return true;
     }
-
-    override initialize(_node: EnumerationDefinition): void {
-        this.isVariation = true;
-        this.isAbstract = true;
+    override set isVariation(value) {
+        // empty
     }
 
     override ast(): EnumerationDefinition | undefined {
         return this._ast as EnumerationDefinition;
-    }
-
-    override parent(): ModelContainer<EnumerationDefinition> {
-        return this._parent;
     }
 }
 

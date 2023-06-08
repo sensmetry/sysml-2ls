@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { ConnectionDefinition } from "../../generated/ast";
 import { AssociationStructMeta } from "../KerML/association-structure";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { PartDefinitionMeta } from "./part-definition";
 
 @metamodelOf(ConnectionDefinition, {
@@ -25,20 +25,12 @@ import { PartDefinitionMeta } from "./part-definition";
     binary: "Connections::BinaryConnection",
 })
 export class ConnectionDefinitionMeta extends Mixin(PartDefinitionMeta, AssociationStructMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ConnectionDefinition>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isBinary() ? "binary" : "base";
     }
 
     override ast(): ConnectionDefinition | undefined {
         return this._ast as ConnectionDefinition;
-    }
-
-    override parent(): ModelContainer<ConnectionDefinition> {
-        return this._parent;
     }
 }
 

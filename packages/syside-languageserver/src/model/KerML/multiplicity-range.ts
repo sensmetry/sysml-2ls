@@ -15,8 +15,9 @@
  ********************************************************************************/
 
 import { MultiplicityRange } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { ExpressionMeta, MultiplicityMeta, OwningMembershipMeta } from "./_internal";
+import { enumerable, LazyGetter } from "../../utils";
+import { metamodelOf } from "../metamodel";
+import { ElementParts, ExpressionMeta, MultiplicityMeta, OwningMembershipMeta } from "./_internal";
 
 export const ImplicitMultiplicityRanges = {
     feature: "Base::naturals",
@@ -30,24 +31,33 @@ export interface Bounds {
 
 @metamodelOf(MultiplicityRange, ImplicitMultiplicityRanges)
 export class MultiplicityRangeMeta extends MultiplicityMeta {
-    range?: OwningMembershipMeta<ExpressionMeta>;
+    protected _bounds: Bounds | undefined | LazyGetter<Bounds | undefined> | "unset" = "unset";
 
-    bounds: Bounds | undefined = undefined;
-
-    constructor(id: ElementID, parent: ModelContainer<MultiplicityRange>) {
-        super(id, parent);
+    protected _range: OwningMembershipMeta<ExpressionMeta> | undefined;
+    get range(): OwningMembershipMeta<ExpressionMeta> | undefined {
+        return this._range;
+    }
+    setRange(value: OwningMembershipMeta<ExpressionMeta>): this {
+        this._range = value;
+        return this;
     }
 
-    override initialize(node: MultiplicityRange): void {
-        this.range = node.range?.$meta as OwningMembershipMeta<ExpressionMeta>;
+    @enumerable
+    get bounds(): Bounds | undefined {
+        if (typeof this._bounds === "function") return (this._bounds = this._bounds());
+        return this._bounds === "unset" ? undefined : this._bounds;
+    }
+    setBounds(value: Bounds | undefined | LazyGetter<Bounds | undefined>): this {
+        this._bounds = value;
+        return this;
     }
 
     override ast(): MultiplicityRange | undefined {
         return this._ast as MultiplicityRange;
     }
 
-    override parent(): ModelContainer<MultiplicityRange> {
-        return this._parent;
+    override textualParts(): ElementParts {
+        return { range: this._range ? [this._range] : [], children: this.children };
     }
 }
 

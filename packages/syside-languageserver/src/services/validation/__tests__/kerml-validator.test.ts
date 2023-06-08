@@ -86,6 +86,24 @@ describe("Element filter memberships", () => {
             /Invalid filter expression, must return boolean/
         );
     });
+
+    test("boolean filters don't trigger validation", async () => {
+        return expectValidations(
+            `
+            package ScalarValues {
+                datatype Boolean;
+            }
+            package BaseFunctions {
+                abstract function '@'{ 
+                    return : ScalarValues::Boolean[1];
+                }
+            }
+            import a::*[@Safety];`,
+            /Invalid filter expression, must return boolean/,
+            0,
+            { ...BUILD_OPTIONS, standardLibrary: "local" }
+        );
+    });
 });
 
 describe("Standard library package validation", () => {

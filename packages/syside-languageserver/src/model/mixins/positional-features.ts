@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { stream } from "langium";
-import { ElementMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
+import { FeatureMeta, MembershipMeta, NamespaceMeta, TypeMeta } from "../KerML/_internal";
 
 export class PositionalFeaturesBase {
     private _owned: FeatureMeta[] | undefined = undefined;
@@ -24,9 +24,9 @@ export class PositionalFeaturesBase {
     /**
      * @returns directly owned features
      */
-    owned(self: ElementMeta, filter: (f: MembershipMeta<FeatureMeta>) => boolean): FeatureMeta[] {
+    owned(self: NamespaceMeta, filter: (f: MembershipMeta<FeatureMeta>) => boolean): FeatureMeta[] {
         if (this._owned === undefined) {
-            this._owned = stream(self.features)
+            this._owned = stream(self.featureMembers())
                 .filter(filter)
                 .map((m) => m.element())
                 .nonNullable()

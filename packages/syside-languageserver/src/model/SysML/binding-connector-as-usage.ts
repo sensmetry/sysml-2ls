@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { BindingConnectorAsUsage } from "../../generated/ast";
 import { BindingConnectorMeta } from "../KerML/binding-connector";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectorAsUsageMeta } from "./connector-as-usage";
 
 @metamodelOf(BindingConnectorAsUsage, {
@@ -25,16 +25,8 @@ import { ConnectorAsUsageMeta } from "./connector-as-usage";
     binary: "Links::selfLinks",
 })
 export class BindingConnectorAsUsageMeta extends Mixin(ConnectorAsUsageMeta, BindingConnectorMeta) {
-    constructor(id: ElementID, parent: ModelContainer<BindingConnectorAsUsage>) {
-        super(id, parent);
-    }
-
     override ast(): BindingConnectorAsUsage | undefined {
         return this._ast as BindingConnectorAsUsage;
-    }
-
-    override parent(): ModelContainer<BindingConnectorAsUsage> {
-        return this._parent;
     }
 }
 

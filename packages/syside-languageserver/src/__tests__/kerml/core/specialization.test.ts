@@ -33,7 +33,8 @@ test("specialization can be parsed", async () => {
         doc /* unnamed */
     }`
     ).toParseKerML({
-        relationshipMembers: [
+        children: [
+            ...anything(4),
             {
                 element: {
                     $type: Specialization,
@@ -46,7 +47,7 @@ test("specialization can be parsed", async () => {
                     $type: Specialization,
                     source: qualifiedTypeReference("x"),
                     reference: qualifiedTypeReference("things"),
-                    annotations: [
+                    elements: [
                         {
                             element: {
                                 $type: Documentation,
@@ -66,13 +67,13 @@ test("types can specialize multiple types", async () => {
             `
     class C specializes A, B;`
     ).toParseKerML({
-        namespaceMembers: [
+        children: [
             ...anything(2),
             {
                 element: {
                     $type: Class,
                     ...withQualifiedName("C"),
-                    typeRelationships: [
+                    heritage: [
                         { reference: qualifiedTypeReference("A") },
                         { reference: qualifiedTypeReference("B") },
                     ],

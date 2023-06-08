@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Subsetting } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta, SpecializationMeta } from "../_internal";
 
 @metamodelOf(Subsetting)
 export class SubsettingMeta<T extends FeatureMeta = FeatureMeta> extends SpecializationMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Subsetting>) {
-        super(id, parent);
-    }
-
     override ast(): Subsetting | undefined {
         return this._ast as Subsetting;
-    }
-
-    override parent(): ModelContainer<Subsetting> {
-        return this._parent;
     }
 }
 

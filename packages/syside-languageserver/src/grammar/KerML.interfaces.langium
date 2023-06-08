@@ -52,18 +52,11 @@ interface TextualRepresentation extends TextualAnnotatingElement {
 interface Element {
     declaredName?: string;
     declaredShortName?: string;
-    prefixes: OwningMembership[];
 }
 
 interface Namespace extends Element {
-    imports: Import[];
-    aliases: Membership[];
-    annotatingMembers: OwningMembership[];
-    relationshipMembers: OwningMembership[];
-    namespaceMembers: OwningMembership[];
-    filters: ElementFilterMembership[];
-// remaining members (features)
-    members: Membership[];
+    prefixes: OwningMembership[];
+    children: (Import | Membership)[];
 }
 
 type TypeRelationship =
@@ -71,9 +64,6 @@ type TypeRelationship =
     | Differencing
     | Disjoining
     | Intersecting
-    | Specialization
-    | Conjugation
-    | Subclassification
 ;
 
 type FeatureRelationship =
@@ -81,18 +71,12 @@ type FeatureRelationship =
     | FeatureChaining
     | FeatureInverting
     | TypeFeaturing
-    | FeatureTyping
-    | Subsetting
-    | ReferenceSubsetting
-    | Redefinition
 ;
 
 interface Type extends Namespace {
     isSufficient: boolean;
     isAbstract?: 'abstract';
-
-// can't override in base interfaces so have to use union of all possible
-// variants
+    heritage: Inheritance[];
     typeRelationships: (TypeRelationship | FeatureRelationship)[];
     multiplicity?: OwningMembership;
 }
@@ -141,6 +125,7 @@ interface ItemFeature extends Feature {}
 interface Step extends Feature {}
 
 interface Connector extends Feature, Relationship {
+    ends: EndFeatureMembership[];
 }
 interface ItemFlowEnd extends Feature {}
 
@@ -151,7 +136,9 @@ interface Expression extends Step {
     result?: ResultExpressionMembership;
 }
 
-interface ItemFlow extends Connector, Step {}
+interface ItemFlow extends Connector, Step {
+    item?: FeatureMembership;
+}
 interface SuccessionItemFlow extends ItemFlow, Succession {}
 interface BooleanExpression extends Expression {}
 
@@ -169,16 +156,20 @@ interface LibraryPackage extends Package {
 
 interface Relationship extends Element {
     visibility?: VisibilityKind;
-    annotations: Annotation[];
-    elements: (Namespace | Relationship | Feature)[];
-    chains: Feature[];
+    elements: (Namespace | Relationship | Feature | Annotation)[];
 // edge source
     source?: ElementReference;
+    sourceChain?: Feature;
 
 // edge targets
     element?: Element;
     reference?: ElementReference;
+    targetChain?: Feature;
 }
+
+// non-standard relationship type so that conjugation and specialization have
+// common base type as both are INHERITING relationships
+interface Inheritance extends Relationship {}
 
 interface Unioning extends Relationship {
 }
@@ -188,7 +179,7 @@ interface Intersecting extends Relationship {
 }
 interface FeatureChaining extends Relationship {
 }
-interface Specialization extends Relationship {
+interface Specialization extends Inheritance {
 }
 interface Disjoining extends Relationship {
 }
@@ -204,7 +195,7 @@ interface Subsetting extends Specialization {
 }
 interface Subtype extends Specialization {}
 
-interface Conjugation extends Relationship {
+interface Conjugation extends Inheritance {
 }
 
 interface Redefinition extends Subsetting {
@@ -213,6 +204,7 @@ interface ReferenceSubsetting extends Subsetting {
 }
 
 interface Dependency extends Relationship {
+    prefixes: Annotation[];
     client: ElementReference[];
     supplier: ElementReference[];
 }

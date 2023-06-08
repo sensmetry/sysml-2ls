@@ -16,7 +16,7 @@
 
 import { StateSubactionKind, StateSubactionMembership } from "../../../generated/ast";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ActionUsageMeta } from "../action-usage";
 
 @metamodelOf(StateSubactionMembership)
@@ -25,20 +25,8 @@ export class StateSubactionMembershipMeta<
 > extends FeatureMembershipMeta<T> {
     kind: StateSubactionKind = "entry";
 
-    constructor(id: ElementID, parent: ModelContainer<StateSubactionMembership>) {
-        super(id, parent);
-    }
-
-    override initialize(node: StateSubactionMembership): void {
-        this.kind = node.kind;
-    }
-
     override ast(): StateSubactionMembership | undefined {
         return this._ast as StateSubactionMembership;
-    }
-
-    override parent(): ModelContainer<StateSubactionMembership> {
-        return this._parent;
     }
 }
 

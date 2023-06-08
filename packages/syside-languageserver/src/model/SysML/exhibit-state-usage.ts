@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { ExhibitStateUsage, ReferenceSubsetting } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { PerformActionUsageMeta } from "./perform-action-usage";
 import { StateUsageMeta } from "./state-usage";
 
@@ -25,10 +25,6 @@ import { StateUsageMeta } from "./state-usage";
     performedAction: "Parts::Part::exhibitedStates",
 })
 export class ExhibitStateUsageMeta extends Mixin(StateUsageMeta, PerformActionUsageMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ExhibitStateUsage>) {
-        super(id, parent);
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");
@@ -38,11 +34,6 @@ export class ExhibitStateUsageMeta extends Mixin(StateUsageMeta, PerformActionUs
     override ast(): ExhibitStateUsage | undefined {
         return this._ast as ExhibitStateUsage;
     }
-
-    override parent(): ModelContainer<ExhibitStateUsage> {
-        return this._parent;
-    }
-
     override namingFeature(): FeatureMeta | undefined {
         return this.types(ReferenceSubsetting).head() as FeatureMeta | undefined;
     }

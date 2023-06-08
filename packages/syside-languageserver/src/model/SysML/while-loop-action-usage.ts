@@ -15,7 +15,16 @@
  ********************************************************************************/
 
 import { WhileLoopActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { NonNullable, enumerable } from "../../utils";
+import {
+    ElementParts,
+    ExpressionMeta,
+    FeatureMeta,
+    MembershipMeta,
+    ParameterMembershipMeta,
+} from "../KerML";
+import { metamodelOf } from "../metamodel";
+import { ActionUsageMeta } from "./action-usage";
 import { LoopActionUsageMeta } from "./loop-action-usage";
 
 @metamodelOf(WhileLoopActionUsage, {
@@ -23,16 +32,57 @@ import { LoopActionUsageMeta } from "./loop-action-usage";
     subaction: "Actions::Action::whileLoops",
 })
 export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<WhileLoopActionUsage>) {
-        super(id, parent);
+    private _condition?: ParameterMembershipMeta<ExpressionMeta> | undefined;
+    private _body?: ParameterMembershipMeta<ActionUsageMeta> | undefined;
+    private _until?: ParameterMembershipMeta<ExpressionMeta> | undefined;
+
+    @enumerable
+    public get condition(): ParameterMembershipMeta<ExpressionMeta> | undefined {
+        return this._condition;
+    }
+    public set condition(value: ParameterMembershipMeta<ExpressionMeta> | undefined) {
+        this._condition = value;
+    }
+
+    @enumerable
+    public get body(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
+        return this._body;
+    }
+    public set body(value: ParameterMembershipMeta<ActionUsageMeta>) {
+        this._body = value;
+    }
+
+    @enumerable
+    public get until(): ParameterMembershipMeta<ExpressionMeta> | undefined {
+        return this._until;
+    }
+    public set until(value: ParameterMembershipMeta<ExpressionMeta> | undefined) {
+        this._until = value;
     }
 
     override ast(): WhileLoopActionUsage | undefined {
         return this._ast as WhileLoopActionUsage;
     }
 
-    override parent(): ModelContainer<WhileLoopActionUsage> {
-        return this._parent;
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = super.featureMembers();
+        return (
+            [this.condition, this.body, this.until] as (MembershipMeta<FeatureMeta> | undefined)[]
+        )
+            .filter(NonNullable)
+            .concat(baseFeatures);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = { prefixes: this.prefixes };
+        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
+        parts.heritage = this.heritage;
+
+        if (this.condition) parts.condition = [this.condition];
+        if (this.body) parts.body = [this.body];
+        if (this.until) parts.until = [this.until];
+
+        return parts;
     }
 }
 

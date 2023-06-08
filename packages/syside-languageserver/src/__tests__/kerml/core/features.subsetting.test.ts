@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { withQualifiedName, qualifiedTypeReference } from "../../../testing";
+import { withQualifiedName, qualifiedTypeReference, anything } from "../../../testing";
 import { Subsetting } from "../../../generated/ast";
 
 test.concurrent.each(["subsets", ":>"])(
@@ -27,14 +27,15 @@ test.concurrent.each(["subsets", ":>"])(
             doc /* doc */
         }
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: Subsetting,
                         ...withQualifiedName("Sub"),
                         source: qualifiedTypeReference("parent"),
                         reference: qualifiedTypeReference("person"),
-                        annotations: [
+                        elements: [
                             {
                                 element: {
                                     body: "/* doc */",
@@ -56,7 +57,8 @@ test.concurrent.each(["specialization", ""])(
         feature person;
         ${prefix} subset parent :> person;
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: Subsetting,

@@ -40,6 +40,7 @@ test("all AST nodes have a factory function", async () => {
   "Expose",
   "Featuring",
   "Import",
+  "Inheritance",
   "Relationship",
   "TextualAnnotatingElement",
 ]

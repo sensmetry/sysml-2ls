@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LiteralString } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { LiteralExpressionMeta } from "../_internal";
 
 export const ImplicitLiteralStrings = {
@@ -28,20 +28,8 @@ export const ImplicitLiteralStrings = {
 export class LiteralStringMeta extends LiteralExpressionMeta {
     literal = "";
 
-    constructor(id: ElementID, parent: ModelContainer<LiteralString>) {
-        super(id, parent);
-    }
-
-    override initialize(node: LiteralString): void {
-        this.literal = node.literal.slice(1, node.literal.length - 1);
-    }
-
     override ast(): LiteralString | undefined {
         return this._ast as LiteralString;
-    }
-
-    override parent(): ModelContainer<LiteralString> {
-        return this._parent;
     }
 
     override returnType(): string {

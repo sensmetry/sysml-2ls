@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { InterfaceUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectionUsageMeta } from "./connection-usage";
 
 @metamodelOf(InterfaceUsage, {
@@ -23,16 +23,8 @@ import { ConnectionUsageMeta } from "./connection-usage";
     binary: "Interfaces::binaryInterfaces",
 })
 export class InterfaceUsageMeta extends ConnectionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<InterfaceUsage>) {
-        super(id, parent);
-    }
-
     override ast(): InterfaceUsage | undefined {
         return this._ast as InterfaceUsage;
-    }
-
-    override parent(): ModelContainer<InterfaceUsage> {
-        return this._parent;
     }
 }
 

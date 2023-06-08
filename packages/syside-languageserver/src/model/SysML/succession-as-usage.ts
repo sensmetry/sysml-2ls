@@ -30,7 +30,7 @@ import {
 } from "../../generated/ast";
 import { FeatureMembershipMeta, FeatureMeta, MembershipMeta } from "../KerML";
 import { SuccessionMeta } from "../KerML/succession";
-import { metamodelOf, ElementID, ModelContainer, Metamodel } from "../metamodel";
+import { metamodelOf, Metamodel } from "../metamodel";
 import { ConnectorAsUsageMeta } from "./connector-as-usage";
 
 @metamodelOf(SuccessionAsUsage, {
@@ -38,26 +38,19 @@ import { ConnectorAsUsageMeta } from "./connector-as-usage";
     binary: "Occurrences::happensBeforeLinks",
 })
 export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, SuccessionMeta) {
-    constructor(id: ElementID, parent: ModelContainer<SuccessionAsUsage>) {
-        super(id, parent);
-    }
-
     override ast(): SuccessionAsUsage | undefined {
         return this._ast as SuccessionAsUsage;
     }
-
-    override parent(): ModelContainer<SuccessionAsUsage> {
-        return this._parent;
-    }
-
     targetFeature(): FeatureMembershipMeta | undefined {
         const owner = this.owner();
-        if (!owner.is(Type)) return;
+        if (!owner?.is(Type)) return;
 
         const parent = this.parent();
-        const index = owner.features.findIndex((m) => m === parent);
-        if (index >= owner.features.length) return;
-        return stream(owner.features.slice(index + 1))
+
+        const features = owner.featureMembers();
+        const index = features.findIndex((m) => m === parent);
+        if (index >= features.length) return;
+        return stream(features.slice(index + 1))
             .filter((m) => m.is(FeatureMembership))
             .head() as FeatureMembershipMeta | undefined;
     }
@@ -67,12 +60,13 @@ export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Successio
         linker?: (model: Metamodel) => void
     ): MembershipMeta<FeatureMeta> | undefined {
         const owner = feature.owner();
-        if (!owner.is(Type)) return;
+        if (!owner?.is(Type)) return;
 
         const parent = feature.parent();
-        let index = owner.features.findIndex((m) => m === parent);
+        const features = owner.featureMembers();
+        let index = features.findIndex((m) => m === parent);
         while (--index >= 0) {
-            const membership = owner.features[index];
+            const membership = features[index];
             if (membership.is(TransitionFeatureMembership)) continue;
 
             linker?.call(undefined, membership);
@@ -82,7 +76,7 @@ export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Successio
                 !element.isParameter &&
                 !element.is(TransitionUsage) &&
                 (!element.is(Connector) ||
-                    (!owner.isAny([ActionDefinition, ActionUsage]) && element.is(ItemFlow)))
+                    (!owner.isAny(ActionDefinition, ActionUsage) && element.is(ItemFlow)))
             )
                 return membership;
         }

@@ -15,30 +15,33 @@
  ********************************************************************************/
 
 import { Definition, Usage } from "../../generated/ast";
+import { enumerable } from "../../utils";
 import { ClassifierMeta } from "../KerML/classifier";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 
 @metamodelOf(Definition)
 export class DefinitionMeta extends ClassifierMeta {
-    isVariation = false;
+    protected _isVariation = false;
     isIndividual = false;
 
-    constructor(id: ElementID, parent: ModelContainer<Definition>) {
-        super(id, parent);
+    @enumerable
+    override get isAbstract(): boolean {
+        return this._isAbstract || this.isVariation;
+    }
+    override set isAbstract(value) {
+        this._isAbstract = value;
     }
 
-    override initialize(node: Definition): void {
-        this.isIndividual = node.isIndividual;
-        this.isVariation = node.isVariation;
-        this.isAbstract ||= this.isVariation;
+    @enumerable
+    get isVariation(): boolean {
+        return this._isVariation;
+    }
+    set isVariation(value) {
+        this._isVariation = value;
     }
 
     override ast(): Definition | undefined {
         return this._ast as Definition;
-    }
-
-    override parent(): ModelContainer<Definition> {
-        return this._parent;
     }
 
     getSubjectParameter(): Usage | undefined {

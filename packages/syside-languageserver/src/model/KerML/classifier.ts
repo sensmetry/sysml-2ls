@@ -14,17 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    Association,
-    Class,
-    Classifier,
-    DataType,
-    Structure,
-    Subclassification,
-} from "../../generated/ast";
+import { Classifier, Subclassification } from "../../generated/ast";
 import { SysMLType } from "../../services/sysml-ast-reflection";
-import { TypeClassifier } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { TypeMeta } from "./_internal";
 
 export const ImplicitClassifiers = {
@@ -33,37 +25,8 @@ export const ImplicitClassifiers = {
 
 @metamodelOf(Classifier, ImplicitClassifiers)
 export class ClassifierMeta extends TypeMeta {
-    constructor(elementId: ElementID, parent: ModelContainer<Classifier>) {
-        super(elementId, parent);
-    }
-
-    override initialize(_node: Classifier): void {
-        this.setupClassifiers();
-    }
-
-    protected setupClassifiers(): void {
-        // if multiple of these can be true at once it means that the grammar is
-        // incorrect
-        if (this.is(Structure)) {
-            this.classifier = TypeClassifier.Structure | TypeClassifier.Class;
-            if (this.is(Association)) {
-                this.classifier |= TypeClassifier.Association;
-            }
-        } else if (this.is(Class)) {
-            this.classifier = TypeClassifier.Class;
-        } else if (this.is(DataType)) {
-            this.classifier = TypeClassifier.DataType;
-        } else if (this.is(Association)) {
-            this.classifier = TypeClassifier.Association;
-        }
-    }
-
     override ast(): Classifier | undefined {
         return this._ast as Classifier;
-    }
-
-    override parent(): ModelContainer<Classifier> {
-        return this._parent;
     }
 
     override specializationKind(): SysMLType {

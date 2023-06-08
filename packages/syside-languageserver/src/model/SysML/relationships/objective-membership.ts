@@ -16,23 +16,15 @@
 
 import { ObjectiveMembership } from "../../../generated/ast";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(ObjectiveMembership)
 export class ObjectiveMembershipMeta<
     T extends RequirementUsageMeta = RequirementUsageMeta
 > extends FeatureMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ObjectiveMembership>) {
-        super(id, parent);
-    }
-
     override ast(): ObjectiveMembership | undefined {
         return this._ast as ObjectiveMembership;
-    }
-
-    override parent(): ModelContainer<ObjectiveMembership> {
-        return this._parent;
     }
 }
 

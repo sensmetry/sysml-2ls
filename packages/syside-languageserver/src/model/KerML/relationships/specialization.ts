@@ -15,21 +15,14 @@
  ********************************************************************************/
 
 import { Specialization } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
-import { RelationshipMeta, TypeMeta } from "../_internal";
+import { metamodelOf } from "../../metamodel";
+import { TypeMeta } from "../_internal";
+import { InheritanceMeta } from "./inheritance";
 
 @metamodelOf(Specialization)
-export class SpecializationMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Specialization>) {
-        super(id, parent);
-    }
-
+export class SpecializationMeta<T extends TypeMeta = TypeMeta> extends InheritanceMeta<T> {
     override ast(): Specialization | undefined {
         return this._ast as Specialization;
-    }
-
-    override parent(): ModelContainer<Specialization> {
-        return this._parent;
     }
 }
 

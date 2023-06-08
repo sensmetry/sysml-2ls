@@ -15,28 +15,19 @@
  ********************************************************************************/
 
 import { Stream, stream } from "langium";
-import {
-    Element,
-    Feature,
-    Membership,
-    MembershipImport,
-    MetadataFeature,
-} from "../../generated/ast";
+import { Element, Membership, MembershipImport } from "../../generated/ast";
 import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
-import { SysMLTypeList } from "../../services/sysml-ast-reflection";
-import { KeysMatching } from "../../utils/common";
-import { BasicMetamodel, ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { BasicMetamodel, metamodelOf } from "../metamodel";
 import { computeQualifiedName, Name } from "../naming";
 import {
     CommentMeta,
     DocumentationMeta,
-    FeatureMeta,
     MembershipMeta,
     MetadataFeatureMeta,
-    NamespaceMeta,
-    RelationshipMeta,
     MembershipImportMeta,
+    TextualRepresentationMeta,
 } from "./_internal";
+import { LazyGetter, enumerable } from "../../utils/common";
 
 /**
  * Types used in named children cache
@@ -46,85 +37,199 @@ import {
  */
 export type NamedChild = MembershipMeta | MembershipImportMeta | "unresolved reference" | "shadow";
 
+export type ElementParts = Record<string, readonly ElementMeta[]>;
+
 export function namedMembership(
     member: MembershipMeta | MembershipImportMeta
 ): MembershipMeta | undefined {
     return member.is(MembershipImport) ? member.element() : member;
 }
 
+export type LazyMetaclass = LazyGetter<MetadataFeatureMeta | undefined>;
+
 @metamodelOf(Element, "abstract")
 export abstract class ElementMeta extends BasicMetamodel<Element> {
-    members: MembershipMeta[] = [];
+    protected _comments: CommentMeta[] = [];
+    protected _metadata: MetadataFeatureMeta[] = [];
+    protected _docs: DocumentationMeta[] = [];
+    protected _reps: TextualRepresentationMeta[] = [];
 
-    /**
-     * Namespace members
-     */
-    elements: MembershipMeta<NamespaceMeta>[] = [];
+    protected _declaredName?: string;
+    protected readonly _name = new Name();
+    protected _declaredShortName?: string;
+    protected readonly _shortName = new Name();
+    protected _qualifiedName = "";
+    protected _description?: SysMLNodeDescription;
 
-    /**
-     * Relationship members
-     */
-    relationships: MembershipMeta<RelationshipMeta>[] = [];
-
-    /**
-     * Feature members
-     */
-    features: MembershipMeta<FeatureMeta>[] = [];
+    // TODO: move to namespace
+    protected readonly _memberLookup = new Map<string, NamedChild>();
+    protected _metaclass: MetadataFeatureMeta | undefined | LazyMetaclass | "unset" = "unset";
 
     /**
      * Comments about this element
      */
-    comments: CommentMeta[] = [];
-
-    /**
-     * Metadata about this element
-     */
-    metadata: MetadataFeatureMeta[] = [];
+    get comments(): readonly CommentMeta[] {
+        return this._comments;
+    }
+    addComment(...comment: CommentMeta[]): this {
+        this._comments.push(...comment);
+        return this;
+    }
 
     /**
      * Documentation about this element
      */
-    docs: DocumentationMeta[] = [];
+    get documentation(): readonly DocumentationMeta[] {
+        return this._docs;
+    }
+    addDocumentation(...comment: DocumentationMeta[]): this {
+        this._docs.push(...comment);
+        return this;
+    }
 
     /**
-     * Regular name of this element
+     * Metadata about this element
      */
-    private readonly _name = new Name();
-    private readonly _shortName = new Name();
+    get metadata(): Stream<MetadataFeatureMeta> {
+        return stream(this._metadata);
+    }
+    addMetadata(...meta: MetadataFeatureMeta[]): this {
+        this._metadata.push(...meta);
+        return this;
+    }
+
+    /**
+     * Textual representations about this element
+     */
+    get textualRepresentation(): readonly TextualRepresentationMeta[] {
+        return this._reps;
+    }
+    addTextualRepresentation(...rep: TextualRepresentationMeta[]): this {
+        this._reps.push(...rep);
+        return this;
+    }
+
+    /**
+     * Name to be used in reference resolution
+     */
+    @enumerable
+    get name(): string | undefined {
+        return this._name.sanitized;
+    }
+
+    /**
+     * Name as parsed
+     */
+    get rawName(): string | undefined {
+        return this._name.declared;
+    }
+
+    /**
+     * Name as it appeared in the source file
+     */
+    @enumerable
+    get declaredName(): string | undefined {
+        return this._declaredName;
+    }
+    set declaredName(value) {
+        if (value === this._declaredName) return;
+        this._declaredName = value;
+        this.setName(value);
+    }
+
+    /**
+     * @param name new name
+     */
+    protected setName(name: string | undefined): void {
+        const old = this.name;
+        this.updateName(this._name, name);
+        const parent = this.parent();
+        if (parent?.is(Membership) && parent.name === old && parent.shortName === this.shortName)
+            parent.updateName(parent._name, name);
+    }
+
+    /**
+     * Alternative name to be used in reference resolution
+     * @see {@link name}
+     */
+    @enumerable
+    get shortName(): string | undefined {
+        return this._shortName.sanitized;
+    }
+
+    /**
+     * Short name as parsed
+     */
+    get rawShortName(): string | undefined {
+        return this._shortName.declared;
+    }
+
+    /**
+     * Name as it appeared in the source file
+     */
+    @enumerable
+    get declaredShortName(): string | undefined {
+        return this._declaredShortName;
+    }
+    set declaredShortName(value) {
+        if (value === this._declaredShortName) return;
+        this._declaredShortName = value;
+        this.setShortName(value);
+    }
+
+    /**
+     * @param name new short name
+     */
+    protected setShortName(name: string | undefined): void {
+        const old = this.shortName;
+        this.updateName(this._shortName, name);
+        const parent = this.parent();
+        if (parent?.is(Membership) && parent.shortName === old && parent.name === this.name)
+            parent.updateName(parent._shortName, name);
+    }
 
     /**
      * Fully qualified name based on preferably name
      */
-    qualifiedName = "";
+    @enumerable
+    get qualifiedName(): string {
+        return this._qualifiedName;
+    }
 
     /**
      * Cached descriptions for this element based on names only
      */
-    description?: SysMLNodeDescription;
+    get description(): SysMLNodeDescription | undefined {
+        return this._description;
+    }
 
-    /**
-     * List of direct children
-     */
-    readonly children = new Map<string, NamedChild>();
+    findMember(name: string): NamedChild | undefined {
+        return this._memberLookup.get(name);
+    }
+    hasMember(name: string): boolean {
+        return this._memberLookup.has(name);
+    }
+
+    get namedMembers(): IterableIterator<[string, NamedChild]> {
+        return this._memberLookup.entries();
+    }
+
+    get reservedNames(): IterableIterator<string> {
+        return this._memberLookup.keys();
+    }
 
     /**
      * Library metaclass of this element
      */
-    metaclass: MetadataFeatureMeta | undefined;
-
-    constructor(elementId: ElementID, parent: ModelContainer<Element>) {
-        super(elementId, parent);
+    get metaclass(): MetadataFeatureMeta | undefined {
+        if (!this._metaclass || this._metaclass === "unset") return;
+        if (typeof this._metaclass === "function") return (this._metaclass = this._metaclass());
+        return this._metaclass;
     }
 
-    override initialize(node: Element): void {
-        if (node.declaredName) this.setName(node.declaredName);
-        if (node.declaredShortName) this.setShortName(node.declaredShortName);
-
-        // namespaces can have no $container but the type system doesn't warn
-        // against it, probably an issue in langium
-        this.qualifiedName = computeQualifiedName(this, node.$container?.$meta);
-
-        this.collectChildrenNodes(node);
+    setMetaclass(meta: MetadataFeatureMeta | undefined | LazyMetaclass): this {
+        this._metaclass = meta;
+        return this;
     }
 
     /**
@@ -138,110 +243,33 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
         return this._ast as Element;
     }
 
-    override parent(): ModelContainer<Element> {
-        return this._parent;
+    override parent(): ElementMeta | undefined {
+        return this._parent as ElementMeta;
     }
 
     override owner(): ElementMeta | undefined {
         return this._owner as ElementMeta | undefined;
     }
 
-    override reset(node: Element): void {
-        this.relationships.length = 0;
-        this.features.length = 0;
-        this.elements.length = 0;
-        this.comments.length = 0;
-        this.docs.length = 0;
-        this.members.length = 0;
-        this.collectChildrenNodes(node);
-        delete this.metaclass;
-    }
-
-    private collectChildrenNodes(node: Element): void {
-        this.metadata = node.prefixes.map((m) => (m.element as MetadataFeature).$meta);
-
-        this.collectChildren(node);
-    }
-
-    protected abstract collectChildren(node: Element): void;
-
     /**
      * @returns stream of all owned and inherited metadata features
      */
     allMetadata(): Stream<MetadataFeatureMeta> {
-        return stream(this.metadata);
-    }
-
-    /**
-     * @returns stream of all owned and inherited features
-     */
-    allFeatures(): Stream<MembershipMeta<FeatureMeta>> {
-        return stream(this.features);
+        return this.metadata;
     }
 
     /**
      * Add a {@link child} to this element scope
      */
-    addChild(child: MembershipMeta<ElementMeta>): void {
+    protected addLookupMember(child: MembershipMeta<ElementMeta>): void {
         const meta = child.element();
         if (child.name || child.shortName) {
-            if (child.name) this.children.set(child.name, child);
-            if (child.shortName) this.children.set(child.shortName, child);
+            if (child.name) this._memberLookup.set(child.name, child);
+            if (child.shortName) this._memberLookup.set(child.shortName, child);
         } else {
-            if (meta?.name) this.children.set(meta.name, child);
-            if (meta?.shortName) this.children.set(meta.shortName, child);
+            if (meta?.name) this._memberLookup.set(meta.name, child);
+            if (meta?.shortName) this._memberLookup.set(meta.shortName, child);
         }
-    }
-
-    /**
-     * Name to be used in reference resolution
-     */
-    get name(): string | undefined {
-        return this._name.sanitized;
-    }
-
-    /**
-     * Name as parsed
-     */
-    get rawName(): string | undefined {
-        return this._name.declared;
-    }
-
-    /**
-     * @param name new name
-     */
-    setName(name: string): void {
-        const old = this.name;
-        this.updateName(this._name, name);
-        const parent = this.parent();
-        if (parent?.is(Membership) && parent.name === old && parent.shortName === this.shortName)
-            parent.updateName(parent._name, name);
-    }
-
-    /**
-     * Alternative name to be used in reference resolution
-     * @see {@link name}
-     */
-    get shortName(): string | undefined {
-        return this._shortName.sanitized;
-    }
-
-    /**
-     * Short name as parsed
-     */
-    get rawShortName(): string | undefined {
-        return this._shortName.declared;
-    }
-
-    /**
-     * @param name new short name
-     */
-    setShortName(name: string): void {
-        const old = this.shortName;
-        this.updateName(this._shortName, name);
-        const parent = this.parent();
-        if (parent?.is(Membership) && parent.shortName === old && parent.name === this.name)
-            parent.updateName(parent._shortName, name);
     }
 
     /**
@@ -249,44 +277,46 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
      * @param exported description corresponding to {@link name} (either full or short name)
      * @param value new name
      */
-    private updateName(name: Name, value: string): void {
+    private updateName(name: Name, value: string | undefined): void {
         const owner = this.owner();
-        // remove this child
-        if (name.sanitized && owner) {
-            // only remove this child if it is already cached with the old name
-            const cached = owner.children.get(name.sanitized);
-            const isCached = cached === this.parent() || cached === "shadow";
-            if (cached && isCached) owner.children.delete(name.sanitized);
-        }
+        const previousName = name.sanitized;
 
         // update names
         name.set(value);
-        this.qualifiedName = computeQualifiedName(this, owner);
+        if (previousName === name.sanitized) return;
+
+        // remove this child
+        if (previousName && owner) {
+            // only remove this child if it is already cached with the old name
+            const cached = owner._memberLookup.get(previousName);
+            const isCached = cached === this.parent() || cached === "shadow";
+            if (cached && isCached) owner._memberLookup.delete(previousName);
+        }
+
+        this._qualifiedName = computeQualifiedName(this, owner);
 
         if (name.sanitized && name.sanitized.length > 0) {
             const membership = this.parent();
-            if (owner && !owner.children.has(name.sanitized) && membership.is(Membership)) {
-                owner.children.set(name.sanitized, membership);
+            if (owner && !owner._memberLookup.has(name.sanitized) && membership?.is(Membership)) {
+                owner._memberLookup.set(name.sanitized, membership);
             }
         }
     }
 
-    featuresByMembership<K extends KeysMatching<SysMLTypeList, Membership>>(
-        kind: K
-    ): Stream<FeatureMeta> {
-        return stream(this.features)
-            .filter((m) => m.is(kind))
-            .map((m) => m.element())
-            .nonNullable();
+    /**
+     * Parts of this elements in the order they appear in textual notation
+     */
+    abstract textualParts(): ElementParts;
+
+    ownedElements(): Stream<ElementMeta> {
+        return stream(Object.values(this.textualParts())).flat();
     }
 
-    featuresMatching<K extends KeysMatching<SysMLTypeList, Feature>>(
-        kind: K
-    ): Stream<SysMLTypeList[K]["$meta"]> {
-        return stream(this.features)
-            .map((m) => m.element())
-            .nonNullable()
-            .filter((f) => f.is(kind)) as Stream<SysMLTypeList[K]["$meta"]>;
+    /**
+     * Invalidate cached members to make sure they are up-to date
+     */
+    invalidateMemberCaches(): void {
+        // empty
     }
 }
 

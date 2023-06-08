@@ -39,7 +39,7 @@ entry Model returns Namespace:
 // Dependencies
 
 Dependency returns Dependency:
-    ( annotations+=PrefixMetadataAnnotation)* 'dependency' Identification? 'from'?
+    ( prefixes+=PrefixMetadataAnnotation)* 'dependency' Identification? 'from'?
     client+=ElementReference ( ',' client+=ElementReference )* 'to'
     supplier+=ElementReference ( ',' supplier+=ElementReference )*
     RelationshipBody
@@ -68,7 +68,7 @@ fragment RelationshipBody:
 ;
 
 fragment RelationshipBodyElements:
-    ( annotations+=OwnedAnnotation )*
+    ( elements+=OwnedAnnotation )*
 ;
 
 // Metadata
@@ -91,7 +91,7 @@ fragment PrefixMetadata:
 ;
 
 PrefixMetadataUsage returns MetadataUsage:
-    '#' typeRelationships+=MetadataTyping
+    '#' heritage+=MetadataTyping
 ;
 
 MetadataUsage returns MetadataUsage:
@@ -101,7 +101,7 @@ MetadataUsage returns MetadataUsage:
 ;
 
 fragment MetadataUsageDeclaration:
-    ( Identification? DefinedByToken )? typeRelationships+=MetadataTyping
+    ( Identification? DefinedByToken )? heritage+=MetadataTyping
 ;
 
 fragment MetadataBody:
@@ -109,12 +109,12 @@ fragment MetadataBody:
 ;
 
 fragment MetadataBodyItems:
-    ( namespaceMembers+=DefinitionMember
-    | relationshipMembers+=RelationshipMember
-    | annotatingMembers+=VisibleAnnotatingMember
-    | members+=MetadataBodyUsageMember
-    | aliases+=AliasMember
-    | imports+=Import
+    ( children+=DefinitionMember
+    | children+=RelationshipMember
+    | children+=VisibleAnnotatingMember
+    | children+=MetadataBodyUsageMember
+    | children+=AliasMember
+    | children+=Import
     )*
 ;
 
@@ -123,7 +123,7 @@ MetadataBodyUsageMember returns FeatureMembership:
 ;
 
 MetadataBodyUsage returns ReferenceUsage:
-    'ref'? RedefinesToken? typeRelationships+=OwnedRedefinition
+    'ref'? RedefinesToken? heritage+=OwnedRedefinition
     FeatureSpecializationPart? ValuePart?
     MetadataBody
 ;
@@ -154,13 +154,13 @@ fragment PackageBodyItems:
 // Package bodies
 
 fragment PackageBodyElement:
-    imports+=Import
-    | aliases+=AliasMember
-    | filters+=ElementFilterMember
-    | annotatingMembers+=VisibleAnnotatingMember
-    | members+=UsageMember
-    | namespaceMembers+=DefinitionMember
-    | relationshipMembers+=RelationshipMember
+    children+=Import
+    | children+=AliasMember
+    | children+=ElementFilterMember
+    | children+=VisibleAnnotatingMember
+    | children+=UsageMember
+    | children+=DefinitionMember
+    | children+=RelationshipMember
 ;
 
 UsageMember returns OwningMembership:
@@ -196,7 +196,7 @@ Import returns Import:
 
 FilterPackage returns Package:
     // imports+=FilterPackageImport
-    ( filters+=FilterPackageMember )+
+    ( children+=FilterPackageMember )+
 ;
 
 FilterPackageMember returns ElementFilterMembership:
@@ -250,7 +250,7 @@ UsageElement returns Usage:
 
 
 fragment SubclassificationPart:
-    SpecializesToken typeRelationships+=OwnedSubclassification ( ',' typeRelationships+=OwnedSubclassification )*
+    SpecializesToken heritage+=OwnedSubclassification ( ',' heritage+=OwnedSubclassification )*
 ;
 
 OwnedSubclassification returns Subclassification:
@@ -282,31 +282,31 @@ fragment FeatureSpecialization:
 ;
 
 fragment Typings:
-    TypedBy ( ',' typeRelationships+=FeatureTyping )*
+    TypedBy ( ',' heritage+=FeatureTyping )*
 ;
 
 fragment TypedBy:
-    DefinedByToken typeRelationships+=FeatureTyping
+    DefinedByToken heritage+=FeatureTyping
 ;
 
 fragment Subsettings:
-    Subsets ( ',' typeRelationships+=OwnedSubsetting )*
+    Subsets ( ',' heritage+=OwnedSubsetting )*
 ;
 
 fragment Subsets:
-    SubsetsToken typeRelationships+=OwnedSubsetting
+    SubsetsToken heritage+=OwnedSubsetting
 ;
 
 fragment References:
-    ReferencesToken typeRelationships+=OwnedReferenceSubsetting
+    ReferencesToken heritage+=OwnedReferenceSubsetting
 ;
 
 fragment Redefinitions:
-    Redefines ( ',' typeRelationships+=OwnedRedefinition )*
+    Redefines ( ',' heritage+=OwnedRedefinition )*
 ;
 
 fragment Redefines:
-    RedefinesToken typeRelationships+=OwnedRedefinition
+    RedefinesToken heritage+=OwnedRedefinition
 ;
 
 /* Feature Typing, Subsetting and Redefinition */
@@ -318,15 +318,15 @@ FeatureTyping returns FeatureTyping:
 // OwnedFeatureTyping inherited from Expression syntax.
 
 OwnedSubsetting returns Subsetting:
-    reference=FeatureReference | chains+=OwnedFeatureChain
+    reference=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 OwnedReferenceSubsetting returns ReferenceSubsetting:
-    reference=FeatureReference | chains+=OwnedFeatureChain
+    reference=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 OwnedRedefinition returns Redefinition:
-    reference=FeatureReference | chains+=OwnedFeatureChain
+    reference=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 
@@ -379,15 +379,15 @@ fragment DefinitionBodyItems:
 ;
 
 fragment DefinitionBodyItem:
-    imports+=Import
-    | aliases+=AliasMember
-    | annotatingMembers+=VisibleAnnotatingMember
-    | relationshipMembers+=RelationshipMember
-    | namespaceMembers+=DefinitionMember
-    | members+=VariantUsageMember
-    | members+=NonOccurrenceUsageMember
-    | members+=EmptySuccessionMember // TODO: must precede OccurrenceUsageMember
-    | members+=OccurrenceUsageMember
+    children+=Import
+    | children+=AliasMember
+    | children+=VisibleAnnotatingMember
+    | children+=RelationshipMember
+    | children+=DefinitionMember
+    | children+=VariantUsageMember
+    | children+=NonOccurrenceUsageMember
+    | children+=EmptySuccessionMember // TODO: must precede OccurrenceUsageMember
+    | children+=OccurrenceUsageMember
 ;
 
 DefinitionMember returns OwningMembership:
@@ -477,8 +477,8 @@ EmptyAssignmentActionMember returns OwningMembership:
 ;
 
 EmptyAssignmentAction returns AssignmentActionUsage:
-    members+=EmptyTargetMember
-    members+=EmptyParameterMember
+    targetMember=EmptyTargetMember
+    assignedValue=EmptyParameterMember
 ;
 
 EmptyTargetMember returns ParameterMembership:
@@ -486,7 +486,7 @@ EmptyTargetMember returns ParameterMembership:
 ;
 
 EmptyTargetParameter returns ReferenceUsage:
-    members+=TargetFeatureMember
+    children+=TargetFeatureMember
 ;
 
 // Reference Usages
@@ -500,7 +500,7 @@ ReferenceUsage returns ReferenceUsage:
 ;
 
 VariantReference returns ReferenceUsage:
-    typeRelationships+=OwnedReferenceSubsetting FeatureSpecialization* UsageBody
+    heritage+=OwnedReferenceSubsetting FeatureSpecialization* UsageBody
 ;
 
 // Body Elements
@@ -614,8 +614,8 @@ fragment EnumerationBody:
 ;
 
 fragment EnumerationItems:
-    ( annotatingMembers+=AnnotatingMember
-    | members+=EnumerationUsageMember
+    ( children+=AnnotatingMember
+    | children+=EnumerationUsageMember
     )*
 ;
 
@@ -683,7 +683,7 @@ PortionUsage returns OccurrenceUsage:
 
 EventOccurrenceUsage returns EventOccurrenceUsage:
     OccurrenceUsagePrefix 'event' (
-        typeRelationships+=OwnedReferenceSubsetting FeatureSpecializationPart?
+        heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
         | 'occurrence' UsageDeclaration?
     ) UsageCompletion
 ;
@@ -695,8 +695,8 @@ EmptySuccessionMember returns FeatureMembership:
 ;
 
 EmptySuccession returns SuccessionAsUsage:
-    'then' (members+=MultiplicitySourceEndMember)?
-    /* members+=EmptyTargetEndMember */
+    'then' (ends+=MultiplicitySourceEndMember)?
+    /* ends+=EmptyTargetEndMember */
 ;
 
 MultiplicitySourceEndMember returns EndFeatureMembership:
@@ -745,7 +745,7 @@ PartUsage returns PartUsage:
 
 PortDefinition returns PortDefinition:
     DefinitionPrefix 'port' 'def' DefinitionSuffix
-    namespaceMembers+=ConjugatedPortDefinitionMember
+    conjugated=ConjugatedPortDefinitionMember
 ;
 
 ConjugatedPortDefinitionMember returns OwningMembership:
@@ -753,7 +753,7 @@ ConjugatedPortDefinitionMember returns OwningMembership:
 ;
 
 ConjugatedPortDefinition returns ConjugatedPortDefinition:
-    typeRelationships+=PortConjugation
+    heritage+=PortConjugation
 ;
 
 PortConjugation returns PortConjugation:
@@ -784,14 +784,14 @@ ConnectorEndMember returns EndFeatureMembership:
 ;
 
 ConnectorEnd returns Feature:
-    ( RegularName ReferencesToken )? typeRelationships+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
+    ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
 ;
 
 // Binding Connectors
 
 BindingConnector returns BindingConnectorAsUsage:
     UsagePrefix ( 'binding' UsageDeclaration? )?
-    'bind' members+=ConnectorEndMember '=' members+=ConnectorEndMember 
+    'bind' ends+=ConnectorEndMember '=' ends+=ConnectorEndMember 
     DefinitionBody
 ;
 
@@ -799,7 +799,7 @@ BindingConnector returns BindingConnectorAsUsage:
 
 Succession returns SuccessionAsUsage:
     UsagePrefix ( 'succession' UsageDeclaration? )? 
-    'first' members+=ConnectorEndMember 'then' members+=ConnectorEndMember 
+    'first' ends+=ConnectorEndMember 'then' ends+=ConnectorEndMember 
     DefinitionBody
 ;
 
@@ -823,11 +823,11 @@ fragment ConnectorPart:
 ;
 
 fragment BinaryConnectorPart:
-    members+=ConnectorEndMember 'to' members+=ConnectorEndMember
+    ends+=ConnectorEndMember 'to' ends+=ConnectorEndMember
 ;
 
 fragment NaryConnectorPart:
-    '(' members+=ConnectorEndMember ( ',' members+=ConnectorEndMember )+ ')'
+    '(' ends+=ConnectorEndMember ( ',' ends+=ConnectorEndMember )+ ')'
 ;
 
 EmptySourceEndMember returns EndFeatureMembership:
@@ -855,9 +855,9 @@ Message returns FlowConnectionUsage:
 ;
 
 fragment MessageDeclaration:
-    UsageDeclaration? ValuePart? ( 'of' members+=ItemFeatureMember )?
-        ( 'from' members+=MessageEventMember 'to' members+=MessageEventMember )?
-    | members+=MessageEventMember 'to' members+=MessageEventMember
+    UsageDeclaration? ValuePart? ( 'of' item=ItemFeatureMember )?
+        ( 'from' ends+=MessageEventMember 'to' ends+=MessageEventMember )?
+    | ends+=MessageEventMember 'to' ends+=MessageEventMember
 ;
 
 MessageEventMember returns ParameterMembership:
@@ -865,7 +865,7 @@ MessageEventMember returns ParameterMembership:
 ;
 
 MessageEvent returns EventOccurrenceUsage:
-    typeRelationships+=OwnedReferenceSubsetting
+    heritage+=OwnedReferenceSubsetting
 ;
 
 // Flow Connection Usages
@@ -879,9 +879,9 @@ SuccessionFlowConnectionUsage returns SuccessionFlowConnectionUsage:
 ;
 
 fragment FlowConnectionDeclaration:
-    UsageDeclaration? ValuePart? ( 'of'  members+=ItemFeatureMember )?
-        ( 'from' members+=FlowEndMember 'to' members+=FlowEndMember )?
-    | members+=FlowEndMember 'to' members+=FlowEndMember
+    UsageDeclaration? ValuePart? ( 'of'  item=ItemFeatureMember )?
+        ( 'from' ends+=FlowEndMember 'to' ends+=FlowEndMember )?
+    | ends+=FlowEndMember 'to' ends+=FlowEndMember
 ;
 
 // Flow Members
@@ -897,8 +897,8 @@ ItemFeature returns ItemFeature:
 fragment PayloadFeature:
     Identification? PayloadFeatureSpecializationPart ValuePart?
     | Identification? ValuePart
-    | typeRelationships+=OwnedFeatureTyping (multiplicity=OwnedMultiplicity)?
-    | multiplicity=OwnedMultiplicity typeRelationships+=OwnedFeatureTyping
+    | heritage+=OwnedFeatureTyping (multiplicity=OwnedMultiplicity)?
+    | multiplicity=OwnedMultiplicity heritage+=OwnedFeatureTyping
 ;
 
 fragment PayloadFeatureSpecializationPart:
@@ -911,11 +911,11 @@ FlowEndMember returns EndFeatureMembership:
 ;
 
 FlowEnd returns ItemFlowEnd:
-    ( typeRelationships+=FlowEndSubsetting )? members+=FlowFeatureMember
+    ( heritage+=FlowEndSubsetting )? children+=FlowFeatureMember
 ;
 
 FlowEndSubsetting returns ReferenceSubsetting:
-    reference=FeatureReference '.' | chains+=FeatureChainPrefix
+    reference=FeatureReference '.' | targetChain=FeatureChainPrefix
 ;
 
 FlowFeatureMember returns FeatureMembership:
@@ -923,7 +923,7 @@ FlowFeatureMember returns FeatureMembership:
 ;
 
 FlowFeature returns ReferenceUsage:
-    typeRelationships+=FlowRedefinition
+    heritage+=FlowRedefinition
 ;
 
 FlowRedefinition returns Redefinition:
@@ -949,15 +949,15 @@ fragment InterfaceBodyItems:
 ;
 
 fragment InterfaceBodyItem:
-    namespaceMembers+=DefinitionMember
-    | relationshipMembers+=RelationshipMember
-    | annotatingMembers+=VisibleAnnotatingMember
-    | members+=VariantUsageMember
-    | members+=InterfaceNonOccurrenceUsageMember
-    | members+=EmptySuccessionMember // must precede InterfaceOccurrenceUsageMember
-    | members+=InterfaceOccurrenceUsageMember
-    | aliases+=AliasMember
-    | imports+=Import
+    children+=DefinitionMember
+    | children+=RelationshipMember
+    | children+=VisibleAnnotatingMember
+    | children+=VariantUsageMember
+    | children+=InterfaceNonOccurrenceUsageMember
+    | children+=EmptySuccessionMember // must precede InterfaceOccurrenceUsageMember
+    | children+=InterfaceOccurrenceUsageMember
+    | children+=AliasMember
+    | children+=Import
 ;
 
 InterfaceNonOccurrenceUsageMember returns FeatureMembership:
@@ -999,11 +999,11 @@ fragment InterfacePart:
 ;
 
 fragment BinaryInterfacePart:
-    members+=InterfaceEndMember 'to' members+=InterfaceEndMember
+    ends+=InterfaceEndMember 'to' ends+=InterfaceEndMember
 ;
 
 fragment NaryInterfacePart:
-    '(' members+=InterfaceEndMember ( ',' members+=InterfaceEndMember )+ ')'
+    '(' ends+=InterfaceEndMember ( ',' ends+=InterfaceEndMember )+ ')'
 ;
 
 InterfaceEndMember returns EndFeatureMembership:
@@ -1011,7 +1011,7 @@ InterfaceEndMember returns EndFeatureMembership:
 ;
 
 InterfaceEnd returns PortUsage:
-    ( RegularName ReferencesToken )? typeRelationships+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
+    ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
 ;
 
 
@@ -1047,20 +1047,20 @@ fragment ActionBodyItems:
 ;
 
 fragment ActionBodyItem:
-    imports+=Import
-    | aliases+=AliasMember
-    | namespaceMembers+=DefinitionMember
-    | relationshipMembers+=RelationshipMember
-    | annotatingMembers+=VisibleAnnotatingMember
-    | members+=VariantUsageMember
-    | members+=NonOccurrenceUsageMember
-    | members+=InitialNodeMember
-    | members+=GuardedSuccessionMember
-    | members+=EmptySuccessionMember // TODO: must precede the 4 members below
-    | members+=StructureUsageMember
-    | members+=BehaviorUsageMember
-    | members+=ActionNodeMember
-    | members+=TargetSuccessionMember // TODO: must be after initial node, behavior usage or action node
+    children+=Import
+    | children+=AliasMember
+    | children+=DefinitionMember
+    | children+=RelationshipMember
+    | children+=VisibleAnnotatingMember
+    | children+=VariantUsageMember
+    | children+=NonOccurrenceUsageMember
+    | children+=InitialNodeMember
+    | children+=GuardedSuccessionMember
+    | children+=EmptySuccessionMember // TODO: must precede the 4 members below
+    | children+=StructureUsageMember
+    | children+=BehaviorUsageMember
+    | children+=ActionNodeMember
+    | children+=TargetSuccessionMember // TODO: must be after initial node, behavior usage or action node
 ;
 
 InitialNodeMember returns Membership:
@@ -1091,7 +1091,7 @@ PerformActionUsage returns PerformActionUsage:
 ;
 
 fragment PerformActionUsageDeclaration:
-    (typeRelationships+=OwnedReferenceSubsetting FeatureSpecializationPart?
+    (heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
     | 'action' UsageDeclaration?
     )
     ValuePart?
@@ -1130,8 +1130,8 @@ fragment AcceptNodeDeclaration:
 ;
 
 fragment AcceptParameterPart:
-    members+=PayloadParameterMember
-    ( 'via' members+=NodeParameterMember 
+    payload=PayloadParameterMember
+    ( 'via' receiver=NodeParameterMember 
     // TODO: empty rule
     /* | members += EmptyParameterMember
     ) */ )?
@@ -1155,8 +1155,8 @@ TriggerFeatureValue returns FeatureValue:
 ;
 
 TriggerExpression returns TriggerInvocationExpression:
-    kind=('at' | 'after') members+=OwnedExpressionMember
-    | kind='when' members+=ChangeExpressionMember
+    kind=('at' | 'after') children+=OwnedExpressionMember
+    | kind='when' children+=ChangeExpressionMember
 ;
 
 ChangeExpressionMember returns FeatureMembership:
@@ -1200,9 +1200,9 @@ AssignmentNode returns AssignmentActionUsage:
 fragment AssignmentNodeDeclaration:
     ActionNodeUsageDeclaration? 'assign' 
     // TODO: seems like https://github.com/langium/chevrotain-allstar/issues/1
-    // members+=AssignmentTargetMember
-    members+=FeatureChainMember ':=' 
-    members+=NodeParameterMember
+    // target=AssignmentTargetMember
+    targetMember=FeatureChainMember ':=' 
+    assignedValue=NodeParameterMember
 ;
 
 AssignmentTargetMember returns ParameterMembership:
@@ -1212,7 +1212,7 @@ AssignmentTargetMember returns ParameterMembership:
 TargetParameter returns ReferenceUsage:
     ( value=TargetBinding '.' )?
     // TODO: empty rule
-    members+=TargetFeatureMember
+    children+=TargetFeatureMember
 ;
 
 TargetFeatureMember returns FeatureMembership:
@@ -1220,7 +1220,7 @@ TargetFeatureMember returns FeatureMembership:
 ;
 
 TargetFeature returns ReferenceUsage:
-    members+=TargetAccessedFeatureMember
+    children+=TargetAccessedFeatureMember
 ;
 
 TargetAccessedFeatureMember returns FeatureMembership:
@@ -1233,15 +1233,15 @@ TargetBinding returns FeatureValue:
 
 TargetExpression returns Expression:
     BaseExpression
-    (  ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+    (  ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
        ( {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
-        | {OperatorExpression.operands+=current} '->' typeRelationships+=ReferenceTyping 
-            ( members+=ExpressionBodyMember
-            | members+=FunctionReferenceMember
+        | {OperatorExpression.operands+=current} '->' heritage+=ReferenceTyping 
+            ( children+=ExpressionBodyMember
+            | children+=FunctionReferenceMember
             | ArgumentList
             )
-        | {CollectExpression.operands+=current} '.' members+=ExpressionBodyMember // collect
-        | {SelectExpression.operands+=current} '.?' members+=ExpressionBodyMember // select
+        | {CollectExpression.operands+=current} '.' children+=ExpressionBodyMember // collect
+        | {SelectExpression.operands+=current} '.?' children+=ExpressionBodyMember // select
         )
     )*
 ;
@@ -1252,9 +1252,9 @@ ExpressionParameterMember returns ParameterMembership:
 
 IfNode returns IfActionUsage:
     ActionNodePrefix 
-    'if' members+=ExpressionParameterMember
-    members+=ActionBodyParameterMember
-    ( 'else' members+=( ActionBodyParameterMember | IfNodeParameterMember ) )?
+    'if' condition=ExpressionParameterMember
+    then=ActionBodyParameterMember
+    ( 'else' else=( ActionBodyParameterMember | IfNodeParameterMember ) )?
 ;
 
 ActionBodyParameterMember returns ParameterMembership:
@@ -1271,18 +1271,18 @@ IfNodeParameterMember returns ParameterMembership:
 
 WhileLoopNode returns WhileLoopActionUsage:
     ActionNodePrefix
-    ( 'while' members+=ExpressionParameterMember
+    ( 'while' condition=ExpressionParameterMember
     | 'loop' /* members+=EmptyParameterMember */
     )
-    members+=ActionBodyParameterMember
-    ( 'until' members+=ExpressionParameterMember ';' )?
+    body=ActionBodyParameterMember
+    ( 'until' until=ExpressionParameterMember ';' )?
 ;
 
 ForLoopNode returns ForLoopActionUsage:
     ActionNodePrefix
-    'for' members+=ForVariableDeclarationMember
-    'in' members+=NodeParameterMember
-    members+=ActionBodyParameterMember
+    'for' variable=ForVariableDeclarationMember
+    'in' sequence=NodeParameterMember
+    body=ActionBodyParameterMember
 ;
 
 ForVariableDeclarationMember returns FeatureMembership:
@@ -1325,7 +1325,7 @@ fragment ActionNodeBody:
 ;
 
 fragment ActionNodeItems:
-    ( annotatingMembers+=AnnotatingMember )*
+    ( children+=AnnotatingMember )*
 ;
 
 EmptyParameterMember returns ParameterMembership:
@@ -1344,27 +1344,27 @@ ActionTargetSuccession returns Usage:
 ;
 
 TargetSuccession returns SuccessionAsUsage:
-    'then' ( members+=MultiplicitySourceEndMember )?
-    members+=ConnectorEndMember
+    'then' ( ends+=MultiplicitySourceEndMember )?
+    ends+=ConnectorEndMember
 ;
 
 GuardedTargetSuccession returns TransitionUsage:
-    /* members += EmptyParameterMember */
-    members+=GuardExpressionMember
-    'then' members+=TransitionSuccessionMember
+    /* transitionLinkSource+= EmptyParameterMember */
+    guard=GuardExpressionMember
+    'then' then=TransitionSuccessionMember
 ;
 
 DefaultTargetSuccession returns TransitionUsage:
-    /* members += EmptyParameterMember */
-    'else' members+=TransitionSuccessionMember
+    /* transitionLinkSource+= EmptyParameterMember */
+    'else' else=TransitionSuccessionMember
 ;
 
 GuardedSuccession returns TransitionUsage:
     ( 'succession' UsageDeclaration )? 'first'
-    members+=TransitionSourceMember 
-    /* members+=EmptyParameterMember */
-    members+=GuardExpressionMember
-    'then' members+=TransitionSuccessionMember
+    source=TransitionSourceMember 
+    /* transitionLinkSource=EmptyParameterMember */
+    guard=GuardExpressionMember
+    'then' then=TransitionSuccessionMember
     UsageBody
 ;
 
@@ -1384,23 +1384,23 @@ fragment StateBodyPart:
 ;
 
 fragment StateBodyItem:
-    imports+=Import
-    | aliases+=AliasMember
-    | namespaceMembers+=DefinitionMember
-    | relationshipMembers+=RelationshipMember
-    | annotatingMembers+=VisibleAnnotatingMember
-    | members+=VariantUsageMember
-    | members+=NonOccurrenceUsageMember
+    children+=Import
+    | children+=AliasMember
+    | children+=DefinitionMember
+    | children+=RelationshipMember
+    | children+=VisibleAnnotatingMember
+    | children+=VariantUsageMember
+    | children+=NonOccurrenceUsageMember
     // parser doesn't like optional groups...
-    | members+=EmptySuccessionMember // TODO: must be before Structure or Behavior usage member
-    | members+=StructureUsageMember
-    | members+=BehaviorUsageMember
-    | members+=TargetTransitionUsageMember // TODO: must be after behavior usage element or another targettransitionusage
-    | members+=TransitionUsageMember
-    | members+=EntryActionMember
-    | members+=EntryTransitionMember// TODO: must follow entry action or other entry transition
-    | members+=DoActionMember
-    | members+=ExitActionMember
+    | children+=EmptySuccessionMember // TODO: must be before Structure or Behavior usage member
+    | children+=StructureUsageMember
+    | children+=BehaviorUsageMember
+    | children+=TargetTransitionUsageMember // TODO: must be after behavior usage element or another targettransitionusage
+    | children+=TransitionUsageMember
+    | children+=EntryActionMember
+    | children+=EntryTransitionMember// TODO: must follow entry action or other entry transition
+    | children+=DoActionMember
+    | children+=ExitActionMember
 ;
 
 EntryActionMember returns StateSubactionMembership:
@@ -1464,7 +1464,7 @@ StateUsage returns StateUsage:
 
 ExhibitStateUsage returns ExhibitStateUsage:
     OccurrenceUsagePrefix 'exhibit' (
-        typeRelationships+=OwnedReferenceSubsetting FeatureSpecializationPart?
+        heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
         | 'state' UsageDeclaration?
     )
     ValuePart? StateBody
@@ -1474,30 +1474,30 @@ ExhibitStateUsage returns ExhibitStateUsage:
 
 TransitionUsage returns TransitionUsage:
     'transition' ( UsageDeclaration? 'first' )? 
-    members+=TransitionSourceMember
-    /* members+=EmptyParameterMember */
-    ( /* members+=EmptyParameterMember */ members+=TriggerActionMember )?
-    ( members+=GuardExpressionMember )?
-    ( members+=EffectBehaviorMember )?
-    'then' members+=TransitionSuccessionMember
+    source=TransitionSourceMember
+    /* transitionLinkSource=EmptyParameterMember */
+    ( /* payload=EmptyParameterMember */ accepter=TriggerActionMember )?
+    ( guard=GuardExpressionMember )?
+    ( effect=EffectBehaviorMember )?
+    'then' then=TransitionSuccessionMember
     ActionBody
 ;
 
 TargetTransitionUsage returns TransitionUsage:
-    /* members+=EmptyParameterMember */
+    /* transitionLinkSource=EmptyParameterMember */
     ( 'transition'
-      ( /* members+=EmptyParameterMember  */
-        members+=TriggerActionMember )?
-      ( members+=GuardExpressionMember )?
-      ( members+=EffectBehaviorMember )?
-    | /* members+=EmptyParameterMember */ 
-      members+=TriggerActionMember
-      ( members+=GuardExpressionMember )?
-      ( members+=EffectBehaviorMember )?
-    | members+=GuardExpressionMember
-      ( members+=EffectBehaviorMember )?
+      ( /* payload=EmptyParameterMember  */
+        accepter=TriggerActionMember )?
+      ( guard=GuardExpressionMember )?
+      ( effect=EffectBehaviorMember )?
+    | /* payload=EmptyParameterMember */ 
+      accepter=TriggerActionMember
+      ( guard=GuardExpressionMember )?
+      ( effect=EffectBehaviorMember )?
+    | guard=GuardExpressionMember
+      ( effect=EffectBehaviorMember )?
     )?
-    'then' members+=TransitionSuccessionMember
+    'then' then=TransitionSuccessionMember
     ActionBody
 ;
 
@@ -1554,8 +1554,8 @@ TransitionSuccessionMember returns OwningMembership:
 ;
 
 TransitionSuccession returns SuccessionAsUsage:
-    members+=EmptySourceEndMember
-    members+=ConnectorEndMember
+    ends+=EmptySourceEndMember
+    ends+=ConnectorEndMember
 ;
 
 // Calculations
@@ -1576,7 +1576,7 @@ fragment CalculationBodyPart:
 ;
 
 fragment CalculationBodyItem:
-    ActionBodyItem | members+=ReturnParameterMember
+    ActionBodyItem | children+=ReturnParameterMember
 ;
 
 ReturnParameterMember returns ReturnParameterMembership:
@@ -1610,7 +1610,7 @@ ConstraintUsage returns ConstraintUsage:
 
 AssertConstraintUsage returns AssertConstraintUsage:
     OccurrenceUsagePrefix 'assert' (isNegated?='not')? (
-        typeRelationships+=OwnedReferenceSubsetting FeatureSpecializationPart?
+        heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
         | 'constraint' UsageDeclaration?
     ) CalculationBody;
 
@@ -1631,12 +1631,12 @@ fragment RequirementBodyItems:
 
 fragment RequirementBodyItem:
     DefinitionBodyItem
-    | members+=SubjectMember
-    | members+=RequirementConstraintMember
-    | members+=FramedConcernMember
-    | members+=RequirementVerificationMember
-    | members+=ActorMember
-    | members+=StakeholderMember
+    | children+=SubjectMember
+    | children+=RequirementConstraintMember
+    | children+=FramedConcernMember
+    | children+=RequirementVerificationMember
+    | children+=ActorMember
+    | children+=StakeholderMember
 ;
 
 SubjectMember returns SubjectMembership:
@@ -1653,7 +1653,7 @@ RequirementConstraintMember returns RequirementConstraintMembership:
 ;
 
 RequirementConstraintUsage returns ConstraintUsage:
-    typeRelationships+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
+    heritage+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
     | ( UsageExtensionKeyword* 'constraint' | UsageExtensionKeyword+ ) CalculationUsageDeclaration CalculationBody
 ;
 
@@ -1662,7 +1662,7 @@ FramedConcernMember returns FramedConcernMembership:
 ;
 
 FramedConcernUsage returns ConcernUsage:
-    (typeRelationships+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
+    (heritage+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
     | ( UsageExtensionKeyword* 'concern' | UsageExtensionKeyword+ ) CalculationUsageDeclaration CalculationBody
     )
 ;
@@ -1691,10 +1691,10 @@ RequirementUsage returns RequirementUsage:
 
 SatisfyRequirementUsage returns SatisfyRequirementUsage:
     OccurrenceUsagePrefix 'assert'? (isNegated?='not')? 'satisfy'
-    ( typeRelationships+=OwnedReferenceSubsetting FeatureSpecializationPart?
+    ( heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
     | 'requirement' UsageDeclaration?
     )
-    ValuePart? ('by' members+=SatisfactionSubjectMember)? RequirementBody
+    ValuePart? ('by' satisfactionSubject=SatisfactionSubjectMember)? RequirementBody
 ;
 
 SatisfactionSubjectMember returns SubjectMembership:
@@ -1743,9 +1743,9 @@ fragment CaseBodyItems:
 
 fragment CaseBodyItem:
     CalculationBodyItem
-    | members+=SubjectMember
-    | members+=ActorMember
-    | members+=ObjectiveMember
+    | children+=SubjectMember
+    | children+=ActorMember
+    | children+=ObjectiveMember
 ;
 
 ObjectiveMember returns ObjectiveMembership:
@@ -1788,7 +1788,7 @@ RequirementVerificationMember returns RequirementVerificationMembership:
 ;
 
 RequirementVerificationUsage returns RequirementUsage:
-    typeRelationships+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
+    heritage+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
     | ( UsageExtensionKeyword* 'requirement' | UsageExtensionKeyword+ ) CalculationUsageDeclaration RequirementBody
 ;
 
@@ -1805,7 +1805,7 @@ UseCaseUsage returns UseCaseUsage:
 
 IncludeUseCaseUsage returns IncludeUseCaseUsage:
     OccurrenceUsagePrefix 'include' (
-        typeRelationships+=OwnedReferenceSubsetting FeatureSpecializationPart?
+        heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
         | 'use' 'case' UsageDeclaration?
     ) ValuePart? CaseBody
 ;
@@ -1827,8 +1827,8 @@ fragment ViewDefinitionBodyItems:
 
 fragment ViewDefinitionBodyItem:
     DefinitionBodyItem
-    | filters+=ElementFilterMember
-    | members+=ViewRenderingMember
+    | children+=ElementFilterMember
+    | children+=ViewRenderingMember
 ;
 
 ViewRenderingMember returns ViewRenderingMembership:
@@ -1836,7 +1836,7 @@ ViewRenderingMember returns ViewRenderingMembership:
 ;
 
 ViewRenderingUsage returns RenderingUsage:
-    typeRelationships+=OwnedReferenceSubsetting FeatureSpecialization* UsageBody
+    heritage+=OwnedReferenceSubsetting FeatureSpecialization* UsageBody
 ;
 
 // View Usages
@@ -1854,9 +1854,9 @@ fragment ViewBodyItems:
 
 fragment ViewBodyItem:
     DefinitionBodyItem
-    | filters+=ElementFilterMember
-    | imports+=Expose
-    | members+=ViewRenderingMember
+    | children+=ElementFilterMember
+    | children+=Expose
+    | children+=ViewRenderingMember
 ;
 
 fragment ExposePrefix:
@@ -1994,15 +1994,15 @@ EqualityExpression returns Expression:
 ClassificationExpression returns Expression:
     RelationalExpression ( 
         {OperatorExpression.operands+=current} (
-            operator=ClassificationTestOperator members+=TypeReferenceMember
-            | operator='as' members+=TypeResultMember
+            operator=ClassificationTestOperator children+=TypeReferenceMember
+            | operator='as' children+=TypeResultMember
         )
     )?
     // Note: empty rule breaks parsing here 
-    | {OperatorExpression} /* operands+=SelfReferenceExpression */ operator=ClassificationTestOperator members+=TypeReferenceMember
-    | {OperatorExpression} operands+=MetadataReference operator='@@' members+=TypeReferenceMember
-    | {OperatorExpression} /* operands+=SelfReferenceExpression */ operator='as' members+=TypeResultMember
-    | {OperatorExpression} operands+=MetadataReference operator='meta' members+=TypeResultMember
+    | {OperatorExpression} /* operands+=SelfReferenceExpression */ operator=ClassificationTestOperator children+=TypeReferenceMember
+    | {OperatorExpression} operands+=MetadataReference operator='@@' children+=TypeReferenceMember
+    | {OperatorExpression} /* operands+=SelfReferenceExpression */ operator='as' children+=TypeResultMember
+    | {OperatorExpression} operands+=MetadataReference operator='meta' children+=TypeResultMember
 ;
 
 // Relational Expressions
@@ -2041,7 +2041,7 @@ UnaryExpression returns Expression:
 // Extent Expressions
 
 ExtentExpression returns Expression:
-    {OperatorExpression} operator='all' members+=TypeResultMember
+    {OperatorExpression} operator='all' children+=TypeResultMember
     | PrimaryExpression
 ;
 
@@ -2049,18 +2049,18 @@ ExtentExpression returns Expression:
 
 PrimaryExpression returns Expression:
     BaseExpression
-    ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+    ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
     (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
         | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
-        | {OperatorExpression.operands+=current} '->' typeRelationships+=ReferenceTyping 
-            ( members+=ExpressionBodyMember
-            | members+=FunctionReferenceMember
+        | {OperatorExpression.operands+=current} '->' heritage+=ReferenceTyping 
+            ( children+=ExpressionBodyMember
+            | children+=FunctionReferenceMember
             | ArgumentList
             )
-        | {CollectExpression.operands+=current} '.' members+=ExpressionBodyMember // collect
-        | {SelectExpression.operands+=current} '.?' members+=ExpressionBodyMember // select
+        | {CollectExpression.operands+=current} '.' children+=ExpressionBodyMember // collect
+        | {SelectExpression.operands+=current} '.?' children+=ExpressionBodyMember // select
         )
-        ( {FeatureChainExpression.operands+=current} '.' members+=FeatureChainMember)?
+        ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
     )*
 ;
 
@@ -2098,7 +2098,7 @@ SequenceExpression returns Expression:
 // Invocation Expressions
 
 InvocationExpression returns InvocationExpression:
-    typeRelationships+=OwnedFeatureTyping ArgumentList
+    heritage+=OwnedFeatureTyping ArgumentList
 ;
 
 fragment ArgumentList:
@@ -2106,7 +2106,7 @@ fragment ArgumentList:
 ;
 
 fragment PositionalArgumentList:
-    members+=ArgumentMember ( ',' members+=ArgumentMember )*
+    children+=ArgumentMember ( ',' children+=ArgumentMember )*
 ;
 
 ArgumentMember returns ParameterMembership:
@@ -2118,7 +2118,7 @@ Argument returns Feature:
 ;
 
 fragment NamedArgumentList:
-    members+=NamedArgumentMember ( ',' members+=NamedArgumentMember )*
+    children+=NamedArgumentMember ( ',' children+=NamedArgumentMember )*
 ;
 
 NamedArgumentMember returns ParameterMembership:
@@ -2126,7 +2126,7 @@ NamedArgumentMember returns ParameterMembership:
 ;
 
 NamedArgument returns Feature:
-    typeRelationships+=ParameterRedefinition '=' value=ArgumentValue
+    heritage+=ParameterRedefinition '=' value=ArgumentValue
 ;
 
 ParameterRedefinition returns Redefinition:

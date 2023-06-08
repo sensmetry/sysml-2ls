@@ -15,9 +15,16 @@
  ********************************************************************************/
 
 import { IfActionUsage } from "../../generated/ast";
-import { ParameterMembershipMeta } from "../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import {
+    ElementParts,
+    ExpressionMeta,
+    FeatureMeta,
+    MembershipMeta,
+    ParameterMembershipMeta,
+} from "../KerML";
+import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
+import { NonNullable, enumerable } from "../../utils";
 
 @metamodelOf(IfActionUsage, {
     base: "Actions::ifThenActions",
@@ -25,27 +32,36 @@ import { ActionUsageMeta } from "./action-usage";
     subaction: "Actions::Action::ifSubactions",
 })
 export class IfActionUsageMeta extends ActionUsageMeta {
-    else?: ParameterMembershipMeta<ActionUsageMeta>;
+    private _condition?: ParameterMembershipMeta<ExpressionMeta>;
+    private _then?: ParameterMembershipMeta<ActionUsageMeta>;
+    private _else?: ParameterMembershipMeta<ActionUsageMeta>;
 
-    constructor(id: ElementID, parent: ModelContainer<IfActionUsage>) {
-        super(id, parent);
+    @enumerable
+    public get condition(): ParameterMembershipMeta<ExpressionMeta> | undefined {
+        return this._condition;
+    }
+    public set condition(value: ParameterMembershipMeta<ExpressionMeta>) {
+        this._condition = value;
     }
 
-    override initialize(node: IfActionUsage): void {
-        if (node.members.length > 2)
-            this.else = node.members[2].$meta as ParameterMembershipMeta<ActionUsageMeta>;
+    @enumerable
+    public get then(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
+        return this._then;
+    }
+    public set then(value: ParameterMembershipMeta<ActionUsageMeta>) {
+        this._then = value;
     }
 
-    override reset(node: IfActionUsage): void {
-        this.initialize(node);
+    @enumerable
+    public get else(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
+        return this._else;
+    }
+    public set else(value: ParameterMembershipMeta<ActionUsageMeta> | undefined) {
+        this._else = value;
     }
 
     override ast(): IfActionUsage | undefined {
         return this._ast as IfActionUsage;
-    }
-
-    override parent(): ModelContainer<IfActionUsage> {
-        return this._parent;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -54,8 +70,29 @@ export class IfActionUsageMeta extends ActionUsageMeta {
         return supertypes;
     }
 
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = super.featureMembers();
+        return ([this._condition, this._then, this._else] as MembershipMeta<FeatureMeta>[])
+            .filter(NonNullable)
+            .concat(baseFeatures);
+    }
+
     isIfThenElse(): boolean {
         return this.else !== undefined;
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = {
+            prefixes: this.prefixes,
+        };
+
+        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
+
+        parts.heritage = this.heritage;
+        if (this.condition) parts.condition = [this.condition];
+        if (this.then) parts.then = [this.then];
+        if (this.else) parts.else = [this.else];
+        return parts;
     }
 }
 

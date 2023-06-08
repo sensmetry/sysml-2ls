@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { BooleanExpression } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ExpressionMeta } from "./_internal";
 
 export const ImplicitBooleanExpressions = {
@@ -24,16 +24,8 @@ export const ImplicitBooleanExpressions = {
 
 @metamodelOf(BooleanExpression, ImplicitBooleanExpressions)
 export class BooleanExpressionMeta extends ExpressionMeta {
-    constructor(id: ElementID, parent: ModelContainer<BooleanExpression>) {
-        super(id, parent);
-    }
-
     override ast(): BooleanExpression | undefined {
         return this._ast as BooleanExpression;
-    }
-
-    override parent(): ModelContainer<BooleanExpression> {
-        return this._parent;
     }
 }
 

@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { LoopActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(LoopActionUsage)
 export class LoopActionUsageMeta extends ActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<LoopActionUsage>) {
-        super(id, parent);
-    }
-
     override ast(): LoopActionUsage | undefined {
         return this._ast as LoopActionUsage;
-    }
-
-    override parent(): ModelContainer<LoopActionUsage> {
-        return this._parent;
     }
 }
 

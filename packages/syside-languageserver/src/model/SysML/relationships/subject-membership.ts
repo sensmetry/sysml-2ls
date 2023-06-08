@@ -16,23 +16,15 @@
 
 import { SubjectMembership } from "../../../generated/ast";
 import { ParameterMembershipMeta } from "../../KerML/relationships/parameter-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ReferenceUsageMeta } from "../reference-usage";
 
 @metamodelOf(SubjectMembership)
 export class SubjectMembershipMeta<
     T extends ReferenceUsageMeta = ReferenceUsageMeta
 > extends ParameterMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<SubjectMembership>) {
-        super(id, parent);
-    }
-
     override ast(): SubjectMembership | undefined {
         return this._ast as SubjectMembership;
-    }
-
-    override parent(): ModelContainer<SubjectMembership> {
-        return this._parent;
     }
 }
 

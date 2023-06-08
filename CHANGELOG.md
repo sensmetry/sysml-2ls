@@ -6,6 +6,12 @@
 
 ## main
 
+### Chores
+
+- Refactored AST and internal model to store order dependent child nodes in
+  separate fields/properties to allow for easier runtime modifications without
+  having to maintain implicit ordering
+
 ## 0.5.2
 
 ### Fixed

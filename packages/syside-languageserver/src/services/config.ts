@@ -21,7 +21,7 @@ export interface DebugConfig {
     /**
      * Append elements in scope to linking errors
      */
-    scopeInLinkingErrors: boolean;
+    scopeInLinkingErrors?: "none" | "types" | "members";
 
     /**
      * Append stacktrace to thrown errors while resolving references
@@ -86,7 +86,7 @@ export interface SysMLConfig {
 }
 
 export const DefaultDebugConfig: Readonly<DebugConfig> = {
-    scopeInLinkingErrors: false,
+    scopeInLinkingErrors: "none",
     stacktraceInLinkingErrors: true,
     linkingTrace: false,
 };

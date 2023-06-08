@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { RenderingDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { PartDefinitionMeta } from "./part-definition";
 
 @metamodelOf(RenderingDefinition, {
     base: "Views::Rendering",
 })
 export class RenderingDefinitionMeta extends PartDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<RenderingDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): RenderingDefinition | undefined {
         return this._ast as RenderingDefinition;
-    }
-
-    override parent(): ModelContainer<RenderingDefinition> {
-        return this._parent;
     }
 }
 

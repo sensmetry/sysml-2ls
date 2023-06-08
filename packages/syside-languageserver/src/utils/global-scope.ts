@@ -16,7 +16,7 @@
 
 import { Stream, stream, EMPTY_STREAM, LangiumDocument } from "langium";
 import { URI, Utils } from "vscode-uri";
-import { NamespaceScope, SysMLScope, ExportedMember } from ".";
+import { NamespaceScope, SysMLScope, ExportedMember } from "./scopes";
 import { Namespace } from "../generated/ast";
 import { MembershipMeta, NamespaceMeta, ElementMeta, namedMembership } from "../model";
 import { erase } from "./common";
@@ -166,7 +166,7 @@ export class GlobalScope extends SysMLScope {
         const langId = getLanguageId(document.uri);
 
         const exports: [string, ScopeEntry][] = [];
-        for (const [name, child] of root.children.entries()) {
+        for (const [name, child] of root.namedMembers) {
             if (typeof child !== "object" || child.visibility !== Visibility.public) continue;
             const member = namedMembership(child);
             if (!member) continue;
@@ -198,7 +198,7 @@ export class GlobalScope extends SysMLScope {
         // exports map.
         if (
             root.imports.some((imp) => imp.visibility === Visibility.public) ||
-            root.features.some((m) => {
+            root.featureMembers().some((m) => {
                 if (m.visibility !== Visibility.public) return false;
                 const target = m.element();
                 if (!target) return false;

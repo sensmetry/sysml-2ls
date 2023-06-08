@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { PerformActionUsage, ReferenceSubsetting } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 import { EventOccurrenceUsageMeta } from "./event-occurrence-usage";
 
@@ -25,10 +25,6 @@ import { EventOccurrenceUsageMeta } from "./event-occurrence-usage";
     performedAction: "Parts::Part::performedActions",
 })
 export class PerformActionUsageMeta extends Mixin(ActionUsageMeta, EventOccurrenceUsageMeta) {
-    constructor(id: ElementID, parent: ModelContainer<PerformActionUsage>) {
-        super(id, parent);
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");
@@ -39,11 +35,6 @@ export class PerformActionUsageMeta extends Mixin(ActionUsageMeta, EventOccurren
     override ast(): PerformActionUsage | undefined {
         return this._ast as PerformActionUsage;
     }
-
-    override parent(): ModelContainer<PerformActionUsage> {
-        return this._parent;
-    }
-
     override namingFeature(): FeatureMeta | undefined {
         return this.types(ReferenceSubsetting).head() as FeatureMeta | undefined;
     }

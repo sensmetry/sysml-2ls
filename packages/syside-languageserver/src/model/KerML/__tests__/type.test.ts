@@ -23,7 +23,7 @@ describe("Conformance", () => {
 
         expect(tree).toMatchObject(NO_ERRORS);
         expect(
-            (tree.value.namespaceMembers.at(-1)?.$meta.element() as TypeMeta).conforms("A")
+            (tree.value.children.at(-1)?.$meta.element() as TypeMeta).conforms("A")
         ).toBeTruthy();
     });
 
@@ -31,7 +31,7 @@ describe("Conformance", () => {
         const tree = await parseKerML("class A; class B :> A; class C :> B;");
 
         expect(tree).toMatchObject(NO_ERRORS);
-        const typeMembers = tree.value.namespaceMembers;
+        const typeMembers = tree.value.children;
         expect(
             (typeMembers.at(-1)?.$meta.element() as TypeMeta).conforms(
                 typeMembers.at(0)?.$meta.element() as TypeMeta
@@ -43,9 +43,7 @@ describe("Conformance", () => {
         const tree = await parseKerML("class A; class B :> A; class C;");
 
         expect(tree).toMatchObject(NO_ERRORS);
-        expect(
-            (tree.value.namespaceMembers.at(-1)?.$meta.element() as TypeMeta).conforms("A")
-        ).toBeFalsy();
+        expect((tree.value.children.at(-1)?.$meta.element() as TypeMeta).conforms("A")).toBeFalsy();
     });
 
     test("firstConforming finds the first conforming type", async () => {
@@ -53,7 +51,7 @@ describe("Conformance", () => {
 
         expect(tree).toMatchObject(NO_ERRORS);
         expect(
-            (tree.value.namespaceMembers.at(-1)?.$meta.element() as TypeMeta)
+            (tree.value.children.at(-1)?.$meta.element() as TypeMeta)
                 .firstConforming(["D", "A"])
                 ?.at(0)
         ).toEqual("A");
@@ -64,10 +62,7 @@ describe("Conformance", () => {
 
         expect(tree).toMatchObject(NO_ERRORS);
         expect(
-            (tree.value.namespaceMembers.at(-1)?.$meta.element() as TypeMeta).firstConforming([
-                "D",
-                "E",
-            ])
+            (tree.value.children.at(-1)?.$meta.element() as TypeMeta).firstConforming(["D", "E"])
         ).toBeUndefined();
     });
 });

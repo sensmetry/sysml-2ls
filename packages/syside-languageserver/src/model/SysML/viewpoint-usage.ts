@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ViewpointUsage, ViewDefinition, ViewUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { RequirementUsageMeta } from "./requirement-usage";
 
 @metamodelOf(ViewpointUsage, {
@@ -23,25 +23,17 @@ import { RequirementUsageMeta } from "./requirement-usage";
     satisfied: "Views::View::viewpointSatisfactions",
 })
 export class ViewpointUsageMeta extends RequirementUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<ViewpointUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isSatisfiedViewpoint() ? "satisfied" : "base";
     }
 
     isSatisfiedViewpoint(): boolean {
         const parent = this.owner();
-        return parent.isAny([ViewDefinition, ViewUsage]);
+        return Boolean(parent?.isAny(ViewDefinition, ViewUsage));
     }
 
     override ast(): ViewpointUsage | undefined {
         return this._ast as ViewpointUsage;
-    }
-
-    override parent(): ModelContainer<ViewpointUsage> {
-        return this._parent;
     }
 }
 

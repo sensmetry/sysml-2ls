@@ -142,7 +142,7 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
             // update scope lookup table with the exports
             const meta = container.$meta;
             for (const member of localExports) {
-                meta.addChild(member);
+                meta["addLookupMember"](member);
             }
         }
 
@@ -158,7 +158,7 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
             node.$meta.name ?? node.$meta.shortName ?? `${node.$meta.elementId}`,
             document
         );
-        node.$meta.description = regular;
+        node.$meta["_description"] = regular;
 
         return regular;
     }

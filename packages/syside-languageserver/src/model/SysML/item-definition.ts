@@ -17,23 +17,15 @@
 import { Mixin } from "ts-mixer";
 import { ItemDefinition } from "../../generated/ast";
 import { StructureMeta } from "../KerML/structure";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceDefinitionMeta } from "./occurrence-definition";
 
 @metamodelOf(ItemDefinition, {
     base: "Items::Item",
 })
 export class ItemDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, StructureMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ItemDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): ItemDefinition | undefined {
         return this._ast as ItemDefinition;
-    }
-
-    override parent(): ModelContainer<ItemDefinition> {
-        return this._parent;
     }
 }
 

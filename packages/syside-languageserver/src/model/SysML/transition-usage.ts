@@ -14,21 +14,28 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream } from "langium";
 import {
-    AcceptActionUsage,
     ActionDefinition,
     ActionUsage,
-    ParameterMembership,
     StateDefinition,
     StateUsage,
-    TransitionFeatureMembership,
     TransitionUsage,
 } from "../../generated/ast";
-import { FeatureMeta } from "../KerML/_internal";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { NonNullable, enumerable } from "../../utils";
+import {
+    ElementParts,
+    ExpressionMeta,
+    FeatureMeta,
+    MembershipMeta,
+    OwningMembershipMeta,
+    ParameterMembershipMeta,
+} from "../KerML/_internal";
+import { metamodelOf } from "../metamodel";
 import { AcceptActionUsageMeta } from "./accept-action-usage";
 import { ActionUsageMeta } from "./action-usage";
+import { TransitionFeatureMembershipMeta } from "./relationships";
+import { SuccessionAsUsageMeta } from "./succession-as-usage";
+import { UsageMeta } from "./usage";
 
 @metamodelOf(TransitionUsage, {
     base: "Actions::transitionActions",
@@ -36,8 +43,73 @@ import { ActionUsageMeta } from "./action-usage";
     stateTransition: "States::StateAction::stateTransitions",
 })
 export class TransitionUsageMeta extends ActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<TransitionUsage>) {
-        super(id, parent);
+    private _source?: MembershipMeta<FeatureMeta> | undefined;
+    // TODO: non-optional
+    private _transitionLinkSource?: ParameterMembershipMeta<UsageMeta> | undefined;
+    private _payload?: ParameterMembershipMeta<UsageMeta> | undefined;
+    private _accepter?: TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined;
+    private _guard?: TransitionFeatureMembershipMeta<ExpressionMeta> | undefined;
+    private _effect?: TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined;
+    private _then?: OwningMembershipMeta<SuccessionAsUsageMeta> | undefined;
+    private _else?: OwningMembershipMeta<SuccessionAsUsageMeta> | undefined;
+
+    @enumerable
+    public get source(): MembershipMeta<FeatureMeta> | undefined {
+        return this._source;
+    }
+    public set source(value: MembershipMeta<FeatureMeta> | undefined) {
+        this._source = value;
+    }
+
+    public get transitionLinkSource(): ParameterMembershipMeta<UsageMeta> | undefined {
+        return this._transitionLinkSource;
+    }
+
+    public get payload(): ParameterMembershipMeta<UsageMeta> | undefined {
+        return this._accepter ? this._payload : undefined;
+    }
+    public set payload(value: ParameterMembershipMeta<UsageMeta> | undefined) {
+        this._payload = value;
+    }
+
+    @enumerable
+    public get accepter(): TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined {
+        return this._accepter;
+    }
+    public set accepter(value: TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined) {
+        this._accepter = value;
+    }
+
+    @enumerable
+    public get guard(): TransitionFeatureMembershipMeta<ExpressionMeta> | undefined {
+        return this._guard;
+    }
+    public set guard(value: TransitionFeatureMembershipMeta<ExpressionMeta> | undefined) {
+        this._guard = value;
+    }
+
+    @enumerable
+    public get effect(): TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined {
+        return this._effect;
+    }
+    public set effect(value: TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined) {
+        this._effect = value;
+    }
+
+    @enumerable
+    public get then(): OwningMembershipMeta<SuccessionAsUsageMeta> | undefined {
+        return this._then;
+    }
+    public set then(value: OwningMembershipMeta<SuccessionAsUsageMeta> | undefined) {
+        this._then = value;
+    }
+
+    @enumerable
+    public get else(): OwningMembershipMeta<SuccessionAsUsageMeta> | undefined {
+        return this._else;
+    }
+    public set else(value: OwningMembershipMeta<SuccessionAsUsageMeta> | undefined) {
+        this._else = value;
     }
 
     override defaultSupertype(): string {
@@ -49,41 +121,62 @@ export class TransitionUsageMeta extends ActionUsageMeta {
     isActionTransition(): boolean {
         if (!this.isComposite) return false;
         const parent = this.owner();
-        return parent.isAny([ActionUsage, ActionDefinition]);
+        return Boolean(parent?.isAny(ActionUsage, ActionDefinition));
     }
 
     isStateTransition(): boolean {
         if (!this.isComposite) return false;
         const parent = this.owner();
-        return parent.isAny([StateDefinition, StateUsage]);
+        return Boolean(parent?.isAny(StateDefinition, StateUsage));
     }
 
     override ast(): TransitionUsage | undefined {
         return this._ast as TransitionUsage;
     }
-
-    override parent(): ModelContainer<TransitionUsage> {
-        return this._parent;
-    }
-
     payloadParameter(): FeatureMeta | undefined {
-        return this.featuresByMembership(ParameterMembership).tail(1).head();
+        return this.payload?.element();
     }
 
-    triggerActions(): Stream<AcceptActionUsageMeta> {
-        return this.featuresMatching(AcceptActionUsage);
+    triggerActions(): AcceptActionUsageMeta | undefined {
+        return this.accepter?.element();
     }
 
     accepterPayloadParameter(): FeatureMeta | undefined {
-        return this.triggerActions().head()?.ownedParameters().head();
+        return this.accepter?.element()?.payload?.element();
     }
 
     transitionLinkFeature(): FeatureMeta | undefined {
-        return this.ownedFeatureMemberships()
-            .filter((m) => !m.isAny([TransitionFeatureMembership, ParameterMembership]))
-            .map((m) => m.element())
-            .nonNullable()
-            .head();
+        return this.transitionLinkSource?.element();
+    }
+
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = super.featureMembers();
+        return (
+            [
+                this.source,
+                this.transitionLinkSource,
+                this.payload,
+                this.accepter,
+                this.guard,
+                this.effect,
+                this.then,
+                this.else,
+            ] as (MembershipMeta<FeatureMeta> | undefined)[]
+        )
+            .filter(NonNullable)
+            .concat(baseFeatures);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = {};
+
+        for (const kw of ["source", "accepter", "guard", "effect", "then", "else"] as const) {
+            const value = this[kw];
+            if (value) parts[kw] = [value];
+        }
+
+        parts.children = this.children;
+        return parts;
     }
 }
 

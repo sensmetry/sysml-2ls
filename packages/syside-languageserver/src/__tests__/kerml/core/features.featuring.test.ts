@@ -25,14 +25,15 @@ test("type featuring can be parsed", async () => {
             doc /* doc */
         }
     `).toParseKerML({
-        relationshipMembers: [
+        children: [
+            ...anything(2),
             {
                 element: {
                     $type: TypeFeaturing,
                     ...withQualifiedName("engine_by_Vehicle"),
                     source: qualifiedTypeReference("engine"),
                     reference: qualifiedTypeReference("Vehicle"),
-                    annotations: [
+                    elements: [
                         {
                             element: {
                                 body: "/* doc */",
@@ -53,7 +54,8 @@ test.each(["of", ""])(
         feature Vehicle;
         featuring ${token} engine by Vehicle;
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: TypeFeaturing,
@@ -72,14 +74,16 @@ test("features can own type featurings", async () => {
     classifier Engine;
     feature engine : Engine featured by Vehicle;
     `).toParseKerML({
-        members: [
-            ...anything(1),
+        children: [
+            ...anything(2),
             {
                 element: {
                     $type: Feature,
                     ...withQualifiedName("engine"),
-                    typeRelationships: [
+                    heritage: [
                         { $type: FeatureTyping, reference: qualifiedTypeReference("Engine") },
+                    ],
+                    typeRelationships: [
                         { $type: TypeFeaturing, reference: qualifiedTypeReference("Vehicle") },
                     ],
                 },

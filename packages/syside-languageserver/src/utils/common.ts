@@ -190,8 +190,10 @@ function toJSONImpl(
     }
 
     const out: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(item)) {
+    for (const key in item) {
         if (typeof key !== "string") continue;
+        // TS doesn't allow indexing by a key from `in`????
+        const value = (item as Record<string, unknown>)[key];
         const replaced = toJSONImpl(item, key, value, replacer);
         if (replaced === undefined) continue;
         out[key] = replaced;
@@ -572,3 +574,65 @@ export async function waitAllPromises<T>(
 
     return resolved;
 }
+
+/**
+ * Decorator to mark properties and fields as enumerable. Such members may then
+ * included in `for ... in` iteration depending on their enumerability. Note
+ * that properties by default are non-enumerable.
+ *
+ * Single value overload allows specifying enumerability value.
+ *
+ * @see
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
+ */
+export function enumerable(target: object, name: string | symbol): void;
+export function enumerable(
+    target: object,
+    name: string | symbol,
+    descriptor: PropertyDescriptor
+): void;
+// `MethodDecorator` and `PropertyDecorator` generate TS errors when used with fields...
+export function enumerable(value: boolean): typeof enumerable;
+
+export function enumerable(
+    targetOrValue: object | boolean,
+    name?: string | symbol,
+    descriptor?: PropertyDescriptor
+): void | MethodDecorator | PropertyDecorator {
+    const decorator = function (
+        target: object,
+        name: string | symbol,
+        descriptor?: PropertyDescriptor
+    ): void {
+        const enumerable = targetOrValue as boolean;
+        if (descriptor) {
+            descriptor.enumerable = enumerable;
+            return;
+        }
+
+        // fields are enumerable by default, no need to overwrite them
+        if (enumerable) return;
+        let value: unknown = undefined;
+        Object.defineProperty(target, name, {
+            configurable: true,
+            enumerable,
+            get() {
+                return value;
+            },
+            set(v) {
+                value = v;
+            },
+        });
+    };
+
+    if (name) {
+        decorator(targetOrValue as object, name as string, descriptor);
+        return;
+    }
+
+    return decorator;
+}
+
+export type LazyGetter<T> = () => T;
+
+export const NonNullable = <T>(item: T | undefined | null): item is T => Boolean(item);

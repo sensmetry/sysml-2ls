@@ -16,28 +16,33 @@
 
 import { Stream, stream, TreeStreamImpl } from "langium";
 import { Mixin } from "ts-mixer";
-import { FeatureMembership, Type } from "../../generated/ast";
-import { SysMLTypeList } from "../../services/sysml-ast-reflection";
-import { KeysMatching } from "../../utils/common";
+import {
+    FeatureMembership,
+    FeatureRelationship,
+    Inheritance,
+    Membership,
+    Type,
+    TypeRelationship,
+} from "../../generated/ast";
+import { SubtypeKeys, SysMLTypeList } from "../../services/sysml-ast-reflection";
+import { enumerable, KeysMatching } from "../../utils/common";
 import { collectRedefinitions } from "../../utils/scope-util";
-import { SpecializationKeys, Specializations, SpecializationType } from "../containers";
+import { ElementContainer } from "../containers";
 import { getTypeClassifierString, TypeClassifier } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { InputParametersMixin } from "../mixins";
 import {
-    ElementMeta,
+    ElementParts,
     FeatureMembershipMeta,
     FeatureMeta,
+    InheritanceMeta,
     MembershipMeta,
     MetadataFeatureMeta,
     MultiplicityRangeMeta,
     NamespaceMeta,
     NonNullRelationship,
     OwningMembershipMeta,
-    ResultExpressionMembershipMeta,
-    ReturnParameterMembershipMeta,
     SpecializationMeta,
-    TargetType,
 } from "./_internal";
 
 export const ImplicitTypes = {
@@ -46,39 +51,52 @@ export const ImplicitTypes = {
 
 @metamodelOf(Type, ImplicitTypes)
 export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
-    /**
-     * Specializations
-     */
-    protected readonly _specializations = new Specializations();
+    protected readonly _heritage = new ElementContainer<Inheritance>();
+    protected readonly _typeRelationships = new ElementContainer<FeatureRelationship>();
+    protected _isAbstract = false;
+    protected _classifier: TypeClassifier = TypeClassifier.None;
+
+    protected _multiplicity: OwningMembershipMeta<MultiplicityRangeMeta> | undefined;
 
     /**
      * Whether this type is abstract
      */
-    isAbstract = false;
+    @enumerable
+    get isAbstract(): boolean {
+        return this._isAbstract;
+    }
+    set isAbstract(value) {
+        this._isAbstract = value;
+    }
+
+    @enumerable
+    get multiplicity(): OwningMembershipMeta<MultiplicityRangeMeta> | undefined {
+        return this._multiplicity;
+    }
+    set multiplicity(value) {
+        this._multiplicity = value;
+    }
+
+    @enumerable
+    get heritage(): readonly InheritanceMeta[] {
+        return this._heritage.all;
+    }
+
+    @enumerable
+    get typeRelationships(): readonly FeatureRelationship["$meta"][] {
+        return this._typeRelationships.all;
+    }
+    addTypeRelationship(...element: TypeRelationship["$meta"][]): this {
+        this._typeRelationships.add(...element);
+        element.forEach((e) => this.maybeTakeOwnership(e));
+        return this;
+    }
 
     /**
      * Cached type classifiers
      */
-    classifier: TypeClassifier = TypeClassifier.None;
-
-    /**
-     * Result member
-     */
-    result: ResultExpressionMembershipMeta | undefined;
-    returns: ReturnParameterMembershipMeta | undefined;
-
-    multiplicity?: OwningMembershipMeta<MultiplicityRangeMeta>;
-
-    constructor(elementId: ElementID, parent: ModelContainer<Type>) {
-        super(elementId, parent);
-    }
-
-    override initialize(node: Type): void {
-        this.isAbstract = !!node.isAbstract;
-        if (node.multiplicity) {
-            this.multiplicity = node.multiplicity
-                .$meta as OwningMembershipMeta<MultiplicityRangeMeta>;
-        }
+    get classifier(): TypeClassifier {
+        return this._classifier;
     }
 
     /**
@@ -92,36 +110,27 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
         return this._ast as Type;
     }
 
-    override parent(): ModelContainer<Type> {
-        return this._parent;
-    }
-
-    override owner(): ElementMeta {
-        // only namespaces are entry types
-        return this._owner as ElementMeta;
-    }
-
     /**
      * Stream of direct specializations matching {@link kind}
      * @param kind specialization kind filter
      */
-    specializations<K extends SpecializationKeys | undefined>(kind: K): SpecializationType<K>[];
-    specializations(kind?: undefined): SpecializationType[];
-    specializations<K extends SpecializationKeys>(kind?: K): SpecializationType<K | undefined>[] {
-        return this._specializations.get(kind);
+    specializations<K extends SubtypeKeys<Inheritance>>(kind: K): readonly InheritanceMeta[];
+    specializations<K extends SubtypeKeys<Inheritance> | undefined>(
+        kind?: K
+    ): readonly InheritanceMeta[];
+    specializations(kind?: undefined): readonly InheritanceMeta[];
+    specializations<K extends SubtypeKeys<Inheritance>>(kind?: K): readonly InheritanceMeta[] {
+        return this._heritage.get(kind);
     }
 
     /**
      * Stream of direct specialized types matching {@link kind}
      * @param kind specialization kind filter
      */
-    types<K extends SpecializationKeys | undefined>(
-        kind: K
-    ): Stream<NonNullable<TargetType<SpecializationType<K>>>>;
-    types(kind?: undefined): Stream<NonNullable<TargetType<SpecializationType>>>;
-    types<K extends SpecializationKeys>(
-        kind?: K
-    ): Stream<NonNullable<TargetType<SpecializationType<K | undefined>>>> {
+    types<K extends SubtypeKeys<Inheritance>>(kind: K): Stream<TypeMeta>;
+    types<K extends SubtypeKeys<Inheritance> | undefined>(kind: K): Stream<TypeMeta>;
+    types(kind?: undefined): Stream<TypeMeta>;
+    types<K extends SubtypeKeys<Inheritance>>(kind?: K): Stream<TypeMeta> {
         return stream(this.specializations(kind))
             .map((s) => s.finalElement())
             .nonNullable();
@@ -131,17 +140,15 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
      * Stream of all direct and indirect specializations
      * @param kind specialization kind filter
      */
-    allSpecializations<K extends SpecializationKeys | undefined>(
-        kind: K
-    ): Stream<SpecializationType<K>>;
-    allSpecializations(kind?: undefined): Stream<SpecializationType<undefined>>;
-    allSpecializations<K extends SpecializationKeys | undefined>(
-        kind?: K
-    ): Stream<SpecializationType<K | undefined>> {
+    allSpecializations<K extends SubtypeKeys<Inheritance>>(kind: K): Stream<InheritanceMeta>;
+    // prettier-ignore
+    allSpecializations<K extends SubtypeKeys<Inheritance> | undefined>(kind: K): Stream<InheritanceMeta>;
+    allSpecializations(kind?: undefined): Stream<InheritanceMeta>;
+    allSpecializations<K extends SubtypeKeys<Inheritance>>(kind?: K): Stream<InheritanceMeta> {
         const visited = new Set<unknown>();
-        const self = new SpecializationMeta(-1, this);
+        const self = new SpecializationMeta(-1);
         self.setElement(this);
-        const tree = new TreeStreamImpl<SpecializationType<K | undefined>>(
+        const tree = new TreeStreamImpl<InheritanceMeta>(
             self as NonNullRelationship<typeof self>,
             // avoid circular specializations, there probably should be a
             // warning
@@ -169,41 +176,13 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
      * @param kind specialization kind filter
      * @param includeSelf if true, also include itself
      */
-    allTypes<T extends TypeMeta, K extends SpecializationKeys | undefined>(
-        this: T,
-        kind: K,
-        includeSelf: true
-    ): Stream<NonNullable<T | TargetType<SpecializationType<K>>>>;
-    allTypes<T extends TypeMeta, K extends SpecializationKeys | undefined>(
-        this: T,
-        kind: K,
-        includeSelf?: false
-    ): Stream<NonNullable<TargetType<SpecializationType<K>>>>;
-    allTypes<T extends TypeMeta, K extends SpecializationKeys | undefined>(
-        this: T,
-        kind: K,
-        includeSelf?: boolean
-    ): Stream<NonNullable<T | TargetType<SpecializationType<K>>>>;
-    allTypes<T extends TypeMeta>(
-        this: T,
-        kind: undefined,
-        includeSelf: true
-    ): Stream<NonNullable<T | TargetType<SpecializationType>>>;
-    allTypes<T extends TypeMeta>(
-        this: T,
-        kind: undefined,
-        includeSelf?: false
-    ): Stream<NonNullable<TargetType<SpecializationType>>>;
-    allTypes<T extends TypeMeta>(
-        this: T,
-        kind?: undefined,
-        includeSelf?: boolean
-    ): Stream<NonNullable<T | TargetType<SpecializationType>>>;
-
-    allTypes<K extends SpecializationKeys | undefined>(
+    // prettier-ignore
+    allTypes<K extends SubtypeKeys<Inheritance> | undefined>(kind: K, includeSelf?: boolean): Stream<TypeMeta>;
+    allTypes(kind?: undefined, includeSelf?: boolean): Stream<TypeMeta>;
+    allTypes<K extends SubtypeKeys<Inheritance> | undefined>(
         kind?: K,
         includeSelf = false
-    ): Stream<NonNullable<TargetType<SpecializationType<K | undefined>> | TypeMeta>> {
+    ): Stream<TypeMeta> {
         const tree = this.allSpecializations(kind)
             .map((s) => s.finalElement())
             .nonNullable();
@@ -247,18 +226,13 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
      */
     specializationsMatching<
         K extends KeysMatching<SysMLTypeList, Type>,
-        SK extends SpecializationKeys
-    >(
-        is: K | K[],
-        kind?: SK
-    ): Stream<NonNullRelationship<SpecializationType<SK | undefined>, SysMLTypeList[K]["$meta"]>> {
+        SK extends SubtypeKeys<Inheritance>
+    >(is: K | K[], kind?: SK): Stream<NonNullRelationship<InheritanceMeta>> {
         return (
             Array.isArray(is)
-                ? stream(this.specializations(kind)).filter((s) => s.finalElement()?.isAny(is))
+                ? stream(this.specializations(kind)).filter((s) => s.finalElement()?.isAny(...is))
                 : stream(this.specializations(kind)).filter((s) => s.finalElement()?.is(is))
-        ) as Stream<
-            NonNullRelationship<SpecializationType<SK | undefined>, SysMLTypeList[K]["$meta"]>
-        >;
+        ) as Stream<NonNullRelationship<InheritanceMeta>>;
     }
 
     /**
@@ -266,7 +240,7 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
      * @param kind specialization kind filter
      * @returns Stream of direct specialized types that satisfy {@link is}
      */
-    typesMatching<K extends KeysMatching<SysMLTypeList, Type>, SK extends SpecializationKeys>(
+    typesMatching<K extends SubtypeKeys<Type>, SK extends SubtypeKeys<Inheritance>>(
         is: K | K[],
         kind?: SK
     ): Stream<SysMLTypeList[K]["$meta"]> {
@@ -281,20 +255,17 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
      * @param includeSelf if true, also include self
      * @returns Stream of all direct and indirect specializations that satisfy {@link is}
      */
-    allSpecializationsMatching<
-        K extends KeysMatching<SysMLTypeList, Type>,
-        SK extends SpecializationKeys
-    >(
+    allSpecializationsMatching<K extends SubtypeKeys<Type>, SK extends SubtypeKeys<Inheritance>>(
         is: K | K[],
         kind?: SK
-    ): Stream<NonNullRelationship<SpecializationType<SK | undefined>, SysMLTypeList[K]["$meta"]>> {
+    ): Stream<NonNullRelationship<InheritanceMeta>> {
         return (
             Array.isArray(is)
-                ? stream(this.allSpecializations(kind)).filter((s) => s.finalElement()?.isAny(is))
+                ? stream(this.allSpecializations(kind)).filter((s) =>
+                      s.finalElement()?.isAny(...is)
+                  )
                 : stream(this.allSpecializations(kind)).filter((s) => s.finalElement()?.is(is))
-        ) as Stream<
-            NonNullRelationship<SpecializationType<SK | undefined>, SysMLTypeList[K]["$meta"]>
-        >;
+        ) as Stream<NonNullRelationship<InheritanceMeta>>;
     }
 
     /**
@@ -303,21 +274,16 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
      * @param includeSelf if true, also include self
      * @returns Stream of all direct and indirect specialized types that satisfy {@link conforms}
      */
-    allTypesMatching<K extends KeysMatching<SysMLTypeList, Type>, SK extends SpecializationKeys>(
+    allTypesMatching<K extends SubtypeKeys<Type>, SK extends SubtypeKeys<Inheritance>>(
         is: K | K[],
         kind?: SK,
         includeSelf = false
     ): Stream<SysMLTypeList[K]["$meta"]> {
         return (
             Array.isArray(is)
-                ? stream(this.allTypes(kind, includeSelf)).filter((s) => s.isAny(is))
+                ? stream(this.allTypes(kind, includeSelf)).filter((s) => s.isAny(...is))
                 : stream(this.allTypes(kind, includeSelf)).filter((s) => s.is(is))
         ) as Stream<SysMLTypeList[K]["$meta"]>;
-    }
-
-    override reset(_: Type): void {
-        this._specializations.clear();
-        this.resetInputParameters();
     }
 
     /**
@@ -346,31 +312,25 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
 
         // TODO: filter by visibility?
         return allTypes.flatMap((s) =>
-            stream(s.features).filter(predicate).tail(count).map(counted)
+            stream(s.featureMembers()).filter(predicate).tail(count).map(counted)
         );
     }
 
-    /**
-     * @returns owned or inherited result parameter if one exists, otherwise undefined
-     */
-    resultParameter(): ResultExpressionMembershipMeta | undefined {
-        return (this.result ??= this.allTypes()
-            .map((t) => t.result)
-            .find((r) => r));
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    protected onSpecializationAdded(spec: InheritanceMeta): void {
+        // empty
     }
 
-    returnParameter(): ReturnParameterMembershipMeta | undefined {
-        return (this.returns ??= this.allTypes()
-            .map((t) => t.returns)
-            .find((r) => r));
+    protected maybeTakeOwnership(element: FeatureRelationship["$meta"] | InheritanceMeta): void {
+        if (!element.parent()?.is(Membership)) this.takeOwnership(element);
     }
 
-    /**
-     * @see {@link Specializations.add}
-     */
-    addSpecialization<T extends SpecializationType>(specialization: T): void {
+    addSpecialization(specialization: InheritanceMeta): void {
         if (specialization.finalElement() === this) return;
-        this._specializations.add(specialization);
+        this._heritage.add(specialization);
+        this.maybeTakeOwnership(specialization);
+
+        this.onSpecializationAdded(specialization);
     }
 
     override allMetadata(): Stream<MetadataFeatureMeta> {
@@ -382,7 +342,7 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
         // TODO: filter by visibility?
         const visited = new Set<object>();
         return this.allTypes(undefined, true)
-            .flatMap((t) => t.features)
+            .flatMap((t) => t.featureMembers())
             .filter((member) => {
                 const f = member.element();
                 if (!f || visited.has(f)) return false;
@@ -393,7 +353,7 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
     }
 
     ownedFeatureMemberships(): Stream<FeatureMembershipMeta> {
-        return stream(this.features).filter((m) =>
+        return stream(this.featureMembers()).filter((m) =>
             m.is(FeatureMembership)
         ) as Stream<FeatureMembershipMeta>;
     }
@@ -404,6 +364,22 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
 
     ownedParameters(): Stream<FeatureMeta> {
         return this.ownedFeatures().filter((f) => f.isParameter);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = {
+            prefixes: this.prefixes,
+        };
+
+        // multiplicity always appears before heritage in non-feature types
+        if (this._multiplicity) {
+            parts.multiplicity = [this._multiplicity];
+        }
+
+        parts.heritage = this.heritage;
+        parts.typeRelationships = this.typeRelationships;
+
+        return parts;
     }
 }
 

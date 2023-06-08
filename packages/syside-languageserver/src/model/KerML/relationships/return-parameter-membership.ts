@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { ReturnParameterMembership } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta, ParameterMembershipMeta } from "../_internal";
 
 @metamodelOf(ReturnParameterMembership)
 export class ReturnParameterMembershipMeta<
     T extends FeatureMeta = FeatureMeta
 > extends ParameterMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ReturnParameterMembership>) {
-        super(id, parent);
-    }
-
     override ast(): ReturnParameterMembership | undefined {
         return this._ast as ReturnParameterMembership;
-    }
-
-    override parent(): ModelContainer<ReturnParameterMembership> {
-        return this._parent;
     }
 }
 

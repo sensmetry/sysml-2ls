@@ -14,10 +14,37 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ReturnParameterMembership } from "../../generated/ast";
-import { ExpressionMeta, FunctionMeta, TypeMeta } from "../KerML/_internal";
+import { Expression, ReturnParameterMembership, SysMLFunction } from "../../generated/ast";
+import {
+    ExpressionMeta,
+    FunctionMeta,
+    ResultExpressionMembershipMeta,
+    ReturnParameterMembershipMeta,
+    TypeMeta,
+} from "../KerML/_internal";
 
 export class FunctionMixin {
+    protected _result: ResultExpressionMembershipMeta | undefined;
+
+    /**
+     * @returns owned or inherited result parameter if one exists, otherwise undefined
+     */
+    resultParameter(this: TypeMeta & FunctionMixin): ResultExpressionMembershipMeta | undefined {
+        if (!this._result) {
+            return this.allTypes()
+                .filter((t): t is TypeMeta & FunctionMixin => t.isAny(SysMLFunction, Expression))
+                .map((e) => (e as FunctionMixin)._result)
+                .nonNullable()
+                .head();
+        }
+
+        return this._result;
+    }
+
+    returnParameter(this: TypeMeta): ReturnParameterMembershipMeta | undefined {
+        return this._children.get(ReturnParameterMembership).at(0);
+    }
+
     /**
      * Get the expected return type of a function or expression
      * @param self AST node that owns this metamodel
@@ -27,10 +54,12 @@ export class FunctionMixin {
         self: FunctionMeta | ExpressionMeta | undefined
     ): TypeMeta | string | undefined {
         if (!self) return;
-        if (self.result) {
-            return self.result.element()?.returnType();
+
+        const result = self.resultParameter();
+        if (result) {
+            return result.element()?.returnType();
         }
-        // TODO: multiple return statements?
-        return self.features.find((m) => m.is(ReturnParameterMembership))?.element();
+
+        return self.returnParameter()?.element();
     }
 }

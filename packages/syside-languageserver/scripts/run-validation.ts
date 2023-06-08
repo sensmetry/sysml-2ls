@@ -104,9 +104,6 @@ async function buildDocuments(
     docs: LangiumDocument[],
     services: LangiumSharedServices
 ): Promise<void> {
-    console.info(
-        `Checking for parsing errors:\n  ${docs.map((doc) => doc.uri.toString()).join("\n  ")}`
-    );
     console.info("Building documents...");
     await services.workspace.DocumentBuilder.build(docs, { validationChecks: "all" });
     console.info("Built documents.");
@@ -201,6 +198,9 @@ async function run(exportDiagnostics = false, ignoreKnown = false): Promise<numb
         standardLibrary: false,
         standardLibraryPath: Utils.joinPath(submodule, "sysml.library").path,
         skipWorkspaceInit: true,
+        debug: {
+            scopeInLinkingErrors: "types",
+        },
     });
     const docs = await collectDocuments(submodule, services.shared);
     await buildDocuments(docs, services.shared);

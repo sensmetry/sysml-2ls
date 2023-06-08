@@ -202,6 +202,32 @@ class TypesIndex<S = SysMLTypeList> {
         return result as Map<Keys<S>, T[]>;
     }
 
+    chain<T>(
+        registry: Readonly<TypeMap<S, T>>,
+        order: "subtype-first" | "supertype-first"
+    ): Map<Keys<S>, T[]> {
+        const result = new Map<Keys<S>, T[]>();
+        const reversed = order === "supertype-first";
+
+        for (const type of this.base.getAllTypes()) {
+            const chain: T[] = [];
+
+            const value = registry[type as Keys<S>];
+            if (value) chain.push(value);
+
+            this.getInheritanceChain(type).forEach((supertype) => {
+                const value = registry[supertype];
+                if (value) chain.push(value);
+            });
+
+            if (registry.default) chain.push(registry.default);
+
+            result.set(type as Keys<S>, reversed ? chain.reverse() : chain);
+        }
+
+        return result;
+    }
+
     isUnion(type: string): boolean {
         return type.startsWith("Named") || type.indexOf("Or") !== -1;
     }

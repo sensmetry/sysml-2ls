@@ -27,6 +27,8 @@ import { streamAst } from "../../../utils";
 import { SysMLSharedServices } from "../../services";
 import { SysMLNodeDescription } from "./ast-descriptions";
 import { MetamodelBuilder } from "./metamodel-builder";
+import { SysMLConfigurationProvider } from "./configuration-provider";
+import { performance } from "perf_hooks";
 
 export const enum BuildProgress {
     Created = 0,
@@ -72,11 +74,13 @@ declare module "langium" {
  */
 export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
     protected readonly metamodelBuilder: MetamodelBuilder;
+    protected readonly config: SysMLConfigurationProvider;
 
     constructor(services: SysMLSharedServices) {
         super(services);
 
         this.metamodelBuilder = services.workspace.MetamodelBuilder;
+        this.config = services.workspace.ConfigurationProvider;
     }
 
     override update<T extends AstNode = AstNode>(document: LangiumDocument<T>): LangiumDocument<T> {
@@ -103,6 +107,14 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
 
         this.metamodelBuilder.onParsed(doc);
         return doc;
+    }
+
+    protected override parse<T extends AstNode>(uri: URI, text: string): ParseResult<T> {
+        if (!this.config.get().logStatistics) return super.parse<T>(uri, text);
+        const start = performance.now();
+        const result = super.parse<T>(uri, text);
+        console.info(`Parsed ${uri.toString()} in ${(performance.now() - start).toFixed(2)} ms`);
+        return result;
     }
 }
 

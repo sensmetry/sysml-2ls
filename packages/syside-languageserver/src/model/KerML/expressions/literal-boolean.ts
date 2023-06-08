@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LiteralBoolean } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { LiteralExpressionMeta } from "../_internal";
 
 export const ImplicitLiteralBooleans = {
@@ -28,20 +28,8 @@ export const ImplicitLiteralBooleans = {
 export class LiteralBooleanMeta extends LiteralExpressionMeta {
     literal = false;
 
-    constructor(id: ElementID, parent: ModelContainer<LiteralBoolean>) {
-        super(id, parent);
-    }
-
-    override initialize(node: LiteralBoolean): void {
-        this.literal = node.literal;
-    }
-
     override ast(): LiteralBoolean | undefined {
         return this._ast as LiteralBoolean;
-    }
-
-    override parent(): ModelContainer<LiteralBoolean> {
-        return this._parent;
     }
 
     override returnType(): string {

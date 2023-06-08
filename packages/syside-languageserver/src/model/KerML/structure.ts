@@ -16,7 +16,7 @@
 
 import { Structure } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ClassMeta } from "./_internal";
 
 export const ImplicitStructures = {
@@ -25,21 +25,10 @@ export const ImplicitStructures = {
 
 @metamodelOf(Structure, ImplicitStructures)
 export class StructureMeta extends ClassMeta {
-    constructor(id: ElementID, parent: ModelContainer<Structure>) {
-        super(id, parent);
-    }
-
-    protected override setupClassifiers(): void {
-        super.setupClassifiers();
-        this.classifier = TypeClassifier.Structure;
-    }
+    protected override _classifier = TypeClassifier.Structure;
 
     override ast(): Structure | undefined {
         return this._ast as Structure;
-    }
-
-    override parent(): ModelContainer<Structure> {
-        return this._parent;
     }
 }
 

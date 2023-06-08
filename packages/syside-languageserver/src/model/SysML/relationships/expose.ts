@@ -15,25 +15,19 @@
  ********************************************************************************/
 
 import { Expose } from "../../../generated/ast";
+import { enumerable } from "../../../utils";
 import { Importable, ImportMeta } from "../../KerML/relationships/import";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 
 @metamodelOf(Expose, "abstract")
 export abstract class ExposeMeta<T extends Importable = Importable> extends ImportMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Expose>) {
-        super(id, parent);
-    }
-
-    override initialize(_: Expose): void {
-        this.importsAll = true;
+    @enumerable
+    override get importsAll(): boolean {
+        return true;
     }
 
     override ast(): Expose | undefined {
         return this._ast as Expose;
-    }
-
-    override parent(): ModelContainer<Expose> {
-        return this._parent;
     }
 }
 

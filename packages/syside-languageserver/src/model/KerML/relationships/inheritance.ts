@@ -14,27 +14,19 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ConjugatedPortDefinition } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { PortDefinitionMeta } from "./port-definition";
+import { Inheritance } from "../../../generated/ast";
+import { metamodelOf } from "../../metamodel";
+import { RelationshipMeta, TypeMeta } from "../_internal";
 
-@metamodelOf(ConjugatedPortDefinition)
-export class ConjugatedPortDefinitionMeta extends PortDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<ConjugatedPortDefinition>) {
-        super(id, parent);
-    }
-
-    override ast(): ConjugatedPortDefinition | undefined {
-        return this._ast as ConjugatedPortDefinition;
-    }
-
-    override parent(): ModelContainer<ConjugatedPortDefinition> {
-        return this._parent;
+@metamodelOf(Inheritance, "abstract")
+export abstract class InheritanceMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
+    override ast(): Inheritance | undefined {
+        return this._ast as Inheritance;
     }
 }
 
-declare module "../../generated/ast" {
-    interface ConjugatedPortDefinition {
-        $meta: ConjugatedPortDefinitionMeta;
+declare module "../../../generated/ast" {
+    interface Inheritance {
+        $meta: InheritanceMeta;
     }
 }

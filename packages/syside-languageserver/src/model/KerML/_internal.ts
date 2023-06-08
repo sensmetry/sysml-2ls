@@ -65,6 +65,7 @@ export * from "./predicate";
 export * from "./boolean-expression";
 export * from "./invariant";
 
+export * from "./relationships/inheritance";
 export * from "./relationships/specialization";
 export * from "./relationships/subsetting";
 export * from "./relationships/redefinition";

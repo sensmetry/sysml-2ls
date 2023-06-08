@@ -15,11 +15,12 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { Expression } from "../../generated/ast";
+import { Expression, FeatureValue, Multiplicity } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { FunctionMeta, StepMeta, TypeMeta } from "./_internal";
+import { FeatureMeta, FunctionMeta, StepMeta, TypeMeta } from "./_internal";
+import { NonNullable } from "../../utils/common";
 
 export const ImplicitExpressions = {
     base: "Performances::evaluations",
@@ -28,16 +29,15 @@ export const ImplicitExpressions = {
 
 @metamodelOf(Expression, ImplicitExpressions)
 export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
-    constructor(id: ElementID, parent: ModelContainer<Expression>) {
-        super(id, parent);
-    }
+    override get featuredBy(): readonly TypeMeta[] {
+        const featurings = super.typeFeaturings;
+        if (featurings.length > 0) return featurings.map((f) => f.element()).filter(NonNullable);
 
-    override initialize(node: Expression): void {
-        if (node.result) this.result = node.result.$meta;
-    }
-
-    override reset(node: Expression): void {
-        this.initialize(node);
+        const owner = this.owner();
+        if (owner?.is(Multiplicity) || this.parent()?.is(FeatureValue)) {
+            return (owner as FeatureMeta).featuredBy;
+        }
+        return this._owningType ? [this._owningType] : [];
     }
 
     override defaultGeneralTypes(): string[] {
@@ -55,11 +55,6 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
     override ast(): Expression | undefined {
         return this._ast as Expression;
     }
-
-    override parent(): ModelContainer<Expression> {
-        return this._parent;
-    }
-
     /**
      * @returns fully qualified name or AST node of the return type of this
      * expression if one can be inferred, undefined otherwise

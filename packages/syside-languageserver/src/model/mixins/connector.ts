@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Association, EndFeatureMembership } from "../../generated/ast";
-import { ElementMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
+import { FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
 import { PositionalFeaturesBase } from "./positional-features";
 
 const Filter: (f: MembershipMeta<FeatureMeta>) => boolean = (f) =>
@@ -27,14 +27,14 @@ export class ConnectorMixin {
     /**
      * @returns directly owned end features
      */
-    ownedEnds(this: ElementMeta & ConnectorMixin): FeatureMeta[] {
+    ownedEnds(this: TypeMeta & ConnectorMixin): FeatureMeta[] {
         return this.endsCache.owned(this, Filter);
     }
 
     /**
      * @returns directly owned and inherited end features
      */
-    ends(this: TypeMeta & ConnectorMixin): FeatureMeta[] {
+    allEnds(this: TypeMeta & ConnectorMixin): FeatureMeta[] {
         return this.endsCache.all(this, Filter, Types);
     }
 
@@ -46,7 +46,7 @@ export class ConnectorMixin {
      * @returns Total number of ends including inherited ones
      */
     totalEnds(this: TypeMeta & ConnectorMixin): number {
-        return this.ends().length;
+        return this.allEnds().length;
     }
 
     /**

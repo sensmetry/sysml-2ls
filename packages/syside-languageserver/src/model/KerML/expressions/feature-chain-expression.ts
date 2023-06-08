@@ -14,10 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { FeatureChainExpression, Type } from "../../../generated/ast";
-import { Target } from "../../../utils/containers";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
-import { ElementMeta, OperatorExpressionMeta, TypeMeta } from "../_internal";
+import { FeatureChainExpression } from "../../../generated/ast";
+import { metamodelOf } from "../../metamodel";
+import { OperatorExpressionMeta, TypeMeta } from "../_internal";
 
 export const ImplicitFeatureChainExpressions = {
     target: "ControlFunctions::'.'::source::target", // TODO
@@ -25,35 +24,15 @@ export const ImplicitFeatureChainExpressions = {
 
 @metamodelOf(FeatureChainExpression, ImplicitFeatureChainExpressions)
 export class FeatureChainExpressionMeta extends OperatorExpressionMeta {
-    /**
-     * Resolved reference target of the right operand
-     */
-    readonly right = new Target<ElementMeta>();
-
-    constructor(id: ElementID, parent: ModelContainer<FeatureChainExpression>) {
-        super(id, parent);
-    }
-
     override ast(): FeatureChainExpression | undefined {
         return this._ast as FeatureChainExpression;
     }
-
-    override parent(): ModelContainer<FeatureChainExpression> {
-        return this._parent;
-    }
-
-    override reset(_: FeatureChainExpression): void {
-        this.right.reset();
-    }
-
     override getFunction(): string | undefined {
         return "ControlFunctions::'.'";
     }
 
     override returnType(): string | TypeMeta | undefined {
-        const target = this.right.target;
-        if (target?.is(Type)) return target;
-        return;
+        return this.featureMembers().at(-1)?.finalElement();
     }
 }
 

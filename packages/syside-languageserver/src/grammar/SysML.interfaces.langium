@@ -52,7 +52,9 @@ interface PartDefinition extends ItemDefinition {}
 interface PartUsage extends ItemUsage {
 }
 
-interface PortDefinition extends OccurrenceDefinition, Structure {}
+interface PortDefinition extends OccurrenceDefinition, Structure {
+    conjugated?: OwningMembership;
+}
 
 interface PortUsage extends OccurrenceUsage {}
 
@@ -63,6 +65,9 @@ interface ActionUsage extends OccurrenceUsage, Step {
 }
 
 interface IfActionUsage extends ActionUsage {
+    condition: ParameterMembership;
+    then: ParameterMembership;
+    else?: ParameterMembership;
 }
 
 interface StateDefinition extends ActionDefinition {
@@ -83,9 +88,20 @@ interface AssertConstraintUsage extends ConstraintUsage, Invariant {
 }
 
 interface TransitionUsage extends ActionUsage {
+    source?: Membership;
+    transitionLinkSource?: ParameterMembership;
+    payload?: ParameterMembership;
+    accepter?: TransitionFeatureMembership;
+    guard?: TransitionFeatureMembership;
+    effect?: TransitionFeatureMembership;
+    then?: OwningMembership;
+    else?: OwningMembership;
 }
 
-interface AcceptActionUsage extends ActionUsage {}
+interface AcceptActionUsage extends ActionUsage {
+    payload: ParameterMembership;
+    receiver?: ParameterMembership;
+}
 
 interface RequirementDefinition extends ConstraintDefinition {}
 
@@ -93,6 +109,7 @@ interface RequirementUsage extends ConstraintUsage {
 }
 
 interface SatisfyRequirementUsage extends RequirementUsage, AssertConstraintUsage {
+    satisfactionSubject?: SubjectMembership;
 }
 
 interface ConcernDefinition extends RequirementDefinition {}
@@ -166,6 +183,8 @@ interface FlowConnectionUsage extends ConnectionUsage, ActionUsage, ItemFlow {}
 interface SuccessionFlowConnectionUsage extends FlowConnectionUsage, SuccessionItemFlow {}
 
 interface AssignmentActionUsage extends ActionUsage {
+    targetMember: Membership;
+    assignedValue: ParameterMembership;
 }
 
 interface TriggerInvocationExpression extends InvocationExpression {
@@ -180,9 +199,15 @@ interface LoopActionUsage extends ActionUsage {
 }
 
 interface WhileLoopActionUsage extends LoopActionUsage {
+    condition?: ParameterMembership;
+    body: ParameterMembership;
+    until?: ParameterMembership;
 }
 
 interface ForLoopActionUsage extends LoopActionUsage {
+    variable: ParameterMembership;
+    sequence: ParameterMembership;
+    body: ParameterMembership;
 }
 
 interface SendActionUsage extends ActionUsage {

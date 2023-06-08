@@ -16,8 +16,17 @@
 
 import { Mixin } from "ts-mixer";
 import { ItemFlow, ItemFlowEnd } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { ConnectorMeta, ItemFlowEndMeta, StepMeta } from "./_internal";
+import { metamodelOf } from "../metamodel";
+import {
+    ConnectorMeta,
+    ElementParts,
+    FeatureMembershipMeta,
+    FeatureMeta,
+    ItemFeatureMeta,
+    ItemFlowEndMeta,
+    MembershipMeta,
+    StepMeta,
+} from "./_internal";
 
 export const ImplicitItemFlows = {
     base: "Transfers::flowTransfers",
@@ -28,18 +37,18 @@ export const ImplicitItemFlows = {
 
 @metamodelOf(ItemFlow, ImplicitItemFlows)
 export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ItemFlow>) {
-        super(id, parent);
+    protected _item?: FeatureMembershipMeta<ItemFeatureMeta> | undefined;
+
+    get item(): FeatureMembershipMeta<ItemFeatureMeta> | undefined {
+        return this._item;
+    }
+    set item(value: FeatureMembershipMeta<ItemFeatureMeta> | undefined) {
+        this._item = value;
     }
 
     override ast(): ItemFlow | undefined {
         return this._ast as ItemFlow;
     }
-
-    override parent(): ModelContainer<ItemFlow> {
-        return this._parent;
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
@@ -58,6 +67,37 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
      */
     itemFlowEnds(): ItemFlowEndMeta[] {
         return this.ownedEnds().filter((f) => f.is(ItemFlowEnd)) as ItemFlowEndMeta[];
+    }
+
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = ConnectorMeta.prototype.featureMembers.call(this);
+        if (!this._item) return baseFeatures;
+        return ([this._item] as MembershipMeta<FeatureMeta>[]).concat(baseFeatures);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = {
+            prefixes: this.prefixes,
+        };
+
+        if (this._multiplicity) {
+            parts.multiplicity = [this._multiplicity];
+        }
+        parts.heritage = this.heritage;
+        parts.typeRelationships = this.typeRelationships;
+
+        if (this.value) {
+            parts.value = [this.value];
+        }
+
+        if (this._item) {
+            parts.item = [this._item];
+        }
+
+        parts.ends = this.ends;
+        parts.children = this.children;
+
+        return parts;
     }
 }
 

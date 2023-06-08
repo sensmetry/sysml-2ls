@@ -16,23 +16,15 @@
 
 import { ViewRenderingMembership } from "../../../generated/ast";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RenderingUsageMeta } from "../rendering-usage";
 
 @metamodelOf(ViewRenderingMembership)
 export class ViewRenderingMembershipMeta<
     T extends RenderingUsageMeta = RenderingUsageMeta
 > extends FeatureMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ViewRenderingMembership>) {
-        super(id, parent);
-    }
-
     override ast(): ViewRenderingMembership | undefined {
         return this._ast as ViewRenderingMembership;
-    }
-
-    override parent(): ModelContainer<ViewRenderingMembership> {
-        return this._parent;
     }
 }
 

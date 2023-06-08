@@ -307,7 +307,7 @@ export class SysMLCompletionProvider extends DefaultCompletionProvider {
             // expression scope and the previous reference is not a feature
             // chain
             const owner = node.element.$meta.owner();
-            if (token === "." && owner.is(InlineExpression) && !owner.is(FeatureChainExpression)) {
+            if (token === "." && owner?.is(InlineExpression) && !owner.is(FeatureChainExpression)) {
                 const item = this.fillCompletionItem(textDocument, offset, {
                     label: "metadata",
                     kind: CompletionItemKind.Operator,

@@ -49,7 +49,7 @@ export async function expectEvaluationResult(test: EvaluationCase): Promise<void
     });
     expect(result).toMatchObject(NO_ERRORS);
 
-    const feature = result.value.members.at(-1)?.element?.$meta as FeatureMeta;
+    const feature = result.value.children.at(-1)?.element?.$meta as FeatureMeta;
     expect(feature).toBeDefined();
     const expression = feature?.value?.element();
     expect(expression).toBeDefined();

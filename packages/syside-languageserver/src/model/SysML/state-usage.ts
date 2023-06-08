@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { StateDefinition, StateUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 
 @metamodelOf(StateUsage, {
@@ -25,10 +25,6 @@ import { ActionUsageMeta } from "./action-usage";
     ownedAction: "Parts::Part::ownedStates",
 })
 export class StateUsageMeta extends ActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<StateUsage>) {
-        super(id, parent);
-    }
-
     override getSubactionType(): string | undefined {
         if (this.isExclusiveState()) return "exclusiveState";
         if (this.isSubstate()) return "substate";
@@ -37,23 +33,17 @@ export class StateUsageMeta extends ActionUsageMeta {
 
     isExclusiveState(): boolean {
         const parent = this.owner();
-        return parent.isAny([StateDefinition, StateUsage]) && !parent.isParallel;
+        return Boolean(parent?.isAny(StateDefinition, StateUsage) && !parent.isParallel);
     }
 
     isSubstate(): boolean {
-        return this.isNonEntryExitComposite() && this.owner().isAny([StateDefinition, StateUsage]);
+        return Boolean(
+            this.isNonEntryExitComposite() && this.owner()?.isAny(StateDefinition, StateUsage)
+        );
     }
 
     override ast(): StateUsage | undefined {
         return this._ast as StateUsage;
-    }
-
-    override parent(): ModelContainer<StateUsage> {
-        return this._parent;
-    }
-
-    override reset(node: StateUsage): void {
-        this.initialize(node);
     }
 }
 

@@ -16,23 +16,15 @@
 
 import { FeatureReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta, TypeReferenceMeta } from "./../_internal";
 
 @metamodelOf(FeatureReference)
 export class FeatureReferenceMeta extends TypeReferenceMeta {
     override readonly to = new Target<FeatureMeta>();
 
-    constructor(id: ElementID, parent: ModelContainer<FeatureReference>) {
-        super(id, parent);
-    }
-
     override ast(): FeatureReference | undefined {
         return this._ast as FeatureReference;
-    }
-
-    override parent(): ModelContainer<FeatureReference> {
-        return this._parent;
     }
 }
 

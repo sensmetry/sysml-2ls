@@ -23,9 +23,10 @@ const BUILD_OPTIONS: SysMLBuildOptions = { ...TEST_BUILD_OPTIONS, validationChec
 export async function expectValidations(
     text: string,
     message: string | RegExp,
-    count = 1
+    count = 1,
+    options = BUILD_OPTIONS
 ): Promise<void> {
-    const result = await parseSysML(text, BUILD_OPTIONS);
+    const result = await parseSysML(text, options);
 
     const regex = typeof message === "string" ? new RegExp(message) : message;
     const diagnostics = result.diagnostics.filter((d) => regex.test(d.message));
@@ -251,5 +252,24 @@ describe("Parallel states", () => {
 describe("Quantity expressions", () => {
     test("non-measurement references trigger validation", async () => {
         return expectValidations("attribute a = 1 [0];", "Invalid quantity expression");
+    });
+
+    test("measurement reference expressions don't trigger validation", async () => {
+        return expectValidations(
+            `
+            package MeasurementReferences {
+                attribute def TensorMeasurementReference;
+                attribute def VectorMeasurementReference :> TensorMeasurementReference;
+                abstract attribute def ScalarMeasurementReference :> VectorMeasurementReference;
+            }
+            abstract attribute def MeasurementUnit :> MeasurementReferences::ScalarMeasurementReference
+            abstract attribute def SimpleUnit :> MeasurementUnit;
+            attribute def LengthUnit :> SimpleUnit;
+            attribute <m> metre : LengthUnit;
+            attribute a = 1 [metre**2];`,
+            "Invalid quantity expression",
+            0,
+            { ...BUILD_OPTIONS, standardLibrary: "local" }
+        );
     });
 });

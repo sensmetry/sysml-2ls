@@ -54,13 +54,13 @@ test.concurrent.each([
         )
     );
     const expected = {
-        members: [
-            ...anything(2),
+        children: [
+            ...anything(4),
             {
                 element: {
                     $type: Feature,
                     ...withQualifiedName("x"),
-                    typeRelationships: expect.arrayContaining(
+                    heritage: expect.arrayContaining(
                         ["A", "B", "f", "g"].map((name) =>
                             recursiveObjectContaining({ reference: qualifiedTypeReference(name) })
                         )
@@ -93,16 +93,16 @@ test("features without subsetting, redefinition and conjugation relationships su
         }
     );
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.members[0].element, Visibility.private)).toEqual([
+    expect(childrenNames(result.value.children[2].element, Visibility.private)).toEqual([
         "Base::things::that", // from things
     ]);
-    expect(sanitizeTree(result.value.members[0].element, undefined, "include $meta")).toMatchObject(
-        {
-            $type: Feature,
-            ...withQualifiedName("person"),
-            typeRelationships: [{ reference: qualifiedTypeReference("Person") }],
-        }
-    );
+    expect(
+        sanitizeTree(result.value.children[2].element, undefined, "include $meta")
+    ).toMatchObject({
+        $type: Feature,
+        ...withQualifiedName("person"),
+        heritage: [{ reference: qualifiedTypeReference("Person") }],
+    });
 });
 
 test.concurrent.each([
@@ -118,7 +118,7 @@ test.concurrent.each([
 ])("feature prefix '%s' is parsed", async (prefix: string, property: string, value: unknown) => {
     const result = await parseKerML(prefix + " feature a;");
     expect(result).toMatchObject(NO_ERRORS);
-    return expect(result.value.members[0].element?.$meta).toMatchObject({
+    return expect(result.value.children[0].element?.$meta).toMatchObject({
         qualifiedName: "a",
         [property]: value,
     });
@@ -135,7 +135,8 @@ test("feature multiplicity can be specified after identification", async () => {
         class Person;
         feature parent[2] : Person;
     `).toParseKerML({
-        members: [
+        children: [
+            ...anything(1),
             {
                 element: {
                     ...withQualifiedName("parent"),
@@ -150,7 +151,7 @@ test("feature multiplicity can be specified after identification", async () => {
                             },
                         },
                     },
-                    typeRelationships: [{ reference: qualifiedTypeReference("Person") }],
+                    heritage: [{ reference: qualifiedTypeReference("Person") }],
                 },
             },
         ],
@@ -162,7 +163,8 @@ test("feature multiplicity can be specified after one specialization", async () 
         class Person;
         feature parent : Person [2];
     `).toParseKerML({
-        members: [
+        children: [
+            ...anything(1),
             {
                 element: {
                     ...withQualifiedName("parent"),
@@ -177,7 +179,7 @@ test("feature multiplicity can be specified after one specialization", async () 
                             },
                         },
                     },
-                    typeRelationships: [{ reference: qualifiedTypeReference("Person") }],
+                    heritage: [{ reference: qualifiedTypeReference("Person") }],
                 },
             },
         ],
@@ -195,7 +197,8 @@ test.concurrent.each([
         return expect(`
     datatype Real;
     feature readings : Real [*] ${keyword};`).toParseKerML({
-            members: [
+            children: [
+                ...anything(1),
                 {
                     element: {
                         $type: Feature,
@@ -229,7 +232,7 @@ test.concurrent.each([
         feature c;
     }
     feature b ${relationship} a.c;`).toParseKerML({
-        members: [
+        children: [
             ...anything(1),
             {
                 element: {
@@ -250,7 +253,7 @@ test("feature can be featured", async () => {
     return expect(`
     feature a; 
     feature b featured by a;`).toParseKerML({
-        members: [
+        children: [
             ...anything(1),
             {
                 element: {

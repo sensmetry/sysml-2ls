@@ -18,32 +18,21 @@ import { mix } from "ts-mixer";
 import { MembershipExpose } from "../../../generated/ast";
 import { MembershipMeta } from "../../KerML/relationships/membership";
 import { MembershipImportMeta } from "../../KerML/relationships/membership-import";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExposeMeta } from "./expose";
 
 export interface MembershipExposeMeta<T extends MembershipMeta = MembershipMeta>
     extends ExposeMeta<T>,
-        MembershipImportMeta<T> {}
+        MembershipImportMeta<T> {
+    get importsAll(): boolean;
+}
 
 @metamodelOf(MembershipExpose)
 @mix(ExposeMeta, MembershipImportMeta)
 // eslint-disable-next-line unused-imports/no-unused-vars
 export class MembershipExposeMeta<T extends MembershipMeta = MembershipMeta> {
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    constructor(id: ElementID, parent: ModelContainer<MembershipExpose>) {
-        // super(id, parent);
-    }
-
-    initialize(_node: MembershipExpose): void {
-        /* needed for conflict resolution in interface */
-    }
-
     ast(): MembershipExpose | undefined {
         return this._ast as MembershipExpose;
-    }
-
-    parent(): ModelContainer<MembershipExpose> {
-        return this._parent;
     }
 }
 

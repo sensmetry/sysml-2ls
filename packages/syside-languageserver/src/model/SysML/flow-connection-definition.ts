@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { FlowConnectionDefinition } from "../../generated/ast";
 import { InteractionMeta } from "../KerML/interaction";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ActionDefinitionMeta } from "./action-definition";
 import { ConnectionDefinitionMeta } from "./connection-definition";
 
@@ -30,16 +30,8 @@ export class FlowConnectionDefinitionMeta extends Mixin(
     ActionDefinitionMeta,
     ConnectionDefinitionMeta
 ) {
-    constructor(id: ElementID, parent: ModelContainer<FlowConnectionDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): FlowConnectionDefinition | undefined {
         return this._ast as FlowConnectionDefinition;
-    }
-
-    override parent(): ModelContainer<FlowConnectionDefinition> {
-        return this._parent;
     }
 }
 

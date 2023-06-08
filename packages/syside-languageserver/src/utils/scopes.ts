@@ -44,6 +44,7 @@ import {
     MembershipImportMeta,
     NamespaceImportMeta,
     namedMembership,
+    OwningMembershipMeta,
 } from "../model";
 import { SysMLNodeDescription } from "../services/shared/workspace/ast-descriptions";
 import { SysMLType, SysMLTypeList } from "../services/sysml-ast-reflection";
@@ -197,7 +198,7 @@ export class ElementScope extends SysMLScope {
     }
 
     protected override getLocalElement(name: string): MembershipMeta | "prune" | undefined {
-        const candidate = this.element.children.get(name);
+        const candidate = this.element.findMember(name);
         if (typeof candidate === "string") {
             if (candidate === "unresolved reference") throw candidate;
             // name is shadowed by this scope so prune any child scopes
@@ -210,7 +211,7 @@ export class ElementScope extends SysMLScope {
 
     protected override getAllLocalElements(ignored: Set<string>): Stream<ExportedMember> {
         // unnamed/shadowed elements are not exported
-        return stream(this.element.children)
+        return stream(this.element.namedMembers)
             .map(([name, child]) => {
                 if (child === "shadow") {
                     ignored.add(name);
@@ -281,8 +282,8 @@ export abstract class ImportScope extends ElementScope {
         let namespaces: Stream<NamespaceMeta>;
 
         if (node) {
-            // TODO: remove when model order is preserved below, works for now
-            // since we don't add new namespace members at runtime
+            // TODO: remove when model order is preserved, works for now since
+            // we don't add new namespace members at runtime
             namespaces = new TreeStreamImpl(
                 node,
                 (child) =>
@@ -298,9 +299,8 @@ export abstract class ImportScope extends ElementScope {
             namespaces = new TreeStreamImpl(
                 target,
                 (ns) =>
-                    // TODO: need to preserve children order
-                    stream(ns.members, ns.features)
-                        .filter((m) => m.is(OwningMembership))
+                    stream(ns.children)
+                        .filter((m): m is OwningMembershipMeta => m.is(OwningMembership))
                         .map((m) => m.element())
                         .filter((e): e is NamespaceMeta => Boolean(e?.is(Namespace))),
                 { includeRoot: true }

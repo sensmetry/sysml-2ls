@@ -15,21 +15,14 @@
  ********************************************************************************/
 
 import { Conjugation } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
-import { RelationshipMeta, TypeMeta } from "../_internal";
+import { metamodelOf } from "../../metamodel";
+import { TypeMeta } from "../_internal";
+import { InheritanceMeta } from "./inheritance";
 
 @metamodelOf(Conjugation)
-export class ConjugationMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Conjugation>) {
-        super(id, parent);
-    }
-
+export class ConjugationMeta<T extends TypeMeta = TypeMeta> extends InheritanceMeta<T> {
     override ast(): Conjugation | undefined {
         return this._ast as Conjugation;
-    }
-
-    override parent(): ModelContainer<Conjugation> {
-        return this._parent;
     }
 }
 

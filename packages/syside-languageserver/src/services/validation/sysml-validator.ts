@@ -16,7 +16,7 @@
 
 import { ValidationAcceptor } from "langium";
 import * as ast from "../../generated/ast";
-import { ElementMeta, StateSubactionMembershipMeta } from "../../model";
+import { ElementMeta, ExpressionMeta, StateSubactionMembershipMeta, TypeMeta } from "../../model";
 import { SysMLType } from "../sysml-ast-reflection";
 import { KerMLValidator } from "./kerml-validator";
 import { validateSysML } from "./validation-registry";
@@ -27,23 +27,23 @@ import { validateSysML } from "./validation-registry";
 export class SysMLValidator extends KerMLValidator {
     @validateSysML(ast.Usage)
     validateUsage(node: ast.Usage, accept: ValidationAcceptor): void {
-        const isVariation = (m: ElementMeta): boolean => {
-            return m.isAny([ast.Definition, ast.Usage]) && m.isVariation;
+        const isVariation = (m: ElementMeta | undefined): boolean => {
+            return Boolean(m?.isAny(ast.Definition, ast.Usage) && m.isVariation);
         };
 
         const meta = node.$meta;
-        if (meta.parent().is(ast.VariantMembership)) {
+        if (meta.parent()?.is(ast.VariantMembership)) {
             if (!isVariation(meta.owner())) {
                 accept("error", "Variant is not owned by a variation", {
-                    node: meta.parent().ast() ?? node,
+                    node: meta.parent()?.ast() ?? node,
                 });
             }
         } else if (
             isVariation(meta.owner()) &&
-            !meta.parent().isAny([ast.ParameterMembership, ast.ObjectiveMembership])
+            !meta.parent()?.isAny(ast.ParameterMembership, ast.ObjectiveMembership)
         ) {
             accept("error", "Variation can only own variants, parameters and objectives", {
-                node: meta.parent().ast() ?? node,
+                node: meta.parent()?.ast() ?? node,
             });
         }
     }
@@ -208,9 +208,9 @@ export class SysMLValidator extends KerMLValidator {
         node: ast.StateDefinition | ast.StateUsage,
         accept: ValidationAcceptor
     ): void {
-        const subactions = node.$meta.features.filter((m) =>
-            m.is(ast.StateSubactionMembership)
-        ) as StateSubactionMembershipMeta[];
+        const subactions = node.$meta
+            .featureMembers()
+            .filter((m) => m.is(ast.StateSubactionMembership)) as StateSubactionMembershipMeta[];
         for (const kind of ["do", "entry", "exit"])
             this.atMostOne(
                 subactions.filter((m) => m.kind === kind),
@@ -279,7 +279,7 @@ export class SysMLValidator extends KerMLValidator {
                 (receiver?.is(ast.FeatureReferenceExpression) &&
                     receiver.expression?.element()?.is(ast.PortUsage)) ||
                 (receiver?.is(ast.FeatureChainExpression) &&
-                    receiver.features[0].element()?.basicFeature().is(ast.PortUsage))
+                    receiver.featureMembers()[0].element()?.basicFeature().is(ast.PortUsage))
             ) {
                 accept(
                     "warning",
@@ -297,7 +297,7 @@ export class SysMLValidator extends KerMLValidator {
         accept: ValidationAcceptor
     ): void {
         const owner = node.$meta.owner();
-        if (owner.isAny([ast.StateDefinition, ast.StateUsage]) && owner.isParallel) {
+        if (owner?.isAny(ast.StateDefinition, ast.StateUsage) && owner.isParallel) {
             accept("error", "Parallel state cannot have successions or transitions", { node });
         }
     }
@@ -310,10 +310,9 @@ export class SysMLValidator extends KerMLValidator {
     validateQuantityExpression(node: ast.OperatorExpression, accept: ValidationAcceptor): void {
         if (node.operator === "[") {
             const arg = node.operands.at(1);
-            const type = arg?.$meta.returnType();
+            if (!arg) return;
             if (
-                type &&
-                !this.index.conforms(type, "MeasurementReferences::TensorMeasurementReference")
+                !this.resultConforms(arg.$meta, "MeasurementReferences::TensorMeasurementReference")
             ) {
                 accept(
                     "warning",
@@ -322,6 +321,23 @@ export class SysMLValidator extends KerMLValidator {
                 );
             }
         }
+    }
+
+    protected resultConforms(expr: ExpressionMeta, type: string | TypeMeta): boolean {
+        const result = expr.returnType();
+        if (result && this.index.conforms(result, type)) return true;
+        if (expr.is(ast.OperatorExpression)) {
+            if (!result) {
+                const t = this.index.findType(result);
+                if (t && !t.types().some((t) => this.index.conforms(type, t))) return false;
+            }
+
+            return expr.args
+                .filter((arg): arg is ExpressionMeta => Boolean(arg?.is(ast.Expression)))
+                .some((arg) => this.resultConforms(arg, type));
+        }
+
+        return false;
     }
 
     protected validateAllTypings(

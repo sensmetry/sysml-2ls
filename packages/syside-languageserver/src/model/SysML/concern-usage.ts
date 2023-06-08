@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ConcernUsage, FramedConcernMembership } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { RequirementUsageMeta } from "./requirement-usage";
 
 @metamodelOf(ConcernUsage, {
@@ -23,20 +23,12 @@ import { RequirementUsageMeta } from "./requirement-usage";
     subrequirement: "Requirements::RequirementCheck::concerns",
 })
 export class ConcernUsageMeta extends RequirementUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<ConcernUsage>) {
-        super(id, parent);
-    }
-
     override ast(): ConcernUsage | undefined {
         return this._ast as ConcernUsage;
     }
 
-    override parent(): ModelContainer<ConcernUsage> {
-        return this._parent;
-    }
-
     override requirementConstraintSupertype(): string | undefined {
-        return this.parent().is(FramedConcernMembership)
+        return this.parent()?.is(FramedConcernMembership)
             ? "subrequirement"
             : super.requirementConstraintKind();
     }

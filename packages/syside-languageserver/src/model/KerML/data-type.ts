@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { DataType } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { TypeClassifier } from "../enums";
+import { metamodelOf } from "../metamodel";
 import { ClassifierMeta } from "./_internal";
 
 export const ImplicitDataTypes = {
@@ -24,16 +25,10 @@ export const ImplicitDataTypes = {
 
 @metamodelOf(DataType, ImplicitDataTypes)
 export class DataTypeMeta extends ClassifierMeta {
-    constructor(id: ElementID, parent: ModelContainer<DataType>) {
-        super(id, parent);
-    }
+    protected override _classifier = TypeClassifier.DataType;
 
     override ast(): DataType | undefined {
         return this._ast as DataType;
-    }
-
-    override parent(): ModelContainer<DataType> {
-        return this._parent;
     }
 }
 

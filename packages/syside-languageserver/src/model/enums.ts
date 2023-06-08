@@ -24,15 +24,16 @@ import { Visibility } from "../utils/scope-util";
  */
 export type BuildState = "none" | "active" | "completed";
 
-export function getVisibility(visibility?: ast.VisibilityKind): Visibility {
+export function getVisibility(visibility?: ast.VisibilityKind): Visibility | undefined {
     switch (visibility) {
         case "protected":
             return Visibility.protected;
         case "private":
             return Visibility.private;
         case "public":
-        case undefined:
             return Visibility.public;
+        case undefined:
+            return;
     }
 }
 

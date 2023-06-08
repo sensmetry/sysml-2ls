@@ -30,8 +30,8 @@ test("named item flows are parsed", async () => {
         flow fuelFlow from fuelTank::fuelOut to engine::fuelIn;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    const vehicle = result.value.namespaceMembers[1].element as Namespace;
-    const flow = vehicle.members[2].element;
+    const vehicle = result.value.children[1].element as Namespace;
+    const flow = vehicle.children[2].element;
     expect(sanitizeTree(flow)).toMatchSnapshot();
 });
 
@@ -61,7 +61,7 @@ test.each([
         ${declaration} from fuelTank.fuelOut to engine.fuelIn;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    const vehicle = result.value.members[0].element as Feature;
-    const flow = vehicle.members[0].element;
+    const vehicle = result.value.children[2].element as Feature;
+    const flow = vehicle.children[0].element;
     expect(sanitizeTree(flow)).toMatchSnapshot();
 });

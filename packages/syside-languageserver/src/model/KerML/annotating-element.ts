@@ -14,35 +14,43 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AnnotatingElement, isTextualRepresentation } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { ElementMeta } from "./element";
+import { AnnotatingElement } from "../../generated/ast";
+import { metamodelOf } from "../metamodel";
+import { AnnotationMeta } from "./_internal";
+import { ElementMeta, ElementParts } from "./element";
 
 @metamodelOf(AnnotatingElement, "abstract")
 export abstract class AnnotatingElementMeta extends ElementMeta {
-    readonly annotates: ElementMeta[] = [];
+    protected _annotations: AnnotationMeta[] = [];
 
-    constructor(id: ElementID, parent: ModelContainer<AnnotatingElement>) {
-        super(id, parent);
+    addAnnotation(...annotation: AnnotationMeta[]): this {
+        this._annotations.push(...annotation);
+        annotation.forEach((a) => a["setParent"](this));
+        return this;
     }
 
-    override initialize(node: AnnotatingElement): void {
-        if (isTextualRepresentation(node) || node.about.length === 0) {
-            this.annotates.push(this.owner());
-        }
+    annotations(): readonly AnnotationMeta[] {
+        return this._annotations;
     }
 
-    override reset(node: AnnotatingElement): void {
-        this.annotates.length = 0;
-        this.initialize(node);
+    annotatedElements(): readonly ElementMeta[] {
+        const annotations = this.annotations();
+        const owner = this.owner();
+        if (annotations.length === 0 && owner) return [owner];
+        return annotations.map((a) => a.element()).filter((e): e is ElementMeta => Boolean(e));
     }
 
     override ast(): AnnotatingElement | undefined {
         return this._ast as AnnotatingElement;
     }
 
-    override owner(): ElementMeta {
-        // only namespaces are entry types
-        return this._owner as ElementMeta;
+    textualParts(): ElementParts {
+        return { about: this._annotations };
+    }
+}
+
+declare module "../../generated/ast" {
+    interface AnnotatingElement {
+        $meta: AnnotatingElementMeta;
     }
 }
