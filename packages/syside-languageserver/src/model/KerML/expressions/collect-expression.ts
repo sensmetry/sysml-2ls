@@ -15,23 +15,14 @@
  ********************************************************************************/
 
 import { CollectExpression } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { OperatorExpressionMeta } from "../_internal";
 
 @metamodelOf(CollectExpression)
 export class CollectExpressionMeta extends OperatorExpressionMeta {
-    constructor(id: ElementID, parent: ModelContainer<CollectExpression>) {
-        super(id, parent);
-    }
-
     override ast(): CollectExpression | undefined {
         return this._ast as CollectExpression;
     }
-
-    override parent(): ModelContainer<CollectExpression> {
-        return this._parent;
-    }
-
     override getFunction(): string | undefined {
         return "ControlFunctions::collect";
     }

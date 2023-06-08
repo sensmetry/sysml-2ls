@@ -24,7 +24,7 @@ import {
 import { RequirementConstraintKind } from "../enums";
 import { FeatureMeta } from "../KerML";
 import { BooleanExpressionMeta } from "../KerML/boolean-expression";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(ConstraintUsage, {
@@ -37,10 +37,6 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     requirement: "Requirements::RequirementCheck::constraints",
 })
 export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, OccurrenceUsageMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ConstraintUsage>) {
-        super(id, parent);
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertype = this.requirementConstraintSupertype();
         const supertypes = supertype ? [supertype] : [];
@@ -62,20 +58,16 @@ export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, Occurrence
         if (!this.isComposite) return false;
 
         const parent = this.owner();
-        return parent.isAny([ItemDefinition, ItemUsage]);
+        return Boolean(parent?.isAny(ItemDefinition, ItemUsage));
     }
 
     override ast(): ConstraintUsage | undefined {
         return this._ast as ConstraintUsage;
     }
 
-    override parent(): ModelContainer<ConstraintUsage> {
-        return this._parent;
-    }
-
     requirementConstraintKind(): RequirementConstraintKind | undefined {
         const parent = this.parent();
-        return parent.is(RequirementConstraintMembership) ? parent.kind : undefined;
+        return parent?.is(RequirementConstraintMembership) ? parent.kind : undefined;
     }
 
     override namingFeature(): FeatureMeta | undefined {

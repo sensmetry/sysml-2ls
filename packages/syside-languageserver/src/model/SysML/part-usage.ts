@@ -23,7 +23,7 @@ import {
     RequirementUsage,
     StakeholderMembership,
 } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ItemUsageMeta } from "./item-usage";
 
 @metamodelOf(PartUsage, {
@@ -34,10 +34,6 @@ import { ItemUsageMeta } from "./item-usage";
     caseActor: "Cases::Case::actors",
 })
 export class PartUsageMeta extends ItemUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<PartUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         if (this.isRequirementActor()) return "requirementActor";
         if (this.isRequirementStakeholder()) return "requirementStakeholder";
@@ -46,36 +42,34 @@ export class PartUsageMeta extends ItemUsageMeta {
     }
 
     protected isRequirementActor(): boolean {
-        return (
-            this.parent().is(ActorMembership) &&
-            this.owner().isAny([RequirementDefinition, RequirementUsage])
+        return Boolean(
+            this.parent()?.is(ActorMembership) &&
+                this.owner()?.isAny(RequirementDefinition, RequirementUsage)
         );
     }
 
     protected isRequirementStakeholder(): boolean {
-        return (
-            this.parent().is(StakeholderMembership) &&
-            this.owner().isAny([RequirementDefinition, RequirementUsage])
+        return Boolean(
+            this.parent()?.is(StakeholderMembership) &&
+                this.owner()?.isAny(RequirementDefinition, RequirementUsage)
         );
     }
 
     protected isCaseActor(): boolean {
-        return this.parent().is(ActorMembership) && this.owner().isAny([CaseDefinition, CaseUsage]);
+        return Boolean(
+            this.parent()?.is(ActorMembership) && this.owner()?.isAny(CaseDefinition, CaseUsage)
+        );
     }
 
     override isIgnoredParameter(): boolean {
-        return (
+        return Boolean(
             super.isIgnoredParameter() ||
-            this.parent().isAny([ActorMembership, StakeholderMembership])
+                this.parent()?.isAny(ActorMembership, StakeholderMembership)
         );
     }
 
     override ast(): PartUsage | undefined {
         return this._ast as PartUsage;
-    }
-
-    override parent(): ModelContainer<PartUsage> {
-        return this._parent;
     }
 }
 

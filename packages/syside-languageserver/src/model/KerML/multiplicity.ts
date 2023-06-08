@@ -15,8 +15,9 @@
  ********************************************************************************/
 
 import { Classifier, Feature, Multiplicity } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { FeatureMeta } from "./_internal";
+import { NonNullable } from "../../utils";
+import { metamodelOf } from "../metamodel";
+import { ElementParts, FeatureMeta, TypeMeta } from "./_internal";
 
 export const ImplicitMultiplicities = {
     base: "Base::naturals",
@@ -26,23 +27,33 @@ export const ImplicitMultiplicities = {
 
 @metamodelOf(Multiplicity, ImplicitMultiplicities)
 export class MultiplicityMeta extends FeatureMeta {
-    constructor(id: ElementID, parent: ModelContainer<Multiplicity>) {
-        super(id, parent);
+    override get featuredBy(): readonly TypeMeta[] {
+        const by = super.typeFeaturings;
+        if (by.length > 0) return by.map((f) => f.element()).filter(NonNullable);
+
+        const owner = this.owner();
+        if (!owner?.is(Feature)) return this._owningType ? [this._owningType] : [];
+
+        return owner.featuredBy;
     }
 
     override ast(): Multiplicity | undefined {
         return this._ast as Multiplicity;
     }
-
-    override parent(): ModelContainer<Multiplicity> {
-        return this._parent;
-    }
-
     override defaultSupertype(): string {
         const owner = this.owner();
-        if (owner.is(Classifier)) return "classifier";
-        if (owner.is(Feature)) return "feature";
+        if (owner?.is(Classifier)) return "classifier";
+        if (owner?.is(Feature)) return "feature";
         return "base";
+    }
+
+    override textualParts(): ElementParts {
+        // prefixes are not allowed
+
+        return {
+            heritage: this.heritage,
+            children: this.children,
+        };
     }
 }
 

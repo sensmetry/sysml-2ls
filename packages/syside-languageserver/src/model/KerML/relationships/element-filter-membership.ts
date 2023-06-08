@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { ElementFilterMembership } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExpressionMeta, OwningMembershipMeta } from "../_internal";
 
 @metamodelOf(ElementFilterMembership)
 export class ElementFilterMembershipMeta<
     T extends ExpressionMeta = ExpressionMeta
 > extends OwningMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ElementFilterMembership>) {
-        super(id, parent);
-    }
-
     override ast(): ElementFilterMembership | undefined {
         return this._ast as ElementFilterMembership;
-    }
-
-    override parent(): ModelContainer<ElementFilterMembership> {
-        return this._parent;
     }
 }
 

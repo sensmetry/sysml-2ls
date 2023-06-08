@@ -35,14 +35,15 @@ test.concurrent.each(["redefines", ":>>"])(
             doc /* doc */
         }
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: Redefinition,
                         ...withQualifiedName("Redef"),
                         source: qualifiedTypeReference("a"),
                         reference: qualifiedTypeReference("b"),
-                        annotations: [
+                        elements: [
                             {
                                 element: {
                                     body: "/* doc */",
@@ -64,7 +65,8 @@ test.concurrent.each(["specialization", ""])(
         feature b;
         ${prefix} redefinition a :>> b;
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: Redefinition,
@@ -82,13 +84,13 @@ test("features can have multiple owned redefinitions", async () => {
     feature a;
     feature b;
     feature c :>> a, b;`).toParseKerML({
-        members: [
+        children: [
             ...anything(2),
             {
                 element: {
                     $type: Feature,
                     ...withQualifiedName("c"),
-                    typeRelationships: [
+                    heritage: [
                         { $type: Redefinition, reference: qualifiedTypeReference("a") },
                         { $type: Redefinition, reference: qualifiedTypeReference("b") },
                     ],
@@ -109,7 +111,7 @@ test("unnamed redefining features implicitly have the same name as the redefined
         feature :>> x;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    expect(
-        childrenNames(result.value.namespaceMembers[1].element, Visibility.private)
-    ).toStrictEqual(["B::x"]);
+    expect(childrenNames(result.value.children[1].element, Visibility.private)).toStrictEqual([
+        "B::x",
+    ]);
 });

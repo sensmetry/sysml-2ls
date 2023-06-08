@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Disjoining } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RelationshipMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(Disjoining)
 export class DisjoiningMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Disjoining>) {
-        super(id, parent);
-    }
-
     override ast(): Disjoining | undefined {
         return this._ast as Disjoining;
-    }
-
-    override parent(): ModelContainer<Disjoining> {
-        return this._parent;
     }
 }
 

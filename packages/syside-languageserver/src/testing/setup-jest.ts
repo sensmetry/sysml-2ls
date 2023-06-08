@@ -125,7 +125,8 @@ export function sanitizeTree(
         (o as any).$meta = cleanMeta;
     }
 
-    for (const [key, value] of Object.entries(node)) {
+    for (const key in node) {
+        const value = (node as Record<string, any>)[key];
         if (key === "_element") {
             // for relationships
             o["element"] = sanitizeTree(value, cache, includeMeta);

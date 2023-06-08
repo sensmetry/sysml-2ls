@@ -15,26 +15,39 @@
  ********************************************************************************/
 
 import { AcceptActionUsage, TransitionFeatureMembership } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { NonNullable, enumerable } from "../../utils";
+import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
+import { ReferenceUsageMeta } from "./reference-usage";
 
 @metamodelOf(AcceptActionUsage, {
     base: "Actions::acceptActions",
     subactions: "Actions::Action::acceptSubactions",
 })
 export class AcceptActionUsageMeta extends ActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<AcceptActionUsage>) {
-        super(id, parent);
+    private _payload?: ParameterMembershipMeta<ReferenceUsageMeta> | undefined;
+    private _receiver?: ParameterMembershipMeta<ReferenceUsageMeta> | undefined;
+
+    @enumerable
+    public get payload(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
+        return this._payload;
+    }
+    public set payload(value: ParameterMembershipMeta<ReferenceUsageMeta>) {
+        this._payload = value;
+    }
+
+    @enumerable
+    public get receiver(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
+        return this._receiver;
+    }
+    public set receiver(value: ParameterMembershipMeta<ReferenceUsageMeta> | undefined) {
+        this._receiver = value;
     }
 
     override ast(): AcceptActionUsage | undefined {
         return this._ast as AcceptActionUsage;
     }
-
-    override parent(): ModelContainer<AcceptActionUsage> {
-        return this._parent;
-    }
-
     override defaultGeneralTypes(): string[] {
         if (!this.isTriggerAction()) return super.defaultGeneralTypes();
         return [];
@@ -42,7 +55,27 @@ export class AcceptActionUsageMeta extends ActionUsageMeta {
 
     isTriggerAction(): boolean {
         const parent = this.parent();
-        return parent.is(TransitionFeatureMembership) && parent.kind === "trigger";
+        return Boolean(parent?.is(TransitionFeatureMembership) && parent.kind === "trigger");
+    }
+
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = super.featureMembers();
+        return ([this.payload, this.receiver] as (MembershipMeta<FeatureMeta> | undefined)[])
+            .filter(NonNullable)
+            .concat(baseFeatures);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = { prefixes: this.prefixes };
+
+        if (this._multiplicity) parts.multiplicity = [this._multiplicity];
+        parts.heritage = this.heritage;
+
+        if (this.payload) parts.payload = [this.payload];
+        if (this.receiver) parts.receiver = [this.receiver];
+
+        parts.children = this.children;
+        return parts;
     }
 }
 

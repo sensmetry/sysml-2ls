@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Intersecting } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RelationshipMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(Intersecting)
 export class IntersectingMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Intersecting>) {
-        super(id, parent);
-    }
-
     override ast(): Intersecting | undefined {
         return this._ast as Intersecting;
-    }
-
-    override parent(): ModelContainer<Intersecting> {
-        return this._parent;
     }
 }
 

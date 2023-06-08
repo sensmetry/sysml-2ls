@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { ActionUsage, PartDefinition, PartUsage } from "../../generated/ast";
 import { StepMeta } from "../KerML/step";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(ActionUsage, {
@@ -35,20 +35,8 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
 export class ActionUsageMeta extends Mixin(StepMeta, OccurrenceUsageMeta) {
     isParallel = false;
 
-    constructor(id: ElementID, parent: ModelContainer<ActionUsage>) {
-        super(id, parent);
-    }
-
-    override initialize(node: ActionUsage): void {
-        this.isParallel = node.isParallel;
-    }
-
     override ast(): ActionUsage | undefined {
         return this._ast as ActionUsage;
-    }
-
-    override parent(): ModelContainer<ActionUsage> {
-        return this._parent;
     }
 
     override defaultSupertype(): string {
@@ -78,7 +66,7 @@ export class ActionUsageMeta extends Mixin(StepMeta, OccurrenceUsageMeta) {
 
     isPerformedAction(): boolean {
         const parent = this.owner();
-        return parent.isAny([PartUsage, PartDefinition]);
+        return Boolean(parent?.isAny(PartUsage, PartDefinition));
     }
 }
 

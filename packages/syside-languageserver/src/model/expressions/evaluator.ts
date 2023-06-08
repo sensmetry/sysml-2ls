@@ -141,9 +141,11 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     targetFeatureFor(target: ElementMeta): FeatureMeta {
         if (target.is(Feature)) return target;
 
-        const feature = new FeatureMeta(this.util.createId(), target);
+        // feature created only for evaluation, parent errors are not useful here
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const feature = new FeatureMeta(this.util.createId());
         if (target.is(Type)) {
-            const typing = new FeatureTypingMeta(this.util.createId(), feature);
+            const typing = new FeatureTypingMeta(this.util.createId());
             typing.isImplied = true;
             typing.setElement(target);
             feature.addSpecialization(typing);
@@ -165,7 +167,7 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
             const target = value.is(Feature)
                 ? type === value
                     ? value
-                    : this.util.chainFeatures(value, this.targetFeatureFor(type), value)
+                    : this.util.chainFeatures(this.targetFeatureFor(type), value)
                 : type;
             return normalize(this.evaluateFeatureChain(subchain, target));
         });
@@ -294,7 +296,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         if (!referenced) throw new Error("No linked reference");
 
         const features = [...referenced.allMetadata()];
-        if (referenced.metaclass) features.push(referenced.metaclass);
+        const metaclass = referenced.metaclass;
+        if (metaclass) features.push(metaclass);
 
         return features;
     }
@@ -316,8 +319,9 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
                 t.is(MetadataFeature) &&
                 feature.conforms("Metaobjects::Metaobject::annotatedElement")
             ) {
-                const annotated = t.annotates.at(0) ?? t.owner();
-                return annotated.metaclass ? [annotated.metaclass] : [];
+                const annotated = t.annotatedElements().at(0) ?? t.owner();
+                const metaclass = annotated?.metaclass;
+                return metaclass ? [metaclass] : [];
             }
 
             if (isMetaclassFeature(t)) {
@@ -328,7 +332,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
 
             // need to find the corresponding feature in `t` which can be
             // evaluated
-            const target = t.features
+            const target = t
+                .featureMembers()
                 .map((member) => member.element())
                 .find((f) => f?.allTypes(Redefinition).includes(feature));
 

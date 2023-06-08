@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LiteralInfinity } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { LiteralExpressionMeta } from "../_internal";
 
 export const ImplicitLiteralInfinities = {
@@ -24,16 +24,8 @@ export const ImplicitLiteralInfinities = {
 
 @metamodelOf(LiteralInfinity, ImplicitLiteralInfinities)
 export class LiteralInfinityMeta extends LiteralExpressionMeta {
-    constructor(id: ElementID, parent: ModelContainer<LiteralInfinity>) {
-        super(id, parent);
-    }
-
     override ast(): LiteralInfinity | undefined {
         return this._ast as LiteralInfinity;
-    }
-
-    override parent(): ModelContainer<LiteralInfinity> {
-        return this._parent;
     }
 
     override returnType(): string {

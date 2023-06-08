@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { FeatureInverting } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta, RelationshipMeta } from "../_internal";
 
 @metamodelOf(FeatureInverting)
 export class FeatureInvertingMeta<T extends FeatureMeta = FeatureMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<FeatureInverting>) {
-        super(id, parent);
-    }
-
     override ast(): FeatureInverting | undefined {
         return this._ast as FeatureInverting;
-    }
-
-    override parent(): ModelContainer<FeatureInverting> {
-        return this._parent;
     }
 }
 

@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Invariant } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { BooleanExpressionMeta } from "./_internal";
 
 export const ImplicitInvariants = {
@@ -30,20 +30,8 @@ export class InvariantMeta extends BooleanExpressionMeta {
      */
     isNegated = false;
 
-    constructor(id: ElementID, parent: ModelContainer<Invariant>) {
-        super(id, parent);
-    }
-
-    override initialize(node: Invariant): void {
-        this.isNegated = node.isNegated;
-    }
-
     override ast(): Invariant | undefined {
         return this._ast as Invariant;
-    }
-
-    override parent(): ModelContainer<Invariant> {
-        return this._parent;
     }
 
     override defaultSupertype(): string {

@@ -15,12 +15,11 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { SpecializationType } from "..";
 import { Association } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
-import { ClassifierMeta, RelationshipMeta } from "./_internal";
+import { ClassifierMeta, InheritanceMeta, RelationshipMeta } from "./_internal";
 
 export const ImplicitAssociations = {
     base: "Links::Link",
@@ -30,13 +29,7 @@ export const ImplicitAssociations = {
 @metamodelOf(Association, ImplicitAssociations)
 // Note: inherited methods are override by the last class inside `Mixin`
 export class AssociationMeta extends Mixin(ConnectorMixin, RelationshipMeta, ClassifierMeta) {
-    constructor(elementId: ElementID, parent: ModelContainer<Association>) {
-        super(elementId, parent);
-    }
-
-    protected override setupClassifiers(): void {
-        this.classifier = TypeClassifier.Association;
-    }
+    protected override _classifier = TypeClassifier.Association;
 
     override defaultSupertype(): string {
         return this.isBinary() ? "binary" : "base";
@@ -46,17 +39,9 @@ export class AssociationMeta extends Mixin(ConnectorMixin, RelationshipMeta, Cla
         return this._ast as Association;
     }
 
-    override parent(): ModelContainer<Association> {
-        return this._parent;
-    }
-
-    override reset(_: Association): void {
+    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
         this.resetEnds();
-    }
-
-    override addSpecialization<T extends SpecializationType>(specialization: T): void {
-        this.resetEnds();
-        super.addSpecialization(specialization);
+        ClassifierMeta.prototype["onSpecializationAdded"].call(this, specialization);
     }
 }
 

@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { AllocationUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectionUsageMeta } from "./connection-usage";
 
 @metamodelOf(AllocationUsage, {
@@ -23,16 +23,8 @@ import { ConnectionUsageMeta } from "./connection-usage";
     binary: "Allocations::allocations",
 })
 export class AllocationUsageMeta extends ConnectionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<AllocationUsage>) {
-        super(id, parent);
-    }
-
     override ast(): AllocationUsage | undefined {
         return this._ast as AllocationUsage;
-    }
-
-    override parent(): ModelContainer<AllocationUsage> {
-        return this._parent;
     }
 }
 

@@ -16,8 +16,8 @@
 
 import { Mixin } from "ts-mixer";
 import { MetadataFeature } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { AnnotatingElementMeta, FeatureMeta } from "./_internal";
+import { metamodelOf } from "../metamodel";
+import { AnnotatingElementMeta, ElementParts, FeatureMeta } from "./_internal";
 
 export const ImplicitMetadataFeatures = {
     base: "Metaobjects::metaobjects",
@@ -27,20 +27,15 @@ export const ImplicitMetadataFeatures = {
 
 @metamodelOf(MetadataFeature, ImplicitMetadataFeatures)
 export class MetadataFeatureMeta extends Mixin(AnnotatingElementMeta, FeatureMeta) {
-    constructor(id: ElementID, parent: ModelContainer<MetadataFeature>) {
-        super(id, parent);
-    }
-
     override ast(): MetadataFeature | undefined {
         return this._ast as MetadataFeature;
     }
-
-    override parent(): ModelContainer<MetadataFeature> {
-        return this._parent;
-    }
-
     override defaultSupertype(): string {
         return "base";
+    }
+
+    override textualParts(): ElementParts {
+        return { heritage: this.heritage, about: this._annotations, children: this.children };
     }
 }
 

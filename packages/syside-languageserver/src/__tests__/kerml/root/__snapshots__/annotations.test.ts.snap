@@ -7,60 +7,37 @@ exports[`Multiple comments are parsed: toParseKerML 1`] = `
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* comment 1 */",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* comment 2 */",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -72,48 +49,29 @@ exports[`elements are parseable with annotations with a named single line commen
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is a comment */",
                 "declaredName": "Comment",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -125,49 +83,30 @@ exports[`elements are parseable with annotations with multi line comment: toPars
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is
              * a comment
              */",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -179,48 +118,29 @@ exports[`elements are parseable with annotations with named documentation: toPar
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* this is a doc */",
                 "declaredName": "Doc",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -232,47 +152,28 @@ exports[`elements are parseable with annotations with single line comment withou
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is a comment */",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -284,47 +185,28 @@ exports[`elements are parseable with annotations with single line comment: toPar
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is a comment */",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -336,29 +218,19 @@ exports[`elements are parseable with annotations with textual representation wit
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "TextualRepresentation",
           "about": [],
           "body": "/* self.x > 0.0 */",
           "language": ""OCL"",
-          "prefixes": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -370,30 +242,20 @@ exports[`elements are parseable with annotations with textual representation wit
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "TextualRepresentation",
           "about": [],
           "body": "/* self.x > 0.0 */",
           "declaredName": "inOCL",
           "language": ""OCL"",
-          "prefixes": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -405,49 +267,30 @@ exports[`elements are parseable with annotations with textual representation wit
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "TextualRepresentation",
                 "about": [],
                 "body": "/* <a href="https://plm.elsewhere.com/part?id="1234"/> */",
                 "language": ""HTML"",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
           "declaredName": "B",
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;
@@ -459,47 +302,28 @@ exports[`elements are parseable with annotations with unnamed documentation: toP
   "parserErrors": [],
   "value": {
     "$type": "Namespace",
-    "aliases": [],
-    "annotatingMembers": [],
-    "filters": [],
-    "imports": [],
-    "members": [],
-    "namespaceMembers": [
+    "children": [
       {
         "$type": "OwningMembership",
-        "annotations": [],
-        "chains": [],
         "element": {
           "$type": "Namespace",
-          "aliases": [],
-          "annotatingMembers": [
+          "children": [
             {
               "$type": "OwningMembership",
-              "annotations": [],
-              "chains": [],
               "element": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* this is a doc */",
-                "prefixes": [],
               },
               "elements": [],
-              "prefixes": [],
             },
           ],
-          "filters": [],
-          "imports": [],
-          "members": [],
-          "namespaceMembers": [],
           "prefixes": [],
-          "relationshipMembers": [],
         },
         "elements": [],
-        "prefixes": [],
       },
     ],
     "prefixes": [],
-    "relationshipMembers": [],
   },
 }
 `;

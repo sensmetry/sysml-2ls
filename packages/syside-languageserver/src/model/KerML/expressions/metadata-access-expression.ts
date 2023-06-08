@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { MetadataAccessExpression } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ElementMeta, ExpressionMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(MetadataAccessExpression)
 export class MetadataAccessExpressionMeta extends ExpressionMeta {
     reference?: ElementMeta;
 
-    constructor(id: ElementID, parent: ModelContainer<MetadataAccessExpression>) {
-        super(id, parent);
-    }
-
     override ast(): MetadataAccessExpression | undefined {
         return this._ast as MetadataAccessExpression;
-    }
-
-    override parent(): ModelContainer<MetadataAccessExpression> {
-        return this._parent;
     }
 
     override returnType(): string | TypeMeta | undefined {

@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Comment } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { TextualAnnotatingMeta } from "./_internal";
 
 @metamodelOf(Comment)
 export class CommentMeta extends TextualAnnotatingMeta {
-    constructor(id: ElementID, parent: ModelContainer<Comment>) {
-        super(id, parent);
-    }
-
     override ast(): Comment | undefined {
         return this._ast as Comment;
-    }
-
-    override parent(): ModelContainer<Comment> {
-        return this._parent;
     }
 }
 

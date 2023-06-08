@@ -15,23 +15,13 @@
  ********************************************************************************/
 
 import { Annotation } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
-import { AnnotatingElementMeta, RelationshipMeta } from "../_internal";
+import { metamodelOf } from "../../metamodel";
+import { ElementMeta, RelationshipMeta } from "../_internal";
 
 @metamodelOf(Annotation)
-export class AnnotationMeta<
-    T extends AnnotatingElementMeta = AnnotatingElementMeta
-> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Annotation>) {
-        super(id, parent);
-    }
-
+export class AnnotationMeta<T extends ElementMeta = ElementMeta> extends RelationshipMeta<T> {
     override ast(): Annotation | undefined {
         return this._ast as Annotation;
-    }
-
-    override parent(): ModelContainer<Annotation> {
-        return this._parent;
     }
 }
 

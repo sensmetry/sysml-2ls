@@ -17,6 +17,7 @@
 import {
     ActionDefinition,
     ActionUsage,
+    FeatureMembership,
     PartDefinition,
     PartUsage,
     PortionKind,
@@ -25,52 +26,69 @@ import {
     Usage,
     VariantMembership,
 } from "../../generated/ast";
+import { enumerable } from "../../utils";
+import { ElementMeta } from "../KerML";
 import { FeatureMeta } from "../KerML/feature";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 
 @metamodelOf(Usage)
 export class UsageMeta extends FeatureMeta {
     isVariant = false;
     isVariation = false;
     isIndividual = false;
-    isReference = false;
+    protected _isReference = false;
     portionKind?: PortionKind;
+    protected _isImpliedComposite = false;
 
-    constructor(id: ElementID, parent: ModelContainer<Usage>) {
-        super(id, parent);
-        this.isVariant = this.isVariantNode();
+    protected override onParentSet(
+        previous: ElementMeta | undefined,
+        current: ElementMeta | undefined
+    ): void {
+        super.onParentSet(previous, current);
+        this.isVariant = !!current?.is(VariantMembership);
+        this._isImpliedComposite = Boolean(
+            this.direction === "none" && !this.isEnd && current?.is(FeatureMembership)
+        );
     }
 
-    override initialize(node: Usage): void {
-        // https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/blob/8e5896300809dd1bcc039e213f88210570909d51/org.omg.sysml/src/org/omg/sysml/util/UsageUtil.java#LL84C29-L84C29
-        // TODO: OwningFeatureMembership
-        this.isComposite = this.direction !== "none" && !this.isEnd;
-        this.isVariation = node.isVariation;
-        this.isAbstract ||= node.isVariation;
-        this.isIndividual = node.isIndividual;
-        this.isReference = node.isReference;
-        this.portionKind = node.portionKind;
+    @enumerable
+    get isReference(): boolean {
+        return this._isReference;
+    }
+    set isReference(value) {
+        this._isReference = value;
+    }
+
+    @enumerable
+    override get isComposite(): boolean {
+        return this._isImpliedComposite || super.isComposite;
+    }
+    override set isComposite(value) {
+        this._isComposite = value;
+    }
+
+    @enumerable
+    override get isAbstract(): boolean {
+        return this._isAbstract || this.isVariation;
+    }
+    override set isAbstract(value) {
+        this._isAbstract = value;
     }
 
     override isIgnoredParameter(): boolean {
-        return super.isIgnoredParameter() || this.parent().is(SubjectMembership);
+        return super.isIgnoredParameter() || !!this.parent()?.is(SubjectMembership);
     }
 
     override ast(): Usage | undefined {
         return this._ast as Usage;
     }
-
-    override parent(): ModelContainer<Usage> {
-        return this._parent;
-    }
-
     protected isVariantNode(): boolean {
-        return this.parent().is(VariantMembership);
+        return !!this.parent()?.is(VariantMembership);
     }
 
     override namingFeature(): FeatureMeta | undefined {
         const parent = this.parent();
-        if (parent.is(VariantMembership)) {
+        if (parent?.is(VariantMembership)) {
             const referenced = this.referencedFeature();
             if (referenced) return referenced;
         }
@@ -82,20 +100,20 @@ export class UsageMeta extends FeatureMeta {
     }
 
     isActionOwnedComposite(): boolean {
-        return (
+        return Boolean(
             this.isComposite &&
-            !this.isEntryExitAction() &&
-            this.owner().isAny([ActionDefinition, ActionUsage])
+                !this.isEntryExitAction() &&
+                this.owner()?.isAny(ActionDefinition, ActionUsage)
         );
     }
 
     isPartOwnedComposite(): boolean {
-        return this.isComposite && this.owner().isAny([PartDefinition, PartUsage]);
+        return Boolean(this.isComposite && this.owner()?.isAny(PartDefinition, PartUsage));
     }
 
     isEntryExitAction(): boolean {
         const parent = this.parent();
-        return parent.is(StateSubactionMembership) && parent.kind !== "do";
+        return !!parent?.is(StateSubactionMembership) && parent.kind !== "do";
     }
 }
 

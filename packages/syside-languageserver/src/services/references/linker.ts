@@ -36,9 +36,7 @@ import {
     ConjugatedPortDefinition,
     Element,
     ElementReference,
-    FeatureChainExpression,
     FeatureReferenceExpression,
-    InvocationExpression,
     isElement,
     Membership,
     MembershipReference,
@@ -47,6 +45,7 @@ import {
     NamespaceImport,
     PortDefinition,
     Relationship,
+    Type,
 } from "../../generated/ast";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLScopeProvider } from "./scope-provider";
@@ -58,10 +57,11 @@ import { sanitizeName } from "../../model/naming";
 import { SysMLConfigurationProvider } from "../shared/workspace/configuration-provider";
 import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
 import { ElementMeta, MembershipMeta } from "../../model";
-import { AliasResolver } from "../../utils/scope-util";
+import { AliasResolver, streamParents } from "../../utils/scope-util";
 import { KeysMatching } from "../../utils/common";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { followAlias } from "../../utils/ast-util";
+import { clearArtifacts } from "../../utils";
 
 /**
  * Reference used by SysML services that makes use of knowing that only Elements can be referenced
@@ -256,47 +256,6 @@ export class SysMLLinker extends DefaultLinker {
     }
 
     /**
-     * Link a {@link FeatureChainExpression}
-     */
-    @linker(FeatureChainExpression)
-    linkFeatureChainExpression(
-        expr: FeatureChainExpression,
-        document: LangiumDocument
-    ): ElementMeta | undefined {
-        const to = expr.$meta.right;
-        if (to.cached) return to.target;
-
-        this.linkInvocationExpression(expr, document);
-        const target = expr.$meta.args.at(-1);
-        to.set(target?.is(Element) ? target : undefined);
-        return to.target;
-    }
-
-    /**
-     * Link an {@link InvocationExpression}
-     * @returns the linked invoked type or undefined
-     */
-    @linker(InvocationExpression)
-    linkInvocationExpression(
-        _expr: InvocationExpression,
-        _document: LangiumDocument
-    ): ElementMeta | undefined {
-        // if (expr.type) {
-        //     expr.$meta.type = this.linkReference(expr.type, document) as TypeMeta | undefined;
-        // }
-
-        // const meta = expr.$meta;
-        // meta.args.length = expr.args.length;
-        // expr.args.forEach((arg, i) => {
-        //     this.linkNode(arg, document);
-        //     const argMeta = arg.$meta;
-        //     meta.args[i] = argMeta.is(ElementReference) ? argMeta.to.target?.element : argMeta;
-        // });
-
-        return;
-    }
-
-    /**
      * Link a {@link FeatureReferenceExpression}
      * @returns the linked expression target or undefined
      */
@@ -392,7 +351,7 @@ export class SysMLLinker extends DefaultLinker {
         }
         if (referenceType === ConjugatedPortDefinition) {
             if (target?.is(PortDefinition)) {
-                target = target.elements.at(-1)?.element();
+                target = target.conjugatedDefinition?.element();
             }
         }
 
@@ -454,7 +413,32 @@ export class SysMLLinker extends DefaultLinker {
             error.message += ".";
         }
 
-        if (!this.config.get().debug.scopeInLinkingErrors) return error;
+        const extra = this.config.get().debug.scopeInLinkingErrors;
+
+        if (!extra || extra === "none") return error;
+
+        if (extra === "types") {
+            const context =
+                refInfo.index === 0
+                    ? this.scopeProvider["getContext"](refInfo.container.$meta) ??
+                      refInfo.container.$meta.owner()
+                    : refInfo.container.$meta.found[refInfo.index - 1];
+
+            if (!context || context === "error") return error;
+
+            if (context.is(Type))
+                error.message += `\n\tMRO: [${context
+                    .allTypes(undefined, true)
+                    .map((t) => `${t.qualifiedName} [${t.setupState}]`)
+                    .join(",\n\t      ")}].`;
+            else {
+                error.message += `\n\tNS:  [${streamParents(context)
+                    .map((m) => (m as ElementMeta).qualifiedName)
+                    .join(",\n\t      ")}].`;
+            }
+
+            return error;
+        }
 
         const scope = this.scopeProvider.getElementReferenceScope(
             refInfo.container.$meta,
@@ -625,7 +609,7 @@ export class SysMLLinker extends DefaultLinker {
         // also have to reset the resolved metamodels since they mostly depend
         // on the resolved references
         document.astNodes.forEach((node) => {
-            node.$meta?.resetToAst(node);
+            if (node.$meta) clearArtifacts(node.$meta);
             if (!isElement(node)) return;
 
             // the computed children may have also been reset completely, add
@@ -636,7 +620,7 @@ export class SysMLLinker extends DefaultLinker {
             children?.forEach((child) => {
                 const meta = child.node?.$meta;
                 if (!meta?.is(Membership)) return;
-                node.$meta.children.set(child.name, meta);
+                node.$meta["_memberLookup"].set(child.name, meta);
             });
         });
         super.unlink(document);

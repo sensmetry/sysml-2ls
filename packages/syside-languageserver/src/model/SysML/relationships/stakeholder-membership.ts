@@ -16,23 +16,15 @@
 
 import { StakeholderMembership } from "../../../generated/ast";
 import { ParameterMembershipMeta } from "../../KerML/relationships/parameter-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { PartUsageMeta } from "../part-usage";
 
 @metamodelOf(StakeholderMembership)
 export class StakeholderMembershipMeta<
     T extends PartUsageMeta = PartUsageMeta
 > extends ParameterMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<StakeholderMembership>) {
-        super(id, parent);
-    }
-
     override ast(): StakeholderMembership | undefined {
         return this._ast as StakeholderMembership;
-    }
-
-    override parent(): ModelContainer<StakeholderMembership> {
-        return this._parent;
     }
 }
 

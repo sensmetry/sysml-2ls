@@ -16,20 +16,12 @@
 
 import { LifeClass } from "../../generated/ast";
 import { ClassMeta } from "../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 
 @metamodelOf(LifeClass)
 export class LifeClassMeta extends ClassMeta {
-    constructor(id: ElementID, parent: ModelContainer<LifeClass>) {
-        super(id, parent);
-    }
-
     override ast(): LifeClass | undefined {
         return this._ast as LifeClass;
-    }
-
-    override parent(): ModelContainer<LifeClass> {
-        return this._parent;
     }
 }
 

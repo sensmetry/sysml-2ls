@@ -16,23 +16,15 @@
 
 import { ConjugatedPortTyping } from "../../../generated/ast";
 import { FeatureTypingMeta } from "../../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
-import { ConjugatedPortDefinitionMeta } from "../conjugated-port-definition";
+import { metamodelOf } from "../../metamodel";
+import { ConjugatedPortDefinitionMeta } from "../port-definition";
 
 @metamodelOf(ConjugatedPortTyping)
 export class ConjugatedPortTypingMeta<
     T extends ConjugatedPortDefinitionMeta = ConjugatedPortDefinitionMeta
 > extends FeatureTypingMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ConjugatedPortTyping>) {
-        super(id, parent);
-    }
-
     override ast(): ConjugatedPortTyping | undefined {
         return this._ast as ConjugatedPortTyping;
-    }
-
-    override parent(): ModelContainer<ConjugatedPortTyping> {
-        return this._parent;
     }
 }
 

@@ -28,6 +28,7 @@ export * from "./feature-typing";
 export * from "./feature-value";
 export * from "./featuring";
 export * from "./import";
+export * from "./inheritance";
 export * from "./intersecting";
 export * from "./membership-import";
 export * from "./membership";

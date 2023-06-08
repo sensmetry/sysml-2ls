@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { AnalysisCaseDefinition, AnalysisCaseUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { CaseUsageMeta } from "./case-usage";
 
 @metamodelOf(AnalysisCaseUsage, {
@@ -23,18 +23,9 @@ import { CaseUsageMeta } from "./case-usage";
     subAnalysisCase: "AnalysisCases::AnalysisCase::subAnalysisCases",
 })
 export class AnalysisCaseUsageMeta extends CaseUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<AnalysisCaseUsage>) {
-        super(id, parent);
-    }
-
     override ast(): AnalysisCaseUsage | undefined {
         return this._ast as AnalysisCaseUsage;
     }
-
-    override parent(): ModelContainer<AnalysisCaseUsage> {
-        return this._parent;
-    }
-
     override getSubactionType(): string | undefined {
         return this.isSubAnalysisCase() ? "subAnalysisCase" : super.getSubactionType();
     }
@@ -43,7 +34,7 @@ export class AnalysisCaseUsageMeta extends CaseUsageMeta {
         const parent = this.owner();
         return (
             this.isNonEntryExitComposite() &&
-            parent.isAny([AnalysisCaseUsage, AnalysisCaseDefinition])
+            Boolean(parent?.isAny(AnalysisCaseUsage, AnalysisCaseDefinition))
         );
     }
 }

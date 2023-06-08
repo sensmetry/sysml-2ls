@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { AssociationStructure } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { AssociationMeta, StructureMeta } from "./_internal";
 
 export const ImplicitAssociationStructures = {
@@ -27,20 +27,10 @@ export const ImplicitAssociationStructures = {
 
 @metamodelOf(AssociationStructure, ImplicitAssociationStructures)
 export class AssociationStructMeta extends Mixin(StructureMeta, AssociationMeta) {
-    constructor(elementId: ElementID, parent: ModelContainer<AssociationStructure>) {
-        super(elementId, parent);
-    }
-
-    protected override setupClassifiers(): void {
-        this.classifier = TypeClassifier.AssociationStruct;
-    }
+    protected override _classifier = TypeClassifier.AssociationStruct;
 
     override ast(): AssociationStructure | undefined {
         return this._ast as AssociationStructure;
-    }
-
-    override parent(): ModelContainer<AssociationStructure> {
-        return this._parent;
     }
 }
 

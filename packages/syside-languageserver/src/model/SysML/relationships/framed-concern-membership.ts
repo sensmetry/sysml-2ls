@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { FramedConcernMembership } from "../../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ConcernUsageMeta } from "../concern-usage";
 import { RequirementConstraintMembershipMeta } from "./requirement-constraint-membership";
 
@@ -23,16 +23,8 @@ import { RequirementConstraintMembershipMeta } from "./requirement-constraint-me
 export class FramedConcernMembershipMeta<
     T extends ConcernUsageMeta = ConcernUsageMeta
 > extends RequirementConstraintMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<FramedConcernMembership>) {
-        super(id, parent);
-    }
-
     override ast(): FramedConcernMembership | undefined {
         return this._ast as FramedConcernMembership;
-    }
-
-    override parent(): ModelContainer<FramedConcernMembership> {
-        return this._parent;
     }
 }
 

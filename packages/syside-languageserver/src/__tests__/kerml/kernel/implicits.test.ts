@@ -80,7 +80,7 @@ test.concurrent.each(TABLE)(
         const result = await parseKerML(str, BUILD_OPTIONS);
         expect(result).toMatchObject(NO_ERRORS);
 
-        const type = result.value.namespaceMembers[1].element as Type;
+        const type = result.value.children[1].element as Type;
         expect(sanitizeTree(type.$meta.specializations())).toMatchObject([
             {
                 element: { qualifiedName: `${pack}::${klass}` },
@@ -114,7 +114,7 @@ test.skip.each(TABLE)(
 
         expect(result).toMatchObject(NO_ERRORS);
         expect(
-            sanitizeTree((result.value.namespaceMembers[2].element as Type).$meta.specializations())
+            sanitizeTree((result.value.children[2].element as Type).$meta.specializations())
         ).toMatchObject([
             {
                 element: { qualifiedName: "B" },
@@ -127,7 +127,7 @@ test.skip.each(TABLE)(
 
 // TODO: chapter 7 may be wrong and only connector features subset links rather
 // than all features, same as the pilot implementation
-test.concurrent.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
+test.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
     "features typed by %s%s implicitly subset related standard library feature",
     async (_, classifier: string, pack: string, klass: string, feature: string, body: string) => {
         const str = formatString(
@@ -144,7 +144,7 @@ test.concurrent.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
 
         expect(result).toMatchObject(NO_ERRORS);
         expect(
-            sanitizeTree((result.value.members[0].element as Feature).$meta.specializations())
+            sanitizeTree((result.value.children[1].element as Feature).$meta.specializations())
         ).toMatchObject([
             ...anything(1),
             {

@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Behavior } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ClassMeta } from "./_internal";
 
 export const ImplicitBehaviors = {
@@ -24,16 +24,8 @@ export const ImplicitBehaviors = {
 
 @metamodelOf(Behavior, ImplicitBehaviors)
 export class BehaviorMeta extends ClassMeta {
-    constructor(id: ElementID, parent: ModelContainer<Behavior>) {
-        super(id, parent);
-    }
-
     override ast(): Behavior | undefined {
         return this._ast as Behavior;
-    }
-
-    override parent(): ModelContainer<Behavior> {
-        return this._parent;
     }
 }
 

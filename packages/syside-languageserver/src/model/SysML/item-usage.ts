@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ItemDefinition, ItemUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(ItemUsage, {
@@ -23,10 +23,6 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     subitem: "Items::Item::subitems",
 })
 export class ItemUsageMeta extends OccurrenceUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<ItemUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isSubitem() ? "subitem" : "base";
     }
@@ -38,15 +34,11 @@ export class ItemUsageMeta extends OccurrenceUsageMeta {
     protected isSubitem(): boolean {
         if (!this.isComposite) return false;
         const parent = this.owner();
-        return parent.isAny([ItemDefinition, ItemUsage]);
+        return Boolean(parent?.isAny(ItemDefinition, ItemUsage));
     }
 
     override ast(): ItemUsage | undefined {
         return this._ast as ItemUsage;
-    }
-
-    override parent(): ModelContainer<ItemUsage> {
-        return this._parent;
     }
 }
 

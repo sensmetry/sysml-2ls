@@ -22,7 +22,9 @@ import {
     Connector,
     EndFeatureMembership,
     Feature,
+    FeatureChaining,
     FeatureMembership,
+    FeatureRelationship,
     FeatureTyping,
     ParameterMembership,
     Redefinition,
@@ -32,13 +34,23 @@ import {
     Structure,
     Subsetting,
     Type,
+    TypeFeaturing,
 } from "../../generated/ast";
-import { FeatureDirectionKind, getFeatureDirectionKind, TypeClassifier } from "../enums";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
-import { FeatureChainingMeta, FeatureValueMeta, TypeMeta } from "./_internal";
-import { SpecializationType } from "../containers";
+import { FeatureDirectionKind, TypeClassifier } from "../enums";
+import { metamodelOf } from "../metamodel";
+import {
+    ElementMeta,
+    ElementParts,
+    FeatureChainingMeta,
+    FeatureValueMeta,
+    InheritanceMeta,
+    OwningMembershipMeta,
+    TypeFeaturingMeta,
+    TypeMeta,
+} from "./_internal";
 import { SysMLType } from "../../services/sysml-ast-reflection";
 import { EMPTY_STREAM, stream, Stream } from "langium";
+import { NonNullable, enumerable } from "../../utils";
 
 export const ImplicitFeatures = {
     base: "Base::things",
@@ -58,20 +70,43 @@ export const ImplicitFeatures = {
 
 @metamodelOf(Feature, ImplicitFeatures)
 export class FeatureMeta extends TypeMeta {
-    /**
-     * Featuring types
-     */
-    readonly featuredBy: TypeMeta[] = [];
+    protected _direction: FeatureDirectionKind = "none";
+    protected _impliedDirection?: "out" | "in";
 
     /**
      * Feature direction
      */
-    direction: FeatureDirectionKind = "none";
+    @enumerable
+    get direction(): FeatureDirectionKind {
+        return this._impliedDirection ?? this._direction;
+    }
+    set direction(value) {
+        this._direction = value;
+        this.computedImpliedDirection();
+    }
+    get explicitDirection(): FeatureDirectionKind {
+        return this._direction;
+    }
+    protected computedImpliedDirection(): void {
+        const parent = this.parent();
+        if (this._direction === "none" && parent?.is(ParameterMembership)) {
+            this._impliedDirection = parent.is(ReturnParameterMembership) ? "out" : "in";
+        } else {
+            this._impliedDirection = undefined;
+        }
+    }
 
+    protected _isComposite = false;
     /**
      * Whether this feature is composite
      */
-    isComposite = false;
+    @enumerable
+    get isComposite(): boolean {
+        return this._isComposite;
+    }
+    set isComposite(value) {
+        this._isComposite = value;
+    }
 
     /**
      * Whether this feature is portion
@@ -88,65 +123,84 @@ export class FeatureMeta extends TypeMeta {
      */
     isDerived = false;
 
+    protected _isEnd = false;
+    protected _isImpliedEnd = false;
+
     /**
      * Whether this feature is end
      */
-    isEnd = false;
-
-    chainings: FeatureChainingMeta[] = [];
+    @enumerable
+    get isEnd(): boolean {
+        return this._isImpliedEnd || this._isEnd;
+    }
+    set isEnd(value) {
+        this._isEnd = value;
+    }
 
     isOrdered = false;
     isNonUnique = false;
 
-    get chainingFeatures(): FeatureMeta[] {
-        return this.chainings
-            .map((chaining) => chaining.element())
-            .filter((e) => e) as FeatureMeta[];
+    addFeatureRelationship(...element: FeatureRelationship["$meta"][]): this {
+        this._typeRelationships.add(...element);
+        element.forEach((e) => this.maybeTakeOwnership(e));
+        return this;
     }
 
-    value?: FeatureValueMeta;
+    get typeFeaturings(): readonly TypeFeaturingMeta[] {
+        return this._typeRelationships.get(TypeFeaturing);
+    }
+
+    get featuredBy(): readonly TypeMeta[] {
+        const featurings = this.typeFeaturings.map((f) => f.element()).filter(NonNullable);
+        const chaining = this.chainings.at(0)?.element();
+        if (chaining) featurings.push(...chaining.featuredBy);
+        if (featurings.length === 0 && this._owningType) return [this._owningType];
+        return featurings;
+    }
+
+    get chainings(): readonly FeatureChainingMeta[] {
+        return this._typeRelationships.get(FeatureChaining);
+    }
+
+    get chainingFeatures(): FeatureMeta[] {
+        return this.chainings.map((chaining) => chaining.element()).filter(NonNullable);
+    }
+
+    protected _value?: FeatureValueMeta | undefined;
+    get value(): FeatureValueMeta | undefined {
+        return this._value;
+    }
+    set value(value: FeatureValueMeta | undefined) {
+        this._value = value;
+    }
+
+    protected _write?: OwningMembershipMeta<FeatureMeta> | undefined;
+    get featureWrite(): OwningMembershipMeta<FeatureMeta> | undefined {
+        return this._value && !this._value.isDefault && this._value.isInitial
+            ? this._write
+            : undefined;
+    }
 
     protected typings: undefined | TypeMeta[] = undefined;
     protected _owningType: TypeMeta | undefined;
 
-    constructor(elementId: ElementID, parent: ModelContainer<Feature>) {
-        super(elementId, parent);
+    protected override onParentSet(
+        previous: ElementMeta | undefined,
+        current: ElementMeta | undefined
+    ): void {
+        super.onParentSet(previous, current);
 
-        const owner = parent.parent();
-        if (parent.is(FeatureMembership) && owner?.is(Type)) {
+        const owner = current?.parent();
+        if (current?.is(FeatureMembership) && owner?.is(Type)) {
             this._owningType = owner;
-            this.featuredBy.push(owner);
         }
+
+        this._isImpliedEnd = Boolean(current?.is(EndFeatureMembership));
+        this.computedImpliedDirection();
     }
 
     get owningType(): TypeMeta | undefined {
         return this._owningType;
-    }
-
-    override initialize(node: Feature): void {
-        this.value = undefined;
-        FeatureMeta.prototype.reset.call(this, node);
-
-        this.direction = getFeatureDirectionKind(node.direction);
-        this.isPortion = !!node.isPortion;
-        this.isComposite = !!node.isComposite || this.isPortion;
-        this.isReadonly = !!node.isReadOnly;
-        this.isDerived = !!node.isDerived;
-        this.isEnd = !!node.isEnd || this.parent().is(EndFeatureMembership);
-
-        this.isOrdered = node.isOrdered;
-        this.isNonUnique = node.isNonunique;
-
-        if (this.direction === "none" && this.parent().is(ParameterMembership)) {
-            this.direction = this.parent().is(ReturnParameterMembership) ? "out" : "in";
-        }
-    }
-
-    override reset(node: Feature): void {
-        this.featuredBy.length = 0;
-        if (this._owningType) this.featuredBy.push(this._owningType);
-        if (node.value) this.value = node.value.$meta;
-        this.isOrdered = node.isOrdered;
     }
 
     override defaultGeneralTypes(): string[] {
@@ -166,11 +220,6 @@ export class FeatureMeta extends TypeMeta {
     override ast(): Feature | undefined {
         return this._ast as Feature;
     }
-
-    override parent(): ModelContainer<Feature> {
-        return this._parent;
-    }
-
     /**
      * @returns true if this feature specializes any structure type, false
      * otherwise
@@ -207,7 +256,7 @@ export class FeatureMeta extends TypeMeta {
      */
     protected isBehaviorOwned(): boolean {
         const owner = this.owner();
-        return owner.isAny([Behavior, Step]);
+        return Boolean(owner?.isAny(Behavior, Step));
     }
 
     /**
@@ -225,7 +274,7 @@ export class FeatureMeta extends TypeMeta {
     protected isSubobject(): boolean {
         if (!this.isComposite) return false;
         const owner = this.owner();
-        return owner.is(Structure) || (owner.is(Feature) && owner.hasStructureType());
+        return Boolean(owner?.is(Structure) || (owner?.is(Feature) && owner.hasStructureType()));
     }
 
     /**
@@ -242,7 +291,7 @@ export class FeatureMeta extends TypeMeta {
     protected isSuboccurrence(): boolean {
         if (!this.isComposite) return false;
         const owner = this.owner();
-        return owner.is(Class) || (owner.is(Feature) && owner.hasClassType());
+        return Boolean(owner?.is(Class) || (owner?.is(Feature) && owner.hasClassType()));
     }
 
     /**
@@ -252,7 +301,7 @@ export class FeatureMeta extends TypeMeta {
     isAssociationEnd(): boolean {
         if (!this.isEnd) return false;
         const owner = this.owner();
-        return owner.isAny([Association, Connector]);
+        return Boolean(owner?.isAny(Association, Connector));
     }
 
     /**
@@ -279,15 +328,15 @@ export class FeatureMeta extends TypeMeta {
 
     get isParameter(): boolean {
         // parameter if direction was specified explicitly
-        return this.direction !== "none" && this.owner().isAny([Behavior, Step]);
+        return Boolean(this.direction !== "none" && this.owner()?.isAny(Behavior, Step));
     }
 
     get isResultParameter(): boolean {
-        return this.parent().is(ReturnParameterMembership);
+        return Boolean(this.parent()?.is(ReturnParameterMembership));
     }
 
-    override addSpecialization<T extends SpecializationType>(specialization: T): void {
-        super.addSpecialization(specialization);
+    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+        super.onSpecializationAdded(specialization);
 
         this.typings = undefined;
 
@@ -310,8 +359,8 @@ export class FeatureMeta extends TypeMeta {
             const owner = this.owningType;
             if (owner && feature) {
                 const addShadow = (name: string): void => {
-                    const existing = owner.children.get(name);
-                    if (!existing) owner.children.set(name, "shadow");
+                    const existing = owner.findMember(name);
+                    if (!existing) owner["_memberLookup"].set(name, "shadow");
                 };
 
                 if (feature.name) addShadow(feature.name);
@@ -324,8 +373,8 @@ export class FeatureMeta extends TypeMeta {
         return Subsetting;
     }
 
-    allTypings(): TypeMeta[] {
-        if (!this.typings) return this.collectTypings();
+    allTypings(recompute = false): TypeMeta[] {
+        if (!this.typings || recompute) return this.collectTypings();
         return this.typings;
     }
 
@@ -389,6 +438,34 @@ export class FeatureMeta extends TypeMeta {
 
     override ownedParameters(): Stream<FeatureMeta> {
         return TypeMeta.prototype.ownedParameters.call(this.basicFeature());
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = {
+            prefixes: this.prefixes,
+        };
+
+        if (this.parent()?.is(EndFeatureMembership)) {
+            parts.heritage = this.heritage;
+            if (this._multiplicity) {
+                parts.multiplicity = [this._multiplicity];
+            }
+        } else {
+            if (this._multiplicity) {
+                parts.multiplicity = [this._multiplicity];
+            }
+            parts.heritage = this.heritage;
+        }
+
+        parts.typeRelationships = this.typeRelationships;
+
+        if (this.value) {
+            parts.value = [this.value];
+        }
+
+        parts.children = this.children;
+
+        return parts;
     }
 }
 

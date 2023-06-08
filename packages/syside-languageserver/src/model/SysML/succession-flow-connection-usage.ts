@@ -17,28 +17,19 @@
 import { Mixin } from "ts-mixer";
 import { SuccessionFlowConnectionUsage } from "../../generated/ast";
 import { SuccessionItemFlowMeta } from "../KerML/succession-item-flow";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { FlowConnectionUsageMeta } from "./flow-connection-usage";
 
 @metamodelOf(SuccessionFlowConnectionUsage, {
     base: "Connections::successionFlowConnections",
-    subperformance: "Performances::Performance::subtransfersBefore",
     message: "Connections::successionFlowConnections",
 })
 export class SuccessionFlowConnectionUsageMeta extends Mixin(
     SuccessionItemFlowMeta,
     FlowConnectionUsageMeta
 ) {
-    constructor(id: ElementID, parent: ModelContainer<SuccessionFlowConnectionUsage>) {
-        super(id, parent);
-    }
-
     override ast(): SuccessionFlowConnectionUsage | undefined {
         return this._ast as SuccessionFlowConnectionUsage;
-    }
-
-    override parent(): ModelContainer<SuccessionFlowConnectionUsage> {
-        return this._parent;
     }
 }
 

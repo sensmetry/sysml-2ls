@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { UseCaseDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { CaseDefinitionMeta } from "./case-definition";
 
 @metamodelOf(UseCaseDefinition, {
     base: "UseCases::UseCase",
 })
 export class UseCaseDefinitionMeta extends CaseDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<UseCaseDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): UseCaseDefinition | undefined {
         return this._ast as UseCaseDefinition;
-    }
-
-    override parent(): ModelContainer<UseCaseDefinition> {
-        return this._parent;
     }
 }
 

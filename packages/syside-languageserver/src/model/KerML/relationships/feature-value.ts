@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { FeatureValue } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer, ParentModel } from "../../metamodel";
-import { ExpressionMeta, FeatureMeta, OwningMembershipMeta } from "../_internal";
+import { metamodelOf } from "../../metamodel";
+import { ExpressionMeta, OwningMembershipMeta } from "../_internal";
 
 @metamodelOf(FeatureValue)
 export class FeatureValueMeta<
@@ -25,26 +25,8 @@ export class FeatureValueMeta<
     isDefault = false;
     isInitial = false;
 
-    constructor(id: ElementID, parent: ModelContainer<FeatureValue>) {
-        super(id, parent);
-    }
-
-    override initialize(node: FeatureValue): void {
-        this.isDefault = node.isDefault;
-        this.isInitial = node.isInitial;
-
-        (this.parent() as FeatureMeta).value = this;
-    }
-
     override ast(): FeatureValue | undefined {
         return this._ast as FeatureValue;
-    }
-
-    override parent(_: true): ParentModel<FeatureValue>;
-    override parent(): ModelContainer<FeatureValue>;
-
-    override parent(): ModelContainer<FeatureValue> {
-        return this._parent;
     }
 }
 

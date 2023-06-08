@@ -14,22 +14,79 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Stream, stream } from "langium";
 import { Dependency } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
-import { RelationshipMeta } from "../_internal";
+import { NonNullable, enumerable } from "../../../utils";
+import { metamodelOf } from "../../metamodel";
+import {
+    AnnotationMeta,
+    ElementMeta,
+    ElementParts,
+    MetadataFeatureMeta,
+    RelationshipMeta,
+} from "../_internal";
 
 @metamodelOf(Dependency)
 export class DependencyMeta extends RelationshipMeta {
-    constructor(id: ElementID, parent: ModelContainer<Dependency>) {
-        super(id, parent);
+    protected _prefixes: AnnotationMeta<MetadataFeatureMeta>[] = [];
+    private _client: ElementMeta[] = [];
+    private _supplier: ElementMeta[] = [];
+
+    override get metadata(): Stream<MetadataFeatureMeta> {
+        return stream(this._prefixes)
+            .map((m) => m.element())
+            .filter(NonNullable)
+            .concat(super.metadata);
+    }
+
+    /**
+     * Metadata prefixes of this elements
+     */
+    @enumerable
+    get prefixes(): readonly AnnotationMeta<MetadataFeatureMeta>[] {
+        return this._prefixes;
+    }
+
+    protected addPrefix(...prefix: AnnotationMeta<MetadataFeatureMeta>[]): this {
+        this._prefixes.push(...prefix);
+        return this;
+    }
+
+    @enumerable
+    get client(): readonly ElementMeta[] {
+        return this._client;
+    }
+    addClient(...client: ElementMeta[]): this {
+        this._client.push(...client);
+        return this;
+    }
+
+    override source(): ElementMeta | undefined {
+        return this._client.at(0) ?? super.source();
+    }
+
+    @enumerable
+    get supplier(): readonly ElementMeta[] {
+        return this._supplier;
+    }
+    addSupplier(...supplier: ElementMeta[]): this {
+        this._supplier.push(...supplier);
+        return this;
+    }
+
+    override element(): ElementMeta | undefined {
+        return this._supplier.at(0);
     }
 
     override ast(): Dependency | undefined {
         return this._ast as Dependency;
     }
 
-    override parent(): ModelContainer<Dependency> {
-        return this._parent;
+    override textualParts(): ElementParts {
+        return {
+            prefixes: this.prefixes,
+            children: this.children,
+        };
     }
 }
 

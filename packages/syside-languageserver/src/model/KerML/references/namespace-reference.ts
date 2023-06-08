@@ -16,23 +16,15 @@
 
 import { NamespaceReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ElementReferenceMeta, NamespaceMeta } from "../_internal";
 
 @metamodelOf(NamespaceReference)
 export class NamespaceReferenceMeta extends ElementReferenceMeta {
     override readonly to = new Target<NamespaceMeta>();
 
-    constructor(id: ElementID, parent: ModelContainer<NamespaceReference>) {
-        super(id, parent);
-    }
-
     override ast(): NamespaceReference | undefined {
         return this._ast as NamespaceReference;
-    }
-
-    override parent(): ModelContainer<NamespaceReference> {
-        return this._parent;
     }
 }
 

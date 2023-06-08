@@ -200,7 +200,7 @@ OwnedFeatureTyping returns FeatureTyping:
 ;
 
 fragment FeatureType:
-    reference=TypeReference | chains+=OwnedFeatureChain
+    reference=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 // Classification Expressions
@@ -218,7 +218,7 @@ TypeResultMember returns ReturnParameterMembership:
 ;
 
 TypeReferenceFeature returns Feature:
-    typeRelationships+=ReferenceTyping
+    heritage+=ReferenceTyping
 ;
 
 ReferenceTyping returns FeatureTyping:
@@ -248,7 +248,7 @@ FunctionReferenceMember returns FeatureMembership:
 ;
 
 FunctionReference returns Expression:
-    typeRelationships+=ReferenceTyping
+    heritage+=ReferenceTyping
 ;
 
 FeatureChainMember returns Membership:

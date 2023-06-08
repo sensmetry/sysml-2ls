@@ -15,32 +15,24 @@
  ********************************************************************************/
 
 import { EventOccurrenceUsage, OccurrenceDefinition, OccurrenceUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(EventOccurrenceUsage, {
     suboccurrence: "Occurrences::Occurrence::timeEnclosedOccurrences",
 })
 export class EventOccurrenceUsageMeta extends OccurrenceUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<EventOccurrenceUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isSuboccurrence() ? "suboccurrence" : super.defaultSupertype();
     }
 
     protected override isSuboccurrence(): boolean {
         const parent = this.owner();
-        return parent.isAny([OccurrenceUsage, OccurrenceDefinition]);
+        return Boolean(parent?.isAny(OccurrenceUsage, OccurrenceDefinition));
     }
 
     override ast(): EventOccurrenceUsage | undefined {
         return this._ast as EventOccurrenceUsage;
-    }
-
-    override parent(): ModelContainer<EventOccurrenceUsage> {
-        return this._parent;
     }
 }
 

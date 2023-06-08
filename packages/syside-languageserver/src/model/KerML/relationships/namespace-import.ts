@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { NamespaceImport } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ImportMeta, NamespaceMeta } from "../_internal";
 
 @metamodelOf(NamespaceImport)
 export class NamespaceImportMeta<T extends NamespaceMeta = NamespaceMeta> extends ImportMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<NamespaceImport>) {
-        super(id, parent);
-    }
-
     override ast(): NamespaceImport | undefined {
         return this._ast as NamespaceImport;
-    }
-
-    override parent(): ModelContainer<NamespaceImport> {
-        return this._parent;
     }
 }
 

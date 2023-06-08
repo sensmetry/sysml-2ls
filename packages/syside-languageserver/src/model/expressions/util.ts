@@ -247,7 +247,7 @@ export function hasType(node: unknown, type: meta.TypeMeta): boolean {
  */
 export function metaclassReferenceOf(element: meta.ElementMeta): meta.ElementMeta | undefined {
     if (!element.is(MetadataFeature)) return;
-    return element.annotates.find((node) => node.metaclass === element);
+    return element.annotatedElements().find((node) => node.metaclass === element);
 }
 
 /**
@@ -272,7 +272,7 @@ export function resultType(value: ExpressionResultValue): meta.TypeMeta | string
     if (typeof value === "string") return "ScalarValues::String";
     if (typeof value === "number")
         return Number.isInteger(value) ? "ScalarValues::Integer" : "ScalarValues::Rational";
-    if (value?.isAny([InlineExpression, Expression])) return value.returnType();
+    if (value?.isAny(InlineExpression, Expression)) return value.returnType();
     if (value?.is(Type)) return value;
     return;
 }
@@ -303,7 +303,7 @@ export function typeFor(result: ExpressionResult): (meta.TypeMeta | string)[] | 
 export function typeOf(arg: ExpressionLike): meta.TypeMeta | string | undefined {
     if (!arg) return;
     if (arg.value) return arg.value.element()?.returnType();
-    if (arg.isAny([Expression, SysMLFunction])) return arg.returnType();
+    if (arg.isAny(Expression, SysMLFunction)) return arg.returnType();
     return arg;
 }
 

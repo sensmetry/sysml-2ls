@@ -19,7 +19,7 @@ import {
     RequirementUsage,
     RequirementVerificationMembership,
 } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConstraintUsageMeta } from "./constraint-usage";
 
 @metamodelOf(RequirementUsage, {
@@ -28,22 +28,22 @@ import { ConstraintUsageMeta } from "./constraint-usage";
     verification: "VerificationCases::VerificationCase::obj::requirementVerifications",
 })
 export class RequirementUsageMeta extends ConstraintUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<RequirementUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isSubrequirement() ? "subrequirement" : "base";
     }
 
     isVerifiedRequirement(): boolean {
         const parent = this.parent();
-        return parent.is(RequirementVerificationMembership) && parent.isLegalVerification();
+        return Boolean(
+            parent?.is(RequirementVerificationMembership) && parent.isLegalVerification()
+        );
     }
 
     isSubrequirement(): boolean {
         if (this.requirementConstraintKind() === "assumption") return false;
-        return this.isComposite && this.owner().isAny([RequirementUsage, RequirementDefinition]);
+        return Boolean(
+            this.isComposite && this.owner()?.isAny(RequirementUsage, RequirementDefinition)
+        );
     }
 
     override requirementConstraintSupertype(): string | undefined {
@@ -54,10 +54,6 @@ export class RequirementUsageMeta extends ConstraintUsageMeta {
 
     override ast(): RequirementUsage | undefined {
         return this._ast as RequirementUsage;
-    }
-
-    override parent(): ModelContainer<RequirementUsage> {
-        return this._parent;
     }
 }
 

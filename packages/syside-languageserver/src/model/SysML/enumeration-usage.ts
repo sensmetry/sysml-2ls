@@ -15,25 +15,16 @@
  ********************************************************************************/
 
 import { EnumerationUsage, EnumerationDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { AttributeUsageMeta } from "./attribute-usage";
 
 @metamodelOf(EnumerationUsage)
 export class EnumerationUsageMeta extends AttributeUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<EnumerationUsage>) {
-        super(id, parent);
-    }
-
     override ast(): EnumerationUsage | undefined {
         return this._ast as EnumerationUsage;
     }
-
-    override parent(): ModelContainer<EnumerationUsage> {
-        return this._parent;
-    }
-
     protected override isVariantNode(): boolean {
-        return this.owner().is(EnumerationDefinition);
+        return Boolean(this.owner()?.is(EnumerationDefinition));
     }
 }
 

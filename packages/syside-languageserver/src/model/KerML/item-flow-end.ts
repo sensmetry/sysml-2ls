@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ItemFlowEnd } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { FeatureMeta } from "./_internal";
 
 export const ImplicitItemFlowEnds = {
@@ -25,16 +25,8 @@ export const ImplicitItemFlowEnds = {
 
 @metamodelOf(ItemFlowEnd, ImplicitItemFlowEnds)
 export class ItemFlowEndMeta extends FeatureMeta {
-    constructor(id: ElementID, parent: ModelContainer<ItemFlowEnd>) {
-        super(id, parent);
-    }
-
     override ast(): ItemFlowEnd | undefined {
         return this._ast as ItemFlowEnd;
-    }
-
-    override parent(): ModelContainer<ItemFlowEnd> {
-        return this._parent;
     }
 }
 

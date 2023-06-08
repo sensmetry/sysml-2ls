@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { LiteralExpression } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExpressionMeta } from "../_internal";
 
 export const ImplicitLiteralExpressions = {
@@ -26,16 +26,8 @@ export const ImplicitLiteralExpressions = {
 
 @metamodelOf(LiteralExpression, ImplicitLiteralExpressions)
 export class LiteralExpressionMeta extends ExpressionMeta {
-    constructor(id: ElementID, parent: ModelContainer<LiteralExpression>) {
-        super(id, parent);
-    }
-
     override ast(): LiteralExpression | undefined {
         return this._ast as LiteralExpression;
-    }
-
-    override parent(): ModelContainer<LiteralExpression> {
-        return this._parent;
     }
 
     override isModelLevelEvaluable(): boolean {

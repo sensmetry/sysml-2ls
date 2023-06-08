@@ -23,7 +23,7 @@ import {
     ViewUsage,
 } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { PartUsageMeta } from "./part-usage";
 
 @metamodelOf(RenderingUsage, {
@@ -31,34 +31,25 @@ import { PartUsageMeta } from "./part-usage";
     subrendering: "Views::Rendering::subrenderings",
 })
 export class RenderingUsageMeta extends PartUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<RenderingUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isSubrendering() ? "subrendering" : "base";
     }
 
     isSubrendering(): boolean {
         const parent = this.owner();
-        return parent.isAny([RenderingUsage, RenderingDefinition]);
+        return Boolean(parent?.isAny(RenderingUsage, RenderingDefinition));
     }
 
     isRender(): boolean {
         const parent = this.owner();
-        return parent.isAny([ViewDefinition, ViewUsage]);
+        return Boolean(parent?.isAny(ViewDefinition, ViewUsage));
     }
 
     override ast(): RenderingUsage | undefined {
         return this._ast as RenderingUsage;
     }
-
-    override parent(): ModelContainer<RenderingUsage> {
-        return this._parent;
-    }
-
     override namingFeature(): FeatureMeta | undefined {
-        return this.parent().is(ViewRenderingMembership)
+        return this.parent()?.is(ViewRenderingMembership)
             ? (this.types(ReferenceSubsetting).head() as FeatureMeta | undefined)
             : super.namingFeature();
     }

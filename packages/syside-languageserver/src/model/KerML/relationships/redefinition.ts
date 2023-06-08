@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Redefinition } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta, SubsettingMeta } from "../_internal";
 
 @metamodelOf(Redefinition)
 export class RedefinitionMeta<T extends FeatureMeta = FeatureMeta> extends SubsettingMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Redefinition>) {
-        super(id, parent);
-    }
-
     override ast(): Redefinition | undefined {
         return this._ast as Redefinition;
-    }
-
-    override parent(): ModelContainer<Redefinition> {
-        return this._parent;
     }
 }
 

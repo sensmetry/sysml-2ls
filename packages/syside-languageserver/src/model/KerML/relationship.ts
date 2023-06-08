@@ -14,19 +14,30 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Stream, stream } from "langium";
 import {
-    AnnotatingElement,
     Comment,
     Documentation,
+    Element,
     Feature,
     Membership,
     MetadataFeature,
     Relationship,
+    TextualRepresentation,
 } from "../../generated/ast";
+import { NonNullable, enumerable } from "../../utils";
 import { Visibility } from "../../utils/scope-util";
-import { getVisibility } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { CommentMeta, DocumentationMeta, ElementMeta, FeatureMeta } from "./_internal";
+import { ElementContainer } from "../containers";
+import { metamodelOf } from "../metamodel";
+import {
+    CommentMeta,
+    DocumentationMeta,
+    ElementMeta,
+    ElementParts,
+    FeatureMeta,
+    MetadataFeatureMeta,
+    TextualRepresentationMeta,
+} from "./_internal";
 
 export type NonNullRelationship<
     R extends RelationshipMeta = RelationshipMeta,
@@ -39,31 +50,72 @@ export type TargetType<T extends RelationshipMeta = RelationshipMeta> = ReturnTy
 
 @metamodelOf(Relationship, "abstract")
 export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> extends ElementMeta {
+    protected _children = new ElementContainer<Element>();
+
+    protected _visibility?: Visibility;
+    isImplied = false;
+
+    protected _source?: ElementMeta;
+    protected _element?: T;
+
+    override get comments(): readonly CommentMeta[] {
+        return this._children.get(Comment).concat(this._comments);
+    }
+
+    override get documentation(): readonly DocumentationMeta[] {
+        return this._children.get(Documentation).concat(this._docs);
+    }
+
+    override get metadata(): Stream<MetadataFeatureMeta> {
+        return stream(this._children.get(MetadataFeature)).concat(this._metadata);
+    }
+
+    override get textualRepresentation(): readonly TextualRepresentationMeta[] {
+        return this._children.get(TextualRepresentation).concat(this._reps);
+    }
+
+    protected override onParentSet(
+        previous: ElementMeta | undefined,
+        current: ElementMeta | undefined
+    ): void {
+        if (!this._source || this._source === previous) this._source = current;
+        super.onParentSet(previous, current);
+    }
+
+    @enumerable
+    get children(): readonly ElementMeta[] {
+        return this._children.all;
+    }
+
+    source(): ElementMeta | undefined {
+        return this._source || (this._owner as ElementMeta | undefined);
+    }
+
+    setSource(s: ElementMeta): void {
+        this._source = s;
+    }
+
     /**
      * Visibility of the element at the end of this relationship
      * @see {@link element}
      */
-    visibility: Visibility = Visibility.public;
-
-    /**
-     * Whether this relationship was constructed implicitly
-     */
-    isImplied = false;
-
-    protected _source: ElementMeta;
-    protected _element?: T;
-
-    constructor(id: ElementID, parent: ModelContainer<Relationship>) {
-        super(id, parent);
-
-        this._source = parent as ElementMeta;
+    @enumerable
+    get visibility(): Visibility {
+        return this._visibility ?? Visibility.public;
     }
 
-    source(): ElementMeta {
-        return this._source;
+    set visibility(value: Visibility) {
+        this._visibility = value;
     }
-    setSource(s: ElementMeta): void {
-        this._source = s;
+
+    clearVisibility(): this {
+        this._visibility = undefined;
+        return this;
+    }
+
+    @enumerable
+    get hasExplicitVisibility(): boolean {
+        return this._visibility !== undefined;
     }
 
     /**
@@ -73,6 +125,7 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
     element(): T | undefined {
         return this._element;
     }
+
     /**
      * @see {@link element}
      */
@@ -80,43 +133,8 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
         this._element = e?.is(Membership) ? e : e;
     }
 
-    override initialize(node: Relationship): void {
-        this.visibility = getVisibility(node.visibility);
-        if (node.element) this._element = node.element.$meta as T;
-    }
-
-    override reset(node: Relationship): void {
-        if (node.element) this._element = node.element.$meta as T;
-        else this._element = undefined;
-    }
-
     override ast(): Relationship | undefined {
         return this._ast as Relationship;
-    }
-
-    override parent(): ModelContainer<Relationship> {
-        return this._parent;
-    }
-
-    override owner(): ElementMeta {
-        // only namespaces are entry types
-        return this._owner as ElementMeta;
-    }
-
-    protected override collectChildren(node: Relationship): void {
-        node.annotations.forEach((a) => {
-            if (!a.element) return;
-
-            const element = a.element as AnnotatingElement;
-            const meta = element.$meta;
-            if (element.about.length > 0) return;
-
-            if (meta.is(MetadataFeature)) this.metadata.push(meta);
-            else if (element.$type === Comment) this.comments.push(meta as CommentMeta);
-            else if (element.$type === Documentation) this.docs.push(meta as DocumentationMeta);
-        });
-
-        // TODO: do something with other elements
     }
 
     /**
@@ -128,6 +146,21 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
         return target?.is(Feature) && target.chainings.length > 0
             ? target.chainings.at(-1)?.element()
             : target;
+    }
+
+    textualParts(): ElementParts {
+        const parts: ElementParts = {};
+        if (this.source()?.parent() === this) {
+            parts.source = [this.source() as ElementMeta];
+        }
+
+        const target = this.element();
+        if (target?.parent() === this) {
+            parts.target = [target];
+        }
+
+        parts.children = this.children;
+        return parts;
     }
 }
 

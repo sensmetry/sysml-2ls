@@ -17,10 +17,18 @@
 import { stream } from "langium";
 import { Mixin } from "ts-mixer";
 import { Connector, ReferenceSubsetting } from "../../generated/ast";
-import { SpecializationType } from "../containers";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
-import { FeatureMeta, RelationshipMeta, TypeMeta } from "./_internal";
+import {
+    ElementParts,
+    EndFeatureMembershipMeta,
+    FeatureMeta,
+    InheritanceMeta,
+    MembershipMeta,
+    RelationshipMeta,
+    TypeMeta,
+} from "./_internal";
+import { enumerable } from "../../utils";
 
 export const ImplicitConnectors = {
     base: "Links::links",
@@ -31,15 +39,23 @@ export const ImplicitConnectors = {
 
 @metamodelOf(Connector, ImplicitConnectors)
 export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, FeatureMeta) {
-    constructor(id: ElementID, parent: ModelContainer<Connector>) {
-        super(id, parent);
+    private _ends: EndFeatureMembershipMeta[] = [];
+
+    @enumerable
+    public get ends(): EndFeatureMembershipMeta[] {
+        return this._ends;
+    }
+    public set ends(value: EndFeatureMembershipMeta[]) {
+        this._ends = value;
     }
 
     override defaultSupertype(): string {
         if (this.hasStructureType()) {
+            if (this._ends.length > 2) return "object";
             return this.isBinary() ? "binaryObject" : "object";
         }
 
+        if (this._ends.length > 2) return "base";
         return this.isBinary() ? "binary" : "base";
     }
 
@@ -47,17 +63,15 @@ export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, Featu
         return this._ast as Connector;
     }
 
-    override parent(): ModelContainer<Connector> {
-        return this._parent;
+    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+        this.resetEnds();
+        FeatureMeta.prototype["onSpecializationAdded"].call(this, specialization);
     }
 
-    override reset(_node: Connector): void {
-        this.resetEnds();
-    }
-
-    override addSpecialization<T extends SpecializationType>(specialization: T): void {
-        this.resetEnds();
-        super.addSpecialization(specialization);
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        return (this._ends as MembershipMeta<FeatureMeta>[]).concat(
+            FeatureMeta.prototype.featureMembers.call(this)
+        );
     }
 
     contextType(): TypeMeta | undefined {
@@ -98,11 +112,32 @@ export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, Featu
     relatedFeatures(): FeatureMeta[] {
         // related features are the reference subsettings of the connector ends
         // by the spec, there shouldn't be more than 1 reference subsetting
-        return stream(this.ends())
+        return stream(this.allEnds())
             .map((end) => end.specializations(ReferenceSubsetting).at(0))
             .map((sub) => sub?.element())
             .nonNullable()
             .toArray() as FeatureMeta[];
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = {
+            prefixes: this.prefixes,
+        };
+
+        if (this._multiplicity) {
+            parts.multiplicity = [this._multiplicity];
+        }
+        parts.heritage = this.heritage;
+        parts.typeRelationships = this.typeRelationships;
+
+        if (this.value) {
+            parts.value = [this.value];
+        }
+
+        parts.ends = this.ends;
+        parts.children = this.children;
+
+        return parts;
     }
 }
 

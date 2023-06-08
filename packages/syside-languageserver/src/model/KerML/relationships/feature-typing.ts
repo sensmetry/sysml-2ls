@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { FeatureTyping } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { SpecializationMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(FeatureTyping)
 export class FeatureTypingMeta<T extends TypeMeta = TypeMeta> extends SpecializationMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<FeatureTyping>) {
-        super(id, parent);
-    }
-
     override ast(): FeatureTyping | undefined {
         return this._ast as FeatureTyping;
-    }
-
-    override parent(): ModelContainer<FeatureTyping> {
-        return this._parent;
     }
 }
 

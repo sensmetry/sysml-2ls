@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { ViewUsage, ViewDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { PartUsageMeta } from "./part-usage";
 
 @metamodelOf(ViewUsage, {
@@ -23,25 +23,17 @@ import { PartUsageMeta } from "./part-usage";
     subview: "Views::View::subviews",
 })
 export class ViewUsageMeta extends PartUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<ViewUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isSubview() ? "subview" : "base";
     }
 
     isSubview(): boolean {
         const parent = this.owner();
-        return parent.isAny([ViewDefinition, ViewUsage]);
+        return Boolean(parent?.isAny(ViewDefinition, ViewUsage));
     }
 
     override ast(): ViewUsage | undefined {
         return this._ast as ViewUsage;
-    }
-
-    override parent(): ModelContainer<ViewUsage> {
-        return this._parent;
     }
 }
 

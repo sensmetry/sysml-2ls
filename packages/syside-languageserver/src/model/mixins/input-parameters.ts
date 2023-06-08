@@ -19,7 +19,7 @@ import {
     ParameterMembership,
     ReturnParameterMembership,
 } from "../../generated/ast";
-import { ElementMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
+import { FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
 import { PositionalFeaturesBase } from "./positional-features";
 
 const Filter: (f: MembershipMeta<FeatureMeta>) => boolean = (f) => {
@@ -33,7 +33,7 @@ export class InputParametersMixin {
     /**
      * @returns directly owned input parameter features
      */
-    ownedInputParameters(this: ElementMeta & InputParametersMixin): FeatureMeta[] {
+    ownedInputParameters(this: TypeMeta & InputParametersMixin): FeatureMeta[] {
         return this.params.owned(this, Filter);
     }
 

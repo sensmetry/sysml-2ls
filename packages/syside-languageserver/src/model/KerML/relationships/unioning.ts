@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { Unioning } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RelationshipMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(Unioning)
 export class UnioningMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Unioning>) {
-        super(id, parent);
-    }
-
     override ast(): Unioning | undefined {
         return this._ast as Unioning;
-    }
-
-    override parent(): ModelContainer<Unioning> {
-        return this._parent;
     }
 }
 

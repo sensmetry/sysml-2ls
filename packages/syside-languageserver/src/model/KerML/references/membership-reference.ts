@@ -16,23 +16,15 @@
 
 import { MembershipReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ElementReferenceMeta, MembershipMeta } from "../_internal";
 
 @metamodelOf(MembershipReference)
 export class MembershipReferenceMeta extends ElementReferenceMeta {
     override readonly to = new Target<MembershipMeta>();
 
-    constructor(id: ElementID, parent: ModelContainer<MembershipReference>) {
-        super(id, parent);
-    }
-
     override ast(): MembershipReference | undefined {
         return this._ast as MembershipReference;
-    }
-
-    override parent(): ModelContainer<MembershipReference> {
-        return this._parent;
     }
 }
 

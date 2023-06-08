@@ -15,30 +15,42 @@
  ********************************************************************************/
 
 import { Mixin } from "ts-mixer";
-import { PortDefinition } from "../../generated/ast";
+import { ConjugatedPortDefinition, PortDefinition } from "../../generated/ast";
 import { StructureMeta } from "../KerML/structure";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceDefinitionMeta } from "./occurrence-definition";
+import { OwningMembershipMeta } from "../KerML";
+import { enumerable } from "../../utils";
 
 @metamodelOf(PortDefinition, {
     base: "Ports::Port",
 })
 export class PortDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, StructureMeta) {
-    constructor(id: ElementID, parent: ModelContainer<PortDefinition>) {
-        super(id, parent);
+    private _conjugatedDefinition?: OwningMembershipMeta<ConjugatedPortDefinitionMeta> | undefined;
+
+    @enumerable
+    get conjugatedDefinition(): OwningMembershipMeta<ConjugatedPortDefinitionMeta> | undefined {
+        return this._conjugatedDefinition;
     }
 
     override ast(): PortDefinition | undefined {
         return this._ast as PortDefinition;
     }
+}
 
-    override parent(): ModelContainer<PortDefinition> {
-        return this._parent;
+@metamodelOf(ConjugatedPortDefinition)
+export class ConjugatedPortDefinitionMeta extends PortDefinitionMeta {
+    override ast(): ConjugatedPortDefinition | undefined {
+        return this._ast as ConjugatedPortDefinition;
     }
 }
 
 declare module "../../generated/ast" {
     interface PortDefinition {
         $meta: PortDefinitionMeta;
+    }
+
+    interface ConjugatedPortDefinition {
+        $meta: ConjugatedPortDefinitionMeta;
     }
 }

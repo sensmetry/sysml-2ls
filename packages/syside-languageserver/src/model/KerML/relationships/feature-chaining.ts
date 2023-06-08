@@ -15,21 +15,13 @@
  ********************************************************************************/
 
 import { FeatureChaining } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta, RelationshipMeta } from "../_internal";
 
 @metamodelOf(FeatureChaining)
 export class FeatureChainingMeta<T extends FeatureMeta = FeatureMeta> extends RelationshipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<FeatureChaining>) {
-        super(id, parent);
-    }
-
     override ast(): FeatureChaining | undefined {
         return this._ast as FeatureChaining;
-    }
-
-    override parent(): ModelContainer<FeatureChaining> {
-        return this._parent;
     }
 }
 

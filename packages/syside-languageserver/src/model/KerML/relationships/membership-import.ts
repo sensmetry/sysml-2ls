@@ -15,23 +15,14 @@
  ********************************************************************************/
 
 import { MembershipImport } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ImportMeta, MembershipMeta } from "../_internal";
 
 @metamodelOf(MembershipImport)
 export class MembershipImportMeta<T extends MembershipMeta = MembershipMeta> extends ImportMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<MembershipImport>) {
-        super(id, parent);
-    }
-
     override ast(): MembershipImport | undefined {
         return this._ast as MembershipImport;
     }
-
-    override parent(): ModelContainer<MembershipImport> {
-        return this._parent;
-    }
-
     override importsNameOnly(): boolean {
         // non-recursive only imports the name
         return !this.isRecursive;

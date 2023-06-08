@@ -16,7 +16,7 @@
 
 import { OperatorExpression } from "../../../generated/ast";
 import { OPERATOR_FUNCTIONS, typeArgument, typeOf } from "../../expressions/util";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { InvocationExpressionMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(OperatorExpression)
@@ -26,20 +26,8 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
      */
     operator = "";
 
-    constructor(id: ElementID, parent: ModelContainer<OperatorExpression>) {
-        super(id, parent);
-    }
-
-    override initialize(node: OperatorExpression): void {
-        if (node.operator) this.operator = `'${node.operator}'`;
-    }
-
     override ast(): OperatorExpression | undefined {
         return this._ast as OperatorExpression;
-    }
-
-    override parent(): ModelContainer<OperatorExpression> {
-        return this._parent;
     }
 
     override getFunction(): string | undefined {
@@ -47,12 +35,6 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     }
 
     override returnType(): string | TypeMeta | undefined {
-        const result = this.resultParameter();
-        if (result) return result.element()?.returnType();
-
-        const returns = this.returnParameter();
-        if (returns) return returns.element();
-
         if (this.operator === "'as'" || this.operator === "'meta'") {
             // cast operators should be treated as its type arguments
             return typeArgument(this);
@@ -69,6 +51,13 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
             // between units and quantities to help with this
             return "Quantities::ScalarQuantityValue";
         }
+
+        const result = this.resultParameter();
+        if (result) return result.element()?.returnType();
+
+        const returns = this.returnParameter();
+        if (returns) return returns.element();
+
         return super.returnType();
     }
 }

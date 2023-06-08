@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { Subclassification } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ClassifierMeta, SpecializationMeta } from "../_internal";
 
 @metamodelOf(Subclassification)
 export class SubclassificationMeta<
     T extends ClassifierMeta = ClassifierMeta
 > extends SpecializationMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<Subclassification>) {
-        super(id, parent);
-    }
-
     override ast(): Subclassification | undefined {
         return this._ast as Subclassification;
-    }
-
-    override parent(): ModelContainer<Subclassification> {
-        return this._parent;
     }
 }
 

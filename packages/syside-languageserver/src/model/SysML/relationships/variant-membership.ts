@@ -16,23 +16,15 @@
 
 import { VariantMembership } from "../../../generated/ast";
 import { OwningMembershipMeta } from "../../KerML/relationships/owning-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { UsageMeta } from "../usage";
 
 @metamodelOf(VariantMembership)
 export class VariantMembershipMeta<
     T extends UsageMeta = UsageMeta
 > extends OwningMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<VariantMembership>) {
-        super(id, parent);
-    }
-
     override ast(): VariantMembership | undefined {
         return this._ast as VariantMembership;
-    }
-
-    override parent(): ModelContainer<VariantMembership> {
-        return this._parent;
     }
 }
 

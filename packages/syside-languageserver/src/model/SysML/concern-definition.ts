@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { ConcernDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { RequirementDefinitionMeta } from "./requirement-definition";
 
 @metamodelOf(ConcernDefinition, {
     base: "Requirements::ConcernCheck",
 })
 export class ConcernDefinitionMeta extends RequirementDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<ConcernDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): ConcernDefinition | undefined {
         return this._ast as ConcernDefinition;
-    }
-
-    override parent(): ModelContainer<ConcernDefinition> {
-        return this._parent;
     }
 }
 

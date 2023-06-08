@@ -69,10 +69,10 @@ export class KerMLValidator {
 
     @validateKerML(ast.Subsetting)
     checkSubsettingMultiplicities(subsetting: ast.Subsetting, accept: ValidationAcceptor): void {
-        const feature = subsetting.$meta.source().ast() as ast.Feature | undefined;
+        const feature = subsetting.$meta.source()?.ast() as ast.Feature | undefined;
         if (!feature) return;
 
-        if (feature.$meta.owner().is(ast.Connector)) {
+        if (feature.$meta.owner()?.is(ast.Connector)) {
             // association features have multiplicity 1..1 implicitly,
             // multiplicity works differently
             return;
@@ -83,7 +83,7 @@ export class KerMLValidator {
 
         const sub = subsetting.$meta.element();
         if (!sub) return;
-        if (sub.owner().is(ast.Connector)) return;
+        if (sub.owner()?.is(ast.Connector)) return;
         if (!sub.isNonUnique && nonunique) {
             accept(
                 "error",
@@ -141,7 +141,8 @@ export class KerMLValidator {
         const names = new MultiMap<string, [MembershipMeta, Properties<ast.Element>]>();
 
         // for performance reasons, only check direct members
-        for (const member of element.$meta.members) {
+        for (const member of element.$meta.children) {
+            if (!member.is(ast.Membership)) continue;
             // skip non-owning memberships that are not aliases
             if (!member.is(ast.OwningMembership) && !member.isAlias()) continue;
             // skip over automatically named reference usages
@@ -206,7 +207,7 @@ export class KerMLValidator {
                 if (!result && func) {
                     if (typeof func === "string") {
                         const element = this.index.findGlobalElement(func)?.node?.$meta;
-                        if (element?.isAny([ast.SysMLFunction, ast.Expression]))
+                        if (element?.isAny(ast.SysMLFunction, ast.Expression))
                             result = element.returnType();
                     } else {
                         result = func.returnType();
@@ -318,7 +319,7 @@ export class KerMLValidator {
 
         if (annotatedElementFeatures.length === 0) return;
 
-        for (const element of node.$meta.annotates) {
+        for (const element of node.$meta.annotatedElements()) {
             const meta = element.metaclass?.types().head();
             if (!meta) continue;
             if (
@@ -332,7 +333,7 @@ export class KerMLValidator {
 
     @validateKerML(ast.MetadataFeature)
     validateMetadataFeatureBody(node: ast.Type, accept: ValidationAcceptor): void {
-        for (const feature of stream(node.$meta.features)
+        for (const feature of stream(node.$meta.featureMembers())
             .filter((m) => m.is(ast.OwningMembership))
             .map((m) => m.element())
             .nonNullable()) {
@@ -410,7 +411,7 @@ export class KerMLValidator {
         if (target.featuredBy.length > 0 && !target.featuredBy.some((t) => ns.conforms(t)))
             accept("error", "Invalid feature chain expression, must refer to a valid feature", {
                 node,
-                property: "members",
+                property: "children",
                 index: 1,
             });
     }
@@ -457,7 +458,7 @@ export class KerMLValidator {
         const type = node.$meta.args.at(1);
         if (!type) return;
         const left = node.$meta.args[0];
-        if (!left?.isAny([ast.Expression, ast.SysMLFunction])) return;
+        if (!left?.isAny(ast.Expression, ast.SysMLFunction)) return;
 
         const arg = this.index.findType(left.returnType());
         if (!arg) return;
@@ -480,7 +481,7 @@ export class KerMLValidator {
     validateMultiplicityCount(node: ast.Type, accept: ValidationAcceptor): void {
         // even though multiplicity is a subtype of feature, it is parsed as a
         // non-feature element...
-        const multiplicities = stream(node.$meta.elements)
+        const multiplicities = stream(node.$meta.children)
             .filter((m) => m.is(ast.OwningMembership))
             .map((m) => m.element())
             .nonNullable()
@@ -500,10 +501,14 @@ export class KerMLValidator {
         }
     }
 
-    @validateKerML(ast.TypeRelationship)
+    @validateKerML(ast.FeatureRelationship)
+    @validateKerML(ast.Inheritance)
     /* istanbul ignore next (grammar doesn't allow triggering this validation) */
-    validateSpecializationEnds(node: ast.TypeRelationship, accept: ValidationAcceptor): void {
-        if (!node.$meta.element() && !node.reference && node.chains.length === 0) {
+    validateSpecializationEnds(
+        node: ast.FeatureRelationship | ast.Inheritance,
+        accept: ValidationAcceptor
+    ): void {
+        if (!node.$meta.element() && !node.reference && !node.targetChain) {
             accept("error", "Invalid relationship, must have at least 2 related elements", {
                 node,
             });
@@ -519,7 +524,7 @@ export class KerMLValidator {
         // abstract connectors can have less than 2 ends
         if (node.$meta.isAbstract) return;
 
-        if (node.$meta.ends().length < 2) {
+        if (node.$meta.allEnds().length < 2) {
             accept("error", `Invalid ${node.$type}, must have at least 2 related elements`, {
                 node,
             });
@@ -557,7 +562,7 @@ export class KerMLValidator {
                     { node: end.ast() ?? node }
                 );
             } else if (!subsettings.some((sub) => !sub.isImplied)) {
-                const owning = end.features.find((m) => m.is(ast.OwningMembership));
+                const owning = end.featureMembers().find((m) => m.is(ast.OwningMembership));
                 if (!owning) return;
                 const feature = owning.element();
                 if (!feature) return;
@@ -581,7 +586,7 @@ export class KerMLValidator {
         if (!subsetting || !subsetted) return;
 
         // connectors have separate validation
-        if (subsetting.owner().is(ast.Connector) || subsetted.owner().is(ast.Connector)) return;
+        if (subsetting.owner()?.is(ast.Connector) || subsetted.owner()?.is(ast.Connector)) return;
 
         const subsettingTypes = subsetting.featuredBy;
         const subsettedTypes = subsetted.featuredBy;
@@ -613,7 +618,7 @@ export class KerMLValidator {
             )
         ) {
             accept(
-                subsetting.owner().is(ast.ItemFlowEnd) ? "error" : "warning",
+                subsetting.owner()?.is(ast.ItemFlowEnd) ? "error" : "warning",
                 "Invalid subsetting, must be an accessible feature, use dot notation for nesting",
                 { node }
             );
@@ -625,7 +630,7 @@ export class KerMLValidator {
         source: ast.Type,
         accept: ValidationAcceptor
     ): void {
-        const featuringTypes = [...node.$meta.featuredBy];
+        const featuringTypes = node.$meta.featuredBy;
 
         const ends = node.$meta.connectorEnds();
         ends.forEach((end, index) => {
@@ -641,7 +646,7 @@ export class KerMLValidator {
 
             // needed later for implicit binding connectors (none constructed currently)
             // if (
-            //     source.$meta.isAny([ast.FeatureReferenceExpression, ast.FeatureChainExpression]) &&
+            //     source.$meta.isAny(ast.FeatureReferenceExpression, ast.FeatureChainExpression) &&
             //     end.owner() === source.$meta
             // )
             //     return;
@@ -662,7 +667,7 @@ export class KerMLValidator {
         accept: ValidationAcceptor
     ): void {
         this.atMostOne(
-            stream(node.$meta.features)
+            stream(node.$meta.featureMembers())
                 .map((m) => m.element())
                 .nonNullable()
                 .filter((f) => f.is(type)),
@@ -676,11 +681,10 @@ export class KerMLValidator {
         type: SysMLType,
         accept: ValidationAcceptor
     ): void {
+        const owner = node.$container.$meta;
+        if (!owner.is(ast.Namespace)) return;
         if (
-            node.$container.$meta.features.reduce(
-                (count, member) => count + Number(member.is(type)),
-                0
-            ) > 1
+            owner.featureMembers().reduce((count, member) => count + Number(member.is(type)), 0) > 1
         )
             accept("error", `At most one ${type} is allowed`, { node });
     }

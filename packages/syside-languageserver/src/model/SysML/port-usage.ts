@@ -15,19 +15,15 @@
  ********************************************************************************/
 
 import { PartDefinition, PortDefinition, PortUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 
 @metamodelOf(PortUsage, {
     base: "Ports::ports",
-    ownedPort: "Parts::Part::ownedPort",
+    ownedPort: "Parts::Part::ownedPorts",
     subport: "Ports::Port::subports",
 })
 export class PortUsageMeta extends OccurrenceUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<PortUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         if (this.isOwnedPort()) return "ownedPort";
         if (this.isSubport()) return "subport";
@@ -35,19 +31,15 @@ export class PortUsageMeta extends OccurrenceUsageMeta {
     }
 
     isOwnedPort(): boolean {
-        return this.isComposite && this.owner().isAny([PartDefinition, PortUsage]);
+        return Boolean(this.isComposite && this.owner()?.isAny(PartDefinition, PortUsage));
     }
 
     isSubport(): boolean {
-        return this.isComposite && this.owner().isAny([PortDefinition, PortUsage]);
+        return Boolean(this.isComposite && this.owner()?.isAny(PortDefinition, PortUsage));
     }
 
     override ast(): PortUsage | undefined {
         return this._ast as PortUsage;
-    }
-
-    override parent(): ModelContainer<PortUsage> {
-        return this._parent;
     }
 }
 

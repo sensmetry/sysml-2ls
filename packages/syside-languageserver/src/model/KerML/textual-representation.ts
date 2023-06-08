@@ -15,8 +15,8 @@
  ********************************************************************************/
 
 import { TextualRepresentation } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
-import { TextualAnnotatingMeta } from "./_internal";
+import { metamodelOf } from "../metamodel";
+import { ElementParts, TextualAnnotatingMeta } from "./_internal";
 
 @metamodelOf(TextualRepresentation)
 export class TextualRepresentationMeta extends TextualAnnotatingMeta {
@@ -25,20 +25,12 @@ export class TextualRepresentationMeta extends TextualAnnotatingMeta {
      */
     language = "";
 
-    constructor(elementId: ElementID, parent: ModelContainer<TextualRepresentation>) {
-        super(elementId, parent);
-    }
-
-    override initialize(node: TextualRepresentation): void {
-        this.language = node.language.substring(1, node.language.length - 1);
-    }
-
     override ast(): TextualRepresentation | undefined {
         return this._ast as TextualRepresentation;
     }
 
-    override parent(): ModelContainer<TextualRepresentation> {
-        return this._parent;
+    override textualParts(): ElementParts {
+        return {};
     }
 }
 

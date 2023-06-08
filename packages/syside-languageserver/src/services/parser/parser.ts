@@ -32,9 +32,6 @@ import {
     Feature,
     FeatureReferenceExpression,
     Import,
-    isConjugatedPortDefinition,
-    isEndFeatureMembership,
-    Membership,
     MembershipExpose,
     MembershipImport,
     MembershipReference,
@@ -50,7 +47,6 @@ import {
     ReferenceUsage,
     ReturnParameterMembership,
     SuccessionAsUsage,
-    TransitionFeatureMembership,
     TransitionUsage,
     TypeReference,
     Usage,
@@ -98,14 +94,11 @@ function fixOperatorExpression(expr: OperatorExpression, services: SysMLDefaultS
 }
 
 function addLoopMember(node: WhileLoopActionUsage, services: SysMLDefaultServices): void {
-    // if there was `until`, the node would end with `;`, easy check here
-    const expected = 2 + (node.$cstNode?.text.endsWith(";") ? 1 : 0);
-    if (node.members.length !== expected) {
+    if (!node.condition) {
         const reflection = services.shared.AstReflection;
         const membership = reflection.createNode(ParameterMembership, {
             $container: node,
-            $containerProperty: "members",
-            $containerIndex: 0,
+            $containerProperty: "condition",
         });
 
         reflection.createNode(Usage, {
@@ -132,7 +125,7 @@ function finalizeImport(node: Import, services: SysMLDefaultServices): void {
                 node.isNamespace ? NamespaceImport : MembershipImport,
                 {
                     $container: pack,
-                    $containerProperty: "imports",
+                    $containerProperty: "children",
                     $containerIndex: 0,
                     isRecursive: node.isRecursive,
                 }
@@ -154,13 +147,12 @@ function finalizeImport(node: Import, services: SysMLDefaultServices): void {
 }
 
 function createConjugatedPort(node: PortDefinition, services: SysMLDefaultServices): void {
-    if (!node.members) node.members = [];
-    if (isConjugatedPortDefinition(node.members.at(-1)?.element)) return;
+    if (node.conjugated) return;
 
     const reflection = services.shared.AstReflection;
     const membership = reflection.createNode(OwningMembership, {
         $container: node,
-        $containerProperty: "namespaceMembers",
+        $containerProperty: "conjugated",
     });
 
     const conjugated = reflection.createNode(ConjugatedPortDefinition, {
@@ -174,7 +166,7 @@ function createConjugatedPort(node: PortDefinition, services: SysMLDefaultServic
 
     const conjugation = reflection.createNode(PortConjugation, {
         $container: conjugated,
-        $containerProperty: "typeRelationships",
+        $containerProperty: "heritage",
     });
 
     const ref = reflection.createNode(TypeReference, {
@@ -196,17 +188,11 @@ function createEmptyParametersInTransitionUsage(
     node: TransitionUsage,
     services: SysMLDefaultServices
 ): void {
-    const hasSourceTransitionMember =
-        node.members[0].$type === Membership ||
-        (node.members[0].$type === OwningMembership && node.members[0].element?.$type === Feature);
-
-    // insert the first empty reference usage, always after source transition member if one exists
     const reflection = services.shared.AstReflection;
     {
         const membership = reflection.createNode(ParameterMembership, {
             $container: node,
-            $containerProperty: "members",
-            $containerIndex: hasSourceTransitionMember ? 1 : 0,
+            $containerProperty: "transitionLinkSource",
         });
 
         reflection.createNode(ReferenceUsage, {
@@ -215,19 +201,11 @@ function createEmptyParametersInTransitionUsage(
         });
     }
 
-    // also insert one parameter before accept usage if one exists
-    const index = node.members.findIndex(
-        (m) =>
-            m.$type === TransitionFeatureMembership &&
-            (m as TransitionFeatureMembership).kind === "accept"
-    );
-    if (index < 0) return;
-
+    if (!node.accepter) return;
     {
         const membership = reflection.createNode(ParameterMembership, {
             $container: node,
-            $containerProperty: "members",
-            $containerIndex: index,
+            $containerProperty: "payload",
         });
 
         reflection.createNode(ReferenceUsage, {
@@ -241,21 +219,21 @@ function createMissingEndsInSuccessionAsUsage(
     node: SuccessionAsUsage,
     services: SysMLDefaultServices
 ): void {
-    // `members` may not have been created yet so it may be undefined
-    const ends = (node.members as Membership[] | undefined)?.filter(isEndFeatureMembership).length;
+    // `ends` may not have been created yet so it may be undefined
+    const ends = node.ends?.length;
     if (ends !== undefined && ends >= 2) return;
 
     const reflection = services.shared.AstReflection;
     // NB: adding CST nodes to the owning element for better validation
     // locations
-    if (ends === undefined) node.members = [];
+    if (ends === undefined) node.ends = [];
 
     // ends === 0 or ends === undefined -> EmptySuccessionMember rule
     // ends === 1 -> missing MultiplicitySourceEndMember
     for (const index of [0, 1].slice(0, 2 - (ends ?? 0))) {
         const member = reflection.createNode(EndFeatureMembership, {
             $container: node,
-            $containerProperty: "members",
+            $containerProperty: "ends",
             $containerIndex: index,
             $cstNode: node.$cstNode,
         });

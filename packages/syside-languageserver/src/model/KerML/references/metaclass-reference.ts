@@ -16,23 +16,15 @@
 
 import { MetaclassReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { MetaclassMeta, TypeReferenceMeta } from "../_internal";
 
 @metamodelOf(MetaclassReference)
 export class MetaclassReferenceMeta extends TypeReferenceMeta {
     override readonly to = new Target<MetaclassMeta>();
 
-    constructor(id: ElementID, parent: ModelContainer<MetaclassReference>) {
-        super(id, parent);
-    }
-
     override ast(): MetaclassReference | undefined {
         return this._ast as MetaclassReference;
-    }
-
-    override parent(): ModelContainer<MetaclassReference> {
-        return this._parent;
     }
 }
 

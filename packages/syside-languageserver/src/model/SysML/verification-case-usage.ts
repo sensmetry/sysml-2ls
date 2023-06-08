@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { VerificationCaseUsage, VerificationCaseDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { CaseUsageMeta } from "./case-usage";
 
 @metamodelOf(VerificationCaseUsage, {
@@ -23,28 +23,20 @@ import { CaseUsageMeta } from "./case-usage";
     subVerificationCase: "VerificationCases::VerificationCase::subVerificationCases",
 })
 export class VerificationCaseUsageMeta extends CaseUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<VerificationCaseUsage>) {
-        super(id, parent);
-    }
-
     override getSubactionType(): string | undefined {
         return this.isSubVerificationCase() ? "subVerificationCase" : super.getSubactionType();
     }
 
     isSubVerificationCase(): boolean {
         const parent = this.owner();
-        return (
+        return Boolean(
             this.isNonEntryExitComposite() &&
-            parent.isAny([VerificationCaseUsage, VerificationCaseDefinition])
+                parent?.isAny(VerificationCaseUsage, VerificationCaseDefinition)
         );
     }
 
     override ast(): VerificationCaseUsage | undefined {
         return this._ast as VerificationCaseUsage;
-    }
-
-    override parent(): ModelContainer<VerificationCaseUsage> {
-        return this._parent;
     }
 }
 

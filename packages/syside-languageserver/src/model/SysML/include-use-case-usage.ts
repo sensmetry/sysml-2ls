@@ -22,7 +22,7 @@ import {
     ReferenceSubsetting,
 } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { PerformActionUsageMeta } from "./perform-action-usage";
 import { UseCaseUsageMeta } from "./use-case-usage";
 
@@ -32,18 +32,9 @@ import { UseCaseUsageMeta } from "./use-case-usage";
     performedAction: "Parts::Part::performedActions",
 })
 export class IncludeUseCaseUsageMeta extends Mixin(PerformActionUsageMeta, UseCaseUsageMeta) {
-    constructor(id: ElementID, parent: ModelContainer<IncludeUseCaseUsage>) {
-        super(id, parent);
-    }
-
     override ast(): IncludeUseCaseUsage | undefined {
         return this._ast as IncludeUseCaseUsage;
     }
-
-    override parent(): ModelContainer<IncludeUseCaseUsage> {
-        return this._parent;
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");
@@ -52,7 +43,7 @@ export class IncludeUseCaseUsageMeta extends Mixin(PerformActionUsageMeta, UseCa
 
     hasRelevantSubjectParameter(): boolean {
         const parent = this.owner();
-        return parent.isAny([CaseDefinition, CaseUsage]);
+        return Boolean(parent?.isAny(CaseDefinition, CaseUsage));
     }
 
     override namingFeature(): FeatureMeta | undefined {

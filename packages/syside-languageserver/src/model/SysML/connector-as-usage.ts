@@ -17,21 +17,13 @@
 import { Mixin } from "ts-mixer";
 import { ConnectorAsUsage } from "../../generated/ast";
 import { ConnectorMeta } from "../KerML/connector";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { UsageMeta } from "./usage";
 
 @metamodelOf(ConnectorAsUsage)
 export class ConnectorAsUsageMeta extends Mixin(UsageMeta, ConnectorMeta) {
-    constructor(id: ElementID, parent: ModelContainer<ConnectorAsUsage>) {
-        super(id, parent);
-    }
-
     override ast(): ConnectorAsUsage | undefined {
         return this._ast as ConnectorAsUsage;
-    }
-
-    override parent(): ModelContainer<ConnectorAsUsage> {
-        return this._parent;
     }
 }
 

@@ -14,25 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ClassifierReference, TypeReference } from "../../../generated/ast";
+import { ClassifierReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ClassifierMeta, TypeReferenceMeta } from "../_internal";
 
 @metamodelOf(ClassifierReference)
 export class ClassifierReferenceMeta extends TypeReferenceMeta {
     override readonly to = new Target<ClassifierMeta>();
 
-    constructor(id: ElementID, parent: ModelContainer<ClassifierReference>) {
-        super(id, parent);
-    }
-
     override ast(): ClassifierReference | undefined {
         return this._ast as ClassifierReference;
-    }
-
-    override parent(): ModelContainer<TypeReference> {
-        return this._parent;
     }
 }
 

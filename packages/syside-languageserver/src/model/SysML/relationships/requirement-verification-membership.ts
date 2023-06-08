@@ -21,7 +21,7 @@ import {
     VerificationCaseDefinition,
     VerificationCaseUsage,
 } from "../../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { RequirementConstraintMembershipMeta } from "./requirement-constraint-membership";
 import { RequirementUsageMeta } from "../requirement-usage";
 
@@ -29,23 +29,14 @@ import { RequirementUsageMeta } from "../requirement-usage";
 export class RequirementVerificationMembershipMeta<
     T extends RequirementUsageMeta = RequirementUsageMeta
 > extends RequirementConstraintMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<RequirementVerificationMembership>) {
-        super(id, parent);
-    }
-
     override ast(): RequirementVerificationMembership | undefined {
         return this._ast as RequirementVerificationMembership;
     }
-
-    override parent(): ModelContainer<RequirementVerificationMembership> {
-        return this._parent;
-    }
-
     isLegalVerification(): boolean {
         let owner = this.owner();
-        if (!owner.is(RequirementUsage) || !owner.parent().is(ObjectiveMembership)) return false;
+        if (!owner?.is(RequirementUsage) || !owner.parent()?.is(ObjectiveMembership)) return false;
         owner = owner.owner();
-        return owner.isAny([VerificationCaseDefinition, VerificationCaseUsage]);
+        return Boolean(owner?.isAny(VerificationCaseDefinition, VerificationCaseUsage));
     }
 }
 

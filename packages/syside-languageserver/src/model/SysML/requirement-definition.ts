@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { RequirementDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConstraintDefinitionMeta } from "./constraint-definition";
 
 @metamodelOf(RequirementDefinition, {
     base: "Requirements::RequirementCheck",
 })
 export class RequirementDefinitionMeta extends ConstraintDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<RequirementDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): RequirementDefinition | undefined {
         return this._ast as RequirementDefinition;
-    }
-
-    override parent(): ModelContainer<RequirementDefinition> {
-        return this._parent;
     }
 }
 

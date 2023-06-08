@@ -17,7 +17,7 @@
 import { RequirementConstraintMembership } from "../../../generated/ast";
 import { RequirementConstraintKind } from "../../enums";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ConstraintUsageMeta } from "../constraint-usage";
 
 @metamodelOf(RequirementConstraintMembership)
@@ -26,20 +26,8 @@ export class RequirementConstraintMembershipMeta<
 > extends FeatureMembershipMeta<T> {
     kind: RequirementConstraintKind = "requirement";
 
-    constructor(id: ElementID, parent: ModelContainer<RequirementConstraintMembership>) {
-        super(id, parent);
-    }
-
-    override initialize(node: RequirementConstraintMembership): void {
-        this.kind = node.kind === "assume" ? "assumption" : "requirement";
-    }
-
     override ast(): RequirementConstraintMembership | undefined {
         return this._ast as RequirementConstraintMembership;
-    }
-
-    override parent(): ModelContainer<RequirementConstraintMembership> {
-        return this._parent;
     }
 }
 

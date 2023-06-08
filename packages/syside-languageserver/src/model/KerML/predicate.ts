@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { Predicate } from "../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { FunctionMeta } from "./_internal";
 
 export const ImplicitPredicates = {
@@ -24,16 +24,8 @@ export const ImplicitPredicates = {
 
 @metamodelOf(Predicate, ImplicitPredicates)
 export class PredicateMeta extends FunctionMeta {
-    constructor(id: ElementID, parent: ModelContainer<Predicate>) {
-        super(id, parent);
-    }
-
     override ast(): Predicate | undefined {
         return this._ast as Predicate;
-    }
-
-    override parent(): ModelContainer<Predicate> {
-        return this._parent;
     }
 }
 

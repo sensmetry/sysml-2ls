@@ -281,9 +281,14 @@
                 },
                 "sysml.debug.scopeInLinkingErrors": {
                     "scope": "window",
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Display elements in scope in linking errors"
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "types",
+                        "members"
+                    ],
+                    "default": "none",
+                    "description": "Display elements in scope in linking errors. Types will display names of scope owning types, members - all members in scope."
                 },
                 "sysml.debug.stacktraceInLinkingErrors": {
                     "scope": "window",

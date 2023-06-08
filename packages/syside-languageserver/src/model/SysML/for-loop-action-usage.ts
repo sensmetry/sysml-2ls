@@ -15,8 +15,12 @@
  ********************************************************************************/
 
 import { ForLoopActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { NonNullable, enumerable } from "../../utils";
+import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import { metamodelOf } from "../metamodel";
+import { ActionUsageMeta } from "./action-usage";
 import { LoopActionUsageMeta } from "./loop-action-usage";
+import { ReferenceUsageMeta } from "./reference-usage";
 
 @metamodelOf(ForLoopActionUsage, {
     base: "Actions::forLoopActions",
@@ -24,16 +28,57 @@ import { LoopActionUsageMeta } from "./loop-action-usage";
     loopVariable: "Actions::ForLoopAction::var", // TODO:
 })
 export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<ForLoopActionUsage>) {
-        super(id, parent);
+    private _variable?: ParameterMembershipMeta<ReferenceUsageMeta>;
+    private _sequence?: ParameterMembershipMeta<ReferenceUsageMeta>;
+    private _body?: ParameterMembershipMeta<ActionUsageMeta>;
+
+    @enumerable
+    public get variable(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
+        return this._variable;
+    }
+    public set variable(value: ParameterMembershipMeta<ReferenceUsageMeta>) {
+        this._variable = value;
+    }
+
+    @enumerable
+    public get sequence(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
+        return this._sequence;
+    }
+    public set sequence(value: ParameterMembershipMeta<ReferenceUsageMeta>) {
+        this._sequence = value;
+    }
+
+    @enumerable
+    public get body(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
+        return this._body;
+    }
+    public set body(value: ParameterMembershipMeta<ActionUsageMeta>) {
+        this._body = value;
     }
 
     override ast(): ForLoopActionUsage | undefined {
         return this._ast as ForLoopActionUsage;
     }
 
-    override parent(): ModelContainer<ForLoopActionUsage> {
-        return this._parent;
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = super.featureMembers();
+        return (
+            [this.variable, this.sequence, this.body] as (MembershipMeta<FeatureMeta> | undefined)[]
+        )
+            .filter(NonNullable)
+            .concat(baseFeatures);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = { prefixes: this.prefixes };
+        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
+        parts.heritage = this.heritage;
+
+        if (this.variable) parts.variable = [this.variable];
+        if (this.sequence) parts.sequence = [this.sequence];
+        if (this.body) parts.body = [this.body];
+
+        return parts;
     }
 }
 

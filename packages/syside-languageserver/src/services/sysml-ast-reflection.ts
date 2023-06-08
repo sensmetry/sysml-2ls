@@ -26,6 +26,14 @@ export type SysMLType = {
 export type SysMLTypeList = { [K in SysMLType]: ast.SysMlAstType[K] };
 export type SysMLInterface<K extends SysMLType> = SysMLTypeList[K];
 
+export type SubtypeList<Bound extends AstNode> = {
+    [K in SysMLType]: SysMLTypeList[K] extends Bound ? SysMLTypeList[K] : never;
+};
+export type SubtypeKeys<Bound extends AstNode> = {
+    [K in keyof SubtypeList<Bound>]: SubtypeList<Bound>[K] extends never ? never : K;
+}[keyof SubtypeList<Bound>];
+export type Subtypes<Bound extends AstNode> = SysMLTypeList[SubtypeKeys<Bound>];
+
 export class SysMLAstReflection extends ast.SysMlAstReflection {
     protected readonly metadata = new Map<string, TypeMetaData>();
 
@@ -152,15 +160,16 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
         const member = (parent as NonNullable<T>)[property];
         const index = info.$containerIndex;
         if (Array.isArray(member)) {
+            const array = member as AstNode[];
             if (index !== undefined) {
-                member.forEach((v, i) => {
+                array.forEach((v, i) => {
                     if (i >= index) (v as Mutable<AstNode>).$containerIndex = i + 1;
                 });
-                member.splice(index, 0, child);
+                array.splice(index, 0, child);
                 (child as Mutable<AstNode>).$containerIndex = index;
             } else {
-                member.push(child);
-                (child as Mutable<AstNode>).$containerIndex = member.length - 1;
+                array.push(child);
+                (child as Mutable<AstNode>).$containerIndex = array.length - 1;
             }
         } else {
             if (index !== undefined)

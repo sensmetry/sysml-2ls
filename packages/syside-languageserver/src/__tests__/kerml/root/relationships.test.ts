@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { qualifiedTypeReference } from "../../../testing";
+import { anything, qualifiedTypeReference } from "../../../testing";
 import { Dependency } from "../../../generated/ast";
 
 test("relationships are parseable", async () => {
@@ -25,7 +25,8 @@ test("relationships are parseable", async () => {
     class <'4'> D;
     dependency <'5'> R from '1', D to B, C;
     `).toParseKerML({
-        relationshipMembers: [
+        children: [
+            ...anything(4),
             {
                 element: {
                     $type: Dependency,

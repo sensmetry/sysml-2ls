@@ -15,27 +15,15 @@
  ********************************************************************************/
 
 import { Expression, InvocationExpression, SysMLFunction } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExpressionMeta, FeatureMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(InvocationExpression)
 export class InvocationExpressionMeta extends ExpressionMeta {
     args: (FeatureMeta | undefined)[] = [];
 
-    constructor(id: ElementID, parent: ModelContainer<InvocationExpression>) {
-        super(id, parent);
-    }
-
-    override reset(_: InvocationExpression): void {
-        /* empty */
-    }
-
     override ast(): InvocationExpression | undefined {
         return this._ast as InvocationExpression;
-    }
-
-    override parent(): ModelContainer<InvocationExpression> {
-        return this._parent;
     }
 
     invokes(): TypeMeta | undefined {
@@ -51,7 +39,7 @@ export class InvocationExpressionMeta extends ExpressionMeta {
 
     override returnType(): string | TypeMeta | undefined {
         const type = this.invokes();
-        if (type?.isAny([Expression, SysMLFunction])) return type.returnType();
+        if (type?.isAny(Expression, SysMLFunction)) return type.returnType();
         return type;
     }
 }

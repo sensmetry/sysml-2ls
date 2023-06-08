@@ -15,23 +15,15 @@
  ********************************************************************************/
 
 import { MergeNode } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ControlNodeMeta } from "./control-node";
 
 @metamodelOf(MergeNode, {
     subaction: "Actions::Action::merges",
 })
 export class MergeNodeMeta extends ControlNodeMeta {
-    constructor(id: ElementID, parent: ModelContainer<MergeNode>) {
-        super(id, parent);
-    }
-
     override ast(): MergeNode | undefined {
         return this._ast as MergeNode;
-    }
-
-    override parent(): ModelContainer<MergeNode> {
-        return this._parent;
     }
 }
 

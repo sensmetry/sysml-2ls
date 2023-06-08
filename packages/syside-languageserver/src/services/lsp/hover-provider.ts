@@ -77,20 +77,20 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
         content += "\n";
 
         // use docs from the first specialization that has them
-        let docs = node.docs;
+        let docs = node.documentation;
         if (docs.length === 0) {
             if (node.is(Membership)) {
                 const target = node.element();
                 if (target) {
                     content += `Alias for \`${target.qualifiedName}\`\n`;
-                    docs = target.docs;
+                    docs = target.documentation;
                     node = target;
                 }
             }
 
             if (node.is(Type)) {
                 for (const type of node.allTypes()) {
-                    docs = type.docs;
+                    docs = type.documentation;
                     if (docs.length > 0) break;
                 }
             }

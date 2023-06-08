@@ -44,7 +44,7 @@ test("multiple relationships can be specified using multiple clauses", async () 
             `
     classifier Person unions Adult unions Child;`
     ).toParseKerML({
-        namespaceMembers: [
+        children: [
             ...anything(2),
             {
                 element: {

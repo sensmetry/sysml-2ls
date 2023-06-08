@@ -16,7 +16,7 @@
 
 import { mix } from "ts-mixer";
 import { FeatureMembership } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { FeatureMeta } from "../feature";
 import { FeaturingMeta } from "./featuring";
 import { OwningMembershipMeta } from "./owning-membership";
@@ -29,18 +29,8 @@ export interface FeatureMembershipMeta<T extends FeatureMeta = FeatureMeta>
 @mix(OwningMembershipMeta, FeaturingMeta)
 // eslint-disable-next-line unused-imports/no-unused-vars
 export class FeatureMembershipMeta<T extends FeatureMeta = FeatureMeta> {
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    constructor(id: ElementID, parent: ModelContainer<FeatureMembership>) {
-        // should be handled by ts-mixer
-        // super(id, parent);
-    }
-
     ast(): FeatureMembership | undefined {
         return this._ast as FeatureMembership;
-    }
-
-    parent(): ModelContainer<FeatureMembership> {
-        return this._parent;
     }
 }
 

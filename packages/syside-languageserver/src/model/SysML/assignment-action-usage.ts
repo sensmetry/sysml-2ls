@@ -15,25 +15,76 @@
  ********************************************************************************/
 
 import { AssignmentActionUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { NonNullable, enumerable } from "../../utils";
+import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
+import { ReferenceUsageMeta } from "./reference-usage";
+import { UsageMeta } from "./usage";
 
 @metamodelOf(AssignmentActionUsage, {
     base: "Actions::assignmentActions",
-    subaction: "Actions::Actions::assignment",
+    subaction: "Actions::Action::assignments",
     featureWrite: "Actions::AssignmentAction",
 })
 export class AssignmentActionUsageMeta extends ActionUsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<AssignmentActionUsage>) {
-        super(id, parent);
+    // Langium cannot parse this...
+    private _target?: ParameterMembershipMeta<ReferenceUsageMeta> | undefined;
+    private _targetMember?: MembershipMeta<FeatureMeta> | undefined;
+    private _assignedValue?: ParameterMembershipMeta<UsageMeta> | undefined;
+
+    @enumerable
+    public get target(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
+        return this._target;
+    }
+    public set target(value: ParameterMembershipMeta<ReferenceUsageMeta> | undefined) {
+        this._target = value;
+    }
+
+    @enumerable
+    public get targetMember(): MembershipMeta<FeatureMeta> | undefined {
+        return this._targetMember;
+    }
+    public set targetMember(value: MembershipMeta<FeatureMeta>) {
+        this._targetMember = value;
+    }
+
+    @enumerable
+    public get assignedValue(): ParameterMembershipMeta<UsageMeta> | undefined {
+        return this._assignedValue;
+    }
+    public set assignedValue(value: ParameterMembershipMeta<UsageMeta>) {
+        this._assignedValue = value;
     }
 
     override ast(): AssignmentActionUsage | undefined {
         return this._ast as AssignmentActionUsage;
     }
 
-    override parent(): ModelContainer<AssignmentActionUsage> {
-        return this._parent;
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        const baseFeatures = super.featureMembers();
+        return (
+            [this.target, this.targetMember, this.assignedValue] as (
+                | MembershipMeta<FeatureMeta>
+                | undefined
+            )[]
+        )
+            .filter(NonNullable)
+            .concat(baseFeatures);
+    }
+
+    override textualParts(): ElementParts {
+        const parts: ElementParts = { prefixes: this.prefixes };
+
+        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
+        parts.heritage = this.heritage;
+
+        if (this.target) parts.target = [this.target];
+        if (this.targetMember) parts.targetMember = [this.targetMember];
+        if (this.assignedValue) parts.assignedValue = [this.assignedValue];
+
+        parts.children = this.children;
+        return parts;
     }
 }
 

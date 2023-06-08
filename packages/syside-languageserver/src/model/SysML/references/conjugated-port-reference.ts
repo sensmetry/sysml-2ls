@@ -17,23 +17,15 @@
 import { ConjugatedPortReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
 import { ClassifierReferenceMeta } from "../../KerML/references/classifier-reference";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { PortDefinitionMeta } from "../port-definition";
 
 @metamodelOf(ConjugatedPortReference)
 export class ConjugatedPortReferenceMeta extends ClassifierReferenceMeta {
     override readonly to = new Target<PortDefinitionMeta>();
 
-    constructor(id: ElementID, parent: ModelContainer<ConjugatedPortReference>) {
-        super(id, parent);
-    }
-
     override ast(): ConjugatedPortReference | undefined {
         return this._ast as ConjugatedPortReference;
-    }
-
-    override parent(): ModelContainer<ConjugatedPortReference> {
-        return this._parent;
     }
 }
 

@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { ActionDefinition, ActionUsage, AssertConstraintUsage } from "../../generated/ast";
 import { InvariantMeta } from "../KerML/invariant";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConstraintUsageMeta } from "./constraint-usage";
 
 @metamodelOf(AssertConstraintUsage, {
@@ -25,25 +25,17 @@ import { ConstraintUsageMeta } from "./constraint-usage";
     negated: "Constraints::negatedConstraintChecks",
 })
 export class AssertConstraintUsageMeta extends Mixin(ConstraintUsageMeta, InvariantMeta) {
-    constructor(id: ElementID, parent: ModelContainer<AssertConstraintUsage>) {
-        super(id, parent);
-    }
-
     override defaultSupertype(): string {
         return this.isNegated ? "negated" : "base";
     }
 
     protected override isBehaviorOwned(): boolean {
         const parent = this.owner();
-        return parent.isAny([ActionDefinition, ActionUsage]);
+        return Boolean(parent?.isAny(ActionDefinition, ActionUsage));
     }
 
     override ast(): AssertConstraintUsage | undefined {
         return this._ast as AssertConstraintUsage;
-    }
-
-    override parent(): ModelContainer<AssertConstraintUsage> {
-        return this._parent;
     }
 }
 

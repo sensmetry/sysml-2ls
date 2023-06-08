@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { LiteralNumber } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { enumerable } from "../../../utils";
+import { metamodelOf } from "../../metamodel";
 import { LiteralExpressionMeta } from "../_internal";
 
 export const ImplicitLiteralNumbers = {
@@ -28,17 +29,20 @@ export const ImplicitLiteralNumbers = {
 
 @metamodelOf(LiteralNumber, ImplicitLiteralNumbers)
 export class LiteralNumberMeta extends LiteralExpressionMeta {
-    isInteger = false;
-    literal = 0;
+    protected _isInteger = false;
+    protected _literal = 0;
 
-    constructor(id: ElementID, parent: ModelContainer<LiteralNumber>) {
-        super(id, parent);
+    @enumerable
+    get literal(): number {
+        return this._literal;
+    }
+    set literal(value) {
+        this._literal = value;
+        this._isInteger = Number.isInteger(value);
     }
 
-    override initialize(node: LiteralNumber): void {
-        // only check the cst node text for exponential or decimal notation
-        this.isInteger = !/[eE.]/.test(node.$cstNode?.text ?? "");
-        this.literal = node.literal;
+    get isInteger(): boolean {
+        return this._isInteger;
     }
 
     override defaultSupertype(): string {
@@ -47,10 +51,6 @@ export class LiteralNumberMeta extends LiteralExpressionMeta {
 
     override ast(): LiteralNumber | undefined {
         return this._ast as LiteralNumber;
-    }
-
-    override parent(): ModelContainer<LiteralNumber> {
-        return this._parent;
     }
 
     override returnType(): string {

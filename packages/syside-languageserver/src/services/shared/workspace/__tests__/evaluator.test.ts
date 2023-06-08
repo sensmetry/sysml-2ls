@@ -126,8 +126,9 @@ describe.each<{ description: CaseDescription; cases: Cases }>([
         const tree = await ("kerml" in testCase
             ? parseKerML(testCase.kerml)
             : parseSysML(testCase.sysml));
-        const feature = (tree.value.members.at(testCase.index ?? 0)?.element as Feature | undefined)
-            ?.$meta;
+        const feature = (
+            tree.value.children.at(testCase.index ?? 0)?.element as Feature | undefined
+        )?.$meta;
 
         expect(feature).toBeDefined();
         if (!feature) return;

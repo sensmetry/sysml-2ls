@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { OccurrenceUsage } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { UsageMeta } from "./usage";
 
 @metamodelOf(OccurrenceUsage, {
@@ -24,10 +24,6 @@ import { UsageMeta } from "./usage";
     snapshot: "Occurrences::Occurrence::snapshots",
 })
 export class OccurrenceUsageMeta extends UsageMeta {
-    constructor(id: ElementID, parent: ModelContainer<OccurrenceUsage>) {
-        super(id, parent);
-    }
-
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isSuboccurrence()) supertypes.push("suboccurrence");
@@ -42,10 +38,6 @@ export class OccurrenceUsageMeta extends UsageMeta {
 
     override ast(): OccurrenceUsage | undefined {
         return this._ast as OccurrenceUsage;
-    }
-
-    override parent(): ModelContainer<OccurrenceUsage> {
-        return this._parent;
     }
 }
 

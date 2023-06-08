@@ -19,6 +19,7 @@ import {
     qualifiedTypeReference,
     parseKerML,
     sanitizeTree,
+    anything,
 } from "../../../testing";
 import { Feature, FeatureTyping } from "../../../generated/ast";
 
@@ -32,14 +33,15 @@ test.concurrent.each(["typed by", ":"])(
             doc /* doc */
         }
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: FeatureTyping,
                         ...withQualifiedName("t"),
                         source: qualifiedTypeReference("customer"),
                         reference: qualifiedTypeReference("Person"),
-                        annotations: [
+                        elements: [
                             {
                                 element: {
                                     body: "/* doc */",
@@ -61,7 +63,8 @@ test.concurrent.each(["specialization", ""])(
         class Person;
         ${prefix} typing customer : Person;
     `).toParseKerML({
-            relationshipMembers: [
+            children: [
+                ...anything(2),
                 {
                     element: {
                         $type: FeatureTyping,
@@ -83,18 +86,19 @@ test("features typed by aliases resolve to aliased types", async () => {
 
     const result = await parseKerML(text);
     expect(result).toParseKerML({
-        members: [
+        children: [
+            ...anything(2),
             {
                 element: {
                     ...withQualifiedName("a"),
-                    typeRelationships: [{ reference: qualifiedTypeReference("A") }],
+                    heritage: [{ reference: qualifiedTypeReference("A") }],
                 },
             },
         ],
     });
 
     const typings = Array.from(
-        (result.value.members[0].element as Feature).$meta.specializations(FeatureTyping)
+        (result.value.children[2].element as Feature).$meta.specializations(FeatureTyping)
     );
 
     expect(typings).toHaveLength(1);

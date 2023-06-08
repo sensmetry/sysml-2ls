@@ -49,10 +49,10 @@ describe("Global scope", () => {
         scope.collectDocument(sysml);
 
         expect(
-            scope.getExportedElement("K1", ".sysml")?.parent().ast()?.$document?.uriString
+            scope.getExportedElement("K1", ".sysml")?.parent()?.ast()?.$document?.uriString
         ).toStrictEqual(sysml.uriString);
         expect(
-            scope.getExportedElement("K1", ".kerml")?.parent().ast()?.$document?.uriString
+            scope.getExportedElement("K1", ".kerml")?.parent()?.ast()?.$document?.uriString
         ).toStrictEqual(kerml.uriString);
         expect(scope.getExportedElement("k1")).toBeDefined();
         expect(scope.getExportedElement("K2")).toBeUndefined();

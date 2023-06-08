@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { NullExpression } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExpressionMeta, TypeMeta } from "../_internal";
 
 export const ImplicitNullExpressions = {
@@ -26,16 +26,8 @@ export const ImplicitNullExpressions = {
 
 @metamodelOf(NullExpression, ImplicitNullExpressions)
 export class NullExpressionMeta extends ExpressionMeta {
-    constructor(id: ElementID, parent: ModelContainer<NullExpression>) {
-        super(id, parent);
-    }
-
     override ast(): NullExpression | undefined {
         return this._ast as NullExpression;
-    }
-
-    override parent(): ModelContainer<NullExpression> {
-        return this._parent;
     }
 
     override returnType(): string | TypeMeta | undefined {

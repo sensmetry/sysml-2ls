@@ -32,7 +32,6 @@ export * from "./case-definition";
 export * from "./case-usage";
 export * from "./concern-definition";
 export * from "./concern-usage";
-export * from "./conjugated-port-definition";
 export * from "./connection-definition";
 export * from "./connection-usage";
 export * from "./connector-as-usage";

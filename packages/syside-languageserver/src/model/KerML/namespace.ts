@@ -14,91 +14,181 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Stream, stream } from "langium";
 import {
-    AnnotatingElement,
     Comment,
     Documentation,
+    Element,
+    ElementFilterMembership,
+    Feature,
+    Import,
+    Membership,
     MetadataFeature,
     Namespace,
+    TextualRepresentation,
 } from "../../generated/ast";
+import { SubtypeKeys, SysMLInterface, SysMLTypeList } from "../../services";
+import { KeysMatching, NonNullable, enumerable } from "../../utils";
 import { BuildState } from "../enums";
-import { ElementID, metamodelOf, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import {
     CommentMeta,
     DocumentationMeta,
+    ElementFilterMembershipMeta,
     ElementMeta,
+    ElementParts,
     FeatureMeta,
     ImportMeta,
     MembershipMeta,
-    RelationshipMeta,
+    MetadataFeatureMeta,
+    OwningMembershipMeta,
+    TextualRepresentationMeta,
 } from "./_internal";
+import { ElementContainer } from "../containers";
+
+const FeatureMembers = (e: ElementMeta): e is MembershipMeta<FeatureMeta> =>
+    Boolean(
+        // filters are feature members but not what we want, they serve a different purpose
+        e.nodeType() !== ElementFilterMembership && e.is(Membership) && e.element()?.is(Feature)
+    );
+const Filters = ElementFilterMembership;
+const Imports = Import;
+
+const makeMemberFilter =
+    <K extends SubtypeKeys<Element>>(type: K) =>
+    (e: ElementMeta): e is MembershipMeta<SysMLInterface<K>["$meta"]> =>
+        Boolean(e.is(Membership) && e.element()?.is(type));
+
+const DocMembers = makeMemberFilter(Documentation);
+const CommentMembers = makeMemberFilter(Comment);
+const MetaMembers = makeMemberFilter(MetadataFeature);
+const RepMembers = makeMemberFilter(TextualRepresentation);
 
 @metamodelOf(Namespace)
 export class NamespaceMeta extends ElementMeta {
+    protected _prefixes: OwningMembershipMeta<MetadataFeatureMeta>[] = [];
+    protected _children = new ElementContainer<Membership | Import>();
+    private _importResolutionState: BuildState = "none";
+
+    override get comments(): readonly CommentMeta[] {
+        return this._children
+            .get(CommentMembers)
+            .map((m) => m.element())
+            .filter(NonNullable)
+            .concat(this._comments);
+    }
+
+    override get documentation(): readonly DocumentationMeta[] {
+        return this._children
+            .get(DocMembers)
+            .map((m) => m.element())
+            .filter(NonNullable)
+            .concat(this._docs);
+    }
+
+    override get metadata(): Stream<MetadataFeatureMeta> {
+        return stream(this._prefixes, this._children.get(MetaMembers))
+            .map((m) => m.element())
+            .filter(NonNullable)
+            .concat(this._metadata);
+    }
+
+    override get textualRepresentation(): readonly TextualRepresentationMeta[] {
+        return this._children
+            .get(RepMembers)
+            .map((m) => m.element())
+            .filter(NonNullable)
+            .concat(this._reps);
+    }
+
+    @enumerable
+    get children(): readonly (MembershipMeta | ImportMeta)[] {
+        return this._children.all;
+    }
+
+    protected addChild(...element: (MembershipMeta | ImportMeta)[]): this {
+        this._children.add(...element);
+        return this;
+    }
+
+    /**
+     * Metadata prefixes of this elements
+     */
+    @enumerable
+    get prefixes(): readonly OwningMembershipMeta<MetadataFeatureMeta>[] {
+        return this._prefixes;
+    }
+
+    protected addPrefix(...prefix: OwningMembershipMeta<MetadataFeatureMeta>[]): this {
+        this._prefixes.push(...prefix);
+        return this;
+    }
+
     /**
      * Import statements
      */
-    imports: ImportMeta[] = [];
+    get imports(): readonly ImportMeta[] {
+        return this._children.get(Imports);
+    }
 
-    /**
-     * Alias members
-     */
-    aliases: MembershipMeta[] = [];
+    get filters(): readonly ElementFilterMembershipMeta[] {
+        return this._children.get(Filters);
+    }
+
+    featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        return this._children.get(FeatureMembers);
+    }
 
     /**
      * Imports resolution state
      */
-    importResolutionState: BuildState = "none";
-
-    constructor(elementId: ElementID, parent: ModelContainer<Namespace>) {
-        super(elementId, parent);
+    get importResolutionState(): BuildState {
+        return this._importResolutionState;
     }
-
-    override initialize(node: Namespace): void {
-        this.imports = node.imports.map((v) => v.$meta);
-        this.aliases = node.aliases.map((v) => v.$meta);
+    set importResolutionState(value: BuildState) {
+        this._importResolutionState = value;
     }
 
     override ast(): Namespace | undefined {
         return this._ast as Namespace;
     }
 
-    override parent(): ModelContainer<Namespace> {
-        return this._parent;
+    /**
+     * @returns stream of all owned and inherited features
+     */
+    allFeatures(): Stream<MembershipMeta<FeatureMeta>> {
+        return stream(this.featureMembers());
     }
 
-    override reset(node: Namespace): void {
-        this.importResolutionState = "none";
-        this.initialize(node);
+    featuresByMembership<K extends KeysMatching<SysMLTypeList, Membership>>(
+        kind: K
+    ): Stream<FeatureMeta> {
+        return stream(this.featureMembers())
+            .filter((m) => m.is(kind))
+            .map((m) => m.element())
+            .nonNullable();
     }
 
-    protected override collectChildren(node: Namespace): void {
-        node.annotatingMembers.forEach((a) => {
-            this.members.push(a.$meta);
-            if (!a.element) return;
+    featuresMatching<K extends KeysMatching<SysMLTypeList, Feature>>(
+        kind: K
+    ): Stream<SysMLTypeList[K]["$meta"]> {
+        return stream(this.featureMembers())
+            .map((m) => m.element())
+            .nonNullable()
+            .filter((f) => f.is(kind)) as Stream<SysMLTypeList[K]["$meta"]>;
+    }
 
-            const element = a.element as AnnotatingElement;
-            if (element.about.length > 0) return;
+    textualParts(): ElementParts {
+        return {
+            prefixes: this.prefixes,
+            children: this.children,
+        };
+    }
 
-            const meta = element.$meta;
-            if (meta.is(MetadataFeature)) this.metadata.push(meta);
-            else if (element.$type === Comment) this.comments.push(meta as CommentMeta);
-            else if (element.$type === Documentation) this.docs.push(meta as DocumentationMeta);
-        });
-
-        node.namespaceMembers.forEach((n) => {
-            this.members.push(n.$meta);
-            this.elements.push(n.$meta as MembershipMeta<NamespaceMeta>);
-        });
-        node.relationshipMembers.forEach((r) => {
-            this.members.push(r.$meta);
-            this.relationships.push(r.$meta as MembershipMeta<RelationshipMeta>);
-        });
-        node.members.forEach((m) => {
-            this.members.push(m.$meta);
-            this.features.push(m.$meta as MembershipMeta<FeatureMeta>);
-        });
-        node.aliases.forEach((a) => this.members.push(a.$meta));
+    override invalidateMemberCaches(): void {
+        // only members in children may have references which may invalidate
+        // caches
+        this._children.invalidateCaches();
     }
 }
 

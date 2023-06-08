@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { Import } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer } from "../../metamodel";
+import { enumerable } from "../../../utils";
+import { metamodelOf } from "../../metamodel";
 import { MembershipMeta, NamespaceMeta, RelationshipMeta } from "../_internal";
 
 export type Importable = MembershipMeta | NamespaceMeta;
@@ -27,23 +28,18 @@ export abstract class ImportMeta<T extends Importable = Importable> extends Rela
     /**
      * Whether visibility is ignored
      */
-    importsAll = false;
+    protected _importsAll = false;
 
-    constructor(id: ElementID, parent: ModelContainer<Import>) {
-        super(id, parent);
+    @enumerable
+    get importsAll(): boolean {
+        return this._importsAll;
     }
-
-    override initialize(node: Import): void {
-        this.isRecursive = !!node.isRecursive;
-        this.importsAll = node.importsAll;
+    set importsAll(value) {
+        this._importsAll = value;
     }
 
     override ast(): Import | undefined {
         return this._ast as Import;
-    }
-
-    override parent(): ModelContainer<Import> {
-        return this._parent;
     }
 
     /**

@@ -15,31 +15,15 @@
  ********************************************************************************/
 
 import { ResultExpressionMembership } from "../../../generated/ast";
-import { ElementID, metamodelOf, ModelContainer, ParentModel } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExpressionMeta, FeatureMembershipMeta } from "../_internal";
 
 @metamodelOf(ResultExpressionMembership)
 export class ResultExpressionMembershipMeta<
     T extends ExpressionMeta = ExpressionMeta
 > extends FeatureMembershipMeta<T> {
-    constructor(id: ElementID, parent: ModelContainer<ResultExpressionMembership>) {
-        super(id, parent);
-    }
-
-    override initialize(_node: ResultExpressionMembership): void {
-        const parent = this.parent(true);
-        if ("result" in parent) parent.result = this;
-    }
-
     override ast(): ResultExpressionMembership | undefined {
         return this._ast as ResultExpressionMembership;
-    }
-
-    override parent(_: true): ParentModel<ResultExpressionMembership>;
-    override parent(): ModelContainer<ResultExpressionMembership>;
-
-    override parent(): ModelContainer<ResultExpressionMembership> {
-        return this._parent;
     }
 }
 

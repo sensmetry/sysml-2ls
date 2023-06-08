@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { InterfaceDefinition } from "../../generated/ast";
-import { metamodelOf, ElementID, ModelContainer } from "../metamodel";
+import { metamodelOf } from "../metamodel";
 import { ConnectionDefinitionMeta } from "./connection-definition";
 
 @metamodelOf(InterfaceDefinition, {
@@ -23,16 +23,8 @@ import { ConnectionDefinitionMeta } from "./connection-definition";
     binary: "Interfaces::BinaryInterface",
 })
 export class InterfaceDefinitionMeta extends ConnectionDefinitionMeta {
-    constructor(id: ElementID, parent: ModelContainer<InterfaceDefinition>) {
-        super(id, parent);
-    }
-
     override ast(): InterfaceDefinition | undefined {
         return this._ast as InterfaceDefinition;
-    }
-
-    override parent(): ModelContainer<InterfaceDefinition> {
-        return this._parent;
     }
 }
 

@@ -18,32 +18,21 @@ import { mix } from "ts-mixer";
 import { NamespaceExpose } from "../../../generated/ast";
 import { NamespaceMeta } from "../../KerML/namespace";
 import { NamespaceImportMeta } from "../../KerML/relationships/namespace-import";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ExposeMeta } from "./expose";
 
 export interface NamespaceExposeMeta<T extends NamespaceMeta = NamespaceMeta>
     extends ExposeMeta<T>,
-        NamespaceImportMeta<T> {}
+        NamespaceImportMeta<T> {
+    get importsAll(): boolean;
+}
 
 @metamodelOf(NamespaceExpose)
 @mix(ExposeMeta, NamespaceImportMeta)
 // eslint-disable-next-line unused-imports/no-unused-vars
 export class NamespaceExposeMeta<T extends NamespaceMeta = NamespaceMeta> {
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    constructor(id: ElementID, parent: ModelContainer<NamespaceExpose>) {
-        // super(id, parent);
-    }
-
-    initialize(_: NamespaceExpose): void {
-        /* empty */
-    }
-
     ast(): NamespaceExpose | undefined {
         return this._ast as NamespaceExpose;
-    }
-
-    parent(): ModelContainer<NamespaceExpose> {
-        return this._parent;
     }
 }
 

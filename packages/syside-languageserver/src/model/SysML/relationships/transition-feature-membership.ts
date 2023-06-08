@@ -15,10 +15,9 @@
  ********************************************************************************/
 
 import { TransitionFeatureKind, TransitionFeatureMembership } from "../../../generated/ast";
-import { getTransitionFeatureKind } from "../../enums";
 import { ExpressionMeta } from "../../KerML";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf, ElementID, ModelContainer } from "../../metamodel";
+import { metamodelOf } from "../../metamodel";
 import { ActionUsageMeta } from "../action-usage";
 
 type Transition = ActionUsageMeta | ExpressionMeta;
@@ -29,20 +28,8 @@ export class TransitionFeatureMembershipMeta<
 > extends FeatureMembershipMeta<T> {
     kind: TransitionFeatureKind = "trigger";
 
-    constructor(id: ElementID, parent: ModelContainer<TransitionFeatureMembership>) {
-        super(id, parent);
-    }
-
-    override initialize(node: TransitionFeatureMembership): void {
-        this.kind = getTransitionFeatureKind(node);
-    }
-
     override ast(): TransitionFeatureMembership | undefined {
         return this._ast as TransitionFeatureMembership;
-    }
-
-    override parent(): ModelContainer<TransitionFeatureMembership> {
-        return this._parent;
     }
 }
 
