@@ -18,7 +18,6 @@ import {
     AstNode,
     interruptAndCheck,
     LangiumDocument,
-    MultiMap,
     ReferenceInfo,
     ServiceRegistry,
     stream,
@@ -120,7 +119,6 @@ import {
     DependencyMeta,
     MembershipImportMeta,
 } from "../../../model";
-import { makeError, SysMLError } from "../../sysml-validation";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
 import { SysMLIndexManager } from "./index-manager";
 import { TypeMap, typeIndex } from "../../../model/types";
@@ -138,8 +136,9 @@ import {
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { URI } from "vscode-uri";
 import { ModelUtil } from "../model-utils";
-import { isExpressionError, SysMLExpressionEvaluator, validationLocation } from "../evaluator";
+import { isExpressionError, SysMLExpressionEvaluator } from "../evaluator";
 import { astToModel, clearArtifacts } from "../../../utils/ast-to-model";
+import { TypedModelDiagnostic } from "../../validation";
 import { streamModel } from "../../../utils";
 
 const MetaclassPackages = [
@@ -203,13 +202,6 @@ export interface MetamodelBuilder {
     onLinkedPart(info: LinkedReferenceInfo, document: LangiumDocument): void;
 
     /**
-     * Get metamodel errors for {@link document}
-     * @param document Document errors apply to
-     * @return readonly array of metamodel errors
-     */
-    getMetamodelErrors(document: LangiumDocument): readonly SysMLError[];
-
-    /**
      * Build a single element according to the specification
      * @param element
      * @param document
@@ -267,7 +259,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     protected readonly statistics: Statistics;
     protected readonly evaluator: SysMLExpressionEvaluator;
 
-    protected readonly metamodelErrors = new MultiMap<string, SysMLError>();
     protected readonly metaFactories: Partial<Record<string, MetaCtor<AstNode>>>;
     protected readonly preLinkFunctions: Map<string, Set<PreLinkFunction[1]>>;
 
@@ -346,10 +337,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (target) this.preLinkModel(target);
     }
 
-    getMetamodelErrors(document: LangiumDocument<AstNode>): readonly SysMLError[] {
-        return this.metamodelErrors.get(document.uriString);
-    }
-
     onParsed(document: LangiumDocument<AstNode>): void {
         // reset the cached nodes in case they are stale
         const children = document.astNodes;
@@ -409,8 +396,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (node) {
             return this.preLinkNode(node, document);
         }
-
-        this.metamodelErrors.delete(document.uri.toString());
 
         for (const node of document.astNodes) {
             await interruptAndCheck(cancelToken);
@@ -498,7 +483,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
             let feature: MetadataFeatureMeta | undefined;
             if (!metaclass) {
-                builder.addError(document, node, `Could not find metaclass for ${name}`);
+                document.modelDiagnostics.add(node, {
+                    element: node,
+                    message: `Could not find metaclass for ${name}`,
+                    severity: "error",
+                    info: {},
+                });
             } else {
                 // make sure the library metaclass is constructed so that it
                 // can be used in evaluations, important for
@@ -604,12 +594,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 this.buildTree(value, document);
                 const result = this.evaluator.evaluate(value, baseType);
                 if (isExpressionError(result)) {
-                    this.metamodelErrors.add(
-                        document.uriString,
-                        makeError(validationLocation(result) ?? node, {
-                            message: result.message,
-                        })
-                    );
+                    document.modelDiagnostics.add(value, <TypedModelDiagnostic<ExpressionMeta>>{
+                        element: value,
+                        message: result.message,
+                        severity: "warning",
+                        info: {},
+                    });
                     continue;
                 }
 
@@ -1414,23 +1404,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     }
 
     /**
-     * Add a metamodel error
-     * @param document Document this error applies to
-     * @param node Context node
-     * @param message Error message
-     */
-    protected addError(document: LangiumDocument, node: ElementMeta, message: string): void {
-        const ast = node.ast();
-        if (!ast) return;
-        this.metamodelErrors.add(
-            document.uri.toString(),
-            makeError(node, { message }, (node) => ({
-                range: node.$cstNode?.range,
-            }))
-        );
-    }
-
-    /**
      * Find a specific library element via name lookup that matches a type predicate {@link is}
      * @param node context node
      * @param qualifiedName qualified type name
@@ -1448,7 +1421,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     ): SysMLInterface<K>["$meta"] | undefined {
         const element = this.indexManager.findGlobalElement(qualifiedName, document, true);
         if (!element?.is(type)) {
-            this.addError(document, node, `${notFoundMessage} '${qualifiedName}'`);
+            document.modelDiagnostics.add(node, {
+                element: node,
+                message: `${notFoundMessage} '${qualifiedName}'`,
+                severity: "error",
+                info: {},
+            });
             return;
         }
 
@@ -1469,11 +1447,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             const implicitName = implicitIndex.get(node.nodeType(), kind);
 
             if (!implicitName) {
-                this.addError(
-                    document,
-                    node,
-                    `Could not find implicit specialization for ${node.nodeType()} (${kind})`
-                );
+                document.modelDiagnostics.add(node, {
+                    element: node,
+                    message: `Could not find implicit specialization for ${node.nodeType()} (${kind})`,
+                    severity: "error",
+                    info: {},
+                });
                 continue;
             }
 

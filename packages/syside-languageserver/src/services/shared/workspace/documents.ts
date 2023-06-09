@@ -19,6 +19,7 @@ import {
     DefaultLangiumDocumentFactory,
     DefaultLangiumDocuments,
     LangiumDocument,
+    MultiMap,
     ParseResult,
 } from "langium";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -29,6 +30,7 @@ import { MetamodelBuilder } from "./metamodel-builder";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { performance } from "perf_hooks";
 import { ElementMeta } from "../../../model";
+import { ModelDiagnostic } from "../../validation";
 
 export const enum BuildProgress {
     Created = 0,
@@ -65,6 +67,11 @@ declare module "langium" {
          * Flattened tree of parsed AST nodes in this document
          */
         astNodes: AstNode[];
+
+        /**
+         * Model element diagnostics
+         */
+        modelDiagnostics: MultiMap<ElementMeta, ModelDiagnostic>;
     }
 }
 
@@ -104,6 +111,7 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
         doc.exports = new Map();
         doc.namedElements = new Map();
         doc.astNodes = streamAst(doc.parseResult.value).toArray();
+        doc.modelDiagnostics = new MultiMap();
 
         this.metamodelBuilder.onParsed(doc);
         return doc;
@@ -125,6 +133,7 @@ export class SysMLDocuments extends DefaultLangiumDocuments {
             doc.progress = BuildProgress.Created;
             doc.exports.clear();
             doc.namedElements.clear();
+            doc.modelDiagnostics.clear();
             // no need to invalidate cached AST nodes since the document is not
             // reparsed here
         }
