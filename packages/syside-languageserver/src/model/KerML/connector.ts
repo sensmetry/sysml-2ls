@@ -119,25 +119,10 @@ export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, Featu
             .toArray() as FeatureMeta[];
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = {
-            prefixes: this.prefixes,
-        };
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
 
-        if (this._multiplicity) {
-            parts.multiplicity = [this._multiplicity];
-        }
-        parts.heritage = this.heritage;
-        parts.typeRelationships = this.typeRelationships;
-
-        if (this.value) {
-            parts.value = [this.value];
-        }
-
-        parts.ends = this.ends;
-        parts.children = this.children;
-
-        return parts;
+        parts.push(["ends", this.ends]);
     }
 }
 

@@ -41,7 +41,6 @@ import {
     Membership,
     MembershipReference,
     MetadataAccessExpression,
-    Namespace,
     NamespaceImport,
     PortDefinition,
     Relationship,
@@ -56,7 +55,7 @@ import { TypeMap, typeIndex } from "../../model/types";
 import { sanitizeName } from "../../model/naming";
 import { SysMLConfigurationProvider } from "../shared/workspace/configuration-provider";
 import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
-import { ElementMeta, MembershipMeta } from "../../model";
+import { ElementMeta, MembershipMeta, NamespaceMeta } from "../../model";
 import { AliasResolver, streamParents } from "../../utils/scope-util";
 import { KeysMatching } from "../../utils/common";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
@@ -176,11 +175,11 @@ export class SysMLLinker extends DefaultLinker {
      * @param node namespace node to link imports for
      * @param document document that contains {@link node}
      */
-    resolveImports(node: Namespace, document: LangiumDocument): void {
-        if (!node.$meta.imports) return; // nothing to import
+    resolveImports(node: NamespaceMeta, document: LangiumDocument): void {
+        if (!node.imports) return; // nothing to import
 
         let index = -1;
-        for (const imp of node.$meta.imports) {
+        for (const imp of node.imports) {
             ++index;
             const impNode = imp.ast();
             if (!impNode) continue; // nothing imported

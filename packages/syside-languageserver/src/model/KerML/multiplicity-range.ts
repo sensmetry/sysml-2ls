@@ -56,8 +56,9 @@ export class MultiplicityRangeMeta extends MultiplicityMeta {
         return this._ast as MultiplicityRange;
     }
 
-    override textualParts(): ElementParts {
-        return { range: this._range ? [this._range] : [], children: this.children };
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        if (this.range) parts.push(["range", [this.range]]);
     }
 }
 

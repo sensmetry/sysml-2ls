@@ -440,32 +440,25 @@ export class FeatureMeta extends TypeMeta {
         return TypeMeta.prototype.ownedParameters.call(this.basicFeature());
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = {
-            prefixes: this.prefixes,
-        };
-
+    protected override collectDeclaration(parts: ElementParts): void {
         if (this.parent()?.is(EndFeatureMembership)) {
-            parts.heritage = this.heritage;
+            parts.push(["heritage", this.heritage]);
             if (this._multiplicity) {
-                parts.multiplicity = [this._multiplicity];
+                parts.push(["multiplicity", [this._multiplicity]]);
             }
         } else {
             if (this._multiplicity) {
-                parts.multiplicity = [this._multiplicity];
+                parts.push(["multiplicity", [this._multiplicity]]);
             }
-            parts.heritage = this.heritage;
+            parts.push(["heritage", this.heritage]);
         }
 
-        parts.typeRelationships = this.typeRelationships;
+        parts.push(["typeRelationships", this.typeRelationships]);
 
         if (this.value) {
-            parts.value = [this.value];
+            parts.push(["value", [this.value]]);
+            if (this.featureWrite) parts.push(["featureWrite", [this.featureWrite]]);
         }
-
-        parts.children = this.children;
-
-        return parts;
     }
 }
 

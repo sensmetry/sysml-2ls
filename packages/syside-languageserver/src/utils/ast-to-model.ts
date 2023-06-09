@@ -69,6 +69,7 @@ const AstToModel: {
 
     [ast.OperatorExpression](model, node) {
         if (node.operator) model.operator = `'${node.operator}'`;
+        model["_operands"] = node.operands.map((e) => e.$meta);
     },
 
     [ast.ElementReference](model, node) {
@@ -147,7 +148,10 @@ const AstToModel: {
     [ast.Relationship](model, node) {
         model["_visibility"] = getVisibility(node.visibility);
         if (node.element) model["_element"] = node.element.$meta;
+        else if (node.targetChain) model["_element"] = node.targetChain.$meta;
         else model["_element"] = undefined;
+
+        if (node.sourceChain) model["_source"] = node.sourceChain.$meta;
 
         model["_children"].add(...node.elements.map((e) => e.$meta));
     },

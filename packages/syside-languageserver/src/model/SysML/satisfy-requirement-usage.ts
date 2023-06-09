@@ -57,16 +57,10 @@ export class SatisfyRequirementUsageMeta extends Mixin(
             .concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = { prefixes: this.prefixes, heritage: this.heritage };
-
-        // heritage can come before multiplicity so put it later
-        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
-        if (this.value) parts.value = [this.value];
-        if (this.satisfactionSubject) parts.satisfactionSubject = [this.satisfactionSubject];
-
-        parts.children = this.children;
-        return parts;
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        if (this.satisfactionSubject)
+            parts.push(["satisfactionSubject", [this.satisfactionSubject]]);
     }
 }
 

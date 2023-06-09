@@ -19,7 +19,7 @@ import { Expression, FeatureValue, Multiplicity } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
 import { metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { FeatureMeta, FunctionMeta, StepMeta, TypeMeta } from "./_internal";
+import { ElementParts, FeatureMeta, FunctionMeta, StepMeta, TypeMeta } from "./_internal";
 import { NonNullable } from "../../utils/common";
 
 export const ImplicitExpressions = {
@@ -70,6 +70,12 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
     isModelLevelEvaluable(): boolean {
         const fn = this.getFunction();
         return fn ? isModelLevelEvaluable(fn) : false;
+    }
+
+    protected override collectParts(): ElementParts {
+        const parts = StepMeta.prototype["collectParts"].call(this);
+        if (this._result) parts.push(["result", [this._result]]);
+        return parts;
     }
 }
 

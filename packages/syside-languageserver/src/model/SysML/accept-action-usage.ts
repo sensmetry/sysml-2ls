@@ -65,17 +65,10 @@ export class AcceptActionUsageMeta extends ActionUsageMeta {
             .concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = { prefixes: this.prefixes };
-
-        if (this._multiplicity) parts.multiplicity = [this._multiplicity];
-        parts.heritage = this.heritage;
-
-        if (this.payload) parts.payload = [this.payload];
-        if (this.receiver) parts.receiver = [this.receiver];
-
-        parts.children = this.children;
-        return parts;
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        if (this.payload) parts.push(["payload", [this.payload]]);
+        if (this.receiver) parts.push(["receiver", [this.receiver]]);
     }
 }
 

@@ -34,8 +34,9 @@ export class MetadataFeatureMeta extends Mixin(AnnotatingElementMeta, FeatureMet
         return "base";
     }
 
-    override textualParts(): ElementParts {
-        return { heritage: this.heritage, about: this._annotations, children: this.children };
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        parts.push(["about", this._annotations]);
     }
 }
 

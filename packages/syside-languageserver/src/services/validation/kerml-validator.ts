@@ -206,7 +206,7 @@ export class KerMLValidator {
                 const func = expr.getFunction();
                 if (!result && func) {
                     if (typeof func === "string") {
-                        const element = this.index.findGlobalElement(func)?.node?.$meta;
+                        const element = this.index.findGlobalElement(func);
                         if (element?.isAny(ast.SysMLFunction, ast.Expression))
                             result = element.returnType();
                     } else {

@@ -14,14 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode } from "langium";
+import { AstNode, isAstNode } from "langium";
 import { Range } from "vscode-languageserver";
+import { ElementMeta } from "../model/KerML";
 
-/**
- * Error info for diagnostics
- * @see {@link }
- */
-export type ErrorRelatedInformation = {
+export type AstErrorInformation = {
     /**
      * The AST node to which the diagnostic is attached.
      */
@@ -52,6 +49,24 @@ export type ErrorRelatedInformation = {
     range?: Range;
 };
 
+export type ModelErrorInformation = {
+    /**
+     * Model element this error is attached to
+     */
+    model: ElementMeta;
+
+    /**
+     * Error message
+     */
+    message: string;
+};
+
+/**
+ * Error info for diagnostics
+ * @see {@link }
+ */
+export type ErrorRelatedInformation = AstErrorInformation | ModelErrorInformation;
+
 /**
  * Diagnostics info
  */
@@ -62,3 +77,19 @@ export type SysMLError = ErrorRelatedInformation & {
      */
     relatedInformation?: ErrorRelatedInformation[];
 };
+
+export function makeError(
+    source: AstNode | ElementMeta,
+    info: Omit<SysMLError, "node" | "model">,
+    extra?: (node: AstNode) => Omit<Partial<AstErrorInformation>, "node">
+): SysMLError {
+    if (!isAstNode(source)) {
+        const ast = source.ast();
+        if (ast) {
+            return { ...info, node: ast, ...extra?.call(undefined, ast) };
+        }
+        return { ...info, model: source };
+    }
+
+    return { ...info, node: source, ...extra?.call(undefined, source) };
+}

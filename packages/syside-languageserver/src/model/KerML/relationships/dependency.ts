@@ -82,11 +82,11 @@ export class DependencyMeta extends RelationshipMeta {
         return this._ast as Dependency;
     }
 
-    override textualParts(): ElementParts {
-        return {
-            prefixes: this.prefixes,
-            children: this.children,
-        };
+    protected override collectParts(): ElementParts {
+        return [
+            ["prefixes", this.prefixes],
+            ["children", this.children],
+        ];
     }
 }
 

@@ -30,7 +30,7 @@ import {
     Range,
     DiagnosticRelatedInformation,
 } from "vscode-languageserver";
-import { ErrorRelatedInformation, SysMLError } from "../sysml-validation";
+import { AstErrorInformation, SysMLError } from "../sysml-validation";
 import { SysMLLinker } from "../references/linker";
 import { SysMLDefaultServices } from "../services";
 import { MetamodelBuilder } from "../shared/workspace/metamodel-builder";
@@ -54,7 +54,9 @@ export class SysMLDocumentValidator extends DefaultDocumentValidator {
         severity: "error" | "warning" | "info" | "hint",
         code: string | number | undefined,
         error: SysMLError
-    ): Diagnostic {
+    ): Diagnostic | undefined {
+        if (!("node" in error)) return;
+
         const info: DiagnosticInfo<AstNode, string> = {
             node: error.node,
             property: error.property,
@@ -62,16 +64,18 @@ export class SysMLDocumentValidator extends DefaultDocumentValidator {
             index: error.index,
             code: code,
             range: getDiagnosticRange(error),
-            relatedInformation: error?.relatedInformation?.map((related) => {
-                const i: DiagnosticRelatedInformation = {
-                    message: related.message,
-                    location: {
-                        uri: getDocument(related.node).uriString,
-                        range: getDiagnosticRange(related),
-                    },
-                };
-                return i;
-            }),
+            relatedInformation: error?.relatedInformation
+                ?.filter((e): e is AstErrorInformation => "node" in e)
+                .map((related) => {
+                    const i: DiagnosticRelatedInformation = {
+                        message: related.message,
+                        location: {
+                            uri: getDocument(related.node).uriString,
+                            range: getDiagnosticRange(related),
+                        },
+                    };
+                    return i;
+                }),
         };
         return this.toDiagnostic(severity, error.message, info);
     }
@@ -89,7 +93,7 @@ export class SysMLDocumentValidator extends DefaultDocumentValidator {
                 SysMLDocumentValidator.ImportError,
                 importError
             );
-            diagnostics.push(diagnostic);
+            if (diagnostic) diagnostics.push(diagnostic);
         }
 
         // collect metamodel errors
@@ -100,7 +104,7 @@ export class SysMLDocumentValidator extends DefaultDocumentValidator {
                     SysMLDocumentValidator.MetamodelError,
                     metamodelError
                 );
-                diagnostics.push(diagnostic);
+                if (diagnostic) diagnostics.push(diagnostic);
             }
         }
 
@@ -114,7 +118,7 @@ export namespace SysMLDocumentValidator {
     export const MetamodelError = "metamodel-error";
 }
 
-function getDiagnosticRangeImpl(info: ErrorRelatedInformation): Range {
+function getDiagnosticRangeImpl(info: AstErrorInformation): Range {
     let cstNode: CstNode | undefined;
     if (info.range) return info.range;
     if (typeof info.property === "string") {
@@ -132,7 +136,7 @@ function getDiagnosticRangeImpl(info: ErrorRelatedInformation): Range {
     return cstNode.range;
 }
 
-export function getDiagnosticRange(info: ErrorRelatedInformation): Range {
+export function getDiagnosticRange(info: AstErrorInformation): Range {
     // need to sanitize the returned range since CST node ranges may become
     // invalidated by LSP and return end with nulls
     return sanitizeRange(getDiagnosticRangeImpl(info));

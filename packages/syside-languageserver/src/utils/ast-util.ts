@@ -37,6 +37,24 @@ export function streamAst(root: AstNode): TreeStream<AstNode> {
 }
 
 /**
+ * Create a stream of all model elements that are directly and indirectly contained
+ * in the given root element. This does not include the root element itself.
+ * @see {@link streamAllContents}
+ */
+export function streamAllModelContents(root: ElementMeta): TreeStream<ElementMeta> {
+    return new TreeStreamImpl(root, (node) => node.ownedElements());
+}
+
+/**
+ * Create a stream of all model elements that are directly and indirectly contained
+ * in the given root element, including the root element itself.
+ * @see {@link streamAst}
+ */
+export function streamModel(root: ElementMeta): TreeStream<ElementMeta> {
+    return new TreeStreamImpl(root, (node) => node.ownedElements(), { includeRoot: true });
+}
+
+/**
  * AST node container type
  */
 export type AstParent<T extends AstNode> = T["$container"];

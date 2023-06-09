@@ -15,9 +15,10 @@
  ********************************************************************************/
 
 import { OperatorExpression } from "../../../generated/ast";
+import { enumerable } from "../../../utils";
 import { OPERATOR_FUNCTIONS, typeArgument, typeOf } from "../../expressions/util";
 import { metamodelOf } from "../../metamodel";
-import { InvocationExpressionMeta, TypeMeta } from "../_internal";
+import { ElementParts, ExpressionMeta, InvocationExpressionMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(OperatorExpression)
 export class OperatorExpressionMeta extends InvocationExpressionMeta {
@@ -25,6 +26,13 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
      * The escaped operator name used in this expression
      */
     operator = "";
+
+    protected _operands: ExpressionMeta[] = [];
+
+    @enumerable
+    get operands(): readonly ExpressionMeta[] {
+        return this._operands;
+    }
 
     override ast(): OperatorExpression | undefined {
         return this._ast as OperatorExpression;
@@ -59,6 +67,11 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
         if (returns) return returns.element();
 
         return super.returnType();
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        parts.push(["operands", this.operands]);
     }
 }
 

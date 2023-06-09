@@ -49,8 +49,10 @@ export class FeatureReferenceExpressionMeta extends ExpressionMeta {
         return true;
     }
 
-    override textualParts(): ElementParts {
-        return { expression: this.expression ? [this.expression] : [] };
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+
+        if (this.expression) parts.push(["expression", [this.expression]]);
     }
 }
 

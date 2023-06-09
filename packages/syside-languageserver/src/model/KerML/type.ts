@@ -366,18 +366,21 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
         return this.ownedFeatures().filter((f) => f.isParameter);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = {
-            prefixes: this.prefixes,
-        };
-
+    protected collectDeclaration(parts: ElementParts): void {
         // multiplicity always appears before heritage in non-feature types
         if (this._multiplicity) {
-            parts.multiplicity = [this._multiplicity];
+            parts.push(["multiplicity", [this._multiplicity]]);
         }
 
-        parts.heritage = this.heritage;
-        parts.typeRelationships = this.typeRelationships;
+        parts.push(["heritage", this.heritage]);
+        parts.push(["typeRelationships", this.typeRelationships]);
+    }
+
+    protected override collectParts(): ElementParts {
+        const parts: ElementParts = [["prefixes", this.prefixes]];
+
+        this.collectDeclaration(parts);
+        parts.push(["children", this.children]);
 
         return parts;
     }

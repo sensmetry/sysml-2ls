@@ -17,7 +17,7 @@
 import { Classifier, Feature, Multiplicity } from "../../generated/ast";
 import { NonNullable } from "../../utils";
 import { metamodelOf } from "../metamodel";
-import { ElementParts, FeatureMeta, TypeMeta } from "./_internal";
+import { FeatureMeta, TypeMeta } from "./_internal";
 
 export const ImplicitMultiplicities = {
     base: "Base::naturals",
@@ -45,15 +45,6 @@ export class MultiplicityMeta extends FeatureMeta {
         if (owner?.is(Classifier)) return "classifier";
         if (owner?.is(Feature)) return "feature";
         return "base";
-    }
-
-    override textualParts(): ElementParts {
-        // prefixes are not allowed
-
-        return {
-            heritage: this.heritage,
-            children: this.children,
-        };
     }
 }
 
