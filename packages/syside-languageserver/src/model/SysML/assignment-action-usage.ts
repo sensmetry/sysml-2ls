@@ -73,18 +73,11 @@ export class AssignmentActionUsageMeta extends ActionUsageMeta {
             .concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = { prefixes: this.prefixes };
-
-        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
-        parts.heritage = this.heritage;
-
-        if (this.target) parts.target = [this.target];
-        if (this.targetMember) parts.targetMember = [this.targetMember];
-        if (this.assignedValue) parts.assignedValue = [this.assignedValue];
-
-        parts.children = this.children;
-        return parts;
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        if (this.target) parts.push(["target", [this.target]]);
+        if (this.targetMember) parts.push(["targetMember", [this.targetMember]]);
+        if (this.assignedValue) parts.push(["assignedValue", [this.assignedValue]]);
     }
 }
 

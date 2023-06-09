@@ -19,7 +19,7 @@ import { SysMLFunction } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
 import { metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { BehaviorMeta, TypeMeta } from "./_internal";
+import { BehaviorMeta, ElementParts, TypeMeta } from "./_internal";
 
 export const ImplicitFunctions = {
     base: "Performances::Evaluation",
@@ -40,6 +40,12 @@ export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
 
     isModelLevelEvaluable(): boolean {
         return isModelLevelEvaluable(this.qualifiedName);
+    }
+
+    protected override collectParts(): ElementParts {
+        const parts = BehaviorMeta.prototype["collectParts"].call(this);
+        if (this._result) parts.push(["result", [this._result]]);
+        return parts;
     }
 }
 

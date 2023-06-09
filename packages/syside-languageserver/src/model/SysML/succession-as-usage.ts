@@ -30,7 +30,7 @@ import {
 } from "../../generated/ast";
 import { FeatureMembershipMeta, FeatureMeta, MembershipMeta } from "../KerML";
 import { SuccessionMeta } from "../KerML/succession";
-import { metamodelOf, Metamodel } from "../metamodel";
+import { metamodelOf, BasicMetamodel } from "../metamodel";
 import { ConnectorAsUsageMeta } from "./connector-as-usage";
 
 @metamodelOf(SuccessionAsUsage, {
@@ -57,7 +57,7 @@ export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Successio
 
     private static findPreviousFeature(
         feature: FeatureMeta,
-        linker?: (model: Metamodel) => void
+        linker?: (model: BasicMetamodel) => void
     ): MembershipMeta<FeatureMeta> | undefined {
         const owner = feature.owner();
         if (!owner?.is(Type)) return;
@@ -86,7 +86,9 @@ export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, Successio
             : undefined;
     }
 
-    previousFeature(linker?: (model: Metamodel) => void): MembershipMeta<FeatureMeta> | undefined {
+    previousFeature(
+        linker?: (model: BasicMetamodel) => void
+    ): MembershipMeta<FeatureMeta> | undefined {
         return SuccessionAsUsageMeta.findPreviousFeature(this, linker);
     }
 }

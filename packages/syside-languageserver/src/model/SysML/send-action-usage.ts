@@ -70,17 +70,12 @@ export class SendActionUsageMeta extends ActionUsageMeta {
             .concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = { prefixes: this.prefixes };
-        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
-        parts.heritage = this.heritage;
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
 
-        if (this.payload) parts.payload = [this.payload];
-        if (this.sender) parts.sender = [this.sender];
-        if (this.receiver) parts.body = [this.receiver];
-
-        parts.children = this.children;
-        return parts;
+        if (this.payload) parts.push(["payload", [this.payload]]);
+        if (this.sender) parts.push(["sender", [this.sender]]);
+        if (this.receiver) parts.push(["body", [this.receiver]]);
     }
 }
 

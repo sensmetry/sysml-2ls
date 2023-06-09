@@ -14,12 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, CstNode, DeepPartial, OperationCancelled } from "langium";
+import { AstNode, CstNode, DeepPartial, LangiumDocument, OperationCancelled } from "langium";
 import { isAbstractRule, isRuleCall } from "langium/lib/grammar/generated/ast";
 import { CancellationToken, Range } from "vscode-languageserver";
 import { Element, isElementReference } from "../generated/ast";
 import { performance } from "perf_hooks";
-import { isMetamodel } from "../model";
+import { BasicMetamodel, Metamodel, isMetamodel } from "../model";
 import path from "path";
 
 /**
@@ -636,3 +636,20 @@ export function enumerable(
 export type LazyGetter<T> = () => T;
 
 export const NonNullable = <T>(item: T | undefined | null): item is T => Boolean(item);
+
+export function getDocument(element: BasicMetamodel): LangiumDocument | undefined {
+    let ast: AstNode | undefined;
+    let current: Metamodel | undefined = element;
+    while (current) {
+        ast = current.ast();
+        if (ast) break;
+        current = current.parent();
+    }
+
+    while (ast) {
+        if (!ast.$container) break;
+        ast = ast.$container;
+    }
+
+    return ast?.$document;
+}

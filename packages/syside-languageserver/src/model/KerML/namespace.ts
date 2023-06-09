@@ -178,11 +178,11 @@ export class NamespaceMeta extends ElementMeta {
             .filter((f) => f.is(kind)) as Stream<SysMLTypeList[K]["$meta"]>;
     }
 
-    textualParts(): ElementParts {
-        return {
-            prefixes: this.prefixes,
-            children: this.children,
-        };
+    protected collectParts(): ElementParts {
+        return [
+            ["prefixes", this.prefixes],
+            ["children", this.children],
+        ];
     }
 
     override invalidateMemberCaches(): void {

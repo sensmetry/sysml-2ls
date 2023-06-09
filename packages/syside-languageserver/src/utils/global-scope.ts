@@ -106,6 +106,24 @@ export class GlobalScope extends SysMLScope {
         return;
     }
 
+    getStaticExportedElement(name: string, langId?: string): MembershipMeta | undefined {
+        const entries = this.staticExports.get(name);
+        if (entries) {
+            const candidate = getFromEntries(entries, langId);
+            if (candidate) return candidate;
+        }
+        return;
+    }
+
+    protected getDynamicExportedElement(name: string, langId?: string): MembershipMeta | undefined {
+        for (const ns of this.getDynamicExports(langId)) {
+            const candidate = ns.getExportedElement(name);
+            if (candidate) return candidate;
+        }
+
+        return;
+    }
+
     override getAllExportedElements(langId?: string): Stream<ExportedMember> {
         return this.getAllLocalElements(new Set(), langId);
     }
@@ -117,18 +135,10 @@ export class GlobalScope extends SysMLScope {
         name: string,
         langId?: string
     ): MembershipMeta<ElementMeta> | "prune" | undefined {
-        const entries = this.staticExports.get(name);
-        if (entries) {
-            const candidate = getFromEntries(entries, langId);
-            if (candidate) return candidate;
-        }
-
-        for (const ns of this.getDynamicExports(langId)) {
-            const candidate = ns.getExportedElement(name);
-            if (candidate) return candidate;
-        }
-
-        return;
+        return (
+            this.getStaticExportedElement(name, langId) ??
+            this.getDynamicExportedElement(name, langId)
+        );
     }
 
     protected getAllLocalElements(ignored: Set<string>, langId?: string): Stream<ExportedMember> {

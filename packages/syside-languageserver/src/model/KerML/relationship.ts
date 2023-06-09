@@ -148,18 +148,18 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
             : target;
     }
 
-    textualParts(): ElementParts {
-        const parts: ElementParts = {};
+    protected collectParts(): ElementParts {
+        const parts: ElementParts = [];
         if (this.source()?.parent() === this) {
-            parts.source = [this.source() as ElementMeta];
+            parts.push(["source", [this.source() as ElementMeta]]);
         }
 
         const target = this.element();
         if (target?.parent() === this) {
-            parts.target = [target];
+            parts.push(["target", [target]]);
         }
 
-        parts.children = this.children;
+        parts.push(["children", this.children]);
         return parts;
     }
 }

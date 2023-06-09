@@ -81,18 +81,11 @@ export class IfActionUsageMeta extends ActionUsageMeta {
         return this.else !== undefined;
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = {
-            prefixes: this.prefixes,
-        };
-
-        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
-
-        parts.heritage = this.heritage;
-        if (this.condition) parts.condition = [this.condition];
-        if (this.then) parts.then = [this.then];
-        if (this.else) parts.else = [this.else];
-        return parts;
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        if (this.condition) parts.push(["condition", [this.condition]]);
+        if (this.then) parts.push(["then", [this.then]]);
+        if (this.else) parts.push(["else", [this.else]]);
     }
 }
 

@@ -18,20 +18,20 @@ import {
     AstNode,
     DefaultIndexManager,
     DocumentState,
-    EMPTY_STREAM,
     LangiumDocument,
     stream,
     Stream,
 } from "langium";
 import { CancellationToken } from "vscode-languageserver";
 import { URI } from "vscode-uri";
-import { Type, isElement, Namespace, Membership } from "../../../generated/ast";
+import { Type, Namespace, Membership } from "../../../generated/ast";
 import { ElementMeta, NamedChild, sanitizeName, TypeMeta } from "../../../model";
 import { getLanguageId, GlobalScope } from "../../../utils/global-scope";
 import { makeScope, SysMLScope } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
 import { SysMLDefaultServices } from "../../services";
 import { SysMLNodeDescription } from "./ast-descriptions";
+import { getDocument } from "../../../utils";
 
 /**
  * Overrides the default IndexManager from Langium to work with members imported
@@ -43,7 +43,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
      * Cache of resolved elements mapping qualified names to descriptions or
      * null if name was not found
      */
-    protected readonly globalElementsCache = new Map<string, SysMLNodeDescription | null>();
+    protected readonly globalElementsCache = new Map<string, ElementMeta | null>();
 
     protected override readonly simpleIndex = new Map<string, SysMLNodeDescription[]>();
     protected override readonly globalScopeCache = new Map<string, SysMLNodeDescription[]>();
@@ -92,7 +92,7 @@ export class SysMLIndexManager extends DefaultIndexManager {
         document.namedElements.clear();
 
         const services = this.serviceRegistry.getServices(document.uri) as SysMLDefaultServices;
-        document.exports = await (
+        const exports = await (
             services.references.ScopeComputation as SysMLScopeComputation
         ).computeExports(
             // all root nodes are namespaces
@@ -100,9 +100,14 @@ export class SysMLIndexManager extends DefaultIndexManager {
             cancelToken
         );
 
+        document.exports.clear();
+        exports.forEach((d) => {
+            if (d.node) document.exports.set(d.name, d.node.$meta);
+        });
+
         if (!document.buildOptions?.standalone) {
             // only exporting to global scope if the document is not standalone
-            this.simpleIndex.set(uri, document.exports);
+            this.simpleIndex.set(uri, exports);
             this.globalScope.collectDocument(document as LangiumDocument<Namespace>);
         }
 
@@ -146,62 +151,55 @@ export class SysMLIndexManager extends DefaultIndexManager {
         qualifiedName: string,
         document?: LangiumDocument,
         addDependency = false
-    ): SysMLNodeDescription | undefined {
+    ): ElementMeta | undefined {
         const local =
             document?.buildOptions?.standardLibrary === "local" ||
             document?.buildOptions?.standalone;
         const uri = document?.uriString;
         const cache = local && uri ? document.namedElements : this.globalElementsCache;
 
-        let description = cache.get(qualifiedName);
+        let candidate = cache.get(qualifiedName);
         // if not undefined, the description was found in the cache
-        if (description !== undefined) return description ?? undefined;
+        if (candidate !== undefined) return candidate ?? undefined;
 
         let parts = qualifiedName.split("::").map((name) => sanitizeName(name));
-        let owner: ElementMeta | undefined;
         const root = parts[0];
         parts = parts.slice(1);
-        let candidate = cache.get(root)?.node;
-        if (candidate === undefined) {
-            let scope: Stream<SysMLNodeDescription> = EMPTY_STREAM;
-
-            // the first exported element is the root node itself
-            if (local && uri) scope = stream(document.exports).tail(1);
-            else scope = stream(this.simpleIndex.values()).flatMap((ds) => stream(ds).tail(1));
-            description = scope.find((d) => d.name === root);
-            cache.set(root, description ?? null);
-            candidate = description?.node;
+        candidate = cache.get(root);
+        if (candidate === null) {
+            return undefined;
         }
 
-        if (isElement(candidate)) {
-            owner = candidate.$meta;
+        if (candidate === undefined) {
+            if (local && uri) candidate = document.exports.get(root);
+            else candidate = this.globalScope.getStaticExportedElement(root)?.element();
+            cache.set(root, candidate ?? null);
         }
 
         // traverse the name chain
         for (const part of parts) {
-            const child: NamedChild | undefined = owner?.findMember(part);
+            const child: NamedChild | undefined = candidate?.findMember(part);
             if (typeof child === "string" || !child) continue;
 
             let element: ElementMeta | undefined;
             if (child.is(Membership)) element = child.element();
             else element = child.element()?.element();
-            description = element?.description;
-            if (!description || !description.node) break;
-            owner = description.node.$meta;
+            candidate = element;
         }
 
         // cache the found element
-        cache.set(qualifiedName, description ?? null);
-        if (!local && uri && description && addDependency) {
+        cache.set(qualifiedName, candidate ?? null);
+        if (!local && uri && candidate && addDependency) {
             let deps = this.modelDependencies.get(uri);
             if (!deps) {
                 deps = new Set();
                 this.modelDependencies.set(uri, deps);
             }
-            deps.add(description.documentUri.toString());
+            const doc = getDocument(candidate);
+            if (doc) deps.add(doc.uriString);
         }
 
-        return description;
+        return candidate;
     }
 
     /**
@@ -221,8 +219,8 @@ export class SysMLIndexManager extends DefaultIndexManager {
     ): TypeMeta | undefined {
         if (!type) return;
         if (typeof type !== "string") return type;
-        const result = this.findGlobalElement(type, document, addDependency)?.node;
-        if (result?.$meta.is(Type)) return result.$meta;
+        const result = this.findGlobalElement(type, document, addDependency);
+        if (result?.is(Type)) return result;
         return;
     }
 

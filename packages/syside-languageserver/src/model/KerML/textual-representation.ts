@@ -16,7 +16,7 @@
 
 import { TextualRepresentation } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ElementParts, TextualAnnotatingMeta } from "./_internal";
+import { TextualAnnotatingMeta } from "./_internal";
 
 @metamodelOf(TextualRepresentation)
 export class TextualRepresentationMeta extends TextualAnnotatingMeta {
@@ -27,10 +27,6 @@ export class TextualRepresentationMeta extends TextualAnnotatingMeta {
 
     override ast(): TextualRepresentation | undefined {
         return this._ast as TextualRepresentation;
-    }
-
-    override textualParts(): ElementParts {
-        return {};
     }
 }
 

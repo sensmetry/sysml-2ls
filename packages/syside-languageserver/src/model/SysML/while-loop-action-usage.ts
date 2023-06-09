@@ -73,16 +73,11 @@ export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
             .concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = { prefixes: this.prefixes };
-        if (this.multiplicity) parts.multiplicity = [this.multiplicity];
-        parts.heritage = this.heritage;
-
-        if (this.condition) parts.condition = [this.condition];
-        if (this.body) parts.body = [this.body];
-        if (this.until) parts.until = [this.until];
-
-        return parts;
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        if (this.condition) parts.push(["condition", [this.condition]]);
+        if (this.body) parts.push(["body", [this.body]]);
+        if (this.until) parts.push(["until", [this.until]]);
     }
 }
 

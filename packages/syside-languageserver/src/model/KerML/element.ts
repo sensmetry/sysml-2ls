@@ -37,7 +37,7 @@ import { LazyGetter, enumerable } from "../../utils/common";
  */
 export type NamedChild = MembershipMeta | MembershipImportMeta | "unresolved reference" | "shadow";
 
-export type ElementParts = Record<string, readonly ElementMeta[]>;
+export type ElementParts = (readonly [string, readonly ElementMeta[]])[];
 
 export function namedMembership(
     member: MembershipMeta | MembershipImportMeta
@@ -303,13 +303,19 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
         }
     }
 
+    protected abstract collectParts(): ElementParts;
+
     /**
      * Parts of this elements in the order they appear in textual notation
      */
-    abstract textualParts(): ElementParts;
+    parts(): Partial<Record<string, readonly ElementMeta[]>> {
+        return Object.fromEntries(this.collectParts());
+    }
 
     ownedElements(): Stream<ElementMeta> {
-        return stream(Object.values(this.textualParts())).flat();
+        return stream(this.collectParts())
+            .map(([_, elements]) => elements)
+            .flat();
     }
 
     /**

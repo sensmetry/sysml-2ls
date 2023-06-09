@@ -167,16 +167,12 @@ export class TransitionUsageMeta extends ActionUsageMeta {
             .concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = {};
-
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
         for (const kw of ["source", "accepter", "guard", "effect", "then", "else"] as const) {
             const value = this[kw];
-            if (value) parts[kw] = [value];
+            if (value) parts.push([kw, [value]]);
         }
-
-        parts.children = this.children;
-        return parts;
     }
 }
 

@@ -75,29 +75,13 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
         return ([this._item] as MembershipMeta<FeatureMeta>[]).concat(baseFeatures);
     }
 
-    override textualParts(): ElementParts {
-        const parts: ElementParts = {
-            prefixes: this.prefixes,
-        };
-
-        if (this._multiplicity) {
-            parts.multiplicity = [this._multiplicity];
-        }
-        parts.heritage = this.heritage;
-        parts.typeRelationships = this.typeRelationships;
-
-        if (this.value) {
-            parts.value = [this.value];
-        }
-
+    protected override collectDeclaration(parts: ElementParts): void {
+        StepMeta.prototype["collectDeclaration"].call(this, parts);
         if (this._item) {
-            parts.item = [this._item];
+            parts.push(["item", [this._item]]);
         }
 
-        parts.ends = this.ends;
-        parts.children = this.children;
-
-        return parts;
+        parts.push(["ends", this.ends]);
     }
 }
 

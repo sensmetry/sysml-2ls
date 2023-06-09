@@ -44,8 +44,8 @@ export abstract class AnnotatingElementMeta extends ElementMeta {
         return this._ast as AnnotatingElement;
     }
 
-    textualParts(): ElementParts {
-        return { about: this._annotations };
+    protected collectParts(): ElementParts {
+        return [["about", this._annotations]];
     }
 }
 

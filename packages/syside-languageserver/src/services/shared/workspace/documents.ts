@@ -25,10 +25,10 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { streamAst } from "../../../utils";
 import { SysMLSharedServices } from "../../services";
-import { SysMLNodeDescription } from "./ast-descriptions";
 import { MetamodelBuilder } from "./metamodel-builder";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { performance } from "perf_hooks";
+import { ElementMeta } from "../../../model";
 
 export const enum BuildProgress {
     Created = 0,
@@ -53,13 +53,13 @@ declare module "langium" {
         /**
          * Local document exports
          */
-        exports: SysMLNodeDescription[];
+        exports: Map<string, ElementMeta>;
 
         /**
          * Lazy cache of fully qualified element names to element descriptions
          * locally in this document
          */
-        namedElements: Map<string, SysMLNodeDescription | null>;
+        namedElements: Map<string, ElementMeta | null>;
 
         /**
          * Flattened tree of parsed AST nodes in this document
@@ -101,7 +101,7 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
     protected onCreated<T extends AstNode>(doc: LangiumDocument<T>): LangiumDocument<T> {
         doc.uriString = doc.uri.toString();
         doc.progress = BuildProgress.Created;
-        doc.exports = [];
+        doc.exports = new Map();
         doc.namedElements = new Map();
         doc.astNodes = streamAst(doc.parseResult.value).toArray();
 
@@ -123,7 +123,7 @@ export class SysMLDocuments extends DefaultLangiumDocuments {
         const doc = super.invalidateDocument(uri);
         if (doc) {
             doc.progress = BuildProgress.Created;
-            doc.exports = [];
+            doc.exports.clear();
             doc.namedElements.clear();
             // no need to invalidate cached AST nodes since the document is not
             // reparsed here
