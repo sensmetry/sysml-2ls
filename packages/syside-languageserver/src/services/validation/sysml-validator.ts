@@ -14,79 +14,119 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ValidationAcceptor } from "langium";
 import * as ast from "../../generated/ast";
-import { ElementMeta, ExpressionMeta, StateSubactionMembershipMeta, TypeMeta } from "../../model";
+import {
+    ActionUsageMeta,
+    AllocationUsageMeta,
+    AnalysisCaseUsageMeta,
+    AttributeUsageMeta,
+    CalculationUsageMeta,
+    CaseUsageMeta,
+    ConnectionUsageMeta,
+    ConstraintUsageMeta,
+    ElementMeta,
+    EnumerationUsageMeta,
+    ExpressionMeta,
+    FeatureMeta,
+    FlowConnectionDefinitionMeta,
+    FlowConnectionUsageMeta,
+    InterfaceDefinitionMeta,
+    InterfaceUsageMeta,
+    ItemUsageMeta,
+    MetadataUsageMeta,
+    ObjectiveMembershipMeta,
+    OccurrenceUsageMeta,
+    OperatorExpressionMeta,
+    PartUsageMeta,
+    PortUsageMeta,
+    RenderingUsageMeta,
+    RequirementUsageMeta,
+    RequirementVerificationMembershipMeta,
+    SendActionUsageMeta,
+    StateDefinitionMeta,
+    StateSubactionMembershipMeta,
+    StateUsageMeta,
+    SubjectMembershipMeta,
+    SuccessionAsUsageMeta,
+    TransitionUsageMeta,
+    TypeMeta,
+    UsageMeta,
+    UseCaseUsageMeta,
+    VerificationCaseUsageMeta,
+    ViewDefinitionMeta,
+    ViewUsageMeta,
+    ViewpointUsageMeta,
+} from "../../model";
 import { SysMLType } from "../sysml-ast-reflection";
 import { KerMLValidator } from "./kerml-validator";
-import { validateSysML } from "./validation-registry";
+import { ModelValidationAcceptor, validateSysML } from "./validation-registry";
 
 /**
  * Implementation of custom validations.
  */
 export class SysMLValidator extends KerMLValidator {
     @validateSysML(ast.Usage)
-    validateUsage(node: ast.Usage, accept: ValidationAcceptor): void {
+    validateUsage(node: UsageMeta, accept: ModelValidationAcceptor): void {
         const isVariation = (m: ElementMeta | undefined): boolean => {
             return Boolean(m?.isAny(ast.Definition, ast.Usage) && m.isVariation);
         };
 
-        const meta = node.$meta;
-        if (meta.parent()?.is(ast.VariantMembership)) {
-            if (!isVariation(meta.owner())) {
+        const parent = node.parent();
+        if (parent?.is(ast.VariantMembership)) {
+            if (!isVariation(node.owner())) {
                 accept("error", "Variant is not owned by a variation", {
-                    node: meta.parent()?.ast() ?? node,
+                    element: parent,
                 });
             }
         } else if (
-            isVariation(meta.owner()) &&
-            !meta.parent()?.isAny(ast.ParameterMembership, ast.ObjectiveMembership)
+            isVariation(node.owner()) &&
+            !node.parent()?.isAny(ast.ParameterMembership, ast.ObjectiveMembership)
         ) {
             accept("error", "Variation can only own variants, parameters and objectives", {
-                node: meta.parent()?.ast() ?? node,
+                element: node.parent() ?? node,
             });
         }
     }
 
     @validateSysML(ast.AttributeUsage)
-    validateAttributeTypes(node: ast.AttributeUsage, accept: ValidationAcceptor): void {
+    validateAttributeTypes(node: AttributeUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.DataType, accept);
     }
 
     @validateSysML(ast.EnumerationUsage)
-    validateEnumerationUsage(node: ast.EnumerationUsage, accept: ValidationAcceptor): void {
+    validateEnumerationUsage(node: EnumerationUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.EnumerationDefinition, accept);
     }
 
     @validateSysML(ast.OccurrenceUsage, [ast.ItemUsage, ast.PortUsage, ast.Step])
-    validateOccurrenceUsage(node: ast.OccurrenceUsage, accept: ValidationAcceptor): void {
+    validateOccurrenceUsage(node: OccurrenceUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.Class, accept);
     }
 
     @validateSysML(ast.ItemUsage, [ast.PartUsage, ast.PortUsage, ast.MetadataUsage])
-    validateItemUsage(node: ast.ItemUsage, accept: ValidationAcceptor): void {
+    validateItemUsage(node: ItemUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.Structure, accept);
     }
 
     @validateSysML(ast.PartUsage, [ast.ConnectionUsage, ast.ViewUsage, ast.RenderingUsage])
-    validatePartUsage(node: ast.PartUsage, accept: ValidationAcceptor): void {
+    validatePartUsage(node: PartUsageMeta, accept: ModelValidationAcceptor): void {
         if (this.validateAllTypings(node, ast.Structure, accept)) {
             this.validateAtLeastTyping(node, ast.PartDefinition, accept);
         }
     }
 
     @validateSysML(ast.ActionUsage, [ast.StateUsage, ast.CalculationUsage, ast.FlowConnectionUsage])
-    validateActionUsage(node: ast.ActionUsage, accept: ValidationAcceptor): void {
+    validateActionUsage(node: ActionUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.Behavior, accept);
     }
 
     @validateSysML(ast.ConstraintUsage, [ast.RequirementUsage])
-    validateConstraintUsage(node: ast.ConstraintUsage, accept: ValidationAcceptor): void {
+    validateConstraintUsage(node: ConstraintUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.Predicate, accept);
     }
 
     @validateSysML(ast.CalculationUsage, [ast.CaseUsage])
-    validateCalculationUsage(node: ast.CalculationUsage, accept: ValidationAcceptor): void {
+    validateCalculationUsage(node: CalculationUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.SysMLFunction, accept);
     }
 
@@ -95,39 +135,39 @@ export class SysMLValidator extends KerMLValidator {
         ast.VerificationCaseUsage,
         ast.UseCaseUsage,
     ])
-    validateCaseUsage(node: ast.CaseUsage, accept: ValidationAcceptor): void {
+    validateCaseUsage(node: CaseUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.CaseDefinition, accept);
     }
 
     @validateSysML(ast.AnalysisCaseUsage)
-    validateAnalysisCaseUsage(node: ast.AnalysisCaseUsage, accept: ValidationAcceptor): void {
+    validateAnalysisCaseUsage(node: AnalysisCaseUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.AnalysisCaseDefinition, accept);
     }
 
     @validateSysML(ast.VerificationCaseUsage)
     validateVerificationCaseUsage(
-        node: ast.VerificationCaseUsage,
-        accept: ValidationAcceptor
+        node: VerificationCaseUsageMeta,
+        accept: ModelValidationAcceptor
     ): void {
         this.validateExactlyOneTyping(node, ast.VerificationCaseDefinition, accept);
     }
 
     @validateSysML(ast.UseCaseUsage)
-    validateUseCaseUsage(node: ast.UseCaseUsage, accept: ValidationAcceptor): void {
+    validateUseCaseUsage(node: UseCaseUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.UseCaseDefinition, accept);
     }
 
     @validateSysML(ast.OccurrenceUsage)
-    validateIndividualUsage(node: ast.OccurrenceUsage, accept: ValidationAcceptor): void {
+    validateIndividualUsage(node: OccurrenceUsageMeta, accept: ModelValidationAcceptor): void {
         if (!node.isIndividual) return;
         if (
-            node.$meta.allTypings().filter((t) => t.is(ast.OccurrenceDefinition) && t.isIndividual)
+            node.allTypings().filter((t) => t.is(ast.OccurrenceDefinition) && t.isIndividual)
                 .length !== 1
         ) {
             accept(
                 "error",
                 "Individual OccurrenceUsage must be typed by exactly one individual OccurrenceDefinition",
-                { node }
+                { element: node }
             );
         }
     }
@@ -137,67 +177,70 @@ export class SysMLValidator extends KerMLValidator {
         ast.InterfaceUsage,
         ast.AllocationUsage,
     ])
-    validateConnectionUsage(node: ast.ConnectionUsage, accept: ValidationAcceptor): void {
+    validateConnectionUsage(node: ConnectionUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.Association, accept);
     }
 
     @validateSysML(ast.FlowConnectionUsage)
-    validateFlowConnectionUsage(node: ast.FlowConnectionUsage, accept: ValidationAcceptor): void {
+    validateFlowConnectionUsage(
+        node: FlowConnectionUsageMeta,
+        accept: ModelValidationAcceptor
+    ): void {
         this.validateAllTypings(node, ast.Interaction, accept);
     }
 
     @validateSysML(ast.InterfaceUsage)
-    validateInterfaceUsage(node: ast.InterfaceUsage, accept: ValidationAcceptor): void {
+    validateInterfaceUsage(node: InterfaceUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.InterfaceDefinition, accept);
     }
 
     @validateSysML(ast.AllocationUsage)
-    validateAllocationUsage(node: ast.AllocationUsage, accept: ValidationAcceptor): void {
+    validateAllocationUsage(node: AllocationUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.AllocationDefinition, accept);
     }
 
     @validateSysML(ast.PortUsage)
-    validatePortUsage(node: ast.PortUsage, accept: ValidationAcceptor): void {
+    validatePortUsage(node: PortUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.PortDefinition, accept);
     }
 
     @validateSysML(ast.RequirementUsage, [ast.ViewpointUsage])
-    validateRequirementUsage(node: ast.RequirementUsage, accept: ValidationAcceptor): void {
+    validateRequirementUsage(node: RequirementUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.RequirementDefinition, accept);
     }
 
     @validateSysML(ast.StateUsage)
-    validateStateUsage(node: ast.StateUsage, accept: ValidationAcceptor): void {
+    validateStateUsage(node: StateUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateAllTypings(node, ast.Behavior, accept);
     }
 
     @validateSysML(ast.ViewUsage)
-    validateViewUsage(node: ast.ViewUsage, accept: ValidationAcceptor): void {
+    validateViewUsage(node: ViewUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.ViewDefinition, accept);
     }
 
     @validateSysML(ast.ViewpointUsage)
-    validateViewpointUsage(node: ast.ViewpointUsage, accept: ValidationAcceptor): void {
+    validateViewpointUsage(node: ViewpointUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.ViewpointDefinition, accept);
     }
 
     @validateSysML(ast.RenderingUsage)
-    validateRenderingUsage(node: ast.RenderingUsage, accept: ValidationAcceptor): void {
+    validateRenderingUsage(node: RenderingUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.RenderingDefinition, accept);
     }
 
     @validateSysML(ast.MetadataUsage)
     /* istanbul ignore next (maybe impossible to trigger since grammar disallows
         non-metaclass references) */
-    validateMetadataUsage(node: ast.MetadataUsage, accept: ValidationAcceptor): void {
+    validateMetadataUsage(node: MetadataUsageMeta, accept: ModelValidationAcceptor): void {
         this.validateExactlyOneTyping(node, ast.Metaclass, accept);
     }
 
     @validateSysML(ast.ViewDefinition)
     @validateSysML(ast.ViewUsage)
     validateViewRenderings(
-        node: ast.ViewDefinition | ast.ViewUsage,
-        accept: ValidationAcceptor
+        node: ViewDefinitionMeta | ViewUsageMeta,
+        accept: ModelValidationAcceptor
     ): void {
         this.atMostOneFeature(node, ast.RenderingUsage, accept);
     }
@@ -205,10 +248,10 @@ export class SysMLValidator extends KerMLValidator {
     @validateSysML(ast.StateDefinition)
     @validateSysML(ast.StateUsage)
     validateStateSubactions(
-        node: ast.StateDefinition | ast.StateUsage,
-        accept: ValidationAcceptor
+        node: StateDefinitionMeta | StateUsageMeta,
+        accept: ModelValidationAcceptor
     ): void {
-        const subactions = node.$meta
+        const subactions = node
             .featureMembers()
             .filter((m) => m.is(ast.StateSubactionMembership)) as StateSubactionMembershipMeta[];
         for (const kind of ["do", "entry", "exit"])
@@ -221,10 +264,10 @@ export class SysMLValidator extends KerMLValidator {
 
     @validateSysML(ast.FlowConnectionDefinition)
     validateFlowConnectionDefinitionEnds(
-        node: ast.FlowConnectionDefinition,
-        accept: ValidationAcceptor
+        node: FlowConnectionDefinitionMeta,
+        accept: ModelValidationAcceptor
     ): void {
-        const ends = node.$meta.ownedEnds();
+        const ends = node.ownedEnds();
         if (ends.length <= 2) return;
         this.apply(ends, "At most 2 end features are allowed in FlowConnectionDefinition", accept);
     }
@@ -232,49 +275,49 @@ export class SysMLValidator extends KerMLValidator {
     @validateSysML(ast.InterfaceDefinition)
     @validateSysML(ast.InterfaceUsage)
     validateInterfaceEnds(
-        node: ast.InterfaceDefinition | ast.InterfaceUsage,
-        accept: ValidationAcceptor
+        node: InterfaceDefinitionMeta | InterfaceUsageMeta,
+        accept: ModelValidationAcceptor
     ): void {
         this.apply(
-            node.$meta.ownedEnds().filter((f) => !f.is(ast.PortUsage)),
+            node.ownedEnds().filter((f) => !f.is(ast.PortUsage)),
             "An interface definition end must be a port",
             accept
         );
     }
 
     @validateSysML(ast.SubjectMembership)
-    validateSubjectMembers(node: ast.SubjectMembership, accept: ValidationAcceptor): void {
+    validateSubjectMembers(node: SubjectMembershipMeta, accept: ModelValidationAcceptor): void {
         this.atMostOneMember(node, ast.SubjectMembership, accept);
     }
 
     @validateSysML(ast.ObjectiveMembership)
-    validateObjectiveMembers(node: ast.ObjectiveMembership, accept: ValidationAcceptor): void {
+    validateObjectiveMembers(node: ObjectiveMembershipMeta, accept: ModelValidationAcceptor): void {
         this.atMostOneMember(node, ast.ObjectiveMembership, accept);
     }
 
     @validateSysML(ast.RequirementVerificationMembership)
     validateRequirementVerificationMembership(
-        node: ast.RequirementVerificationMembership,
-        accept: ValidationAcceptor
+        node: RequirementVerificationMembershipMeta,
+        accept: ModelValidationAcceptor
     ): void {
-        if (!node.$meta.isLegalVerification())
+        if (!node.isLegalVerification())
             accept(
                 "error",
                 "A requirement verification must be owned by the objective of a verification case",
-                { node }
+                { element: node }
             );
     }
 
     @validateSysML(ast.SendActionUsage)
-    validateSendActionUsage(node: ast.SendActionUsage, accept: ValidationAcceptor): void {
-        if (!node.$meta.sender?.element() && !node.$meta.receiver?.element())
+    validateSendActionUsage(node: SendActionUsageMeta, accept: ModelValidationAcceptor): void {
+        if (!node.sender?.element() && !node.receiver?.element())
             accept(
                 "error",
                 "Send action usage must have at least either a sender ('via') or receiver ('to')",
-                { node }
+                { element: node }
             );
         else {
-            const receiver = node.$meta.receiver?.element()?.value?.element();
+            const receiver = node.receiver?.element()?.value?.element();
             if (
                 (receiver?.is(ast.FeatureReferenceExpression) &&
                     receiver.expression?.element()?.is(ast.PortUsage)) ||
@@ -284,7 +327,7 @@ export class SysMLValidator extends KerMLValidator {
                 accept(
                     "warning",
                     "Sending to a port should be done through 'via' instead of 'to'",
-                    { node }
+                    { element: node }
                 );
             }
         }
@@ -293,12 +336,14 @@ export class SysMLValidator extends KerMLValidator {
     @validateSysML(ast.SuccessionAsUsage)
     @validateSysML(ast.TransitionUsage)
     validateNotParallel(
-        node: ast.SuccessionAsUsage | ast.TransitionUsage,
-        accept: ValidationAcceptor
+        node: SuccessionAsUsageMeta | TransitionUsageMeta,
+        accept: ModelValidationAcceptor
     ): void {
-        const owner = node.$meta.owner();
+        const owner = node.owner();
         if (owner?.isAny(ast.StateDefinition, ast.StateUsage) && owner.isParallel) {
-            accept("error", "Parallel state cannot have successions or transitions", { node });
+            accept("error", "Parallel state cannot have successions or transitions", {
+                element: node,
+            });
         }
     }
 
@@ -307,17 +352,18 @@ export class SysMLValidator extends KerMLValidator {
         ast.SelectExpression,
         ast.FeatureChainExpression,
     ])
-    validateQuantityExpression(node: ast.OperatorExpression, accept: ValidationAcceptor): void {
-        if (node.operator === "[") {
+    validateQuantityExpression(
+        node: OperatorExpressionMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        if (node.operator === "'['") {
             const arg = node.operands.at(1);
             if (!arg) return;
-            if (
-                !this.resultConforms(arg.$meta, "MeasurementReferences::TensorMeasurementReference")
-            ) {
+            if (!this.resultConforms(arg, "MeasurementReferences::TensorMeasurementReference")) {
                 accept(
                     "warning",
                     "Invalid quantity expression, expected a measurement reference unit",
-                    { node, property: "operands", index: 1 }
+                    { element: node, property: "operands", index: 1 }
                 );
             }
         }
@@ -341,12 +387,12 @@ export class SysMLValidator extends KerMLValidator {
     }
 
     protected validateAllTypings(
-        node: ast.Feature,
+        node: FeatureMeta,
         bound: SysMLType,
-        accept: ValidationAcceptor
+        accept: ModelValidationAcceptor
     ): boolean {
-        if (node.$meta.allTypings().some((t) => !t.is(bound))) {
-            accept("error", `${node.$type} must be typed by ${bound}`, { node });
+        if (node.allTypings().some((t) => !t.is(bound))) {
+            accept("error", `${node.nodeType()} must be typed by ${bound}`, { element: node });
             return false;
         }
 
@@ -354,12 +400,14 @@ export class SysMLValidator extends KerMLValidator {
     }
 
     protected validateAtLeastTyping(
-        node: ast.Feature,
+        node: FeatureMeta,
         bound: SysMLType,
-        accept: ValidationAcceptor
+        accept: ModelValidationAcceptor
     ): boolean {
-        if (!node.$meta.allTypings().find((t) => t.is(bound))) {
-            accept("error", `${node.$type} must be typed by at least one ${bound}`, { node });
+        if (!node.allTypings().find((t) => t.is(bound))) {
+            accept("error", `${node.nodeType()} must be typed by at least one ${bound}`, {
+                element: node,
+            });
             return false;
         }
 
@@ -367,13 +415,15 @@ export class SysMLValidator extends KerMLValidator {
     }
 
     protected validateExactlyOneTyping(
-        node: ast.Feature,
+        node: FeatureMeta,
         bound: SysMLType,
-        accept: ValidationAcceptor
+        accept: ModelValidationAcceptor
     ): boolean {
-        const typings = node.$meta.allTypings();
+        const typings = node.allTypings();
         if (typings.length !== 1 || !typings.find((t) => t.is(bound))) {
-            accept("error", `${node.$type} must be typed by exactly one ${bound}`, { node });
+            accept("error", `${node.nodeType()} must be typed by exactly one ${bound}`, {
+                element: node,
+            });
             return false;
         }
 

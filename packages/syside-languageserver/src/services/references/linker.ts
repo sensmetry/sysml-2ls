@@ -48,19 +48,19 @@ import {
 } from "../../generated/ast";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLScopeProvider } from "./scope-provider";
-import { SysMLError } from "../sysml-validation";
 import { SysMLDefaultServices } from "../services";
 import { LinkedReferenceInfo, MetamodelBuilder } from "../shared/workspace/metamodel-builder";
 import { TypeMap, typeIndex } from "../../model/types";
 import { sanitizeName } from "../../model/naming";
 import { SysMLConfigurationProvider } from "../shared/workspace/configuration-provider";
 import { SysMLNodeDescription } from "../shared/workspace/ast-descriptions";
-import { ElementMeta, MembershipMeta, NamespaceMeta } from "../../model";
+import { ElementMeta, MembershipMeta, NamespaceMeta, ImportMeta } from "../../model";
 import { AliasResolver, streamParents } from "../../utils/scope-util";
 import { KeysMatching } from "../../utils/common";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { followAlias } from "../../utils/ast-util";
 import { clearArtifacts } from "../../utils";
+import { TypedModelDiagnostic } from "../validation";
 
 /**
  * Reference used by SysML services that makes use of knowing that only Elements can be referenced
@@ -119,11 +119,6 @@ export class SysMLLinker extends DefaultLinker {
     protected readonly config: SysMLConfigurationProvider;
 
     /**
-     * Errors found while resolving imports
-     */
-    protected readonly importErrors = new MultiMap<LangiumDocument, SysMLError>();
-
-    /**
      * Map of AST node types to specific link functions as link order may be
      * important
      */
@@ -146,9 +141,6 @@ export class SysMLLinker extends DefaultLinker {
         document: LangiumDocument,
         cancelToken = CancellationToken.None
     ): Promise<void> {
-        // similar to the default but scope affecting references are linked
-        // first
-        this.importErrors.delete(document);
         await this.metamodelBuilder.preLink(undefined, document, cancelToken);
 
         for (const node of document.astNodes) {
@@ -194,13 +186,16 @@ export class SysMLLinker extends DefaultLinker {
                 // check that wildcard imports are valid
                 const namespace = imported.is(Membership) ? imported.element() : imported;
                 if (!namespace) {
-                    this.importErrors.add(document, {
+                    document.modelDiagnostics.add(imp, <TypedModelDiagnostic<ImportMeta>>{
+                        severity: "error",
                         // `namespace` is undefined only if `imported` has been
                         // successfully resolved to an alias
                         message: `Could not find Namespace referenced by ${ref?.$meta.text}`,
-                        node: impNode,
-                        property: "importedNamespace",
-                        index: index,
+                        element: imp,
+                        info: {
+                            property: "reference",
+                            index: index,
+                        },
                     });
                 }
             }
@@ -491,15 +486,6 @@ export class SysMLLinker extends DefaultLinker {
         } else if (resolved) {
             this.metamodelBuilder.onLinkedPart(refInfo as LinkedReferenceInfo, document);
         }
-    }
-
-    /**
-     * Get import errors related to `document`
-     * @param document document
-     * @returns Import errors in `document`
-     */
-    getImportErrors(document: LangiumDocument): readonly SysMLError[] {
-        return this.importErrors.get(document);
     }
 
     protected getAliasResolver(): AliasResolver {

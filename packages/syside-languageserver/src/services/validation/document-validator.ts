@@ -18,23 +18,26 @@ import {
     AstNode,
     CstNode,
     DefaultDocumentValidator,
-    DiagnosticInfo,
     findNodeForKeyword,
     findNodeForProperty,
-    getDocument,
+    interruptAndCheck,
     LangiumDocument,
+    toDiagnosticSeverity,
 } from "langium";
-import {
-    CancellationToken,
-    Diagnostic,
-    Range,
-    DiagnosticRelatedInformation,
-} from "vscode-languageserver";
-import { AstErrorInformation, SysMLError } from "../sysml-validation";
+import { CancellationToken, Diagnostic, Range } from "vscode-languageserver";
+import { AstErrorInformation } from "../sysml-validation";
 import { SysMLLinker } from "../references/linker";
 import { SysMLDefaultServices } from "../services";
 import { MetamodelBuilder } from "../shared/workspace/metamodel-builder";
 import { sanitizeRange } from "../../utils/common";
+import { ElementMeta } from "../../model";
+import {
+    BaseValidationRegistry,
+    ModelDiagnostic,
+    ModelDiagnosticInfo,
+    ModelValidationAcceptor,
+} from "./validation-registry";
+import { streamModel } from "../../utils/ast-util";
 
 /**
  * SysML document validator that additionally gathers SysML specific document
@@ -43,72 +46,89 @@ import { sanitizeRange } from "../../utils/common";
 export class SysMLDocumentValidator extends DefaultDocumentValidator {
     protected readonly linker: SysMLLinker;
     protected readonly metamodelBuilder: MetamodelBuilder;
+    protected override validationRegistry: BaseValidationRegistry;
 
     constructor(services: SysMLDefaultServices) {
         super(services);
         this.linker = services.references.Linker;
         this.metamodelBuilder = services.shared.workspace.MetamodelBuilder;
+        this.validationRegistry = services.validation.ValidationRegistry;
     }
 
-    protected createDiagnostic(
-        severity: "error" | "warning" | "info" | "hint",
-        code: string | number | undefined,
-        error: SysMLError
-    ): Diagnostic | undefined {
-        if (!("node" in error)) return;
-
-        const info: DiagnosticInfo<AstNode, string> = {
-            node: error.node,
-            property: error.property,
-            keyword: error.keyword,
-            index: error.index,
-            code: code,
-            range: getDiagnosticRange(error),
-            relatedInformation: error?.relatedInformation
-                ?.filter((e): e is AstErrorInformation => "node" in e)
-                .map((related) => {
-                    const i: DiagnosticRelatedInformation = {
-                        message: related.message,
-                        location: {
-                            uri: getDocument(related.node).uriString,
-                            range: getDiagnosticRange(related),
-                        },
-                    };
-                    return i;
-                }),
+    async validateElement<T extends ElementMeta>(
+        element: T,
+        document: LangiumDocument,
+        cancelToken = CancellationToken.None,
+        items: ModelDiagnostic[] = []
+    ): Promise<ModelDiagnostic[]> {
+        const acceptor: ModelValidationAcceptor = <N extends ElementMeta>(
+            severity: "error" | "warning" | "info" | "hint",
+            message: string,
+            info: ModelDiagnosticInfo<N>
+        ) => {
+            items.push({ severity, message, element: info.element, info });
         };
-        return this.toDiagnostic(severity, error.message, info);
+
+        const checks = this.validationRegistry.getModelChecks(element.nodeType());
+        await Promise.all(checks.map((check) => check(element, acceptor, cancelToken)));
+        return items;
     }
 
-    override async validateDocument(
+    async validateModel(
+        rootNode: ElementMeta,
+        document: LangiumDocument,
+        cancelToken = CancellationToken.None
+    ): Promise<ModelDiagnostic[]> {
+        const validationItems: ModelDiagnostic[] = [];
+        const acceptor: ModelValidationAcceptor = <N extends ElementMeta>(
+            severity: "error" | "warning" | "info" | "hint",
+            message: string,
+            info: ModelDiagnosticInfo<N>
+        ) => {
+            validationItems.push({ severity, message, element: info.element, info });
+        };
+
+        await Promise.all(
+            streamModel(rootNode).map(async (node) => {
+                await interruptAndCheck(cancelToken);
+                const checks = this.validationRegistry.getModelChecks(node.nodeType());
+                for (const check of checks) {
+                    await check(node, acceptor, cancelToken);
+                }
+            })
+        );
+        return validationItems;
+    }
+
+    protected override async validateAst(
+        rootNode: AstNode,
         document: LangiumDocument<AstNode>,
         cancelToken?: CancellationToken | undefined
     ): Promise<Diagnostic[]> {
-        const diagnostics = await super.validateDocument(document, cancelToken);
+        const diagnostics = await this.validateModel(
+            rootNode.$meta as ElementMeta,
+            document,
+            cancelToken
+        );
 
-        // collect import errors
-        for (const importError of this.linker.getImportErrors(document)) {
-            const diagnostic = this.createDiagnostic(
-                "error",
-                SysMLDocumentValidator.ImportError,
-                importError
-            );
-            if (diagnostic) diagnostics.push(diagnostic);
-        }
+        // don't want to completely rewrite `validateDocument` so mutating
+        // document here instead
+        diagnostics.forEach((d) => document.modelDiagnostics.add(d.element, d));
+        return diagnostics.map((d) => this.fromModelDiagnostic(d));
+    }
 
-        // collect metamodel errors
-        if (!document.buildOptions?.ignoreMetamodelErrors) {
-            for (const metamodelError of this.metamodelBuilder.getMetamodelErrors(document)) {
-                const diagnostic = this.createDiagnostic(
-                    "error",
-                    SysMLDocumentValidator.MetamodelError,
-                    metamodelError
-                );
-                if (diagnostic) diagnostics.push(diagnostic);
-            }
-        }
-
-        return diagnostics;
+    protected fromModelDiagnostic(diagnostic: ModelDiagnostic): Diagnostic {
+        return {
+            message: diagnostic.message,
+            range: getModelDiagnosticRange(diagnostic.info, diagnostic.element),
+            severity: toDiagnosticSeverity(diagnostic.severity),
+            code: diagnostic.info.code,
+            codeDescription: diagnostic.info.codeDescription,
+            tags: diagnostic.info.tags,
+            relatedInformation: diagnostic.info.relatedInformation,
+            data: diagnostic.info.data,
+            source: this.getSource(),
+        };
     }
 }
 
@@ -118,15 +138,18 @@ export namespace SysMLDocumentValidator {
     export const MetamodelError = "metamodel-error";
 }
 
-function getDiagnosticRangeImpl(info: AstErrorInformation): Range {
+function getDiagnosticRangeImpl(
+    info: Omit<AstErrorInformation, "node" | "message">,
+    node: AstNode
+): Range {
     let cstNode: CstNode | undefined;
     if (info.range) return info.range;
     if (typeof info.property === "string") {
-        cstNode = findNodeForProperty(info.node.$cstNode, info.property, info.index);
+        cstNode = findNodeForProperty(node.$cstNode, info.property, info.index);
     } else if (typeof info.keyword === "string") {
-        cstNode = findNodeForKeyword(info.node.$cstNode, info.keyword, info.index);
+        cstNode = findNodeForKeyword(node.$cstNode, info.keyword, info.index);
     }
-    cstNode ??= info.node.$cstNode;
+    cstNode ??= node.$cstNode;
     if (!cstNode) {
         return {
             start: { line: 0, character: 0 },
@@ -139,5 +162,24 @@ function getDiagnosticRangeImpl(info: AstErrorInformation): Range {
 export function getDiagnosticRange(info: AstErrorInformation): Range {
     // need to sanitize the returned range since CST node ranges may become
     // invalidated by LSP and return end with nulls
-    return sanitizeRange(getDiagnosticRangeImpl(info));
+    return sanitizeRange(getDiagnosticRangeImpl(info, info.node));
+}
+
+const EMPTY_RANGE: Range = { start: { character: 0, line: 0 }, end: { character: 0, line: 0 } };
+
+export function getModelDiagnosticRange(
+    info: Omit<ModelDiagnosticInfo<ElementMeta, string>, "element">,
+    element: ElementMeta
+): Range {
+    let node = element.ast();
+    if (node) return sanitizeRange(getDiagnosticRangeImpl(info, node));
+
+    let current = element.parent();
+    while (current) {
+        node = current.ast();
+        if (node?.$cstNode) return node.$cstNode.range;
+        current = current.parent();
+    }
+
+    return EMPTY_RANGE;
 }

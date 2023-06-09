@@ -138,6 +138,8 @@ export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
         // to access them
         documents.forEach((doc) => {
             doc.buildOptions = options;
+            // clear diagnostics so that services can add own diagnostics
+            doc.modelDiagnostics.clear();
         });
 
         if (this.config.get().logStatistics) {
