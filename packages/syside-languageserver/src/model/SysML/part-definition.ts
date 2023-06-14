@@ -16,7 +16,9 @@
 
 import { PartDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ItemDefinitionMeta } from "./item-definition";
+import { ItemDefinitionMeta, ItemDefinitionOptions } from "./item-definition";
+
+export type PartDefinitionOptions = ItemDefinitionOptions;
 
 @metamodelOf(PartDefinition, {
     base: "Parts::Part",

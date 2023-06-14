@@ -14,10 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { ViewRenderingMembership } from "../../../generated/ast";
+import { RelationshipOptionsBody } from "../../KerML";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { RenderingUsageMeta } from "../rendering-usage";
+import { ViewDefinitionMeta } from "../view-definition";
+import { ViewUsageMeta } from "../view-usage";
 
 @metamodelOf(ViewRenderingMembership)
 export class ViewRenderingMembershipMeta<
@@ -25,6 +29,15 @@ export class ViewRenderingMembershipMeta<
 > extends FeatureMembershipMeta<T> {
     override ast(): ViewRenderingMembership | undefined {
         return this._ast as ViewRenderingMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<RenderingUsageMeta, ViewDefinitionMeta | ViewUsageMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

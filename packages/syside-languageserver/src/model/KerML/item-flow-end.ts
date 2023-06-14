@@ -16,12 +16,16 @@
 
 import { ItemFlowEnd } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { FeatureMeta } from "./_internal";
+import { EndFeatureMembershipMeta, FeatureMeta, FeatureOptions } from "./_internal";
 
 export const ImplicitItemFlowEnds = {
     sourceOutput: "Transfers::Transfer::source::sourceOutput",
     targetInput: "Transfers::Transfer::target::targetInput",
 };
+
+export interface ItemFlowEndOptions extends FeatureOptions {
+    parent?: EndFeatureMembershipMeta;
+}
 
 @metamodelOf(ItemFlowEnd, ImplicitItemFlowEnds)
 export class ItemFlowEndMeta extends FeatureMeta {

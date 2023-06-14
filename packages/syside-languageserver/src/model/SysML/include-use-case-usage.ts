@@ -23,8 +23,12 @@ import {
 } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
 import { metamodelOf } from "../metamodel";
-import { PerformActionUsageMeta } from "./perform-action-usage";
-import { UseCaseUsageMeta } from "./use-case-usage";
+import { PerformActionUsageMeta, PerformActionUsageOptions } from "./perform-action-usage";
+import { UseCaseUsageMeta, UseCaseUsageOptions } from "./use-case-usage";
+
+export interface IncludeUseCaseUsageOptions
+    extends PerformActionUsageOptions,
+        UseCaseUsageOptions {}
 
 @metamodelOf(IncludeUseCaseUsage, {
     base: "UseCases::useCases",

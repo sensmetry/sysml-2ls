@@ -16,11 +16,13 @@
 
 import { Succession } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectorMeta } from "./_internal";
+import { ConnectorMeta, ConnectorOptions } from "./_internal";
 
 export const ImplicitSuccessions = {
     binary: "Occurrences::happensBeforeLinks",
 };
+
+export type SuccessionOptions = ConnectorOptions;
 
 @metamodelOf(Succession, ImplicitSuccessions)
 export class SuccessionMeta extends ConnectorMeta {

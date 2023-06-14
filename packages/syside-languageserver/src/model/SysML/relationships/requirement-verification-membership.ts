@@ -21,9 +21,12 @@ import {
     VerificationCaseDefinition,
     VerificationCaseUsage,
 } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { RequirementConstraintMembershipMeta } from "./requirement-constraint-membership";
 import { RequirementUsageMeta } from "../requirement-usage";
+import { AstNode, LangiumDocument } from "langium";
+import { RelationshipOptionsBody } from "../../KerML";
+import { RequirementDefinitionMeta } from "../requirement-definition";
 
 @metamodelOf(RequirementVerificationMembership)
 export class RequirementVerificationMembershipMeta<
@@ -32,11 +35,24 @@ export class RequirementVerificationMembershipMeta<
     override ast(): RequirementVerificationMembership | undefined {
         return this._ast as RequirementVerificationMembership;
     }
+
     isLegalVerification(): boolean {
         let owner = this.owner();
         if (!owner?.is(RequirementUsage) || !owner.parent()?.is(ObjectiveMembership)) return false;
         owner = owner.owner();
         return Boolean(owner?.isAny(VerificationCaseDefinition, VerificationCaseUsage));
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<
+            RequirementUsageMeta,
+            RequirementDefinitionMeta | RequirementUsageMeta
+        >
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

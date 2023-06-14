@@ -16,14 +16,16 @@
 
 import { Mixin } from "ts-mixer";
 import { AttributeDefinition } from "../../generated/ast";
-import { DataTypeMeta } from "../KerML/data-type";
+import { DataTypeMeta, DataTypeOptions } from "../KerML/data-type";
 import { metamodelOf } from "../metamodel";
-import { DefinitionMeta } from "./definition";
+import { DefinitionMeta, DefinitionOptions } from "./definition";
+
+export interface AttributeDefinitionOptions extends DataTypeOptions, DefinitionOptions {}
 
 @metamodelOf(AttributeDefinition, {
     base: "Base::DataValue",
 })
-export class AttributeDefinitionMeta extends Mixin(DefinitionMeta, DataTypeMeta) {
+export class AttributeDefinitionMeta extends Mixin(DataTypeMeta, DefinitionMeta) {
     override ast(): AttributeDefinition | undefined {
         return this._ast as AttributeDefinition;
     }

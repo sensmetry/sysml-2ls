@@ -16,7 +16,9 @@
 
 import { InterfaceDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectionDefinitionMeta } from "./connection-definition";
+import { ConnectionDefinitionMeta, ConnectionDefinitionOptions } from "./connection-definition";
+
+export type InterfaceDefinitionOptions = ConnectionDefinitionOptions;
 
 @metamodelOf(InterfaceDefinition, {
     base: "Interfaces::Interface",

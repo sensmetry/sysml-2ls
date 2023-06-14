@@ -20,6 +20,7 @@ import {
     AllocationUsageMeta,
     AnalysisCaseUsageMeta,
     AttributeUsageMeta,
+    BasicMetamodel,
     CalculationUsageMeta,
     CaseUsageMeta,
     ConnectionUsageMeta,
@@ -44,7 +45,6 @@ import {
     RequirementVerificationMembershipMeta,
     SendActionUsageMeta,
     StateDefinitionMeta,
-    StateSubactionMembershipMeta,
     StateUsageMeta,
     SubjectMembershipMeta,
     SuccessionAsUsageMeta,
@@ -253,7 +253,7 @@ export class SysMLValidator extends KerMLValidator {
     ): void {
         const subactions = node
             .featureMembers()
-            .filter((m) => m.is(ast.StateSubactionMembership)) as StateSubactionMembershipMeta[];
+            .filter(BasicMetamodel.is(ast.StateSubactionMembership));
         for (const kind of ["do", "entry", "exit"])
             this.atMostOne(
                 subactions.filter((m) => m.kind === kind),
@@ -379,7 +379,7 @@ export class SysMLValidator extends KerMLValidator {
             }
 
             return expr.args
-                .filter((arg): arg is ExpressionMeta => Boolean(arg?.is(ast.Expression)))
+                .filter(BasicMetamodel.is(ast.Expression))
                 .some((arg) => this.resultConforms(arg, type));
         }
 

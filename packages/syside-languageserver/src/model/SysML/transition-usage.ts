@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import {
     ActionDefinition,
     ActionUsage,
@@ -30,12 +31,16 @@ import {
     OwningMembershipMeta,
     ParameterMembershipMeta,
 } from "../KerML/_internal";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { AcceptActionUsageMeta } from "./accept-action-usage";
-import { ActionUsageMeta } from "./action-usage";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
+import { ReferenceUsageMeta } from "./reference-usage";
 import { TransitionFeatureMembershipMeta } from "./relationships";
 import { SuccessionAsUsageMeta } from "./succession-as-usage";
 import { UsageMeta } from "./usage";
+
+// TODO: add source, accepter, guard, effect, then, else
+export type TransitionUsageOptions = ActionUsageOptions;
 
 @metamodelOf(TransitionUsage, {
     base: "Actions::transitionActions",
@@ -44,9 +49,8 @@ import { UsageMeta } from "./usage";
 })
 export class TransitionUsageMeta extends ActionUsageMeta {
     private _source?: MembershipMeta<FeatureMeta> | undefined;
-    // TODO: non-optional
-    private _transitionLinkSource?: ParameterMembershipMeta<UsageMeta> | undefined;
-    private _payload?: ParameterMembershipMeta<UsageMeta> | undefined;
+    private _transitionLinkSource: ParameterMembershipMeta<UsageMeta>;
+    private _payload: ParameterMembershipMeta<UsageMeta>;
     private _accepter?: TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined;
     private _guard?: TransitionFeatureMembershipMeta<ExpressionMeta> | undefined;
     private _effect?: TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined;
@@ -61,15 +65,12 @@ export class TransitionUsageMeta extends ActionUsageMeta {
         this._source = value;
     }
 
-    public get transitionLinkSource(): ParameterMembershipMeta<UsageMeta> | undefined {
+    public get transitionLinkSource(): ParameterMembershipMeta<UsageMeta> {
         return this._transitionLinkSource;
     }
 
     public get payload(): ParameterMembershipMeta<UsageMeta> | undefined {
         return this._accepter ? this._payload : undefined;
-    }
-    public set payload(value: ParameterMembershipMeta<UsageMeta> | undefined) {
-        this._payload = value;
     }
 
     @enumerable
@@ -146,7 +147,7 @@ export class TransitionUsageMeta extends ActionUsageMeta {
     }
 
     transitionLinkFeature(): FeatureMeta | undefined {
-        return this.transitionLinkSource?.element();
+        return this.transitionLinkSource.element();
     }
 
     override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
@@ -169,10 +170,46 @@ export class TransitionUsageMeta extends ActionUsageMeta {
 
     protected override collectDeclaration(parts: ElementParts): void {
         super.collectDeclaration(parts);
-        for (const kw of ["source", "accepter", "guard", "effect", "then", "else"] as const) {
+        for (const kw of [
+            "source",
+            "transitionLinkSource",
+            "payload",
+            "accepter",
+            "guard",
+            "effect",
+            "then",
+            "else",
+        ] as const) {
             const value = this[kw];
             if (value) parts.push([kw, [value]]);
         }
+    }
+
+    protected static applyTransitionOptions(
+        _model: TransitionUsageMeta,
+        _options: TransitionUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: TransitionUsageOptions
+    ): T["$meta"] {
+        const usage = super.create(provider, document, options) as TransitionUsageMeta;
+        if (options) TransitionUsageMeta.applyTransitionOptions(usage, options);
+
+        for (const prop of ["_transitionLinkSource", "_payload"] as const) {
+            const target = ReferenceUsageMeta.create(provider, document);
+            const member = ParameterMembershipMeta.create(provider, document, { target });
+
+            (usage[prop] as ParameterMembershipMeta) = member;
+            usage.takeOwnership(member);
+        }
+
+        return usage;
     }
 }
 

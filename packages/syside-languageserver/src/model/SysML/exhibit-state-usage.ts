@@ -18,13 +18,15 @@ import { Mixin } from "ts-mixer";
 import { ExhibitStateUsage, ReferenceSubsetting } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
 import { metamodelOf } from "../metamodel";
-import { PerformActionUsageMeta } from "./perform-action-usage";
-import { StateUsageMeta } from "./state-usage";
+import { PerformActionUsageMeta, PerformActionUsageOptions } from "./perform-action-usage";
+import { StateUsageMeta, StateUsageOptions } from "./state-usage";
+
+export interface ExhibitStateUsageOptions extends PerformActionUsageOptions, StateUsageOptions {}
 
 @metamodelOf(ExhibitStateUsage, {
     performedAction: "Parts::Part::exhibitedStates",
 })
-export class ExhibitStateUsageMeta extends Mixin(StateUsageMeta, PerformActionUsageMeta) {
+export class ExhibitStateUsageMeta extends Mixin(PerformActionUsageMeta, StateUsageMeta) {
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");

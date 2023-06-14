@@ -17,11 +17,13 @@
 import { Class } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { metamodelOf } from "../metamodel";
-import { ClassifierMeta } from "./_internal";
+import { ClassifierMeta, ClassifierOptions } from "./_internal";
 
 export const ImplicitClasses = {
     base: "Occurrences::Occurrence",
 };
+
+export type ClassOptions = ClassifierOptions;
 
 @metamodelOf(Class, ImplicitClasses)
 export class ClassMeta extends ClassifierMeta {

@@ -14,10 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { StakeholderMembership } from "../../../generated/ast";
+import { RelationshipOptionsBody } from "../../KerML";
 import { ParameterMembershipMeta } from "../../KerML/relationships/parameter-membership";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { PartUsageMeta } from "../part-usage";
+import { RequirementDefinitionMeta } from "../requirement-definition";
+import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(StakeholderMembership)
 export class StakeholderMembershipMeta<
@@ -25,6 +29,18 @@ export class StakeholderMembershipMeta<
 > extends ParameterMembershipMeta<T> {
     override ast(): StakeholderMembership | undefined {
         return this._ast as StakeholderMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<
+            PartUsageMeta,
+            RequirementDefinitionMeta | RequirementUsageMeta
+        >
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

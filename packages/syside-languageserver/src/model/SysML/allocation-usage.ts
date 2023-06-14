@@ -16,7 +16,9 @@
 
 import { AllocationUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectionUsageMeta } from "./connection-usage";
+import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
+
+export type AllocationUsageOptions = ConnectionUsageOptions;
 
 @metamodelOf(AllocationUsage, {
     base: "Allocations::allocations",

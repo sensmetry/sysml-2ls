@@ -16,7 +16,9 @@
 
 import { RequirementDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConstraintDefinitionMeta } from "./constraint-definition";
+import { ConstraintDefinitionMeta, ConstraintDefinitionOptions } from "./constraint-definition";
+
+export type RequirementDefinitionOptions = ConstraintDefinitionOptions;
 
 @metamodelOf(RequirementDefinition, {
     base: "Requirements::RequirementCheck",

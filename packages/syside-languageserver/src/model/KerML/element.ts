@@ -14,10 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream, stream } from "langium";
+import { AstNode, LangiumDocument, Stream, stream } from "langium";
 import { Element, Membership, MembershipImport } from "../../generated/ast";
 import { SysMLNodeDescription } from "../../services/shared/workspace/ast-descriptions";
-import { BasicMetamodel, metamodelOf } from "../metamodel";
+import {
+    BasicMetamodel,
+    ElementIDProvider,
+    MetatypeProto,
+    ModelElementOptions,
+    metamodelOf,
+} from "../metamodel";
 import { computeQualifiedName, Name } from "../naming";
 import {
     CommentMeta,
@@ -46,6 +52,12 @@ export function namedMembership(
 }
 
 export type LazyMetaclass = LazyGetter<MetadataFeatureMeta | undefined>;
+
+export interface ElementOptions<Parent extends ElementMeta | undefined = ElementMeta>
+    extends ModelElementOptions<Parent> {
+    declaredShortName?: string;
+    declaredName?: string;
+}
 
 @metamodelOf(Element, "abstract")
 export abstract class ElementMeta extends BasicMetamodel<Element> {
@@ -323,6 +335,22 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
      */
     invalidateMemberCaches(): void {
         // empty
+    }
+
+    protected static applyElementOptions(model: ElementMeta, options: ElementOptions): void {
+        if (options?.declaredName) model.declaredName = options.declaredName;
+        if (options?.declaredShortName) model.declaredShortName = options.declaredShortName;
+    }
+
+    protected static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ElementOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as ElementMeta;
+        if (options) ElementMeta.applyElementOptions(model, options);
+        return model;
     }
 }
 

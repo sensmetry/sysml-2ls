@@ -18,8 +18,11 @@ import { AcceptActionUsage, TransitionFeatureMembership } from "../../generated/
 import { NonNullable, enumerable } from "../../utils";
 import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
 import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
+
+// TODO: add payload and receiver
+export type AcceptActionUsageOptions = ActionUsageOptions;
 
 @metamodelOf(AcceptActionUsage, {
     base: "Actions::acceptActions",

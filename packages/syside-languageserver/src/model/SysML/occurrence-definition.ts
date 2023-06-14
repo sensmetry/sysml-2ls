@@ -16,9 +16,11 @@
 
 import { Mixin } from "ts-mixer";
 import { OccurrenceDefinition } from "../../generated/ast";
-import { ClassMeta } from "../KerML/class";
+import { ClassMeta, ClassOptions } from "../KerML/class";
 import { metamodelOf } from "../metamodel";
-import { DefinitionMeta } from "./definition";
+import { DefinitionMeta, DefinitionOptions } from "./definition";
+
+export interface OccurrenceDefinitionOptions extends ClassOptions, DefinitionOptions {}
 
 @metamodelOf(OccurrenceDefinition, {
     base: "Occurrences::Occurrence",

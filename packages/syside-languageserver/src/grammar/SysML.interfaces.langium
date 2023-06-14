@@ -53,7 +53,6 @@ interface PartUsage extends ItemUsage {
 }
 
 interface PortDefinition extends OccurrenceDefinition, Structure {
-    conjugated?: OwningMembership;
 }
 
 interface PortUsage extends OccurrenceUsage {}
@@ -61,7 +60,6 @@ interface PortUsage extends OccurrenceUsage {}
 interface ActionDefinition extends OccurrenceDefinition, Behavior {}
 
 interface ActionUsage extends OccurrenceUsage, Step {
-    isParallel: boolean;
 }
 
 interface IfActionUsage extends ActionUsage {
@@ -75,6 +73,7 @@ interface StateDefinition extends ActionDefinition {
 }
 
 interface StateUsage extends ActionUsage {
+    isParallel: boolean;
 }
 
 interface ExhibitStateUsage extends StateUsage, PerformActionUsage {}

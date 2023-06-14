@@ -17,7 +17,9 @@
 import { EnumerationDefinition } from "../../generated/ast";
 import { enumerable } from "../../utils";
 import { metamodelOf } from "../metamodel";
-import { AttributeDefinitionMeta } from "./attribute-definition";
+import { AttributeDefinitionMeta, AttributeDefinitionOptions } from "./attribute-definition";
+
+export type EnumerationDefinitionOptions = AttributeDefinitionOptions;
 
 @metamodelOf(EnumerationDefinition)
 export class EnumerationDefinitionMeta extends AttributeDefinitionMeta {

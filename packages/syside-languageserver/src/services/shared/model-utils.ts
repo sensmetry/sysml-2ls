@@ -14,17 +14,13 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ElementID, FeatureChainingMeta, FeatureMeta } from "../../model";
-
-class ElementIdProvider {
-    private count = 0;
-
-    next(): number {
-        // sequential IDs are simple and fast but may not be best if used as
-        // hash keys
-        return this.count++;
-    }
-}
+import {
+    ElementID,
+    ElementIDProvider,
+    FeatureChainingMeta,
+    FeatureMeta,
+    basicIdProvider,
+} from "../../model";
 
 /**
  * Utilities for working with the internal model. This is a class instead of the
@@ -32,14 +28,14 @@ class ElementIdProvider {
  * all used modules into one and then singletons are different per module.
  */
 export class ModelUtil {
-    protected provider = new ElementIdProvider();
+    readonly idProvider: ElementIDProvider = basicIdProvider();
 
     /**
      *
      * @returns An element ID for use when creating internal models programmatically
      */
     createId(): ElementID {
-        return this.provider.next();
+        return this.idProvider();
     }
 
     /**
@@ -49,23 +45,24 @@ export class ModelUtil {
      * @returns {@link chained}
      */
     addChainingFeature(chained: FeatureMeta, chaining: FeatureMeta): FeatureMeta {
-        const relationship = new FeatureChainingMeta(this.createId());
-        relationship.setElement(chaining);
+        const relationship = FeatureChainingMeta.create(this.idProvider, chained.document, {
+            target: chaining,
+        });
         chained.addFeatureRelationship(relationship);
         return chained;
     }
 
     /**
      * Constructs a feature that chains all {@link features}
-     * @param parent the constructed feature parent
      * @param features chaining features
      * @returns
      */
-    chainFeatures(...features: FeatureMeta[]): FeatureMeta {
-        const chained = new FeatureMeta(this.createId());
-        for (const feature of features) {
-            const chaining = feature.chainingFeatures;
-            if (chaining.length === 0) this.addChainingFeature(chained, feature);
+    chainFeatures(feature: FeatureMeta, ...features: FeatureMeta[]): FeatureMeta {
+        const chained = FeatureMeta.create(this.idProvider, feature.document);
+
+        for (const feat of [feature, ...features]) {
+            const chaining = feat.chainingFeatures;
+            if (chaining.length === 0) this.addChainingFeature(chained, feat);
             else chaining.forEach((f) => this.addChainingFeature(chained, f));
         }
 

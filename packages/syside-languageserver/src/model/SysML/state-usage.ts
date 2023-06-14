@@ -14,9 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { StateDefinition, StateUsage } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
+
+export interface StateUsageOptions extends ActionUsageOptions {
+    isParallel?: boolean;
+}
 
 @metamodelOf(StateUsage, {
     base: "States::stateActions",
@@ -25,6 +30,8 @@ import { ActionUsageMeta } from "./action-usage";
     ownedAction: "Parts::Part::ownedStates",
 })
 export class StateUsageMeta extends ActionUsageMeta {
+    isParallel = false;
+
     override getSubactionType(): string | undefined {
         if (this.isExclusiveState()) return "exclusiveState";
         if (this.isSubstate()) return "substate";
@@ -44,6 +51,17 @@ export class StateUsageMeta extends ActionUsageMeta {
 
     override ast(): StateUsage | undefined {
         return this._ast as StateUsage;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: StateUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as StateUsageMeta;
+        if (options) model.isParallel = Boolean(options.isParallel);
+        return model;
     }
 }
 

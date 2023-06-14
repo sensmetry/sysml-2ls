@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import {
     ActionDefinition,
     ActionUsage,
@@ -28,8 +29,15 @@ import {
 } from "../../generated/ast";
 import { enumerable } from "../../utils";
 import { ElementMeta } from "../KerML";
-import { FeatureMeta } from "../KerML/feature";
-import { metamodelOf } from "../metamodel";
+import { FeatureMeta, FeatureOptions } from "../KerML/feature";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+
+export interface UsageOptions extends FeatureOptions {
+    isVariation?: boolean;
+    isIndividual?: boolean;
+    isReference?: boolean;
+    portionKind?: PortionKind;
+}
 
 @metamodelOf(Usage)
 export class UsageMeta extends FeatureMeta {
@@ -114,6 +122,24 @@ export class UsageMeta extends FeatureMeta {
     isEntryExitAction(): boolean {
         const parent = this.parent();
         return !!parent?.is(StateSubactionMembership) && parent.kind !== "do";
+    }
+
+    protected static applyUsageOptions(model: UsageMeta, options: UsageOptions): void {
+        model.isVariation = Boolean(options.isVariation);
+        model.isIndividual = Boolean(options.isIndividual);
+        model._isReference = Boolean(options.isReference);
+        model.portionKind = options.portionKind;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: UsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as UsageMeta;
+        if (options) UsageMeta.applyUsageOptions(model, options);
+        return model;
     }
 }
 

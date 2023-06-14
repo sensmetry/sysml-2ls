@@ -16,9 +16,13 @@
 
 import { Mixin } from "ts-mixer";
 import { SuccessionFlowConnectionUsage } from "../../generated/ast";
-import { SuccessionItemFlowMeta } from "../KerML/succession-item-flow";
+import { SuccessionItemFlowMeta, SuccessionItemFlowOptions } from "../KerML/succession-item-flow";
 import { metamodelOf } from "../metamodel";
-import { FlowConnectionUsageMeta } from "./flow-connection-usage";
+import { FlowConnectionUsageMeta, FlowConnectionUsageOptions } from "./flow-connection-usage";
+
+export interface SuccessionFlowConnectionUsageOptions
+    extends SuccessionItemFlowOptions,
+        FlowConnectionUsageOptions {}
 
 @metamodelOf(SuccessionFlowConnectionUsage, {
     base: "Connections::successionFlowConnections",

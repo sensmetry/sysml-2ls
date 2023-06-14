@@ -143,18 +143,19 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
 
         // feature created only for evaluation, parent errors are not useful here
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const feature = new FeatureMeta(this.util.createId());
+        const feature = FeatureMeta.create(this.util.idProvider, target.document);
         if (target.is(Type)) {
-            const typing = new FeatureTypingMeta(this.util.createId());
-            typing.isImplied = true;
-            typing.setElement(target);
+            const typing = FeatureTypingMeta.create(this.util.idProvider, target.document, {
+                isImplied: true,
+                target: target,
+            });
             feature.addSpecialization(typing);
         }
 
         return feature;
     }
 
-    evaluateFeatureChain(features: FeatureMeta[], type: TypeMeta): ExpressionResult {
+    evaluateFeatureChain(features: readonly FeatureMeta[], type: TypeMeta): ExpressionResult {
         if (features.length === 0) return [];
         const values = this.evaluateFeature(features[0], type);
         if (features.length === 1) return values;
@@ -311,8 +312,9 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
             return this.evaluateFeatureChain(feature.chainingFeatures, type);
         }
 
+        // readonly arrays can't be reversed...
         const types =
-            type.is(Feature) && type.chainings.length > 0 ? type.chainingFeatures : [type];
+            type.is(Feature) && type.chainings.length > 0 ? [...type.chainingFeatures] : [type];
 
         for (const t of types.reverse()) {
             if (

@@ -16,8 +16,9 @@
 
 import { Mixin } from "ts-mixer";
 import { SuccessionItemFlow } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { ItemFlowMeta, SuccessionMeta } from "./_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ItemFlowMeta, ItemFlowOptions, SuccessionMeta, SuccessionOptions } from "./_internal";
+import { AstNode, LangiumDocument } from "langium";
 
 export const ImplicitSuccessionItemFlows = {
     base: "Transfers::flowTransfersBefore",
@@ -26,12 +27,28 @@ export const ImplicitSuccessionItemFlows = {
     ownedPerformance: "Objects::Object::ownedPerformances",
 };
 
-// TODO: implement implicit kind selection
+export interface SuccessionItemFlowOptions extends ItemFlowOptions, SuccessionOptions {}
 
 @metamodelOf(SuccessionItemFlow, ImplicitSuccessionItemFlows)
 export class SuccessionItemFlowMeta extends Mixin(ItemFlowMeta, SuccessionMeta) {
     override ast(): SuccessionItemFlow | undefined {
         return this._ast as SuccessionItemFlow;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: SuccessionItemFlowOptions
+    ): T["$meta"] {
+        const model = SuccessionMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as SuccessionItemFlowMeta;
+        if (options) ItemFlowMeta.applyItemFlowOptions(model, options);
+        return model;
     }
 }
 

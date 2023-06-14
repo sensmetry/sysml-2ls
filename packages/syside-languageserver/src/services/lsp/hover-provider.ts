@@ -21,6 +21,7 @@ import { isElement, Membership, Type } from "../../generated/ast";
 import { ElementMeta } from "../../model";
 import { LanguageEvents } from "../events";
 import { SysMLDefaultServices } from "../services";
+import { NonNullable } from "../../utils";
 
 export class SysMLHoverProvider extends AstNodeHoverProvider {
     protected readonly events: LanguageEvents;
@@ -43,8 +44,8 @@ export class SysMLHoverProvider extends AstNodeHoverProvider {
         const hover = await super.getHoverContent(document, params);
 
         const additional = (await this.events.onHoverRequest.emit(document, params)).filter(
-            (value) => value
-        ) as string[];
+            NonNullable
+        );
         if (additional.length === 0) return hover;
 
         if (!hover) {

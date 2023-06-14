@@ -14,10 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { LangiumDocument } from "langium";
+import { AstNode, LangiumDocument } from "langium";
 import { ElementReference } from "../../../generated/ast";
 import { Target } from "../../../utils/containers";
-import { BasicMetamodel, metamodelOf } from "../../metamodel";
+import {
+    BasicMetamodel,
+    ElementIDProvider,
+    MetatypeProto,
+    ModelElementOptions,
+    metamodelOf,
+} from "../../metamodel";
 import { ElementMeta } from "../_internal";
 
 @metamodelOf(ElementReference)
@@ -38,17 +44,21 @@ export class ElementReferenceMeta extends BasicMetamodel<ElementReference> {
      */
     text = "";
 
-    /**
-     * Document this reference originates from
-     */
-    document: LangiumDocument | undefined;
-
     override owner(): ElementMeta | undefined {
         return this._owner as ElementMeta;
     }
 
     override ast(): ElementReference | undefined {
         return this._ast as ElementReference;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ModelElementOptions<ElementMeta> | undefined
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

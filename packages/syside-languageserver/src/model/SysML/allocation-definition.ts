@@ -16,7 +16,9 @@
 
 import { AllocationDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectionDefinitionMeta } from "./connection-definition";
+import { ConnectionDefinitionMeta, ConnectionDefinitionOptions } from "./connection-definition";
+
+export type AllocationDefinitionOptions = ConnectionDefinitionOptions;
 
 @metamodelOf(AllocationDefinition, {
     base: "Allocations::Allocation",

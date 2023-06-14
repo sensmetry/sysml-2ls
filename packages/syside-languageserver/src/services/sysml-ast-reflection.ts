@@ -30,8 +30,8 @@ export type SubtypeList<Bound extends AstNode> = {
     [K in SysMLType]: SysMLTypeList[K] extends Bound ? SysMLTypeList[K] : never;
 };
 export type SubtypeKeys<Bound extends AstNode> = {
-    [K in keyof SubtypeList<Bound>]: SubtypeList<Bound>[K] extends never ? never : K;
-}[keyof SubtypeList<Bound>];
+    [K in SysMLType]: SysMLTypeList[K] extends Bound ? K : never;
+}[SysMLType];
 export type Subtypes<Bound extends AstNode> = SysMLTypeList[SubtypeKeys<Bound>];
 
 export class SysMLAstReflection extends ast.SysMlAstReflection {

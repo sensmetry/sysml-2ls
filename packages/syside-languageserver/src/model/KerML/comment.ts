@@ -14,14 +14,26 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Comment } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { TextualAnnotatingMeta } from "./_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { TextualAnnotatingElementOptions, TextualAnnotatingMeta } from "./_internal";
+
+export type CommentOptions = TextualAnnotatingElementOptions;
 
 @metamodelOf(Comment)
 export class CommentMeta extends TextualAnnotatingMeta {
     override ast(): Comment | undefined {
         return this._ast as Comment;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: TextualAnnotatingElementOptions | undefined
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

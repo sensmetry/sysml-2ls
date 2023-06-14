@@ -17,18 +17,25 @@
 import { Mixin } from "ts-mixer";
 import { Association } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
-import { metamodelOf } from "../metamodel";
+import { ElementID, metamodelOf } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
-import { ClassifierMeta, InheritanceMeta, RelationshipMeta } from "./_internal";
+import { ClassifierMeta, ClassifierOptions, InheritanceMeta, RelationshipMeta } from "./_internal";
+import { Class } from "ts-mixer/dist/types/types";
 
 export const ImplicitAssociations = {
     base: "Links::Link",
     binary: "Links::BinaryLink",
 };
 
+export type AssociationOptions = ClassifierOptions;
+
 @metamodelOf(Association, ImplicitAssociations)
 // Note: inherited methods are override by the last class inside `Mixin`
-export class AssociationMeta extends Mixin(ConnectorMixin, RelationshipMeta, ClassifierMeta) {
+export class AssociationMeta extends Mixin(
+    ConnectorMixin,
+    RelationshipMeta as Class<[ElementID], RelationshipMeta, typeof RelationshipMeta>,
+    ClassifierMeta
+) {
     protected override _classifier = TypeClassifier.Association;
 
     override defaultSupertype(): string {

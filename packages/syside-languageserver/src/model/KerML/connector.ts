@@ -14,21 +14,23 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { stream } from "langium";
+import { AstNode, LangiumDocument, stream } from "langium";
 import { Mixin } from "ts-mixer";
 import { Connector, ReferenceSubsetting } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
+import { ElementID, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
 import {
     ElementParts,
     EndFeatureMembershipMeta,
     FeatureMeta,
+    FeatureOptions,
     InheritanceMeta,
     MembershipMeta,
     RelationshipMeta,
     TypeMeta,
 } from "./_internal";
-import { enumerable } from "../../utils";
+import { NonNullable, enumerable } from "../../utils";
+import { Class } from "ts-mixer/dist/types/types";
 
 export const ImplicitConnectors = {
     base: "Links::links",
@@ -37,8 +39,16 @@ export const ImplicitConnectors = {
     binaryObject: "Objects::binaryLinkObjects",
 };
 
+// TODO: add ends
+export type ConnectorOptions = FeatureOptions;
+
 @metamodelOf(Connector, ImplicitConnectors)
-export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, FeatureMeta) {
+// @ts-expect-error stop it with static inheritance errors
+export class ConnectorMeta extends Mixin(
+    ConnectorMixin,
+    RelationshipMeta as Class<[ElementID], RelationshipMeta, typeof RelationshipMeta>,
+    FeatureMeta
+) {
     private _ends: EndFeatureMembershipMeta[] = [];
 
     @enumerable
@@ -93,7 +103,7 @@ export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, Featu
                     // no change
                     return type;
                 })
-                .filter((t) => t) as TypeMeta[];
+                .filter(NonNullable);
         }
 
         return commonFeaturingTypes?.at(0);
@@ -123,6 +133,16 @@ export class ConnectorMeta extends Mixin(ConnectorMixin, RelationshipMeta, Featu
         super.collectDeclaration(parts);
 
         parts.push(["ends", this.ends]);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ConnectorOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as TypeMeta;
+        return model;
     }
 }
 

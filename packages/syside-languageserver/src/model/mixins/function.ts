@@ -23,6 +23,7 @@ import {
     ReturnParameterMembershipMeta,
     TypeMeta,
 } from "../KerML/_internal";
+import { BasicMetamodel } from "../metamodel";
 
 export class FunctionMixin {
     protected _result: ResultExpressionMembershipMeta | undefined;
@@ -41,7 +42,7 @@ export class FunctionMixin {
     resultParameter(this: TypeMeta & FunctionMixin): ResultExpressionMembershipMeta | undefined {
         if (!this._result) {
             return this.allTypes()
-                .filter((t): t is TypeMeta & FunctionMixin => t.isAny(SysMLFunction, Expression))
+                .filter(BasicMetamodel.isAny(SysMLFunction, Expression))
                 .map((e) => (e as FunctionMixin)._result)
                 .nonNullable()
                 .head();

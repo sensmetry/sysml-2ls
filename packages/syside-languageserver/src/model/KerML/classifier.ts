@@ -14,14 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Classifier, Subclassification } from "../../generated/ast";
-import { SysMLType } from "../../services/sysml-ast-reflection";
-import { metamodelOf } from "../metamodel";
-import { TypeMeta } from "./_internal";
+import { AstNode, LangiumDocument } from "langium";
+import { Classifier, Inheritance, Subclassification } from "../../generated/ast";
+import { SubtypeKeys } from "../../services";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { TypeMeta, TypeOptions } from "./_internal";
 
 export const ImplicitClassifiers = {
     base: "Base::Anything",
 };
+
+// TODO: add constrained heritage
+export type ClassifierOptions = TypeOptions;
 
 @metamodelOf(Classifier, ImplicitClassifiers)
 export class ClassifierMeta extends TypeMeta {
@@ -29,8 +33,17 @@ export class ClassifierMeta extends TypeMeta {
         return this._ast as Classifier;
     }
 
-    override specializationKind(): SysMLType {
+    override specializationKind(): SubtypeKeys<Inheritance> {
         return Subclassification;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ClassifierOptions
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

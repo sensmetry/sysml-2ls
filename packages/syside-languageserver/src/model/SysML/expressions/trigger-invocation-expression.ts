@@ -15,8 +15,13 @@
  ********************************************************************************/
 
 import { TriggerInvocationExpression } from "../../../generated/ast";
-import { InvocationExpressionMeta } from "../../KerML/expressions/invocation-expression";
+import {
+    InvocationExpressionMeta,
+    InvocationExpressionOptions,
+} from "../../KerML/expressions/invocation-expression";
 import { metamodelOf } from "../../metamodel";
+
+export type TriggerInvocationExpressionOptions = InvocationExpressionOptions;
 
 @metamodelOf(TriggerInvocationExpression, {
     when: "Triggers::TriggerWhen",

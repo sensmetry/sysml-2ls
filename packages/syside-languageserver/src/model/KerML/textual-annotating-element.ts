@@ -14,9 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { TextualAnnotatingElement } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { AnnotatingElementMeta } from "./_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { AnnotatingElementMeta, AnnotatingElementOptions } from "./_internal";
+
+export interface TextualAnnotatingElementOptions extends AnnotatingElementOptions {
+    body: string;
+}
 
 @metamodelOf(TextualAnnotatingElement, "abstract")
 export abstract class TextualAnnotatingMeta extends AnnotatingElementMeta {
@@ -27,6 +32,17 @@ export abstract class TextualAnnotatingMeta extends AnnotatingElementMeta {
 
     override ast(): TextualAnnotatingElement | undefined {
         return this._ast as TextualAnnotatingElement;
+    }
+
+    protected static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: TextualAnnotatingElementOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as TextualAnnotatingMeta;
+        if (options) model.body = options.body;
+        return model;
     }
 }
 

@@ -16,9 +16,11 @@
 
 import { Mixin } from "ts-mixer";
 import { ActionUsage, PartDefinition, PartUsage } from "../../generated/ast";
-import { StepMeta } from "../KerML/step";
+import { StepMeta, StepOptions } from "../KerML/step";
 import { metamodelOf } from "../metamodel";
-import { OccurrenceUsageMeta } from "./occurrence-usage";
+import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
+
+export interface ActionUsageOptions extends StepOptions, OccurrenceUsageOptions {}
 
 @metamodelOf(ActionUsage, {
     base: "Actions::actions",
@@ -33,8 +35,6 @@ import { OccurrenceUsageMeta } from "./occurrence-usage";
     effect: "Actions::TransitionAction::effect",
 })
 export class ActionUsageMeta extends Mixin(StepMeta, OccurrenceUsageMeta) {
-    isParallel = false;
-
     override ast(): ActionUsage | undefined {
         return this._ast as ActionUsage;
     }

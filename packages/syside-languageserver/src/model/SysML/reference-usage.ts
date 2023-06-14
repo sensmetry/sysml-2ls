@@ -17,7 +17,9 @@
 import { ReferenceUsage, TransitionUsage } from "../../generated/ast";
 import { enumerable } from "../../utils/common";
 import { metamodelOf } from "../metamodel";
-import { UsageMeta } from "./usage";
+import { UsageMeta, UsageOptions } from "./usage";
+
+export type ReferenceUsageOptions = UsageOptions;
 
 // TODO: Redefinitions
 

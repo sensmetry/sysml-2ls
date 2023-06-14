@@ -16,7 +16,9 @@
 
 import { LoopActionUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
+
+export type LoopActionUsageOptions = ActionUsageOptions;
 
 @metamodelOf(LoopActionUsage)
 export class LoopActionUsageMeta extends ActionUsageMeta {

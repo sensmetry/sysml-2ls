@@ -16,7 +16,9 @@
 
 import { ConcernUsage, FramedConcernMembership } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { RequirementUsageMeta } from "./requirement-usage";
+import { RequirementUsageMeta, RequirementUsageOptions } from "./requirement-usage";
+
+export type ConcernUsageOptions = RequirementUsageOptions;
 
 @metamodelOf(ConcernUsage, {
     base: "Requirements::concernChecks",

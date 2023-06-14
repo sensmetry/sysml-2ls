@@ -16,7 +16,9 @@
 
 import { InterfaceUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectionUsageMeta } from "./connection-usage";
+import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
+
+export type InterfaceUsageOptions = ConnectionUsageOptions;
 
 @metamodelOf(InterfaceUsage, {
     base: "Interfaces::interfaces",

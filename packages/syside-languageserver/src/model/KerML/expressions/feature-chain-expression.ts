@@ -16,11 +16,15 @@
 
 import { FeatureChainExpression } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { OperatorExpressionMeta, TypeMeta } from "../_internal";
+import { OperatorExpressionMeta, OperatorExpressionOptions, TypeMeta } from "../_internal";
 
 export const ImplicitFeatureChainExpressions = {
     target: "ControlFunctions::'.'::source::target", // TODO
 };
+
+export interface FeatureChainExpressionOptions extends OperatorExpressionOptions {
+    operator?: never;
+}
 
 @metamodelOf(FeatureChainExpression, ImplicitFeatureChainExpressions)
 export class FeatureChainExpressionMeta extends OperatorExpressionMeta {

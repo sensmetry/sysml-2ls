@@ -16,7 +16,9 @@
 
 import { OccurrenceUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { UsageMeta } from "./usage";
+import { UsageMeta, UsageOptions } from "./usage";
+
+export type OccurrenceUsageOptions = UsageOptions;
 
 @metamodelOf(OccurrenceUsage, {
     base: "Occurrences::occurrences",

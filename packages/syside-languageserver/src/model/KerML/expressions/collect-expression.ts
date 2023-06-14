@@ -16,7 +16,11 @@
 
 import { CollectExpression } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { OperatorExpressionMeta } from "../_internal";
+import { OperatorExpressionMeta, OperatorExpressionOptions } from "../_internal";
+
+export interface CollectExpressionOptions extends OperatorExpressionOptions {
+    operator?: never;
+}
 
 @metamodelOf(CollectExpression)
 export class CollectExpressionMeta extends OperatorExpressionMeta {

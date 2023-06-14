@@ -26,6 +26,7 @@ import {
     FeatureMembership,
     FeatureRelationship,
     FeatureTyping,
+    Inheritance,
     ParameterMembership,
     Redefinition,
     ReferenceSubsetting,
@@ -37,7 +38,7 @@ import {
     TypeFeaturing,
 } from "../../generated/ast";
 import { FeatureDirectionKind, TypeClassifier } from "../enums";
-import { metamodelOf } from "../metamodel";
+import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import {
     ElementMeta,
     ElementParts,
@@ -47,9 +48,10 @@ import {
     OwningMembershipMeta,
     TypeFeaturingMeta,
     TypeMeta,
+    TypeOptions,
 } from "./_internal";
-import { SysMLType } from "../../services/sysml-ast-reflection";
-import { EMPTY_STREAM, stream, Stream } from "langium";
+import { SubtypeKeys, SysMLType } from "../../services/sysml-ast-reflection";
+import { AstNode, EMPTY_STREAM, LangiumDocument, stream, Stream } from "langium";
 import { NonNullable, enumerable } from "../../utils";
 
 export const ImplicitFeatures = {
@@ -67,6 +69,17 @@ export const ImplicitFeatures = {
     accessedFeature:
         "FeatureReferencingPerformances::FeatureAccessPerformance::onOccurrence::startingAt::accessedFeature",
 };
+
+export interface FeatureOptions extends TypeOptions {
+    direction?: FeatureDirectionKind;
+    isComposite?: boolean;
+    isPortion?: boolean;
+    isReadonly?: boolean;
+    isDerived?: boolean;
+    isEnd?: boolean;
+    isOrdered?: boolean;
+    isNonUnique?: boolean;
+}
 
 @metamodelOf(Feature, ImplicitFeatures)
 export class FeatureMeta extends TypeMeta {
@@ -162,7 +175,7 @@ export class FeatureMeta extends TypeMeta {
         return this._typeRelationships.get(FeatureChaining);
     }
 
-    get chainingFeatures(): FeatureMeta[] {
+    get chainingFeatures(): readonly FeatureMeta[] {
         return this.chainings.map((chaining) => chaining.element()).filter(NonNullable);
     }
 
@@ -369,7 +382,7 @@ export class FeatureMeta extends TypeMeta {
         }
     }
 
-    override specializationKind(): SysMLType {
+    override specializationKind(): SubtypeKeys<Inheritance> {
         return Subsetting;
     }
 
@@ -403,7 +416,7 @@ export class FeatureMeta extends TypeMeta {
             this.collectDirectTypes(visited),
             ...([Conjugation, Subsetting] as const).map((kind) =>
                 this.types(kind)
-                    .filter((t) => t.is(Feature))
+                    .filter(BasicMetamodel.is(Feature))
                     .flatMap((f) => (f as FeatureMeta).collectInheritedTypes(visited))
             )
         );
@@ -459,6 +472,28 @@ export class FeatureMeta extends TypeMeta {
             parts.push(["value", [this.value]]);
             if (this.featureWrite) parts.push(["featureWrite", [this.featureWrite]]);
         }
+    }
+
+    protected static applyFeatureOptions(model: FeatureMeta, options: FeatureOptions): void {
+        model._direction = options.direction ?? "none";
+        model._isComposite = Boolean(options.isComposite);
+        model.isPortion = Boolean(options.isPortion);
+        model.isReadonly = Boolean(options.isReadonly);
+        model.isDerived = Boolean(options.isDerived);
+        model._isEnd = Boolean(options.isEnd);
+        model.isOrdered = Boolean(options.isOrdered);
+        model.isNonUnique = Boolean(options.isNonUnique);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: FeatureOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as FeatureMeta;
+        if (options) FeatureMeta.applyFeatureOptions(model, options);
+        return model;
     }
 }
 

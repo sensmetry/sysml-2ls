@@ -103,17 +103,15 @@ export class DotFunction extends BuiltinFunction {
         if (values instanceof RangeGenerator) return [];
 
         if (!target.is(Type)) throw new Error("Cannot evaluate feature chain for non-type targets");
-        return (
-            values.filter(
-                (value) => typeof value === "object" && value.is(Feature)
-            ) as FeatureMeta[]
-        ).flatMap((value) => {
-            const chaining = [value];
-            if (targetFeature.chainingFeatures.length > 0)
-                chaining.push(...targetFeature.chainingFeatures);
-            else chaining.push(targetFeature);
-            return normalize(evaluator.evaluateFeatureChain(chaining, target));
-        });
+        return values
+            .filter((value): value is FeatureMeta => typeof value === "object" && value.is(Feature))
+            .flatMap((value) => {
+                const chaining = [value];
+                if (targetFeature.chainingFeatures.length > 0)
+                    chaining.push(...targetFeature.chainingFeatures);
+                else chaining.push(targetFeature);
+                return normalize(evaluator.evaluateFeatureChain(chaining, target));
+            });
     }
 }
 

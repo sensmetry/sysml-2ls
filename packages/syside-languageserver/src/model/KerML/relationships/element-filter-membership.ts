@@ -14,16 +14,40 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { ElementFilterMembership } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ExpressionMeta, OwningMembershipMeta } from "../_internal";
+import { Visibility, enumerable } from "../../../utils";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    ExpressionMeta,
+    NamespaceMeta,
+    OwningMembershipMeta,
+    RelationshipOptionsBody,
+} from "../_internal";
 
 @metamodelOf(ElementFilterMembership)
 export class ElementFilterMembershipMeta<
     T extends ExpressionMeta = ExpressionMeta
 > extends OwningMembershipMeta<T> {
+    @enumerable
+    override get visibility(): Visibility {
+        return Visibility.private;
+    }
+    override set visibility(value) {
+        super.visibility = value;
+    }
+
     override ast(): ElementFilterMembership | undefined {
         return this._ast as ElementFilterMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<ExpressionMeta, NamespaceMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

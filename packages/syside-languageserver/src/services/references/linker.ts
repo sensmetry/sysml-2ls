@@ -20,7 +20,6 @@ import {
     CstNode,
     DefaultLinker,
     DocumentState,
-    getDocument,
     interruptAndCheck,
     isAstNodeDescription,
     isLinkingError,
@@ -275,7 +274,7 @@ export class SysMLLinker extends DefaultLinker {
     linkRelationship(node: Relationship, document: LangiumDocument): ElementMeta | undefined {
         if (!node.reference) return node.element?.$meta;
         const target = this.linkReference(node.reference, document);
-        node.$meta.setElement(target);
+        node.$meta["setElement"](target);
         return target;
     }
 
@@ -331,7 +330,7 @@ export class SysMLLinker extends DefaultLinker {
             // always reference named elements anyway so the predicate will
             // always return true anyway
             if (node) {
-                target = this.linkMembership(node as Membership, getDocument(node));
+                target = this.linkMembership(node as Membership, node.$meta.document);
             }
         } else {
             target = node?.$meta;
@@ -467,7 +466,9 @@ export class SysMLLinker extends DefaultLinker {
                 // only resolve alias if we are not looking for membership
                 // reference
                 const ast = resolved.ast();
-                resolved = ast ? this.linkMembership(ast, getDocument(ast)) : followAlias(resolved);
+                resolved = ast
+                    ? this.linkMembership(ast, resolved.document)
+                    : followAlias(resolved);
             }
 
             // unwrap the found membership if we expect a concrete element
@@ -495,7 +496,7 @@ export class SysMLLinker extends DefaultLinker {
             if (!node || target || this.visitedAliases.has(n)) {
                 return target;
             }
-            return this.linkMembership(node, getDocument(node));
+            return this.linkMembership(node, n.document);
         };
     }
 

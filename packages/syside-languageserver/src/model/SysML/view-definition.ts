@@ -16,7 +16,9 @@
 
 import { ViewDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { PartDefinitionMeta } from "./part-definition";
+import { PartDefinitionMeta, PartDefinitionOptions } from "./part-definition";
+
+export type ViewDefinitionOptions = PartDefinitionOptions;
 
 @metamodelOf(ViewDefinition, {
     base: "Views::View",

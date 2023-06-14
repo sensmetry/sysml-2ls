@@ -16,7 +16,9 @@
 
 import { JoinNode } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ControlNodeMeta } from "./control-node";
+import { ControlNodeMeta, ControlNodeOptions } from "./control-node";
+
+export type JoinNodeOptions = ControlNodeOptions;
 
 @metamodelOf(JoinNode, {
     subaction: "Actions::Action::joins",

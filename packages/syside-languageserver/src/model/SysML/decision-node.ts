@@ -16,7 +16,9 @@
 
 import { DecisionNode } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ControlNodeMeta } from "./control-node";
+import { ControlNodeMeta, ControlNodeOptions } from "./control-node";
+
+export type DecisionNodeOptions = ControlNodeOptions;
 
 @metamodelOf(DecisionNode, {
     subaction: "Actions::Action::decisions",

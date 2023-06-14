@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { getDocument, Stream } from "langium";
+import { Stream } from "langium";
 import { parseKerML, parseSysML, TEST_BUILD_OPTIONS } from "../../testing";
 import { GlobalScope } from "../global-scope";
 import { NamespaceScope } from "../scopes";
@@ -130,7 +130,7 @@ describe("Global scope", () => {
         expect(
             scope
                 .getAllExportedElements(".sysml")
-                .map((e) => [e[0], getDocument(e[1].ast() ?? kerml.parseResult.value).uriString])
+                .map((e) => [e[0], e[1].document.uriString])
                 .toArray()
         ).toEqual([
             ["A", sysml.uriString],

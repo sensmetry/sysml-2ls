@@ -16,11 +16,13 @@
 
 import { BindingConnector } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectorMeta } from "./_internal";
+import { ConnectorMeta, ConnectorOptions } from "./_internal";
 
 export const ImplicitBindingConnectors = {
     binary: "Links::selfLinks",
 };
+
+export type BindingConnectorOptions = ConnectorOptions;
 
 @metamodelOf(BindingConnector, ImplicitBindingConnectors)
 export class BindingConnectorMeta extends ConnectorMeta {

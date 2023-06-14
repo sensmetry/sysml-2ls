@@ -44,7 +44,7 @@ import {
     MembershipImportMeta,
     NamespaceImportMeta,
     namedMembership,
-    OwningMembershipMeta,
+    BasicMetamodel,
 } from "../model";
 import { SysMLNodeDescription } from "../services/shared/workspace/ast-descriptions";
 import { SysMLType, SysMLTypeList } from "../services/sysml-ast-reflection";
@@ -60,11 +60,12 @@ import {
     streamParents,
     isVisibleWith,
 } from "./scope-util";
+import { NonNullable } from "./common";
 
 /**
  * Tuple of [exported name, membership]
  */
-export type ExportedMember = [string, MembershipMeta];
+export type ExportedMember = readonly [string, MembershipMeta];
 
 /**
  * An abstract class used to lazily construct scope for SysML name resolution
@@ -223,9 +224,9 @@ export class ElementScope extends SysMLScope {
 
                 const element = namedMembership(child);
                 if (!element || !this.isVisible(child)) return;
-                return [name, element];
+                return [name, element] as const;
             })
-            .filter((t): t is ExportedMember => Boolean(t));
+            .filter(NonNullable);
     }
 
     /**
@@ -300,9 +301,9 @@ export abstract class ImportScope extends ElementScope {
                 target,
                 (ns) =>
                     stream(ns.children)
-                        .filter((m): m is OwningMembershipMeta => m.is(OwningMembership))
+                        .filter(BasicMetamodel.is(OwningMembership))
                         .map((m) => m.element())
-                        .filter((e): e is NamespaceMeta => Boolean(e?.is(Namespace))),
+                        .filter(BasicMetamodel.is(Namespace)),
                 { includeRoot: true }
             );
         }
@@ -563,16 +564,14 @@ export function makeLinkingScope(
             imported: { visibility: Visibility.private, depth: 1 },
             inherited: { visibility: Visibility.private, depth: 1 },
         });
-        parentScopes = parents
-            .filter((p) => p.is(Element))
-            .map((parent) =>
-                makeScope(parent, {
-                    ...scopeOptions,
-                    // redefinitions are only valid in the owning scope
-                    visited: new Set(),
-                    specializations: new Set(),
-                })
-            );
+        parentScopes = parents.filter(BasicMetamodel.is(Element)).map((parent) =>
+            makeScope(parent, {
+                ...scopeOptions,
+                // redefinitions are only valid in the owning scope
+                visited: new Set(),
+                specializations: new Set(),
+            })
+        );
     }
 
     // global scope is a kind of parent

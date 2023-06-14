@@ -16,15 +16,19 @@
 
 import { Mixin } from "ts-mixer";
 import { BindingConnectorAsUsage } from "../../generated/ast";
-import { BindingConnectorMeta } from "../KerML/binding-connector";
+import { BindingConnectorMeta, BindingConnectorOptions } from "../KerML/binding-connector";
 import { metamodelOf } from "../metamodel";
-import { ConnectorAsUsageMeta } from "./connector-as-usage";
+import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
+
+export interface BindingConnectorAsUsageOptions
+    extends BindingConnectorOptions,
+        ConnectorAsUsageOptions {}
 
 @metamodelOf(BindingConnectorAsUsage, {
     base: "Links::links",
     binary: "Links::selfLinks",
 })
-export class BindingConnectorAsUsageMeta extends Mixin(ConnectorAsUsageMeta, BindingConnectorMeta) {
+export class BindingConnectorAsUsageMeta extends Mixin(BindingConnectorMeta, ConnectorAsUsageMeta) {
     override ast(): BindingConnectorAsUsage | undefined {
         return this._ast as BindingConnectorAsUsage;
     }

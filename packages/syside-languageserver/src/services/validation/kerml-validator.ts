@@ -18,6 +18,7 @@ import { MultiMap, Properties, stream } from "langium";
 import * as ast from "../../generated/ast";
 import {
     AssociationMeta,
+    BasicMetamodel,
     BindingConnectorMeta,
     ClassifierMeta,
     ConnectorMeta,
@@ -47,7 +48,6 @@ import { SysMLConfigurationProvider } from "../shared/workspace/configuration-pr
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLType } from "../sysml-ast-reflection";
 import { ModelValidationAcceptor, validateKerML } from "./validation-registry";
-import { getDocument } from "../../utils";
 
 /**
  * Implementation of custom validations.
@@ -143,7 +143,7 @@ export class KerMLValidator {
 
     @validateKerML(ast.Feature)
     checkFeatureChainingLength(feature: FeatureMeta, accept: ModelValidationAcceptor): void {
-        const chainings = feature.typeRelationships.filter((r) => r.is(ast.FeatureChaining));
+        const chainings = feature.typeRelationships.filter(BasicMetamodel.is(ast.FeatureChaining));
         if (chainings.length === 1) {
             accept("error", "Feature chain must be a chain of 2 or more features", {
                 element: chainings[0],
@@ -266,7 +266,7 @@ export class KerMLValidator {
             return;
         }
 
-        if (!getDocument(node)?.uriString.startsWith(std)) {
+        if (!node.document.uriString.startsWith(std)) {
             emit();
         }
     }
@@ -351,7 +351,7 @@ export class KerMLValidator {
     @validateKerML(ast.MetadataFeature)
     validateMetadataFeatureBody(node: TypeMeta, accept: ModelValidationAcceptor): void {
         for (const feature of stream(node.featureMembers())
-            .filter((m) => m.is(ast.OwningMembership))
+            .filter(BasicMetamodel.is(ast.OwningMembership))
             .map((m) => m.element())
             .nonNullable()) {
             if (
@@ -501,10 +501,10 @@ export class KerMLValidator {
         // even though multiplicity is a subtype of feature, it is parsed as a
         // non-feature element...
         const multiplicities = stream(node.children)
-            .filter((m) => m.is(ast.OwningMembership))
+            .filter(BasicMetamodel.is(ast.OwningMembership))
             .map((m) => m.element())
             .nonNullable()
-            .filter((f) => f.is(ast.Multiplicity))
+            .filter(BasicMetamodel.is(ast.Multiplicity))
             .tail(node.multiplicity ? 0 : 1);
 
         this.apply(multiplicities, "Invalid type, too many multiplicities", accept);
@@ -692,7 +692,7 @@ export class KerMLValidator {
             stream(node.featureMembers())
                 .map((m) => m.element())
                 .nonNullable()
-                .filter((f) => f.is(type)),
+                .filter(BasicMetamodel.is(type)),
             accept,
             `At most one ${type} is allowed`
         );

@@ -14,13 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { ForLoopActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
-import { LoopActionUsageMeta } from "./loop-action-usage";
+import { LoopActionUsageMeta, LoopActionUsageOptions } from "./loop-action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
+
+// TODO: add variable, sequence and body
+export type ForLoopActionUsageOptions = LoopActionUsageOptions;
 
 @metamodelOf(ForLoopActionUsage, {
     base: "Actions::forLoopActions",
@@ -74,6 +78,24 @@ export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
         if (this.variable) parts.push(["variable", [this.variable]]);
         if (this.sequence) parts.push(["sequence", [this.sequence]]);
         if (this.body) parts.push(["body", [this.body]]);
+    }
+
+    protected static applyForLoopOptions(
+        _model: ForLoopActionUsageMeta,
+        _options: ForLoopActionUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ForLoopActionUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as ForLoopActionUsageMeta;
+        if (options) ForLoopActionUsageMeta.applyForLoopOptions(model, options);
+        return model;
     }
 }
 

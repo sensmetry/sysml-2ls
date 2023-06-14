@@ -143,7 +143,7 @@ export class GlobalScope extends SysMLScope {
 
     protected getAllLocalElements(ignored: Set<string>, langId?: string): Stream<ExportedMember> {
         return stream(this.staticExports)
-            .map(([name, entries]) => [name, getFromEntries(entries, langId)])
+            .map(([name, entries]) => [name, getFromEntries(entries, langId)] as const)
             .filter((t): t is ExportedMember => Boolean(t[1]))
             .concat(this.getDynamicExports(langId).flatMap((ns) => ns.getAllExportedElements()))
             .distinct(([name]) => name);

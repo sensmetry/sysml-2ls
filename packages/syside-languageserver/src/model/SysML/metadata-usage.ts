@@ -16,16 +16,22 @@
 
 import { Mixin } from "ts-mixer";
 import { MetadataUsage } from "../../generated/ast";
-import { MetadataFeatureMeta } from "../KerML/metadata-feature";
-import { metamodelOf } from "../metamodel";
-import { ItemUsageMeta } from "./item-usage";
+import { MetadataFeatureMeta, MetadataFeatureOptions } from "../KerML/metadata-feature";
+import { ElementID, metamodelOf } from "../metamodel";
+import { ItemUsageMeta, ItemUsageOptions } from "./item-usage";
+import { Class } from "ts-mixer/dist/types/types";
+
+export interface MetadataUsageOptions extends MetadataFeatureOptions, ItemUsageOptions {}
 
 @metamodelOf(MetadataUsage, {
     base: "Metadata::metadataItems",
     annotatedElement: "Metaobjects::Metaobject::annotatedElement",
     baseType: "Metaobjects::SemanticMetadata::baseType",
 })
-export class MetadataUsageMeta extends Mixin(MetadataFeatureMeta, ItemUsageMeta) {
+export class MetadataUsageMeta extends Mixin(
+    MetadataFeatureMeta as Class<[ElementID], MetadataFeatureMeta, typeof MetadataFeatureMeta>,
+    ItemUsageMeta
+) {
     override defaultSupertype(): string {
         return "base";
     }

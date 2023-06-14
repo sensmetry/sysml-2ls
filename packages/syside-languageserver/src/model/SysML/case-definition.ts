@@ -16,7 +16,9 @@
 
 import { CaseDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { CalculationDefinitionMeta } from "./calculation-definition";
+import { CalculationDefinitionMeta, CalculationDefinitionOptions } from "./calculation-definition";
+
+export type CaseDefinitionOptions = CalculationDefinitionOptions;
 
 @metamodelOf(CaseDefinition, {
     base: "Cases::Case",

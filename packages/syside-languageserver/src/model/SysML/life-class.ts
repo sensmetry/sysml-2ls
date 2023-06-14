@@ -15,8 +15,10 @@
  ********************************************************************************/
 
 import { LifeClass } from "../../generated/ast";
-import { ClassMeta } from "../KerML";
+import { ClassMeta, ClassOptions } from "../KerML";
 import { metamodelOf } from "../metamodel";
+
+export type LifeClassOptions = ClassOptions;
 
 @metamodelOf(LifeClass)
 export class LifeClassMeta extends ClassMeta {

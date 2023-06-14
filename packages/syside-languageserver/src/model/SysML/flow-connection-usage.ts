@@ -16,10 +16,16 @@
 
 import { Mixin } from "ts-mixer";
 import { FlowConnectionUsage } from "../../generated/ast";
-import { ItemFlowMeta } from "../KerML/item-flow";
-import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
-import { ConnectionUsageMeta } from "./connection-usage";
+import { ItemFlowMeta, ItemFlowOptions } from "../KerML/item-flow";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
+import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
+import { AstNode, LangiumDocument } from "langium";
+
+export interface FlowConnectionUsageOptions
+    extends ConnectionUsageOptions,
+        ActionUsageOptions,
+        ItemFlowOptions {}
 
 @metamodelOf(FlowConnectionUsage, {
     base: "Connections::flowConnections",
@@ -31,9 +37,9 @@ import { ConnectionUsageMeta } from "./connection-usage";
     ownedAction: "Parts::Part::ownedActions",
 })
 export class FlowConnectionUsageMeta extends Mixin(
-    ConnectionUsageMeta,
     ActionUsageMeta,
-    ItemFlowMeta
+    ItemFlowMeta,
+    ConnectionUsageMeta
 ) {
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
@@ -53,6 +59,24 @@ export class FlowConnectionUsageMeta extends Mixin(
 
     override ast(): FlowConnectionUsage | undefined {
         return this._ast as FlowConnectionUsage;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: FlowConnectionUsageOptions
+    ): T["$meta"] {
+        const model = ConnectionUsageMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as FlowConnectionUsageMeta;
+        if (options) {
+            ItemFlowMeta.applyItemFlowOptions(model, options);
+        }
+        return model;
     }
 }
 

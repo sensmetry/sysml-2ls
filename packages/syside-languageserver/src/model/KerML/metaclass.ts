@@ -16,11 +16,13 @@
 
 import { Metaclass } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { StructureMeta } from "./_internal";
+import { StructureMeta, StructureOptions } from "./_internal";
 
 export const ImplicitMetaclasses = {
     base: "Metaobjects::Metaobject",
 };
+
+export type MetaclassOptions = StructureOptions;
 
 @metamodelOf(Metaclass, ImplicitMetaclasses)
 export class MetaclassMeta extends StructureMeta {

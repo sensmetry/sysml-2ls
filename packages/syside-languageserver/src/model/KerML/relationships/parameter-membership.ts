@@ -14,9 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { ParameterMembership } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { FeatureMembershipMeta, FeatureMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    ExpressionMeta,
+    FeatureMembershipMeta,
+    FeatureMeta,
+    FunctionMeta,
+    RelationshipOptions,
+} from "../_internal";
+import type { ActionUsageMeta } from "../../SysML";
 
 @metamodelOf(ParameterMembership)
 export class ParameterMembershipMeta<
@@ -24,6 +32,19 @@ export class ParameterMembershipMeta<
 > extends FeatureMembershipMeta<T> {
     override ast(): ParameterMembership | undefined {
         return this._ast as ParameterMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<
+            FeatureMeta,
+            FunctionMeta | ExpressionMeta | ActionUsageMeta,
+            never
+        >
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

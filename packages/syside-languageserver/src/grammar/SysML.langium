@@ -200,7 +200,6 @@ FilterPackage returns Package:
 ;
 
 FilterPackageMember returns ElementFilterMembership:
-    // TODO: always private visibility
     '[' element=OwnedExpression ']'
 ;
 
@@ -472,22 +471,22 @@ FeatureValueExpression returns FeatureValue:
     isInitial?=':=' element=OwnedExpression
 ;
 
-EmptyAssignmentActionMember returns OwningMembership:
-    element=EmptyAssignmentAction
-;
+// EmptyAssignmentActionMember returns OwningMembership:
+//     element=EmptyAssignmentAction
+// ;
 
-EmptyAssignmentAction returns AssignmentActionUsage:
-    targetMember=EmptyTargetMember
-    assignedValue=EmptyParameterMember
-;
+// EmptyAssignmentAction returns AssignmentActionUsage:
+//     targetMember=EmptyTargetMember
+//     assignedValue=EmptyParameterMember
+// ;
 
-EmptyTargetMember returns ParameterMembership:
-    element=EmptyTargetParameter
-;
+// EmptyTargetMember returns ParameterMembership:
+//     element=EmptyTargetParameter
+// ;
 
-EmptyTargetParameter returns ReferenceUsage:
-    children+=TargetFeatureMember
-;
+// EmptyTargetParameter returns ReferenceUsage:
+//     children+=TargetFeatureMember
+// ;
 
 // Reference Usages
 
@@ -745,9 +744,12 @@ PartUsage returns PartUsage:
 
 PortDefinition returns PortDefinition:
     DefinitionPrefix 'port' 'def' DefinitionSuffix
-    conjugated=ConjugatedPortDefinitionMember
+    // constructed implicitly in the model
+    /* conjugated=ConjugatedPortDefinitionMember */
 ;
 
+// constructed in the model, no need to parse 
+/*
 ConjugatedPortDefinitionMember returns OwningMembership:
     element=ConjugatedPortDefinition
 ;
@@ -759,6 +761,7 @@ ConjugatedPortDefinition returns ConjugatedPortDefinition:
 PortConjugation returns PortConjugation:
     {PortConjugation}
 ;
+*/
 
 ConjugatedPortTyping returns ConjugatedPortTyping:
     '~' reference=ConjugatedPortReference
@@ -830,13 +833,13 @@ fragment NaryConnectorPart:
     '(' ends+=ConnectorEndMember ( ',' ends+=ConnectorEndMember )+ ')'
 ;
 
-EmptySourceEndMember returns EndFeatureMembership:
-    element=EmptySourceEnd
-;
+// EmptySourceEndMember returns EndFeatureMembership:
+//     element=EmptySourceEnd
+// ;
 
-EmptySourceEnd returns Feature:
-    {Feature}
-;
+// EmptySourceEnd returns Feature:
+//     {Feature}
+// ;
 
 
 // Flow Connections
@@ -1205,6 +1208,8 @@ fragment AssignmentNodeDeclaration:
     assignedValue=NodeParameterMember
 ;
 
+// currently doesn't work in langium
+/*
 AssignmentTargetMember returns ParameterMembership:
     element=TargetParameter
 ;
@@ -1245,6 +1250,7 @@ TargetExpression returns Expression:
         )
     )*
 ;
+*/
 
 ExpressionParameterMember returns ParameterMembership:
     element=OwnedExpression
@@ -1328,13 +1334,13 @@ fragment ActionNodeItems:
     ( children+=AnnotatingMember )*
 ;
 
-EmptyParameterMember returns ParameterMembership:
-    element=EmptyUsage
-;
+// EmptyParameterMember returns ParameterMembership:
+//     element=EmptyUsage
+// ;
 
-EmptyUsage returns Usage:
-    {ReferenceUsage}
-;
+// EmptyUsage returns Usage:
+//     {ReferenceUsage}
+// ;
 
 /* Action Succession */
 
@@ -1398,6 +1404,8 @@ fragment StateBodyItem:
     | children+=TargetTransitionUsageMember // TODO: must be after behavior usage element or another targettransitionusage
     | children+=TransitionUsageMember
     | children+=EntryActionMember
+    // ambiguous with TargetTransitionUsageMember but parser bug prevents us
+    // from using correct grammar rules
     | children+=EntryTransitionMember// TODO: must follow entry action or other entry transition
     | children+=DoActionMember
     | children+=ExitActionMember
@@ -1554,7 +1562,7 @@ TransitionSuccessionMember returns OwningMembership:
 ;
 
 TransitionSuccession returns SuccessionAsUsage:
-    ends+=EmptySourceEndMember
+    // ends+=EmptySourceEndMember
     ends+=ConnectorEndMember
 ;
 

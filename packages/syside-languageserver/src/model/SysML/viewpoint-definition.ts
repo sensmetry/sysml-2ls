@@ -17,6 +17,9 @@
 import { ViewpointDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
 import { RequirementDefinitionMeta } from "./requirement-definition";
+import { RequirementUsageOptions } from "./requirement-usage";
+
+export type ViewpointDefinitionOptions = RequirementUsageOptions;
 
 @metamodelOf(ViewpointDefinition, {
     base: "Views::ViewpointCheck",

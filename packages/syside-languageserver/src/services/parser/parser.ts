@@ -26,7 +26,6 @@ import {
 import { createParser } from "langium/lib/parser/parser-builder-base";
 import { CstNodeBuilder } from "langium/lib/parser/cst-node-builder";
 import {
-    ConjugatedPortDefinition,
     EndFeatureMembership,
     Expose,
     Feature,
@@ -39,16 +38,12 @@ import {
     NamespaceImport,
     NamespaceReference,
     OperatorExpression,
-    OwningMembership,
     Package,
     ParameterMembership,
-    PortConjugation,
-    PortDefinition,
     ReferenceUsage,
     ReturnParameterMembership,
     SuccessionAsUsage,
     TransitionUsage,
-    TypeReference,
     Usage,
     WhileLoopActionUsage,
 } from "../../generated/ast";
@@ -58,8 +53,6 @@ import { compareRanges } from "../../utils/ast-util";
 import { isRuleCall } from "langium/lib/grammar/generated/ast";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
 import { erase } from "../../utils/common";
-import { DefaultReference } from "../references/linker";
-import { sanitizeName } from "../../model";
 
 const ClassificationTestOperator = ["istype", "hastype", "@", "as"];
 
@@ -146,44 +139,8 @@ function finalizeImport(node: Import, services: SysMLDefaultServices): void {
     }
 }
 
-function createConjugatedPort(node: PortDefinition, services: SysMLDefaultServices): void {
-    if (node.conjugated) return;
-
-    const reflection = services.shared.AstReflection;
-    const membership = reflection.createNode(OwningMembership, {
-        $container: node,
-        $containerProperty: "conjugated",
-    });
-
-    const conjugated = reflection.createNode(ConjugatedPortDefinition, {
-        $container: membership,
-        $containerProperty: "element",
-    });
-
-    if (node.declaredName) conjugated.declaredName = `'~${sanitizeName(node.declaredName)}'`;
-    if (node.declaredShortName)
-        conjugated.declaredShortName = `'~${sanitizeName(node.declaredShortName)}'`;
-
-    const conjugation = reflection.createNode(PortConjugation, {
-        $container: conjugated,
-        $containerProperty: "heritage",
-    });
-
-    const ref = reflection.createNode(TypeReference, {
-        $container: conjugation,
-        $containerProperty: "reference",
-        text: node.declaredName ?? node.declaredShortName ?? "",
-    });
-
-    ref.parts.push(<DefaultReference>{
-        // we are not inside a generic grammar so we can create a resolved
-        // reference
-        $refText: ref.text ?? "",
-        ref: node,
-        _ref: node,
-    });
-}
-
+// This only exists since Langium doesn't allow linking to elements without AST
+// nodes (╯°□°)╯︵ ┻━┻
 function createEmptyParametersInTransitionUsage(
     node: TransitionUsage,
     services: SysMLDefaultServices
@@ -269,7 +226,6 @@ export class SysMLCstNodeBuilder extends CstNodeBuilder {
             OperatorExpression: fixOperatorExpression,
             WhileLoopActionUsage: addLoopMember,
             Import: finalizeImport,
-            PortDefinition: createConjugatedPort,
             TransitionUsage: createEmptyParametersInTransitionUsage,
             SuccessionAsUsage: createMissingEndsInSuccessionAsUsage,
         };

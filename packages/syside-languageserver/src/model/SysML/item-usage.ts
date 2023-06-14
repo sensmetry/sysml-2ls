@@ -16,7 +16,9 @@
 
 import { ItemDefinition, ItemUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { OccurrenceUsageMeta } from "./occurrence-usage";
+import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
+
+export type ItemUsageOptions = OccurrenceUsageOptions;
 
 @metamodelOf(ItemUsage, {
     base: "Items::items",

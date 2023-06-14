@@ -14,13 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { AssignmentActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 import { UsageMeta } from "./usage";
+
+// TODO: add target, targetMember and assignedValue
+export type AssignmentActionUsageOptions = ActionUsageOptions;
 
 @metamodelOf(AssignmentActionUsage, {
     base: "Actions::assignmentActions",
@@ -78,6 +82,24 @@ export class AssignmentActionUsageMeta extends ActionUsageMeta {
         if (this.target) parts.push(["target", [this.target]]);
         if (this.targetMember) parts.push(["targetMember", [this.targetMember]]);
         if (this.assignedValue) parts.push(["assignedValue", [this.assignedValue]]);
+    }
+
+    protected static applyAssignmentActionOptions(
+        _model: AssignmentActionUsageMeta,
+        _options: AssignmentActionUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: AssignmentActionUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as AssignmentActionUsageMeta;
+        if (options) AssignmentActionUsageMeta.applyAssignmentActionOptions(model, options);
+        return model;
     }
 }
 

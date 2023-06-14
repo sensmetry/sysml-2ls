@@ -16,14 +16,16 @@
 
 import { Mixin } from "ts-mixer";
 import { ActionDefinition } from "../../generated/ast";
-import { BehaviorMeta } from "../KerML/behavior";
+import { BehaviorMeta, BehaviorOptions } from "../KerML/behavior";
 import { metamodelOf } from "../metamodel";
-import { OccurrenceDefinitionMeta } from "./occurrence-definition";
+import { OccurrenceDefinitionMeta, OccurrenceDefinitionOptions } from "./occurrence-definition";
+
+export interface ActionDefinitionOptions extends BehaviorOptions, OccurrenceDefinitionOptions {}
 
 @metamodelOf(ActionDefinition, {
     base: "Actions::Action",
 })
-export class ActionDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, BehaviorMeta) {
+export class ActionDefinitionMeta extends Mixin(BehaviorMeta, OccurrenceDefinitionMeta) {
     override ast(): ActionDefinition | undefined {
         return this._ast as ActionDefinition;
     }

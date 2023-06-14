@@ -16,7 +16,9 @@
 
 import { UseCaseUsage, UseCaseDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { CaseUsageMeta } from "./case-usage";
+import { CaseUsageMeta, CaseUsageOptions } from "./case-usage";
+
+export type UseCaseUsageOptions = CaseUsageOptions;
 
 @metamodelOf(UseCaseUsage, {
     base: "UseCases::useCases",

@@ -14,12 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { mix } from "ts-mixer";
+import { AstNode, LangiumDocument } from "langium";
 import { MembershipExpose } from "../../../generated/ast";
 import { MembershipMeta } from "../../KerML/relationships/membership";
 import { MembershipImportMeta } from "../../KerML/relationships/membership-import";
-import { metamodelOf } from "../../metamodel";
+import { ElementID, ElementIDProvider, MetatypeProto, metamodelOf, mix } from "../../metamodel";
 import { ExposeMeta } from "./expose";
+import { ImportOptions } from "../../KerML";
+import { ViewUsageMeta } from "../view-usage";
 
 export interface MembershipExposeMeta<T extends MembershipMeta = MembershipMeta>
     extends ExposeMeta<T>,
@@ -31,8 +33,22 @@ export interface MembershipExposeMeta<T extends MembershipMeta = MembershipMeta>
 @mix(ExposeMeta, MembershipImportMeta)
 // eslint-disable-next-line unused-imports/no-unused-vars
 export class MembershipExposeMeta<T extends MembershipMeta = MembershipMeta> {
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    protected constructor(id: ElementID) {
+        // empty
+    }
+
     ast(): MembershipExpose | undefined {
         return this._ast as MembershipExpose;
+    }
+
+    static create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ImportOptions<MembershipMeta, ViewUsageMeta>
+    ): T["$meta"] {
+        return ExposeMeta.create.call(this, provider, document, options);
     }
 }
 

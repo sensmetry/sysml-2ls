@@ -16,14 +16,16 @@
 
 import { Mixin } from "ts-mixer";
 import { MetadataDefinition } from "../../generated/ast";
-import { MetaclassMeta } from "../KerML/metaclass";
+import { MetaclassMeta, MetaclassOptions } from "../KerML/metaclass";
 import { metamodelOf } from "../metamodel";
-import { ItemDefinitionMeta } from "./item-definition";
+import { ItemDefinitionMeta, ItemDefinitionOptions } from "./item-definition";
+
+export interface MetadataDefinitionOptions extends MetaclassOptions, ItemDefinitionOptions {}
 
 @metamodelOf(MetadataDefinition, {
     base: "Metadata::MetadataItem",
 })
-export class MetadataDefinitionMeta extends Mixin(ItemDefinitionMeta, MetaclassMeta) {
+export class MetadataDefinitionMeta extends Mixin(MetaclassMeta, ItemDefinitionMeta) {
     override ast(): MetadataDefinition | undefined {
         return this._ast as MetadataDefinition;
     }

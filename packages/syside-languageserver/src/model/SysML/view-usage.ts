@@ -16,7 +16,9 @@
 
 import { ViewUsage, ViewDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { PartUsageMeta } from "./part-usage";
+import { PartUsageMeta, PartUsageOptions } from "./part-usage";
+
+export type ViewUsageOptions = PartUsageOptions;
 
 @metamodelOf(ViewUsage, {
     base: "Views::views",

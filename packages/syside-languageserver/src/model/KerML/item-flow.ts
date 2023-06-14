@@ -16,9 +16,10 @@
 
 import { Mixin } from "ts-mixer";
 import { ItemFlow, ItemFlowEnd } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
+import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import {
     ConnectorMeta,
+    ConnectorOptions,
     ElementParts,
     FeatureMembershipMeta,
     FeatureMeta,
@@ -26,7 +27,9 @@ import {
     ItemFlowEndMeta,
     MembershipMeta,
     StepMeta,
+    StepOptions,
 } from "./_internal";
+import { AstNode, LangiumDocument } from "langium";
 
 export const ImplicitItemFlows = {
     base: "Transfers::flowTransfers",
@@ -34,6 +37,10 @@ export const ImplicitItemFlows = {
     subperformance: "Performances::Performance::subperformances",
     ownedPerformance: "Objects::Object::ownedPerformances",
 };
+
+export interface ItemFlowOptions extends StepOptions, ConnectorOptions {
+    // TODO: add item
+}
 
 @metamodelOf(ItemFlow, ImplicitItemFlows)
 export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
@@ -66,7 +73,7 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
      * @returns owned item flow ends of this item flow
      */
     itemFlowEnds(): ItemFlowEndMeta[] {
-        return this.ownedEnds().filter((f) => f.is(ItemFlowEnd)) as ItemFlowEndMeta[];
+        return this.ownedEnds().filter(BasicMetamodel.is(ItemFlowEnd));
     }
 
     override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
@@ -82,6 +89,21 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
         }
 
         parts.push(["ends", this.ends]);
+    }
+
+    protected static applyItemFlowOptions(_model: ItemFlowMeta, _options: ItemFlowOptions): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ItemFlowOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as ItemFlowMeta;
+        if (options) ItemFlowMeta.applyItemFlowOptions(model, options);
+        return model;
     }
 }
 

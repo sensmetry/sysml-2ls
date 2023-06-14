@@ -14,10 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Definition, Usage } from "../../generated/ast";
 import { enumerable } from "../../utils";
-import { ClassifierMeta } from "../KerML/classifier";
-import { metamodelOf } from "../metamodel";
+import { ClassifierMeta, ClassifierOptions } from "../KerML/classifier";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+
+export interface DefinitionOptions extends ClassifierOptions {
+    isVariation?: boolean;
+    isIndividual?: boolean;
+}
 
 @metamodelOf(Definition)
 export class DefinitionMeta extends ClassifierMeta {
@@ -46,6 +52,25 @@ export class DefinitionMeta extends ClassifierMeta {
 
     getSubjectParameter(): Usage | undefined {
         return;
+    }
+
+    protected static applyDefinitionOptions(
+        model: DefinitionMeta,
+        options: DefinitionOptions
+    ): void {
+        model._isVariation = Boolean(options.isVariation);
+        model.isIndividual = Boolean(options.isIndividual);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: DefinitionOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as DefinitionMeta;
+        if (options) DefinitionMeta.applyDefinitionOptions(model, options);
+        return model;
     }
 }
 

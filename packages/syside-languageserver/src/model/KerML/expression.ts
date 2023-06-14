@@ -17,15 +17,26 @@
 import { Mixin } from "ts-mixer";
 import { Expression, FeatureValue, Multiplicity } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { ElementParts, FeatureMeta, FunctionMeta, StepMeta, TypeMeta } from "./_internal";
+import {
+    ElementParts,
+    FeatureMeta,
+    FunctionMeta,
+    StepMeta,
+    StepOptions,
+    TypeMeta,
+} from "./_internal";
 import { NonNullable } from "../../utils/common";
+import { AstNode, LangiumDocument } from "langium";
 
 export const ImplicitExpressions = {
     base: "Performances::evaluations",
     enclosedPerformance: "Performances::Performance::enclosedPerformances",
 };
+
+// TODO: add result
+export type ExpressionOptions = StepOptions;
 
 @metamodelOf(Expression, ImplicitExpressions)
 export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
@@ -76,6 +87,24 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
         const parts = StepMeta.prototype["collectParts"].call(this);
         if (this._result) parts.push(["result", [this._result]]);
         return parts;
+    }
+
+    protected static applyExpressionOptions(
+        _model: ExpressionMeta,
+        _options: ExpressionOptions
+    ): void {
+        // TODO: assign result
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ExpressionOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as ExpressionMeta;
+        if (options) ExpressionMeta.applyExpressionOptions(model, options);
+        return model;
     }
 }
 

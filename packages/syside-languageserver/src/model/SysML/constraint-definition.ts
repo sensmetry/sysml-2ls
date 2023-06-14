@@ -16,16 +16,37 @@
 
 import { Mixin } from "ts-mixer";
 import { ConstraintDefinition } from "../../generated/ast";
-import { PredicateMeta } from "../KerML/predicate";
-import { metamodelOf } from "../metamodel";
-import { OccurrenceDefinitionMeta } from "./occurrence-definition";
+import { PredicateMeta, PredicateOptions } from "../KerML/predicate";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { OccurrenceDefinitionMeta, OccurrenceDefinitionOptions } from "./occurrence-definition";
+import { AstNode, LangiumDocument } from "langium";
+
+export interface ConstraintDefinitionOptions
+    extends PredicateOptions,
+        OccurrenceDefinitionOptions {}
 
 @metamodelOf(ConstraintDefinition, {
     base: "Constraints::ConstraintCheck",
 })
-export class ConstraintDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, PredicateMeta) {
+export class ConstraintDefinitionMeta extends Mixin(PredicateMeta, OccurrenceDefinitionMeta) {
     override ast(): ConstraintDefinition | undefined {
         return this._ast as ConstraintDefinition;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ConstraintDefinitionOptions
+    ): T["$meta"] {
+        const model = OccurrenceDefinitionMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as ConstraintDefinitionMeta;
+        if (options) PredicateMeta.applyFunctionOptions(model, options);
+        return model;
     }
 }
 

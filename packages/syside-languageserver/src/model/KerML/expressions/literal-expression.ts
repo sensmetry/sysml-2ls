@@ -14,15 +14,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { LiteralExpression } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ExpressionMeta } from "../_internal";
+import {
+    ElementIDProvider,
+    MetatypeProto,
+    ModelElementOptions,
+    metamodelOf,
+} from "../../metamodel";
+import { ExpressionMeta, RelationshipMeta } from "../_internal";
 
 export const ImplicitLiteralExpressions = {
     base: "Performances::literalIntegerEvaluations",
 };
 
-// TODO: implement implicit kind selection
+export type LiteralExpressionOptions = ModelElementOptions<RelationshipMeta>;
 
 @metamodelOf(LiteralExpression, ImplicitLiteralExpressions)
 export class LiteralExpressionMeta extends ExpressionMeta {
@@ -32,5 +38,20 @@ export class LiteralExpressionMeta extends ExpressionMeta {
 
     override isModelLevelEvaluable(): boolean {
         return true;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: LiteralExpressionOptions
+    ): T["$meta"] {
+        return super.create(provider, document, options);
+    }
+}
+
+declare module "../../../generated/ast" {
+    interface LiteralExpression {
+        $meta: LiteralExpressionMeta;
     }
 }

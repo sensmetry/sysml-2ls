@@ -16,7 +16,9 @@
 
 import { PartDefinition, PortDefinition, PortUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { OccurrenceUsageMeta } from "./occurrence-usage";
+import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
+
+export type PortUsageOptions = OccurrenceUsageOptions;
 
 @metamodelOf(PortUsage, {
     base: "Ports::ports",

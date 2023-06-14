@@ -17,6 +17,7 @@
 import { JSONConvertible } from "../utils/common";
 import { SubtypeKeys, SysMLInterface, SysMLType } from "../services";
 import { Element } from "../generated/ast";
+import { BasicMetamodel } from "./metamodel";
 
 /**
  * Container for elements that also allows filtering by type with caching
@@ -89,11 +90,9 @@ export class ElementContainer<T extends Element = Element>
         let filtered = this.caches.get(kindOrFilter);
         if (filtered) return filtered;
 
-        if (typeof kindOrFilter === "string") {
-            filtered = all.filter((e) => e.is(kindOrFilter));
-        } else {
-            filtered = all.filter(kindOrFilter);
-        }
+        filtered = all.filter(
+            typeof kindOrFilter === "string" ? BasicMetamodel.is(kindOrFilter) : kindOrFilter
+        );
 
         this.caches.set(kindOrFilter, filtered);
         return filtered;

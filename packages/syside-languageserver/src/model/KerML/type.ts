@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream, stream, TreeStreamImpl } from "langium";
+import { AstNode, LangiumDocument, Stream, stream, TreeStreamImpl } from "langium";
 import { Mixin } from "ts-mixer";
 import {
     FeatureMembership,
@@ -29,7 +29,13 @@ import { enumerable, KeysMatching } from "../../utils/common";
 import { collectRedefinitions } from "../../utils/scope-util";
 import { ElementContainer } from "../containers";
 import { getTypeClassifierString, TypeClassifier } from "../enums";
-import { metamodelOf } from "../metamodel";
+import {
+    BasicMetamodel,
+    ElementID,
+    ElementIDProvider,
+    metamodelOf,
+    MetatypeProto,
+} from "../metamodel";
 import { InputParametersMixin } from "../mixins";
 import {
     ElementParts,
@@ -40,17 +46,29 @@ import {
     MetadataFeatureMeta,
     MultiplicityRangeMeta,
     NamespaceMeta,
+    NamespaceOptions,
     NonNullRelationship,
     OwningMembershipMeta,
     SpecializationMeta,
 } from "./_internal";
+import { Class } from "ts-mixer/dist/types/types";
 
 export const ImplicitTypes = {
     base: "Base::Anything",
 };
 
+export interface TypeOptions extends NamespaceOptions {
+    isAbstract?: boolean;
+    // TODO: add heritage
+    // TODO: add multiplicity
+    // TODO: add typeRelationships
+}
+
 @metamodelOf(Type, ImplicitTypes)
-export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
+export class TypeMeta extends Mixin(
+    InputParametersMixin,
+    NamespaceMeta as Class<[ElementID], NamespaceMeta, typeof NamespaceMeta>
+) {
     protected readonly _heritage = new ElementContainer<Inheritance>();
     protected readonly _typeRelationships = new ElementContainer<FeatureRelationship>();
     protected _isAbstract = false;
@@ -146,10 +164,10 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
     allSpecializations(kind?: undefined): Stream<InheritanceMeta>;
     allSpecializations<K extends SubtypeKeys<Inheritance>>(kind?: K): Stream<InheritanceMeta> {
         const visited = new Set<unknown>();
-        const self = new SpecializationMeta(-1);
-        self.setElement(this);
+        const self = SpecializationMeta.create(() => -1, this.document);
+        self["setElement"](this);
         const tree = new TreeStreamImpl<InheritanceMeta>(
-            self as NonNullRelationship<typeof self>,
+            self,
             // avoid circular specializations, there probably should be a
             // warning
             (s) =>
@@ -168,7 +186,7 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
         );
 
         if (!kind) return tree;
-        return tree.filter((s) => s.is(kind));
+        return tree.filter(BasicMetamodel.is(kind));
     }
 
     /**
@@ -353,9 +371,7 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
     }
 
     ownedFeatureMemberships(): Stream<FeatureMembershipMeta> {
-        return stream(this.featureMembers()).filter((m) =>
-            m.is(FeatureMembership)
-        ) as Stream<FeatureMembershipMeta>;
+        return stream(this.featureMembers()).filter(BasicMetamodel.is(FeatureMembership));
     }
 
     ownedFeatures(): Stream<FeatureMeta> {
@@ -383,6 +399,21 @@ export class TypeMeta extends Mixin(InputParametersMixin, NamespaceMeta) {
         parts.push(["children", this.children]);
 
         return parts;
+    }
+
+    protected static applyTypeOptions(model: TypeMeta, options: TypeOptions): void {
+        model._isAbstract = Boolean(options.isAbstract);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: TypeOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as TypeMeta;
+        if (options) TypeMeta.applyTypeOptions(model, options);
+        return model;
     }
 }
 

@@ -157,7 +157,6 @@ FilterPackage returns Package:
 // ;
 
 FilterPackageMember returns ElementFilterMembership:
-    // TODO: always private visibility
     '[' element=OwnedExpression ']'
 ;
 
@@ -580,7 +579,8 @@ FeatureConjugation returns Conjugation:
 fragment ValuePart:
     value=FeatureValue
     | value=FeatureValueExpression
-      write=EmptyFeatureWriteMember
+    // not reliable in Langium
+    //   write=EmptyFeatureWriteMember
 ;
 
 FeatureValue returns FeatureValue:
@@ -591,39 +591,39 @@ FeatureValueExpression returns FeatureValue:
     isInitial?=':=' element=OwnedExpression
 ;
 
-EmptyFeatureWriteMember returns OwningMembership:
-    element=EmptyFeatureWrite
-;
+// EmptyFeatureWriteMember returns OwningMembership:
+//     element=EmptyFeatureWrite
+// ;
 
-EmptyFeatureWrite returns Step:
-    children+=EmptyTargetMember
-    children+=EmptyParameterMember
-;
+// EmptyFeatureWrite returns Step:
+//     children+=EmptyTargetMember
+//     children+=EmptyParameterMember
+// ;
 
-EmptyTargetMember returns ParameterMembership:
-    element=EmptyTargetParameter
-;
+// EmptyTargetMember returns ParameterMembership:
+//     element=EmptyTargetParameter
+// ;
 
 // SysML type in KerML? Really?
-EmptyTargetParameter returns Feature:
-    children+=TargetFeatureMember
-;
+// EmptyTargetParameter returns Feature:
+//     children+=TargetFeatureMember
+// ;
 
-TargetFeatureMember returns FeatureMembership:
-    element=TargetFeature
-;
+// TargetFeatureMember returns FeatureMembership:
+//     element=TargetFeature
+// ;
 
-TargetFeature returns Feature:
-    children+=EmptyFeatureMember
-;
+// TargetFeature returns Feature:
+//     children+=EmptyFeatureMember
+// ;
 
-EmptyFeatureMember returns FeatureMembership:
-    element=EmptyFeature
-;
+// EmptyFeatureMember returns FeatureMembership:
+//     element=EmptyFeature
+// ;
 
-EmptyParameterMember returns ParameterMembership:
-    element=EmptyFeature
-;
+// EmptyParameterMember returns ParameterMembership:
+//     element=EmptyFeature
+// ;
 
 /* MULTIPLICITIES */
 

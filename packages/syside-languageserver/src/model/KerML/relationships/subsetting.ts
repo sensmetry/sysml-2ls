@@ -14,14 +14,33 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Subsetting } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { FeatureMeta, SpecializationMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    FeatureMeta,
+    RelationshipMeta,
+    RelationshipOptions,
+    SpecializationMeta,
+} from "../_internal";
 
 @metamodelOf(Subsetting)
+// @ts-expect-error ignoring static inheritance error
 export class SubsettingMeta<T extends FeatureMeta = FeatureMeta> extends SpecializationMeta<T> {
     override ast(): Subsetting | undefined {
         return this._ast as Subsetting;
+    }
+
+    static override create<
+        T extends AstNode,
+        Parent extends FeatureMeta | RelationshipMeta | undefined
+    >(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<FeatureMeta, Parent, FeatureMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

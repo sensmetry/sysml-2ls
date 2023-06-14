@@ -15,16 +15,15 @@
  ********************************************************************************/
 
 import {
-    AstNode,
     DefaultScopeProvider,
     findLeafNodeAtOffset,
-    getDocument,
     isLeafCstNode,
     LangiumDocument,
     ReferenceInfo,
 } from "langium";
 import {
     Conjugation,
+    Element,
     ElementReference,
     EndFeatureMembership,
     Expression,
@@ -124,12 +123,7 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
 
         // not a start of the reference so it has to be resolved in the scope of
         // `parent`
-        const ast = container.ast();
-        return this.localScope(
-            parent,
-            container.document ?? (ast ? getDocument(ast) : undefined),
-            aliasResolver
-        );
+        return this.localScope(parent, container.document, aliasResolver);
     }
 
     /**
@@ -210,18 +204,12 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
 
         if (!owner) return;
 
-        const ast = owner.ast();
-        if (ast) {
-            // skipping the the owning node to avoid name resolution bugs if the
-            // node has the same name as the reference
-            try {
-                document ??= getDocument(ast);
-            } catch {
-                // doesn't matter if no document was found
-            }
+        // skipping the the owning node to avoid name resolution bugs if the
+        // node has the same name as the reference
+        document ??= owner.document;
 
-            if (document) this.initializeParents(ast, document);
-        }
+        const parent = owner.is(Element) ? owner : (owner.parent() as ElementMeta | undefined);
+        if (parent) this.initializeParents(parent, document);
 
         return makeLinkingScope(
             owner,
@@ -309,10 +297,10 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
      * @param node AST node that scope is being constructed for
      * @param document document that contains {@link node}
      */
-    protected initializeParents(node: AstNode | undefined, document: LangiumDocument): void {
+    protected initializeParents(node: ElementMeta | undefined, document: LangiumDocument): void {
         while (node) {
-            this.metamodelBuilder.preLink(node, document, CancellationToken.None);
-            node = node.$container;
+            this.metamodelBuilder.buildElement(node, document);
+            node = node.parent();
         }
     }
 }

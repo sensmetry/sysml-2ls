@@ -16,7 +16,7 @@
 
 import { ItemFlow, Step } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { FeatureMeta } from "./_internal";
+import { FeatureMeta, FeatureOptions } from "./_internal";
 
 export const ImplicitSteps = {
     base: "Performances::performances",
@@ -26,6 +26,8 @@ export const ImplicitSteps = {
     incomingTransfer: "Occurrences::Occurrence::incomingTransfers",
     featureWrite: "FeatureReferencingPerformances::FeatureWritePerformance", // TODO
 };
+
+export type StepOptions = FeatureOptions;
 
 @metamodelOf(Step, ImplicitSteps)
 export class StepMeta extends FeatureMeta {

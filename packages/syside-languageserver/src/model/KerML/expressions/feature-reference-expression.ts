@@ -23,6 +23,9 @@ import {
 import { metamodelOf } from "../../metamodel";
 import { ElementParts, ExpressionMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../_internal";
 
+// TODO:add expression
+export type FeatureReferenceExpressionOptions = ExpressionMeta;
+
 @metamodelOf(FeatureReferenceExpression)
 export class FeatureReferenceExpressionMeta extends ExpressionMeta {
     private _expression?: MembershipMeta<FeatureMeta> | undefined;
