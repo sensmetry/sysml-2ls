@@ -18,12 +18,14 @@ import { Mixin } from "ts-mixer";
 import { AssociationStructure } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { metamodelOf } from "../metamodel";
-import { AssociationMeta, StructureMeta } from "./_internal";
+import { AssociationMeta, AssociationOptions, StructureMeta, StructureOptions } from "./_internal";
 
 export const ImplicitAssociationStructures = {
     base: "Objects::LinkObject",
     binary: "Objects::BinaryLinkObject",
 };
+
+export interface AssociationStructureOptions extends StructureOptions, AssociationOptions {}
 
 @metamodelOf(AssociationStructure, ImplicitAssociationStructures)
 export class AssociationStructMeta extends Mixin(StructureMeta, AssociationMeta) {

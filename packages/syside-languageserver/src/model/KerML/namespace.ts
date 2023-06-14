@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream, stream } from "langium";
+import { AstNode, LangiumDocument, Stream, stream } from "langium";
 import {
     Comment,
     Documentation,
@@ -30,18 +30,20 @@ import {
 import { SubtypeKeys, SysMLInterface, SysMLTypeList } from "../../services";
 import { KeysMatching, NonNullable, enumerable } from "../../utils";
 import { BuildState } from "../enums";
-import { metamodelOf } from "../metamodel";
+import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import {
     CommentMeta,
     DocumentationMeta,
     ElementFilterMembershipMeta,
     ElementMeta,
+    ElementOptions,
     ElementParts,
     FeatureMeta,
     ImportMeta,
     MembershipMeta,
     MetadataFeatureMeta,
     OwningMembershipMeta,
+    RelationshipMeta,
     TextualRepresentationMeta,
 } from "./_internal";
 import { ElementContainer } from "../containers";
@@ -63,6 +65,10 @@ const DocMembers = makeMemberFilter(Documentation);
 const CommentMembers = makeMemberFilter(Comment);
 const MetaMembers = makeMemberFilter(MetadataFeature);
 const RepMembers = makeMemberFilter(TextualRepresentation);
+
+// TODO: add prefixes
+// TODO: add children
+export type NamespaceOptions = ElementOptions<RelationshipMeta>;
 
 @metamodelOf(Namespace)
 export class NamespaceMeta extends ElementMeta {
@@ -164,7 +170,7 @@ export class NamespaceMeta extends ElementMeta {
         kind: K
     ): Stream<FeatureMeta> {
         return stream(this.featureMembers())
-            .filter((m) => m.is(kind))
+            .filter(BasicMetamodel.is(kind))
             .map((m) => m.element())
             .nonNullable();
     }
@@ -175,7 +181,7 @@ export class NamespaceMeta extends ElementMeta {
         return stream(this.featureMembers())
             .map((m) => m.element())
             .nonNullable()
-            .filter((f) => f.is(kind)) as Stream<SysMLTypeList[K]["$meta"]>;
+            .filter(BasicMetamodel.is(kind));
     }
 
     protected collectParts(): ElementParts {
@@ -189,6 +195,16 @@ export class NamespaceMeta extends ElementMeta {
         // only members in children may have references which may invalidate
         // caches
         this._children.invalidateCaches();
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: NamespaceOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as NamespaceMeta;
+        return model;
     }
 }
 

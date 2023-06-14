@@ -14,10 +14,19 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { StateSubactionKind, StateSubactionMembership } from "../../../generated/ast";
+import { RelationshipOptionsBody } from "../../KerML";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { ActionUsageMeta } from "../action-usage";
+import { StateDefinitionMeta } from "../state-definition";
+import { StateUsageMeta } from "../state-usage";
+
+export interface StateSubactionMembershipOptions
+    extends RelationshipOptionsBody<ActionUsageMeta, StateDefinitionMeta | StateUsageMeta> {
+    kind?: StateSubactionKind;
+}
 
 @metamodelOf(StateSubactionMembership)
 export class StateSubactionMembershipMeta<
@@ -27,6 +36,17 @@ export class StateSubactionMembershipMeta<
 
     override ast(): StateSubactionMembership | undefined {
         return this._ast as StateSubactionMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: StateSubactionMembershipOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as StateSubactionMembershipMeta;
+        if (options?.kind) model.kind = options.kind;
+        return model;
     }
 }
 

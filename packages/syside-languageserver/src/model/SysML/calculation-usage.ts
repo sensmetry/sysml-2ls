@@ -16,9 +16,13 @@
 
 import { Mixin } from "ts-mixer";
 import { CalculationDefinition, CalculationUsage } from "../../generated/ast";
-import { ExpressionMeta } from "../KerML/expression";
-import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ExpressionMeta, ExpressionOptions } from "../KerML/expression";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
+import { AstNode, LangiumDocument } from "langium";
+import { ElementParts } from "../KerML";
+
+export interface CalculationUsageOptions extends ExpressionOptions, ActionUsageOptions {}
 
 @metamodelOf(CalculationUsage, {
     base: "Calculations::calculations",
@@ -37,6 +41,22 @@ export class CalculationUsageMeta extends Mixin(ExpressionMeta, ActionUsageMeta)
         return Boolean(
             this.isNonEntryExitComposite() && parent?.isAny(CalculationUsage, CalculationDefinition)
         );
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        ActionUsageMeta.prototype["collectDeclaration"].call(this, parts);
+        if (this._result) parts.push(["result", [this._result]]);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: CalculationUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as CalculationUsageMeta;
+        if (options) ExpressionMeta.applyExpressionOptions(model, options);
+        return model;
     }
 }
 

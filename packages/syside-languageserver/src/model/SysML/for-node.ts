@@ -16,7 +16,9 @@
 
 import { ForkNode } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ControlNodeMeta } from "./control-node";
+import { ControlNodeMeta, ControlNodeOptions } from "./control-node";
+
+export type ForNodeOptions = ControlNodeOptions;
 
 @metamodelOf(ForkNode, {
     subaction: "Actions::Action::forks",

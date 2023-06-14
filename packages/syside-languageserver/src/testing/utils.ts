@@ -30,6 +30,7 @@ import { makeLinkingScope, makeScope, SysMLScope } from "../utils/scopes";
 import { SysMLConfig } from "../services/config";
 import { Visibility } from "../utils/scope-util";
 import { expect } from "@jest/globals";
+import { BasicMetamodel, RelationshipMeta } from "../model";
 
 export const TEST_SERVER_OPTIONS: DeepPartial<SysMLConfig> = {
     // don't parse the standard library
@@ -173,4 +174,56 @@ export function findCursor(text: string): { text: string; cursor: number } {
     }
 
     return { text, cursor };
+}
+
+declare module "../model/metamodel" {
+    interface BasicMetamodel {
+        toJSON(): Record<string, unknown>;
+    }
+}
+
+BasicMetamodel.prototype.toJSON = function (this: BasicMetamodel): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    for (const key in this) {
+        if (key.startsWith("_")) continue;
+        const value = (this as unknown as Record<string, unknown>)[key];
+        if (typeof value === "function") continue;
+        out[key] = value;
+    }
+
+    out["$type"] = this.nodeType();
+    return out;
+};
+
+RelationshipMeta.prototype.toJSON = function (this: RelationshipMeta): Record<string, unknown> {
+    const out: Record<string, unknown> = BasicMetamodel.prototype.toJSON.call(this);
+    if (this.element()) out.element = this.element();
+
+    return out;
+};
+
+declare module "langium" {
+    interface LangiumDocument {
+        toJSON?: () => unknown;
+    }
+}
+
+/**
+ * Patch a document so that it works with `JSON.stringify`
+ * @param doc
+ * @returns
+ */
+export function patchDocument(doc: LangiumDocument): LangiumDocument {
+    doc.toJSON = function (this: LangiumDocument): unknown {
+        return {
+            ...this,
+            parseResult: {
+                ...this.parseResult,
+                value: undefined,
+            },
+            astNodes: undefined,
+        };
+    };
+
+    return doc;
 }

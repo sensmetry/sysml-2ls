@@ -14,14 +14,34 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { TypeFeaturing } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { FeaturingMeta, TypeMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    FeatureMeta,
+    FeaturingMeta,
+    RelationshipMeta,
+    RelationshipOptions,
+    TypeMeta,
+} from "../_internal";
 
 @metamodelOf(TypeFeaturing)
+// @ts-expect-error ignoring static inheritance error
 export class TypeFeaturingMeta<T extends TypeMeta = TypeMeta> extends FeaturingMeta<T> {
     override ast(): TypeFeaturing | undefined {
         return this._ast as TypeFeaturing;
+    }
+
+    static override create<
+        T extends AstNode,
+        Parent extends FeatureMeta | RelationshipMeta | undefined
+    >(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<TypeMeta, Parent, FeatureMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

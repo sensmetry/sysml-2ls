@@ -16,11 +16,13 @@
 
 import { Behavior } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ClassMeta } from "./_internal";
+import { ClassMeta, ClassOptions } from "./_internal";
 
 export const ImplicitBehaviors = {
     base: "Performances::Performance",
 };
+
+export type BehaviorOptions = ClassOptions;
 
 @metamodelOf(Behavior, ImplicitBehaviors)
 export class BehaviorMeta extends ClassMeta {

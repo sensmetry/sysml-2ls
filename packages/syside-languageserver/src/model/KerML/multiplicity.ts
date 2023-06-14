@@ -17,13 +17,15 @@
 import { Classifier, Feature, Multiplicity } from "../../generated/ast";
 import { NonNullable } from "../../utils";
 import { metamodelOf } from "../metamodel";
-import { FeatureMeta, TypeMeta } from "./_internal";
+import { FeatureMeta, FeatureOptions, TypeMeta } from "./_internal";
 
 export const ImplicitMultiplicities = {
     base: "Base::naturals",
     feature: "Base::exactlyOne",
     classifier: "Base::zeroOrOne",
 };
+
+export type MultiplicityOptions = FeatureOptions;
 
 @metamodelOf(Multiplicity, ImplicitMultiplicities)
 export class MultiplicityMeta extends FeatureMeta {

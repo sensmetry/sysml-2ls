@@ -31,7 +31,6 @@ import { makeScope, SysMLScope } from "../../../utils/scopes";
 import { SysMLScopeComputation } from "../../references/scope-computation";
 import { SysMLDefaultServices } from "../../services";
 import { SysMLNodeDescription } from "./ast-descriptions";
-import { getDocument } from "../../../utils";
 
 /**
  * Overrides the default IndexManager from Langium to work with members imported
@@ -195,8 +194,8 @@ export class SysMLIndexManager extends DefaultIndexManager {
                 deps = new Set();
                 this.modelDependencies.set(uri, deps);
             }
-            const doc = getDocument(candidate);
-            if (doc) deps.add(doc.uriString);
+            const doc = candidate.document;
+            deps.add(doc.uriString);
         }
 
         return candidate;

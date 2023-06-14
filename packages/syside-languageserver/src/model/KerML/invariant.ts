@@ -14,14 +14,19 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Invariant } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { BooleanExpressionMeta } from "./_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { BooleanExpressionMeta, BooleanExpressionOptions } from "./_internal";
 
 export const ImplicitInvariants = {
     base: "Performances::trueEvaluations",
     negated: "Performances::falseEvaluations",
 };
+
+export interface InvariantOptions extends BooleanExpressionOptions {
+    isNegated?: boolean;
+}
 
 @metamodelOf(Invariant, ImplicitInvariants)
 export class InvariantMeta extends BooleanExpressionMeta {
@@ -36,6 +41,21 @@ export class InvariantMeta extends BooleanExpressionMeta {
 
     override defaultSupertype(): string {
         return this.isNegated ? "negated" : "base";
+    }
+
+    protected static applyInvariantOptions(model: InvariantMeta, options: InvariantOptions): void {
+        model.isNegated = Boolean(options.isNegated);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: InvariantOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as InvariantMeta;
+        if (options) InvariantMeta.applyInvariantOptions(model, options);
+        return model;
     }
 }
 

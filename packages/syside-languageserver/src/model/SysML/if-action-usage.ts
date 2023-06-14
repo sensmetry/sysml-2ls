@@ -22,9 +22,13 @@ import {
     MembershipMeta,
     ParameterMembershipMeta,
 } from "../KerML";
-import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { NonNullable, enumerable } from "../../utils";
+import { AstNode, LangiumDocument } from "langium";
+
+// TODO: add condition, then, else
+export type IfActionUsageOptions = ActionUsageOptions;
 
 @metamodelOf(IfActionUsage, {
     base: "Actions::ifThenActions",
@@ -86,6 +90,24 @@ export class IfActionUsageMeta extends ActionUsageMeta {
         if (this.condition) parts.push(["condition", [this.condition]]);
         if (this.then) parts.push(["then", [this.then]]);
         if (this.else) parts.push(["else", [this.else]]);
+    }
+
+    protected static applyIfOptions(
+        _model: IfActionUsageMeta,
+        _options: IfActionUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: IfActionUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as IfActionUsageMeta;
+        if (options) IfActionUsageMeta.applyIfOptions(model, options);
+        return model;
     }
 }
 

@@ -14,10 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { SubjectMembership } from "../../../generated/ast";
+import { RelationshipOptionsBody } from "../../KerML";
 import { ParameterMembershipMeta } from "../../KerML/relationships/parameter-membership";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { ReferenceUsageMeta } from "../reference-usage";
+import { RequirementDefinitionMeta } from "../requirement-definition";
+import { RequirementUsageMeta } from "../requirement-usage";
+import { CaseDefinitionMeta } from "../case-definition";
+import { CaseUsageMeta } from "../case-usage";
 
 @metamodelOf(SubjectMembership)
 export class SubjectMembershipMeta<
@@ -25,6 +31,18 @@ export class SubjectMembershipMeta<
 > extends ParameterMembershipMeta<T> {
     override ast(): SubjectMembership | undefined {
         return this._ast as SubjectMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<
+            ReferenceUsageMeta,
+            RequirementDefinitionMeta | RequirementUsageMeta | CaseDefinitionMeta | CaseUsageMeta
+        >
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

@@ -20,7 +20,9 @@ import {
     RequirementVerificationMembership,
 } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConstraintUsageMeta } from "./constraint-usage";
+import { ConstraintUsageMeta, ConstraintUsageOptions } from "./constraint-usage";
+
+export type RequirementUsageOptions = ConstraintUsageOptions;
 
 @metamodelOf(RequirementUsage, {
     base: "Requirements::requirementChecks",

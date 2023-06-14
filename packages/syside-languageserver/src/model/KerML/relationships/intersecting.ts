@@ -14,14 +14,25 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Intersecting } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { RelationshipMeta, TypeMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { RelationshipMeta, RelationshipOptions, TypeMeta } from "../_internal";
 
 @metamodelOf(Intersecting)
+// @ts-expect-error ignoring static inheritance error
 export class IntersectingMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
     override ast(): Intersecting | undefined {
         return this._ast as Intersecting;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<TypeMeta, TypeMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

@@ -14,14 +14,25 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { FeatureInverting } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { FeatureMeta, RelationshipMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { FeatureMeta, RelationshipMeta, RelationshipOptions } from "../_internal";
 
 @metamodelOf(FeatureInverting)
+// @ts-expect-error ignoring static inheritance error
 export class FeatureInvertingMeta<T extends FeatureMeta = FeatureMeta> extends RelationshipMeta<T> {
     override ast(): FeatureInverting | undefined {
         return this._ast as FeatureInverting;
+    }
+
+    static override create<T extends AstNode, Parent extends FeatureMeta | RelationshipMeta>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<FeatureMeta, Parent, FeatureMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

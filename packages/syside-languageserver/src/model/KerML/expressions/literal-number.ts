@@ -14,10 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { LiteralNumber } from "../../../generated/ast";
 import { enumerable } from "../../../utils";
-import { metamodelOf } from "../../metamodel";
-import { LiteralExpressionMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { LiteralExpressionMeta, LiteralExpressionOptions } from "../_internal";
 
 export const ImplicitLiteralNumbers = {
     // can't parse ints and reals into separate node
@@ -25,11 +26,13 @@ export const ImplicitLiteralNumbers = {
     real: "Performances::literalRationalEvaluations",
 };
 
-// TODO: implement implicit kind selection
+export interface LiteralNumberOptions extends LiteralExpressionOptions {
+    value?: number;
+}
 
 @metamodelOf(LiteralNumber, ImplicitLiteralNumbers)
 export class LiteralNumberMeta extends LiteralExpressionMeta {
-    protected _isInteger = false;
+    protected _isInteger = true;
     protected _literal = 0;
 
     @enumerable
@@ -55,6 +58,17 @@ export class LiteralNumberMeta extends LiteralExpressionMeta {
 
     override returnType(): string {
         return this.isInteger ? "ScalarValues::Rational" : "ScalarValues::Integer";
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: LiteralNumberOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as LiteralNumberMeta;
+        if (options?.value) model.literal = options.value;
+        return model;
     }
 }
 

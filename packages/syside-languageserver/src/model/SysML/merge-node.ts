@@ -16,7 +16,9 @@
 
 import { MergeNode } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ControlNodeMeta } from "./control-node";
+import { ControlNodeMeta, ControlNodeOptions } from "./control-node";
+
+export type MergeNodeOptions = ControlNodeOptions;
 
 @metamodelOf(MergeNode, {
     subaction: "Actions::Action::merges",

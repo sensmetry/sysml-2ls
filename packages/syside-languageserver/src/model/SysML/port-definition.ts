@@ -16,25 +16,73 @@
 
 import { Mixin } from "ts-mixer";
 import { ConjugatedPortDefinition, PortDefinition } from "../../generated/ast";
-import { StructureMeta } from "../KerML/structure";
-import { metamodelOf } from "../metamodel";
-import { OccurrenceDefinitionMeta } from "./occurrence-definition";
-import { OwningMembershipMeta } from "../KerML";
+import { StructureMeta, StructureOptions } from "../KerML/structure";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { OccurrenceDefinitionMeta, OccurrenceDefinitionOptions } from "./occurrence-definition";
+import { ElementParts, OwningMembershipMeta } from "../KerML";
 import { enumerable } from "../../utils";
+import { AstNode, LangiumDocument } from "langium";
+import { PortConjugationMeta } from "./relationships";
+
+export interface PortDefinitionOptions extends StructureOptions, OccurrenceDefinitionOptions {}
 
 @metamodelOf(PortDefinition, {
     base: "Ports::Port",
 })
-export class PortDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, StructureMeta) {
-    private _conjugatedDefinition?: OwningMembershipMeta<ConjugatedPortDefinitionMeta> | undefined;
+export class PortDefinitionMeta extends Mixin(StructureMeta, OccurrenceDefinitionMeta) {
+    private _conjugatedDefinition: OwningMembershipMeta<ConjugatedPortDefinitionMeta>;
 
     @enumerable
-    get conjugatedDefinition(): OwningMembershipMeta<ConjugatedPortDefinitionMeta> | undefined {
+    get conjugatedDefinition(): OwningMembershipMeta<ConjugatedPortDefinitionMeta> {
         return this._conjugatedDefinition;
     }
 
     override ast(): PortDefinition | undefined {
         return this._ast as PortDefinition;
+    }
+
+    protected override setName(name: string | undefined): void {
+        super.setName(name);
+
+        const def = this._conjugatedDefinition?.element();
+        if (def) def.declaredName = this.name ? `'~${this.name}'` : undefined;
+    }
+
+    protected override setShortName(name: string | undefined): void {
+        super.setShortName(name);
+
+        const def = this._conjugatedDefinition?.element();
+        if (def) def.declaredShortName = this.shortName ? `'~${this.shortName}'` : undefined;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: PortDefinitionOptions
+    ): T["$meta"] {
+        const portDef = super.create(provider, document, options) as PortDefinitionMeta;
+        const conjugated = ConjugatedPortDefinitionMeta.create(provider, document);
+        conjugated.addSpecialization(
+            PortConjugationMeta.create(provider, document, { target: portDef })
+        );
+        portDef._conjugatedDefinition = OwningMembershipMeta.create(provider, document, {
+            parent: portDef,
+            target: conjugated,
+        }) as OwningMembershipMeta<ConjugatedPortDefinitionMeta>;
+
+        if (options?.declaredName) portDef.setName(options.declaredName);
+        if (options?.declaredShortName) portDef.setShortName(options.declaredShortName);
+
+        return portDef;
+    }
+
+    protected override collectParts(): ElementParts {
+        const parts = OccurrenceDefinitionMeta.prototype["collectParts"].call(this);
+        if (this._conjugatedDefinition)
+            parts.push(["conjugatedDefinition", [this._conjugatedDefinition]]);
+
+        return parts;
     }
 }
 
@@ -42,6 +90,16 @@ export class PortDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, Structur
 export class ConjugatedPortDefinitionMeta extends PortDefinitionMeta {
     override ast(): ConjugatedPortDefinition | undefined {
         return this._ast as ConjugatedPortDefinition;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: PortDefinitionOptions
+    ): T["$meta"] {
+        // don't need to add conjugation again
+        return OccurrenceDefinitionMeta.create.call(this, provider, document, options);
     }
 }
 

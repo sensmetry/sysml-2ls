@@ -16,7 +16,9 @@
 
 import { EnumerationUsage, EnumerationDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { AttributeUsageMeta } from "./attribute-usage";
+import { AttributeUsageMeta, AttributeUsageOptions } from "./attribute-usage";
+
+export type EnumerationUsageOptions = AttributeUsageOptions;
 
 @metamodelOf(EnumerationUsage)
 export class EnumerationUsageMeta extends AttributeUsageMeta {

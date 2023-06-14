@@ -14,14 +14,24 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Annotation } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ElementMeta, RelationshipMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { ElementMeta, RelationshipMeta, RelationshipOptions } from "../_internal";
 
 @metamodelOf(Annotation)
 export class AnnotationMeta<T extends ElementMeta = ElementMeta> extends RelationshipMeta<T> {
     override ast(): Annotation | undefined {
         return this._ast as Annotation;
+    }
+
+    static override create<T extends AstNode, P extends ElementMeta | undefined>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<ElementMeta, P, ElementMeta> | undefined
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

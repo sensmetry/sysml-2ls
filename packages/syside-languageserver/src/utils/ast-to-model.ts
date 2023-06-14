@@ -20,7 +20,6 @@ import * as ast from "../generated/ast";
 import {
     ActionUsageMeta,
     BasicMetamodel,
-    ConjugatedPortDefinitionMeta,
     ExpressionMeta,
     FeatureMeta,
     MembershipMeta,
@@ -28,6 +27,7 @@ import {
     MultiplicityRangeMeta,
     OwningMembershipMeta,
     ParameterMembershipMeta,
+    ReferenceUsageMeta,
     RelationshipMeta,
     getFeatureDirectionKind,
     getTransitionFeatureKind,
@@ -194,7 +194,7 @@ const AstToModel: {
         (model["_receiver"] as RelationshipMeta | undefined) = node.receiver?.$meta;
     },
 
-    [ast.ActionUsage](model, node) {
+    [ast.StateUsage](model, node) {
         model.isParallel = node.isParallel;
     },
 
@@ -220,11 +220,6 @@ const AstToModel: {
         model["_else"] = node.else?.$meta as ParameterMembershipMeta<ActionUsageMeta>;
     },
 
-    [ast.PortDefinition](model, node) {
-        model["_conjugatedDefinition"] = node.conjugated
-            ?.$meta as OwningMembershipMeta<ConjugatedPortDefinitionMeta>;
-    },
-
     [ast.SatisfyRequirementUsage](model, node) {
         model["_satisfactionSubject"] = node.satisfactionSubject?.$meta;
     },
@@ -241,14 +236,26 @@ const AstToModel: {
 
     [ast.TransitionUsage](model, node) {
         (model["_source"] as RelationshipMeta | undefined) = node.source?.$meta;
-        (model["_payload"] as RelationshipMeta | undefined) = node.payload?.$meta;
         (model["_accepter"] as RelationshipMeta | undefined) = node.accepter?.$meta;
-        (model["_transitionLinkSource"] as RelationshipMeta | undefined) =
-            node.transitionLinkSource?.$meta;
         (model["_guard"] as RelationshipMeta | undefined) = node.guard?.$meta;
         (model["_effect"] as RelationshipMeta | undefined) = node.effect?.$meta;
         (model["_then"] as RelationshipMeta | undefined) = node.then?.$meta;
         (model["_else"] as RelationshipMeta | undefined) = node.else?.$meta;
+
+        // Only needed so that linking can be resolved...
+        if (node.payload) {
+            node.payload.$meta = model["_payload"];
+            if (node.payload.element)
+                node.payload.element.$meta = model["_payload"].element() as ReferenceUsageMeta;
+        }
+
+        if (node.transitionLinkSource) {
+            node.transitionLinkSource.$meta = model["_transitionLinkSource"];
+            if (node.transitionLinkSource.element)
+                node.transitionLinkSource.element.$meta = model[
+                    "_transitionLinkSource"
+                ].element() as ReferenceUsageMeta;
+        }
     },
 
     [ast.Usage](model, node) {

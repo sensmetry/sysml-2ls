@@ -24,7 +24,9 @@ import {
 } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
 import { metamodelOf } from "../metamodel";
-import { PartUsageMeta } from "./part-usage";
+import { PartUsageMeta, PartUsageOptions } from "./part-usage";
+
+export type RenderingUsageOptions = PartUsageOptions;
 
 @metamodelOf(RenderingUsage, {
     base: "Views::renderings",

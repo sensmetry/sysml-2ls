@@ -24,7 +24,9 @@ import {
     StakeholderMembership,
 } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ItemUsageMeta } from "./item-usage";
+import { ItemUsageMeta, ItemUsageOptions } from "./item-usage";
+
+export type PartUsageOptions = ItemUsageOptions;
 
 @metamodelOf(PartUsage, {
     base: "Parts::parts",

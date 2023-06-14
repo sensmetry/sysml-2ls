@@ -17,11 +17,13 @@
 import { DataType } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { metamodelOf } from "../metamodel";
-import { ClassifierMeta } from "./_internal";
+import { ClassifierMeta, ClassifierOptions } from "./_internal";
 
 export const ImplicitDataTypes = {
     base: "Base::DataValue",
 };
+
+export type DataTypeOptions = ClassifierOptions;
 
 @metamodelOf(DataType, ImplicitDataTypes)
 export class DataTypeMeta extends ClassifierMeta {

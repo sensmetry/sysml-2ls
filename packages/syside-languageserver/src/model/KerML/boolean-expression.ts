@@ -16,11 +16,13 @@
 
 import { BooleanExpression } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ExpressionMeta } from "./_internal";
+import { ExpressionMeta, ExpressionOptions } from "./_internal";
 
 export const ImplicitBooleanExpressions = {
     base: "Performances::booleanEvaluations",
 };
+
+export type BooleanExpressionOptions = ExpressionOptions;
 
 @metamodelOf(BooleanExpression, ImplicitBooleanExpressions)
 export class BooleanExpressionMeta extends ExpressionMeta {

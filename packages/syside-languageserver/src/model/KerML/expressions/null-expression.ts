@@ -14,15 +14,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { NullExpression } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ExpressionMeta, TypeMeta } from "../_internal";
+import {
+    ElementIDProvider,
+    MetatypeProto,
+    ModelElementOptions,
+    metamodelOf,
+} from "../../metamodel";
+import { ExpressionMeta, RelationshipMeta, TypeMeta } from "../_internal";
 
 export const ImplicitNullExpressions = {
     base: "Performances::nullEvaluations",
 };
 
-// TODO: implement implicit kind selection
+export type NullExpressionOptions = ModelElementOptions<RelationshipMeta>;
 
 @metamodelOf(NullExpression, ImplicitNullExpressions)
 export class NullExpressionMeta extends ExpressionMeta {
@@ -36,6 +42,15 @@ export class NullExpressionMeta extends ExpressionMeta {
 
     override isModelLevelEvaluable(): boolean {
         return true;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: NullExpressionOptions
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

@@ -16,14 +16,42 @@
 
 import { Mixin } from "ts-mixer";
 import { ConnectorAsUsage } from "../../generated/ast";
-import { ConnectorMeta } from "../KerML/connector";
-import { metamodelOf } from "../metamodel";
-import { UsageMeta } from "./usage";
+import { ConnectorMeta, ConnectorOptions } from "../KerML/connector";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { UsageMeta, UsageOptions } from "./usage";
+import { AstNode, LangiumDocument } from "langium";
+import { FeatureMeta, InheritanceMeta, MembershipMeta } from "../KerML";
+
+export interface ConnectorAsUsageOptions extends UsageOptions, ConnectorOptions {}
 
 @metamodelOf(ConnectorAsUsage)
-export class ConnectorAsUsageMeta extends Mixin(UsageMeta, ConnectorMeta) {
+export class ConnectorAsUsageMeta extends Mixin(ConnectorMeta, UsageMeta) {
     override ast(): ConnectorAsUsage | undefined {
         return this._ast as ConnectorAsUsage;
+    }
+
+    override defaultSupertype(): string {
+        return ConnectorMeta.prototype.defaultSupertype.call(this);
+    }
+
+    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+        this.resetEnds();
+        UsageMeta.prototype["onSpecializationAdded"].call(this, specialization);
+    }
+
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        return ConnectorMeta.prototype.featureMembers.call(this);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ConnectorAsUsageOptions
+    ): T["$meta"] {
+        const model = ConnectorMeta.create.call(this, provider, document, options) as UsageMeta;
+        if (options) UsageMeta.applyUsageOptions(model, options);
+        return model;
     }
 }
 

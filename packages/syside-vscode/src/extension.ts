@@ -26,6 +26,7 @@ import { SysMLVSCodeClientExtender } from "./vscode";
 import { URI, Utils } from "vscode-uri";
 import { uriToFsPath } from "vscode-uri/lib/umd/uri";
 import { LanguageClientExtension, ServerConfig } from "syside-languageclient";
+import { NonNullable } from "syside-languageserver";
 
 type ClientExtension = LanguageClientExtension<vscode.ExtensionContext>;
 type Extension = {
@@ -88,7 +89,7 @@ async function collectExtensions(ids: string[]): Promise<Extension[]> {
                 );
                 return;
             })
-            .filter((value): value is Extension => value !== undefined)
+            .filter(NonNullable)
     );
 }
 

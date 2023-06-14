@@ -14,13 +14,20 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { TransitionFeatureKind, TransitionFeatureMembership } from "../../../generated/ast";
-import { ExpressionMeta } from "../../KerML";
+import { ExpressionMeta, RelationshipOptionsBody } from "../../KerML";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { ActionUsageMeta } from "../action-usage";
+import { TransitionUsageMeta } from "../transition-usage";
 
 type Transition = ActionUsageMeta | ExpressionMeta;
+
+export interface TransitionFeatureMembershipOptions
+    extends RelationshipOptionsBody<Transition, TransitionUsageMeta> {
+    kind?: TransitionFeatureKind;
+}
 
 @metamodelOf(TransitionFeatureMembership)
 export class TransitionFeatureMembershipMeta<
@@ -30,6 +37,17 @@ export class TransitionFeatureMembershipMeta<
 
     override ast(): TransitionFeatureMembership | undefined {
         return this._ast as TransitionFeatureMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: TransitionFeatureMembershipOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as TransitionFeatureMembershipMeta;
+        if (options?.kind) model.kind = options.kind;
+        return model;
     }
 }
 

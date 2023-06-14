@@ -14,15 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { LiteralBoolean } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { LiteralExpressionMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { LiteralExpressionMeta, LiteralExpressionOptions } from "../_internal";
 
 export const ImplicitLiteralBooleans = {
     base: "Performances::literalBooleanEvaluations",
 };
 
-// TODO: implement implicit kind selection
+export interface LiteralBooleanOptions extends LiteralExpressionOptions {
+    value?: boolean;
+}
 
 @metamodelOf(LiteralBoolean, ImplicitLiteralBooleans)
 export class LiteralBooleanMeta extends LiteralExpressionMeta {
@@ -34,6 +37,17 @@ export class LiteralBooleanMeta extends LiteralExpressionMeta {
 
     override returnType(): string {
         return "ScalarValues::Boolean";
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: LiteralBooleanOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as LiteralBooleanMeta;
+        model.literal = Boolean(options?.value);
+        return model;
     }
 }
 

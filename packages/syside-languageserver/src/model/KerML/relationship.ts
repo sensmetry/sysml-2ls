@@ -14,13 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream, stream } from "langium";
+import { AstNode, LangiumDocument, Stream, stream } from "langium";
 import {
     Comment,
     Documentation,
     Element,
     Feature,
-    Membership,
     MetadataFeature,
     Relationship,
     TextualRepresentation,
@@ -28,7 +27,7 @@ import {
 import { NonNullable, enumerable } from "../../utils";
 import { Visibility } from "../../utils/scope-util";
 import { ElementContainer } from "../containers";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, ModelElementOptions, metamodelOf } from "../metamodel";
 import {
     CommentMeta,
     DocumentationMeta,
@@ -48,12 +47,32 @@ export type NonNullRelationship<
 
 export type TargetType<T extends RelationshipMeta = RelationshipMeta> = ReturnType<T["element"]>;
 
+export type SourcePart<
+    Parent extends ElementMeta | undefined = undefined,
+    Source extends ElementMeta = ElementMeta
+> = Parent extends RelationshipMeta ? { source: Source } : { source?: never };
+
+export interface RelationshipOptionsBody<
+    Target extends ElementMeta | undefined,
+    Parent extends ElementMeta | undefined = undefined
+> extends ModelElementOptions<Parent> {
+    target: Target;
+    isImplied?: boolean;
+    visibility?: Visibility;
+}
+
+export type RelationshipOptions<
+    Target extends ElementMeta | undefined,
+    Parent extends ElementMeta | undefined = undefined,
+    Source extends ElementMeta = ElementMeta
+> = RelationshipOptionsBody<Target, Parent> & SourcePart<Parent, Source>;
+
 @metamodelOf(Relationship, "abstract")
 export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> extends ElementMeta {
     protected _children = new ElementContainer<Element>();
 
     protected _visibility?: Visibility;
-    isImplied = false;
+    protected _isImplied = false;
 
     protected _source?: ElementMeta;
     protected _element?: T;
@@ -83,6 +102,11 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
     }
 
     @enumerable
+    get isImplied(): boolean {
+        return this._isImplied;
+    }
+
+    @enumerable
     get children(): readonly ElementMeta[] {
         return this._children.all;
     }
@@ -91,7 +115,7 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
         return this._source || (this._owner as ElementMeta | undefined);
     }
 
-    setSource(s: ElementMeta): void {
+    protected setSource(s: ElementMeta): void {
         this._source = s;
     }
 
@@ -129,8 +153,17 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
     /**
      * @see {@link element}
      */
-    setElement(e?: T): void {
-        this._element = e?.is(Membership) ? e : e;
+    protected setElement(e?: T): void {
+        if (this._element === e) return;
+        const previous = this._element;
+        this._element = e;
+
+        this.onTargetSet(previous, e);
+    }
+
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    protected onTargetSet(previous?: T, current?: T): void {
+        // empty
     }
 
     override ast(): Relationship | undefined {
@@ -161,6 +194,24 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
 
         parts.push(["children", this.children]);
         return parts;
+    }
+
+    protected static override create<T extends AstNode, P extends ElementMeta | undefined>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptions<ElementMeta, P>
+    ): T["$meta"] {
+        const self = super.create(provider, document, options) as RelationshipMeta;
+
+        if (options) {
+            self._visibility = options.visibility;
+            self._isImplied = Boolean(options.isImplied);
+            // type inference breaks down...
+            if (options.source) self._source = options.source;
+            self.setElement(options.target);
+        }
+        return self;
     }
 }
 

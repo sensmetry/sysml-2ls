@@ -14,17 +14,28 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { PortConjugation } from "../../../generated/ast";
-import { ConjugationMeta } from "../../KerML";
-import { metamodelOf } from "../../metamodel";
-import { PortDefinitionMeta } from "../port-definition";
+import { ConjugationMeta, RelationshipOptionsBody } from "../../KerML";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { ConjugatedPortDefinitionMeta, PortDefinitionMeta } from "../port-definition";
 
 @metamodelOf(PortConjugation)
+// @ts-expect-error ignoring static inheritance error
 export class PortConjugationMeta<
     T extends PortDefinitionMeta = PortDefinitionMeta
 > extends ConjugationMeta<T> {
     override ast(): PortConjugation | undefined {
         return this._ast as PortConjugation;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<PortDefinitionMeta, ConjugatedPortDefinitionMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

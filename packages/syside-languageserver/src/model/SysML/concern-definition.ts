@@ -16,7 +16,9 @@
 
 import { ConcernDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { RequirementDefinitionMeta } from "./requirement-definition";
+import { RequirementDefinitionMeta, RequirementDefinitionOptions } from "./requirement-definition";
+
+export type ConcernDefinitionOptions = RequirementDefinitionOptions;
 
 @metamodelOf(ConcernDefinition, {
     base: "Requirements::ConcernCheck",

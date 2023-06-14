@@ -14,9 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { MembershipImport } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ImportMeta, MembershipMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { ImportMeta, ImportOptions, MembershipMeta } from "../_internal";
 
 @metamodelOf(MembershipImport)
 export class MembershipImportMeta<T extends MembershipMeta = MembershipMeta> extends ImportMeta<T> {
@@ -26,6 +27,15 @@ export class MembershipImportMeta<T extends MembershipMeta = MembershipMeta> ext
     override importsNameOnly(): boolean {
         // non-recursive only imports the name
         return !this.isRecursive;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ImportOptions<MembershipMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

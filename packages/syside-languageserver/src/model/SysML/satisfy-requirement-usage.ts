@@ -16,13 +16,20 @@
 
 import { Mixin } from "ts-mixer";
 import { SatisfyRequirementUsage } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { AssertConstraintUsageMeta } from "./assert-constraint-usage";
-import { RequirementUsageMeta } from "./requirement-usage";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { AssertConstraintUsageMeta, AssertConstraintUsageOptions } from "./assert-constraint-usage";
+import { RequirementUsageMeta, RequirementUsageOptions } from "./requirement-usage";
 import { SubjectMembershipMeta } from "./relationships";
 import { NonNullable, enumerable } from "../../utils";
 import { ElementParts, FeatureMeta, MembershipMeta } from "../KerML";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
+import { AstNode, LangiumDocument } from "langium";
+
+export interface SatisfyRequirementUsageOptions
+    extends RequirementUsageOptions,
+        AssertConstraintUsageOptions {
+    // TODO: add subject parameter
+}
 
 @metamodelOf(SatisfyRequirementUsage, {
     base: "Requirements::satisfiedRequirementChecks",
@@ -61,6 +68,31 @@ export class SatisfyRequirementUsageMeta extends Mixin(
         super.collectDeclaration(parts);
         if (this.satisfactionSubject)
             parts.push(["satisfactionSubject", [this.satisfactionSubject]]);
+    }
+
+    protected static applySatisfyRequirementOptions(
+        _model: SatisfyRequirementUsageMeta,
+        _options: SatisfyRequirementUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: SatisfyRequirementUsageOptions
+    ): T["$meta"] {
+        const model = AssertConstraintUsageMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as SatisfyRequirementUsageMeta;
+        if (options) {
+            SatisfyRequirementUsageMeta.applySatisfyRequirementOptions(model, options);
+        }
+        return model;
     }
 }
 

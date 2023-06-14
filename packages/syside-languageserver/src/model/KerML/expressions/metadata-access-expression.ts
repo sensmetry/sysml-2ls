@@ -14,9 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { MetadataAccessExpression } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ElementMeta, ExpressionMeta, TypeMeta } from "../_internal";
+import {
+    ElementIDProvider,
+    MetatypeProto,
+    ModelElementOptions,
+    metamodelOf,
+} from "../../metamodel";
+import { ElementMeta, ExpressionMeta, RelationshipMeta, TypeMeta } from "../_internal";
+
+// TODO: add reference
+export type MetadataAcscessExpressionOptions = ModelElementOptions<RelationshipMeta>;
 
 @metamodelOf(MetadataAccessExpression)
 export class MetadataAccessExpressionMeta extends ExpressionMeta {
@@ -28,6 +37,15 @@ export class MetadataAccessExpressionMeta extends ExpressionMeta {
 
     override returnType(): string | TypeMeta | undefined {
         return "Metaobjects::Metaobject";
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: MetadataAcscessExpressionOptions
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

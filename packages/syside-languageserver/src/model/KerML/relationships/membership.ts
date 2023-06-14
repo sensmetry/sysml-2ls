@@ -14,11 +14,25 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Membership } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ElementMeta, RelationshipMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    ElementMeta,
+    ElementOptions,
+    NamespaceMeta,
+    RelationshipMeta,
+    RelationshipOptionsBody,
+} from "../_internal";
+
+export interface MembershipOptions<
+    Target extends ElementMeta = ElementMeta,
+    Parent extends NamespaceMeta | undefined = NamespaceMeta
+> extends RelationshipOptionsBody<Target, Parent>,
+        ElementOptions<Parent> {}
 
 @metamodelOf(Membership)
+// @ts-expect-error ignoring static inheritance error
 export class MembershipMeta<T extends ElementMeta = ElementMeta> extends RelationshipMeta<T> {
     override ast(): Membership | undefined {
         return this._ast as Membership;
@@ -34,6 +48,17 @@ export class MembershipMeta<T extends ElementMeta = ElementMeta> extends Relatio
 
     isAlias(): boolean {
         return Boolean(super.shortName || super.name);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: MembershipOptions
+    ): T["$meta"] {
+        const member = super.create(provider, document, options) as MembershipMeta;
+        if (options) ElementMeta.applyElementOptions(member, options);
+        return member;
     }
 }
 

@@ -16,16 +16,24 @@
 
 import { Mixin } from "ts-mixer";
 import { CalculationDefinition } from "../../generated/ast";
-import { FunctionMeta } from "../KerML/function";
+import { FunctionMeta, FunctionOptions } from "../KerML/function";
 import { metamodelOf } from "../metamodel";
-import { ActionDefinitionMeta } from "./action-definition";
+import { ActionDefinitionMeta, ActionDefinitionOptions } from "./action-definition";
+import { ElementParts } from "../KerML";
+
+export interface CalculationDefinitionOptions extends FunctionOptions, ActionDefinitionOptions {}
 
 @metamodelOf(CalculationDefinition, {
     base: "Calculations::Calculation",
 })
-export class CalculationDefinitionMeta extends Mixin(ActionDefinitionMeta, FunctionMeta) {
+export class CalculationDefinitionMeta extends Mixin(FunctionMeta, ActionDefinitionMeta) {
     override ast(): CalculationDefinition | undefined {
         return this._ast as CalculationDefinition;
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        ActionDefinitionMeta.prototype["collectDeclaration"].call(this, parts);
+        if (this._result) parts.push(["result", [this._result]]);
     }
 }
 

@@ -16,7 +16,11 @@
 
 import { SelectExpression } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { OperatorExpressionMeta } from "../_internal";
+import { OperatorExpressionMeta, OperatorExpressionOptions } from "../_internal";
+
+export interface SelectExpressionOptions extends OperatorExpressionOptions {
+    operator?: never;
+}
 
 @metamodelOf(SelectExpression)
 export class SelectExpressionMeta extends OperatorExpressionMeta {

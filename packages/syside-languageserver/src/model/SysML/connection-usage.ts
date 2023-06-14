@@ -17,16 +17,32 @@
 import { Mixin } from "ts-mixer";
 import { ConnectionUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ConnectorAsUsageMeta } from "./connector-as-usage";
-import { PartUsageMeta } from "./part-usage";
+import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
+import { PartUsageMeta, PartUsageOptions } from "./part-usage";
+import { FeatureMeta, InheritanceMeta, MembershipMeta } from "../KerML";
+
+export interface ConnectionUsageOptions extends PartUsageOptions, ConnectorAsUsageOptions {}
 
 @metamodelOf(ConnectionUsage, {
     base: "Connections::connections",
     binary: "Connections::binaryConnections",
 })
-export class ConnectionUsageMeta extends Mixin(PartUsageMeta, ConnectorAsUsageMeta) {
+export class ConnectionUsageMeta extends Mixin(ConnectorAsUsageMeta, PartUsageMeta) {
+    override defaultSupertype(): string {
+        return this.isBinary() ? "binary" : "base";
+    }
+
     override ast(): ConnectionUsage | undefined {
         return this._ast as ConnectionUsage;
+    }
+
+    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+        this.resetEnds();
+        PartUsageMeta.prototype["onSpecializationAdded"].call(this, specialization);
+    }
+
+    override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
+        return ConnectorAsUsageMeta.prototype.featureMembers.call(this);
     }
 }
 

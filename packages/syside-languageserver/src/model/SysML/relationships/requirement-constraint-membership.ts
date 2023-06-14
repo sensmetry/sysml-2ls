@@ -14,11 +14,23 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { RequirementConstraintMembership } from "../../../generated/ast";
 import { RequirementConstraintKind } from "../../enums";
+import { RelationshipOptionsBody } from "../../KerML";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, metamodelOf, MetatypeProto } from "../../metamodel";
 import { ConstraintUsageMeta } from "../constraint-usage";
+import { RequirementDefinitionMeta } from "../requirement-definition";
+import { RequirementUsageMeta } from "../requirement-usage";
+
+export interface RequirementConstraintMembershipOptions
+    extends RelationshipOptionsBody<
+        ConstraintUsageMeta,
+        RequirementDefinitionMeta | RequirementUsageMeta
+    > {
+    kind?: RequirementConstraintKind;
+}
 
 @metamodelOf(RequirementConstraintMembership)
 export class RequirementConstraintMembershipMeta<
@@ -28,6 +40,21 @@ export class RequirementConstraintMembershipMeta<
 
     override ast(): RequirementConstraintMembership | undefined {
         return this._ast as RequirementConstraintMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RequirementConstraintMembershipOptions
+    ): T["$meta"] {
+        const model = super.create(
+            provider,
+            document,
+            options
+        ) as RequirementConstraintMembershipMeta;
+        if (options?.kind) model.kind = options.kind;
+        return model;
     }
 }
 

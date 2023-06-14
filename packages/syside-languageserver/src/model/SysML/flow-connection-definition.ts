@@ -16,15 +16,22 @@
 
 import { Mixin } from "ts-mixer";
 import { FlowConnectionDefinition } from "../../generated/ast";
-import { InteractionMeta } from "../KerML/interaction";
-import { metamodelOf } from "../metamodel";
-import { ActionDefinitionMeta } from "./action-definition";
-import { ConnectionDefinitionMeta } from "./connection-definition";
+import { InteractionMeta, InteractionOptions } from "../KerML/interaction";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionDefinitionMeta, ActionDefinitionOptions } from "./action-definition";
+import { ConnectionDefinitionMeta, ConnectionDefinitionOptions } from "./connection-definition";
+import { AstNode, LangiumDocument } from "langium";
+
+export interface FlowConnectionDefinitionOptions
+    extends InteractionOptions,
+        ActionDefinitionOptions,
+        ConnectionDefinitionOptions {}
 
 @metamodelOf(FlowConnectionDefinition, {
     base: "Connections::Connection",
     binary: "Connections::MessageConnection",
 })
+// @ts-expect-error ignoring static inheritance error
 export class FlowConnectionDefinitionMeta extends Mixin(
     InteractionMeta,
     ActionDefinitionMeta,
@@ -32,6 +39,21 @@ export class FlowConnectionDefinitionMeta extends Mixin(
 ) {
     override ast(): FlowConnectionDefinition | undefined {
         return this._ast as FlowConnectionDefinition;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: FlowConnectionDefinitionOptions
+    ): T["$meta"] {
+        const model = ConnectionDefinitionMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as FlowConnectionDefinitionMeta;
+        return model;
     }
 }
 

@@ -14,10 +14,17 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { MultiplicityRange } from "../../generated/ast";
 import { enumerable, LazyGetter } from "../../utils";
-import { metamodelOf } from "../metamodel";
-import { ElementParts, ExpressionMeta, MultiplicityMeta, OwningMembershipMeta } from "./_internal";
+import { ElementIDProvider, metamodelOf, MetatypeProto } from "../metamodel";
+import {
+    ElementParts,
+    ExpressionMeta,
+    MultiplicityMeta,
+    MultiplicityOptions,
+    OwningMembershipMeta,
+} from "./_internal";
 
 export const ImplicitMultiplicityRanges = {
     feature: "Base::naturals",
@@ -28,6 +35,9 @@ export interface Bounds {
     lower?: number;
     upper?: number;
 }
+
+// TODO: add range
+export type MultiplicityRangeOptions = MultiplicityOptions;
 
 @metamodelOf(MultiplicityRange, ImplicitMultiplicityRanges)
 export class MultiplicityRangeMeta extends MultiplicityMeta {
@@ -59,6 +69,16 @@ export class MultiplicityRangeMeta extends MultiplicityMeta {
     protected override collectDeclaration(parts: ElementParts): void {
         super.collectDeclaration(parts);
         if (this.range) parts.push(["range", [this.range]]);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: MultiplicityRangeOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as MultiplicityRangeMeta;
+        return model;
     }
 }
 

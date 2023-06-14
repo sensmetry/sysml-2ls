@@ -17,13 +17,17 @@
 import { Mixin } from "ts-mixer";
 import { SysMLFunction } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { BehaviorMeta, ElementParts, TypeMeta } from "./_internal";
+import { BehaviorMeta, BehaviorOptions, ElementParts, TypeMeta } from "./_internal";
+import { AstNode, LangiumDocument } from "langium";
 
 export const ImplicitFunctions = {
     base: "Performances::Evaluation",
 };
+
+// TODO: add result
+export type FunctionOptions = BehaviorOptions;
 
 @metamodelOf(SysMLFunction, ImplicitFunctions)
 export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
@@ -46,6 +50,21 @@ export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
         const parts = BehaviorMeta.prototype["collectParts"].call(this);
         if (this._result) parts.push(["result", [this._result]]);
         return parts;
+    }
+
+    protected static applyFunctionOptions(_model: FunctionMeta, _options: FunctionOptions): void {
+        // TODO: assign result
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: FunctionOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as FunctionMeta;
+        if (options) FunctionMeta.applyFunctionOptions(model, options);
+        return model;
     }
 }
 

@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { WhileLoopActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import {
@@ -23,9 +24,12 @@ import {
     MembershipMeta,
     ParameterMembershipMeta,
 } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
-import { LoopActionUsageMeta } from "./loop-action-usage";
+import { LoopActionUsageMeta, LoopActionUsageOptions } from "./loop-action-usage";
+
+// TODO: add condition, body, until
+export type WhileLoopActionUsageOptions = LoopActionUsageOptions;
 
 @metamodelOf(WhileLoopActionUsage, {
     base: "Actions::whileLoopActions",
@@ -78,6 +82,24 @@ export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
         if (this.condition) parts.push(["condition", [this.condition]]);
         if (this.body) parts.push(["body", [this.body]]);
         if (this.until) parts.push(["until", [this.until]]);
+    }
+
+    protected static applyWhileLoopOptions(
+        _model: WhileLoopActionUsageMeta,
+        _options: WhileLoopActionUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: WhileLoopActionUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as WhileLoopActionUsageMeta;
+        if (options) WhileLoopActionUsageMeta.applyWhileLoopOptions(model, options);
+        return model;
     }
 }
 

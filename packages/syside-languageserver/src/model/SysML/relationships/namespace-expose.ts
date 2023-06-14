@@ -14,12 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { mix } from "ts-mixer";
+import { AstNode, LangiumDocument } from "langium";
 import { NamespaceExpose } from "../../../generated/ast";
 import { NamespaceMeta } from "../../KerML/namespace";
 import { NamespaceImportMeta } from "../../KerML/relationships/namespace-import";
-import { metamodelOf } from "../../metamodel";
+import { ElementID, ElementIDProvider, MetatypeProto, metamodelOf, mix } from "../../metamodel";
 import { ExposeMeta } from "./expose";
+import { ImportOptions } from "../../KerML";
+import { ViewUsageMeta } from "../view-usage";
 
 export interface NamespaceExposeMeta<T extends NamespaceMeta = NamespaceMeta>
     extends ExposeMeta<T>,
@@ -31,8 +33,22 @@ export interface NamespaceExposeMeta<T extends NamespaceMeta = NamespaceMeta>
 @mix(ExposeMeta, NamespaceImportMeta)
 // eslint-disable-next-line unused-imports/no-unused-vars
 export class NamespaceExposeMeta<T extends NamespaceMeta = NamespaceMeta> {
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    protected constructor(id: ElementID) {
+        // empty
+    }
+
     ast(): NamespaceExpose | undefined {
         return this._ast as NamespaceExpose;
+    }
+
+    static create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ImportOptions<NamespaceMeta, ViewUsageMeta>
+    ): T["$meta"] {
+        return ExposeMeta.create.call(this, provider, document, options);
     }
 }
 

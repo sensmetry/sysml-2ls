@@ -16,7 +16,9 @@
 
 import { ControlNode } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
+
+export type ControlNodeOptions = ActionUsageOptions;
 
 @metamodelOf(ControlNode)
 export class ControlNodeMeta extends ActionUsageMeta {

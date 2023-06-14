@@ -16,7 +16,9 @@
 
 import { ViewpointUsage, ViewDefinition, ViewUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { RequirementUsageMeta } from "./requirement-usage";
+import { RequirementUsageMeta, RequirementUsageOptions } from "./requirement-usage";
+
+export type ViewpointUsageOptions = RequirementUsageOptions;
 
 @metamodelOf(ViewpointUsage, {
     base: "Views::viewpointChecks",

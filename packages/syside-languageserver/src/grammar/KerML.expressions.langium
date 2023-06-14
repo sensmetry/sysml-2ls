@@ -225,17 +225,18 @@ ReferenceTyping returns FeatureTyping:
     reference=TypeReference
 ;
 
-SelfReferenceExpression returns FeatureReferenceExpression:
-    expression=SelfReferenceMember
-;
+// Doesn't always work in Langium, so just disable them
+// SelfReferenceExpression returns FeatureReferenceExpression:
+//     expression=SelfReferenceMember
+// ;
 
-SelfReferenceMember returns ReturnParameterMembership:
-    element=EmptyFeature
-;
+// SelfReferenceMember returns ReturnParameterMembership:
+//     element=EmptyFeature
+// ;
 
-EmptyFeature returns Feature:
-    {Feature}
-;
+// EmptyFeature returns Feature:
+//     {Feature}
+// ;
 
 // Primary Expressions
 

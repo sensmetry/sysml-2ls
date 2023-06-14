@@ -23,9 +23,12 @@ import {
 } from "../../generated/ast";
 import { RequirementConstraintKind } from "../enums";
 import { FeatureMeta } from "../KerML";
-import { BooleanExpressionMeta } from "../KerML/boolean-expression";
-import { metamodelOf } from "../metamodel";
-import { OccurrenceUsageMeta } from "./occurrence-usage";
+import { BooleanExpressionMeta, BooleanExpressionOptions } from "../KerML/boolean-expression";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
+import { AstNode, LangiumDocument } from "langium";
+
+export interface ConstraintUsageOptions extends BooleanExpressionOptions, OccurrenceUsageOptions {}
 
 @metamodelOf(ConstraintUsage, {
     base: "Constraints::constraintChecks",
@@ -78,6 +81,22 @@ export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, Occurrence
 
     requirementConstraintSupertype(): string | undefined {
         return this.requirementConstraintKind();
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ConstraintUsageOptions
+    ): T["$meta"] {
+        const model = OccurrenceUsageMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as ConstraintUsageMeta;
+        if (options) BooleanExpressionMeta.applyExpressionOptions(model, options);
+        return model;
     }
 }
 

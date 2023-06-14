@@ -14,14 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ItemFeature, Redefinition } from "../../generated/ast";
-import { SysMLType } from "../../services/sysml-ast-reflection";
+import { Inheritance, ItemFeature, Redefinition } from "../../generated/ast";
+import { SubtypeKeys } from "../../services/sysml-ast-reflection";
 import { metamodelOf } from "../metamodel";
-import { FeatureMeta } from "./_internal";
+import { FeatureMeta, FeatureOptions } from "./_internal";
 
 export const ItemFeatureImplicits = {
     payload: "Transfers::Transfer::item",
 };
+
+export type ItemFeatureOptions = FeatureOptions;
 
 @metamodelOf(ItemFeature, ItemFeatureImplicits)
 export class ItemFeatureMeta extends FeatureMeta {
@@ -32,7 +34,7 @@ export class ItemFeatureMeta extends FeatureMeta {
         return "payload";
     }
 
-    override specializationKind(): SysMLType {
+    override specializationKind(): SubtypeKeys<Inheritance> {
         return Redefinition;
     }
 }

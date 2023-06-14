@@ -14,10 +14,15 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { AnnotatingElement } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { AnnotationMeta } from "./_internal";
+import { NonNullable } from "../../utils";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { AnnotationMeta, ElementOptions, RelationshipMeta } from "./_internal";
 import { ElementMeta, ElementParts } from "./element";
+
+// TODO: add annotations
+export type AnnotatingElementOptions = ElementOptions<RelationshipMeta>;
 
 @metamodelOf(AnnotatingElement, "abstract")
 export abstract class AnnotatingElementMeta extends ElementMeta {
@@ -25,7 +30,7 @@ export abstract class AnnotatingElementMeta extends ElementMeta {
 
     addAnnotation(...annotation: AnnotationMeta[]): this {
         this._annotations.push(...annotation);
-        annotation.forEach((a) => a["setParent"](this));
+        annotation.forEach((a) => this.takeOwnership(a));
         return this;
     }
 
@@ -37,7 +42,7 @@ export abstract class AnnotatingElementMeta extends ElementMeta {
         const annotations = this.annotations();
         const owner = this.owner();
         if (annotations.length === 0 && owner) return [owner];
-        return annotations.map((a) => a.element()).filter((e): e is ElementMeta => Boolean(e));
+        return annotations.map((a) => a.element()).filter(NonNullable);
     }
 
     override ast(): AnnotatingElement | undefined {
@@ -46,6 +51,24 @@ export abstract class AnnotatingElementMeta extends ElementMeta {
 
     protected collectParts(): ElementParts {
         return [["about", this._annotations]];
+    }
+
+    protected static applyAnnotatingElementOptions(
+        _model: AnnotatingElementMeta,
+        _options: AnnotatingElementOptions
+    ): void {
+        // empty
+    }
+
+    protected static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: AnnotatingElementOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as AnnotatingElementMeta;
+        if (options) AnnotatingElementMeta.applyAnnotatingElementOptions(model, options);
+        return model;
     }
 }
 

@@ -14,12 +14,16 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { SendActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
-import { ActionUsageMeta } from "./action-usage";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
+
+// TODO: add payload, sender, receiver
+export type SendActionUsageOptions = ActionUsageOptions;
 
 @metamodelOf(SendActionUsage, {
     base: "Actions::sendActions",
@@ -76,6 +80,26 @@ export class SendActionUsageMeta extends ActionUsageMeta {
         if (this.payload) parts.push(["payload", [this.payload]]);
         if (this.sender) parts.push(["sender", [this.sender]]);
         if (this.receiver) parts.push(["body", [this.receiver]]);
+    }
+
+    protected static applySendOptions(
+        _model: SendActionUsageMeta,
+        _options: SendActionUsageOptions
+    ): void {
+        // empty
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: SendActionUsageOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as SendActionUsageMeta;
+        if (options) {
+            SendActionUsageMeta.applySendOptions(model, options);
+        }
+        return model;
     }
 }
 

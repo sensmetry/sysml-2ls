@@ -16,7 +16,9 @@
 
 import { Package } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { ElementMeta, NamespaceMeta } from "./_internal";
+import { ElementMeta, NamespaceMeta, NamespaceOptions } from "./_internal";
+
+export type PackageOptions = NamespaceOptions;
 
 @metamodelOf(Package)
 export class PackageMeta extends NamespaceMeta {

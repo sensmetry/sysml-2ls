@@ -14,10 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { Expose } from "../../../generated/ast";
 import { enumerable } from "../../../utils";
-import { Importable, ImportMeta } from "../../KerML/relationships/import";
-import { metamodelOf } from "../../metamodel";
+import { Importable, ImportMeta, ImportOptions } from "../../KerML/relationships/import";
+import { ElementIDProvider, metamodelOf, MetatypeProto } from "../../metamodel";
+import { ViewUsageMeta } from "../view-usage";
 
 @metamodelOf(Expose, "abstract")
 export abstract class ExposeMeta<T extends Importable = Importable> extends ImportMeta<T> {
@@ -28,6 +30,15 @@ export abstract class ExposeMeta<T extends Importable = Importable> extends Impo
 
     override ast(): Expose | undefined {
         return this._ast as Expose;
+    }
+
+    protected static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ImportOptions<Importable, ViewUsageMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

@@ -16,7 +16,9 @@
 
 import { AttributeUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { UsageMeta } from "./usage";
+import { UsageMeta, UsageOptions } from "./usage";
+
+export type AttributeUsageOptions = UsageOptions;
 
 @metamodelOf(AttributeUsage, {
     base: "Base::dataValues",

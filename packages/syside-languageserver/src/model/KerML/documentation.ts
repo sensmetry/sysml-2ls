@@ -16,7 +16,9 @@
 
 import { Documentation } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { CommentMeta } from "./_internal";
+import { CommentMeta, CommentOptions } from "./_internal";
+
+export type DocumentationOptions = CommentOptions;
 
 @metamodelOf(Documentation)
 export class DocumentationMeta extends CommentMeta {

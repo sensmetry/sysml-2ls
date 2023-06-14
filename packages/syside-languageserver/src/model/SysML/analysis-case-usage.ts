@@ -16,7 +16,9 @@
 
 import { AnalysisCaseDefinition, AnalysisCaseUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { CaseUsageMeta } from "./case-usage";
+import { CaseUsageMeta, CaseUsageOptions } from "./case-usage";
+
+export type AnalysisCaseUsageOptions = CaseUsageOptions;
 
 @metamodelOf(AnalysisCaseUsage, {
     base: "AnalysisCases::analysisCases",

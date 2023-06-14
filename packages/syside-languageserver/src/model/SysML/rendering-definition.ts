@@ -16,7 +16,9 @@
 
 import { RenderingDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { PartDefinitionMeta } from "./part-definition";
+import { PartDefinitionMeta, PartDefinitionOptions } from "./part-definition";
+
+export type RenderingDefinitionOptions = PartDefinitionOptions;
 
 @metamodelOf(RenderingDefinition, {
     base: "Views::Rendering",

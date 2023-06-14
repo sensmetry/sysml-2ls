@@ -16,11 +16,13 @@
 
 import { Predicate } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { FunctionMeta } from "./_internal";
+import { FunctionMeta, FunctionOptions } from "./_internal";
 
 export const ImplicitPredicates = {
     base: "Performances::BooleanEvaluation",
 };
+
+export type PredicateOptions = FunctionOptions;
 
 @metamodelOf(Predicate, ImplicitPredicates)
 export class PredicateMeta extends FunctionMeta {

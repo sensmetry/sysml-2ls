@@ -17,11 +17,13 @@
 import { Structure } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { metamodelOf } from "../metamodel";
-import { ClassMeta } from "./_internal";
+import { ClassMeta, ClassOptions } from "./_internal";
 
 export const ImplicitStructures = {
     base: "Objects::Object",
 };
+
+export type StructureOptions = ClassOptions;
 
 @metamodelOf(Structure, ImplicitStructures)
 export class StructureMeta extends ClassMeta {

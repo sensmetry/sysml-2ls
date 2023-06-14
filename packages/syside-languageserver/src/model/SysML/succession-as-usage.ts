@@ -29,18 +29,25 @@ import {
     Type,
 } from "../../generated/ast";
 import { FeatureMembershipMeta, FeatureMeta, MembershipMeta } from "../KerML";
-import { SuccessionMeta } from "../KerML/succession";
+import { SuccessionMeta, SuccessionOptions } from "../KerML/succession";
 import { metamodelOf, BasicMetamodel } from "../metamodel";
-import { ConnectorAsUsageMeta } from "./connector-as-usage";
+import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
+
+export interface SuccessionAsUsageOptions extends SuccessionOptions, ConnectorAsUsageOptions {}
 
 @metamodelOf(SuccessionAsUsage, {
     base: "Links::links",
     binary: "Occurrences::happensBeforeLinks",
 })
-export class SuccessionAsUsageMeta extends Mixin(ConnectorAsUsageMeta, SuccessionMeta) {
+export class SuccessionAsUsageMeta extends Mixin(SuccessionMeta, ConnectorAsUsageMeta) {
     override ast(): SuccessionAsUsage | undefined {
         return this._ast as SuccessionAsUsage;
     }
+
+    override defaultSupertype(): string {
+        return SuccessionMeta.prototype.defaultSupertype.call(this);
+    }
+
     targetFeature(): FeatureMembershipMeta | undefined {
         const owner = this.owner();
         if (!owner?.is(Type)) return;

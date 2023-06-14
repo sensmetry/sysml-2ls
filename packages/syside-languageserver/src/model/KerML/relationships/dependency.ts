@@ -14,19 +14,33 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream, stream } from "langium";
+import { AstNode, LangiumDocument, Stream, stream } from "langium";
 import { Dependency } from "../../../generated/ast";
 import { NonNullable, enumerable } from "../../../utils";
-import { metamodelOf } from "../../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import {
     AnnotationMeta,
     ElementMeta,
+    ElementOptions,
     ElementParts,
     MetadataFeatureMeta,
     RelationshipMeta,
 } from "../_internal";
 
+export interface DependencyOptions extends ElementOptions<RelationshipMeta> {
+    /**
+     * Should be at least length 1
+     */
+    client: ElementMeta[];
+
+    /**
+     * Should be at least length 1
+     */
+    supplier: ElementMeta[];
+}
+
 @metamodelOf(Dependency)
+// @ts-expect-error ignore static inheritance warning why is it even a thing???
 export class DependencyMeta extends RelationshipMeta {
     protected _prefixes: AnnotationMeta<MetadataFeatureMeta>[] = [];
     private _client: ElementMeta[] = [];
@@ -53,25 +67,17 @@ export class DependencyMeta extends RelationshipMeta {
     }
 
     @enumerable
-    get client(): readonly ElementMeta[] {
+    get client(): ElementMeta[] {
         return this._client;
-    }
-    addClient(...client: ElementMeta[]): this {
-        this._client.push(...client);
-        return this;
     }
 
     override source(): ElementMeta | undefined {
-        return this._client.at(0) ?? super.source();
+        return this._client.at(0);
     }
 
     @enumerable
-    get supplier(): readonly ElementMeta[] {
+    get supplier(): ElementMeta[] {
         return this._supplier;
-    }
-    addSupplier(...supplier: ElementMeta[]): this {
-        this._supplier.push(...supplier);
-        return this;
     }
 
     override element(): ElementMeta | undefined {
@@ -87,6 +93,20 @@ export class DependencyMeta extends RelationshipMeta {
             ["prefixes", this.prefixes],
             ["children", this.children],
         ];
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: DependencyOptions
+    ): T["$meta"] {
+        const model = ElementMeta.create.call(this, provider, document, options) as DependencyMeta;
+        if (options) {
+            model._client.push(...options.client);
+            model._supplier.push(...options.supplier);
+        }
+        return model;
     }
 }
 

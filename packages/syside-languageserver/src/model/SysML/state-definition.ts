@@ -14,9 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { StateDefinition } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
-import { ActionDefinitionMeta } from "./action-definition";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ActionDefinitionMeta, ActionDefinitionOptions } from "./action-definition";
+
+export interface StateDefinitionOptions extends ActionDefinitionOptions {
+    isParallel?: boolean;
+}
 
 @metamodelOf(StateDefinition, {
     base: "States::StateAction",
@@ -26,6 +31,17 @@ export class StateDefinitionMeta extends ActionDefinitionMeta {
 
     override ast(): StateDefinition | undefined {
         return this._ast as StateDefinition;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: StateDefinitionOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as StateDefinitionMeta;
+        if (options) model.isParallel = Boolean(options.isParallel);
+        return model;
     }
 }
 

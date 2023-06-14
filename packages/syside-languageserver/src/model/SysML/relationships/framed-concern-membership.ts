@@ -14,10 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { FramedConcernMembership } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
+import { RelationshipOptionsBody } from "../../KerML";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { ConcernUsageMeta } from "../concern-usage";
+import { RequirementDefinitionMeta } from "../requirement-definition";
 import { RequirementConstraintMembershipMeta } from "./requirement-constraint-membership";
+import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(FramedConcernMembership)
 export class FramedConcernMembershipMeta<
@@ -25,6 +29,18 @@ export class FramedConcernMembershipMeta<
 > extends RequirementConstraintMembershipMeta<T> {
     override ast(): FramedConcernMembership | undefined {
         return this._ast as FramedConcernMembership;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: RelationshipOptionsBody<
+            ConcernUsageMeta,
+            RequirementDefinitionMeta | RequirementUsageMeta
+        >
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

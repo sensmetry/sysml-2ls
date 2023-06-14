@@ -16,7 +16,9 @@
 
 import { Expression, InvocationExpression, SysMLFunction } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { ExpressionMeta, FeatureMeta, TypeMeta } from "../_internal";
+import { ExpressionMeta, ExpressionOptions, FeatureMeta, TypeMeta } from "../_internal";
+
+export type InvocationExpressionOptions = ExpressionOptions;
 
 @metamodelOf(InvocationExpression)
 export class InvocationExpressionMeta extends ExpressionMeta {

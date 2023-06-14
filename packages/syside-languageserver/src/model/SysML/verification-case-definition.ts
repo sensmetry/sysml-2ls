@@ -16,7 +16,9 @@
 
 import { VerificationCaseDefinition } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { CaseDefinitionMeta } from "./case-definition";
+import { CaseDefinitionMeta, CaseDefinitionOptions } from "./case-definition";
+
+export type VerificationCaseDefinitionOptions = CaseDefinitionOptions;
 
 @metamodelOf(VerificationCaseDefinition, {
     base: "VerificationCases::VerificationCase",

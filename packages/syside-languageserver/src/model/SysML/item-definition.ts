@@ -16,14 +16,16 @@
 
 import { Mixin } from "ts-mixer";
 import { ItemDefinition } from "../../generated/ast";
-import { StructureMeta } from "../KerML/structure";
+import { StructureMeta, StructureOptions } from "../KerML/structure";
 import { metamodelOf } from "../metamodel";
-import { OccurrenceDefinitionMeta } from "./occurrence-definition";
+import { OccurrenceDefinitionMeta, OccurrenceDefinitionOptions } from "./occurrence-definition";
+
+export interface ItemDefinitionOptions extends StructureOptions, OccurrenceDefinitionOptions {}
 
 @metamodelOf(ItemDefinition, {
     base: "Items::Item",
 })
-export class ItemDefinitionMeta extends Mixin(OccurrenceDefinitionMeta, StructureMeta) {
+export class ItemDefinitionMeta extends Mixin(StructureMeta, OccurrenceDefinitionMeta) {
     override ast(): ItemDefinition | undefined {
         return this._ast as ItemDefinition;
     }

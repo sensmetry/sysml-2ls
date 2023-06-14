@@ -14,16 +14,27 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { OperatorExpression } from "../../../generated/ast";
 import { enumerable } from "../../../utils";
 import { OPERATOR_FUNCTIONS, typeArgument, typeOf } from "../../expressions/util";
-import { metamodelOf } from "../../metamodel";
-import { ElementParts, ExpressionMeta, InvocationExpressionMeta, TypeMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    ElementParts,
+    ExpressionMeta,
+    InvocationExpressionMeta,
+    InvocationExpressionOptions,
+    TypeMeta,
+} from "../_internal";
+
+export interface OperatorExpressionOptions extends InvocationExpressionOptions {
+    operator?: string;
+}
 
 @metamodelOf(OperatorExpression)
 export class OperatorExpressionMeta extends InvocationExpressionMeta {
     /**
-     * The escaped operator name used in this expression
+     * The escaped operator name used in this expression, i.e. `'+'`
      */
     operator = "";
 
@@ -72,6 +83,17 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     protected override collectDeclaration(parts: ElementParts): void {
         super.collectDeclaration(parts);
         parts.push(["operands", this.operands]);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: OperatorExpressionOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as OperatorExpressionMeta;
+        if (options?.operator) model.operator = options.operator;
+        return model;
     }
 }
 

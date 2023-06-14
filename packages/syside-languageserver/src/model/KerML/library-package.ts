@@ -16,7 +16,9 @@
 
 import { LibraryPackage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { PackageMeta } from "./_internal";
+import { PackageMeta, PackageOptions } from "./_internal";
+
+export type LibraryPackageOptions = PackageOptions;
 
 @metamodelOf(LibraryPackage)
 export class LibraryPackageMeta extends PackageMeta {

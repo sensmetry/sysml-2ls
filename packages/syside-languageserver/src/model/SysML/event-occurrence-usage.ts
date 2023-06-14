@@ -16,7 +16,9 @@
 
 import { EventOccurrenceUsage, OccurrenceDefinition, OccurrenceUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
-import { OccurrenceUsageMeta } from "./occurrence-usage";
+import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
+
+export type EventOccurrenceUsageOptions = OccurrenceUsageOptions;
 
 @metamodelOf(EventOccurrenceUsage, {
     suboccurrence: "Occurrences::Occurrence::timeEnclosedOccurrences",

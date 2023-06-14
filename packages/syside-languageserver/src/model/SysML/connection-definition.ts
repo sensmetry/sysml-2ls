@@ -16,21 +16,31 @@
 
 import { Mixin } from "ts-mixer";
 import { ConnectionDefinition } from "../../generated/ast";
-import { AssociationStructMeta } from "../KerML/association-structure";
+import { AssociationStructMeta, AssociationStructureOptions } from "../KerML/association-structure";
 import { metamodelOf } from "../metamodel";
-import { PartDefinitionMeta } from "./part-definition";
+import { PartDefinitionMeta, PartDefinitionOptions } from "./part-definition";
+import { InheritanceMeta } from "../KerML";
+
+export interface ConnectionDefinitionOptions
+    extends AssociationStructureOptions,
+        PartDefinitionOptions {}
 
 @metamodelOf(ConnectionDefinition, {
     base: "Connections::Connection",
     binary: "Connections::BinaryConnection",
 })
-export class ConnectionDefinitionMeta extends Mixin(PartDefinitionMeta, AssociationStructMeta) {
+export class ConnectionDefinitionMeta extends Mixin(AssociationStructMeta, PartDefinitionMeta) {
     override defaultSupertype(): string {
-        return this.isBinary() ? "binary" : "base";
+        return AssociationStructMeta.prototype.defaultSupertype.call(this);
     }
 
     override ast(): ConnectionDefinition | undefined {
         return this._ast as ConnectionDefinition;
+    }
+
+    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+        this.resetEnds();
+        PartDefinitionMeta.prototype["onSpecializationAdded"].call(this, specialization);
     }
 }
 

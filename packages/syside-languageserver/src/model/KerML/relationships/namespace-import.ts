@@ -14,14 +14,24 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { NamespaceImport } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ImportMeta, NamespaceMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import { ImportMeta, ImportOptions, NamespaceMeta } from "../_internal";
 
 @metamodelOf(NamespaceImport)
 export class NamespaceImportMeta<T extends NamespaceMeta = NamespaceMeta> extends ImportMeta<T> {
     override ast(): NamespaceImport | undefined {
         return this._ast as NamespaceImport;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: ImportOptions<NamespaceMeta>
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

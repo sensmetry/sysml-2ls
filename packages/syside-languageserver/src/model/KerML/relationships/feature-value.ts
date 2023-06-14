@@ -14,9 +14,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { FeatureValue } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ExpressionMeta, OwningMembershipMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    ExpressionMeta,
+    FeatureMeta,
+    OwningMembershipMeta,
+    RelationshipOptions,
+} from "../_internal";
+
+export interface FeatureValueOptions
+    extends RelationshipOptions<ExpressionMeta, FeatureMeta, never> {
+    isDefault?: boolean;
+    isInitial?: boolean;
+}
 
 @metamodelOf(FeatureValue)
 export class FeatureValueMeta<
@@ -27,6 +39,15 @@ export class FeatureValueMeta<
 
     override ast(): FeatureValue | undefined {
         return this._ast as FeatureValue;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: FeatureValueOptions
+    ): T["$meta"] {
+        return super.create(provider, document, options);
     }
 }
 

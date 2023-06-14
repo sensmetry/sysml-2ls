@@ -16,11 +16,13 @@
 
 import { LiteralInfinity } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { LiteralExpressionMeta } from "../_internal";
+import { LiteralExpressionMeta, LiteralExpressionOptions } from "../_internal";
 
 export const ImplicitLiteralInfinities = {
     base: "Performances::literalIntegerEvaluations",
 };
+
+export type LiteralInfinityOptions = LiteralExpressionOptions;
 
 @metamodelOf(LiteralInfinity, ImplicitLiteralInfinities)
 export class LiteralInfinityMeta extends LiteralExpressionMeta {
