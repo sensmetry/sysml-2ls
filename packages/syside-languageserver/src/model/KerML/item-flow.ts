@@ -20,7 +20,9 @@ import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from ".
 import {
     ConnectorMeta,
     ConnectorOptions,
+    Edge,
     ElementParts,
+    EndFeatureMembershipMeta,
     FeatureMembershipMeta,
     FeatureMeta,
     ItemFeatureMeta,
@@ -30,6 +32,7 @@ import {
     StepOptions,
 } from "./_internal";
 import { AstNode, LangiumDocument } from "langium";
+import { enumerable } from "../../utils";
 
 export const ImplicitItemFlows = {
     base: "Transfers::flowTransfers",
@@ -39,18 +42,20 @@ export const ImplicitItemFlows = {
 };
 
 export interface ItemFlowOptions extends StepOptions, ConnectorOptions {
-    // TODO: add item
+    ends?: readonly Edge<EndFeatureMembershipMeta, ItemFlowEndMeta>[];
+    item?: Edge<FeatureMembershipMeta, ItemFeatureMeta>;
 }
 
 @metamodelOf(ItemFlow, ImplicitItemFlows)
 export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
     protected _item?: FeatureMembershipMeta<ItemFeatureMeta> | undefined;
 
+    @enumerable
     get item(): FeatureMembershipMeta<ItemFeatureMeta> | undefined {
         return this._item;
     }
-    set item(value: FeatureMembershipMeta<ItemFeatureMeta> | undefined) {
-        this._item = value;
+    set item(value: Edge<FeatureMembershipMeta, ItemFeatureMeta> | undefined) {
+        this._item = this.swapEdgeOwnership(this._item, value);
     }
 
     override ast(): ItemFlow | undefined {
@@ -91,8 +96,8 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
         parts.push(["ends", this.ends]);
     }
 
-    protected static applyItemFlowOptions(_model: ItemFlowMeta, _options: ItemFlowOptions): void {
-        // empty
+    protected static applyItemFlowOptions(model: ItemFlowMeta, options: ItemFlowOptions): void {
+        model.item = options.item;
     }
 
     static override create<T extends AstNode>(

@@ -17,11 +17,32 @@
 import { AstNode, LangiumDocument } from "langium";
 import { Inheritance } from "../../../generated/ast";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
-import { RelationshipMeta, RelationshipOptions, TypeMeta } from "../_internal";
+import { ElementMeta, RelationshipMeta, RelationshipOptions, TypeMeta } from "../_internal";
 
 @metamodelOf(Inheritance, "abstract")
-// @ts-expect-error ignoring static inheritance error
 export abstract class InheritanceMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
+    /**
+     * Adds new owned body elements and returns the new number of body elements.
+     */
+    addChild(...element: ElementMeta[]): number {
+        return this.addOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements and returns the new number of body elements.
+     */
+    removeChild(...element: ElementMeta[]): number {
+        return this.removeOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements by predicate and returns the new number of
+     * body elements.
+     */
+    removeChildIf(predicate: (element: ElementMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
+    }
+
     override ast(): Inheritance | undefined {
         return this._ast as Inheritance;
     }

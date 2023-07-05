@@ -17,14 +17,17 @@
 import { AstNode, LangiumDocument } from "langium";
 import { AssignmentActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
-import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import { Edge, ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 import { UsageMeta } from "./usage";
 
-// TODO: add target, targetMember and assignedValue
-export type AssignmentActionUsageOptions = ActionUsageOptions;
+export interface AssignmentActionUsageOptions extends ActionUsageOptions {
+    target: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    targetMember: Edge<MembershipMeta, FeatureMeta>;
+    assignedValue: Edge<ParameterMembershipMeta, UsageMeta>;
+}
 
 @metamodelOf(AssignmentActionUsage, {
     base: "Actions::assignmentActions",
@@ -41,24 +44,24 @@ export class AssignmentActionUsageMeta extends ActionUsageMeta {
     public get target(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._target;
     }
-    public set target(value: ParameterMembershipMeta<ReferenceUsageMeta> | undefined) {
-        this._target = value;
+    public set target(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
+        this._target = this.swapEdgeOwnership(this._target, value);
     }
 
     @enumerable
     public get targetMember(): MembershipMeta<FeatureMeta> | undefined {
         return this._targetMember;
     }
-    public set targetMember(value: MembershipMeta<FeatureMeta>) {
-        this._targetMember = value;
+    public set targetMember(value: Edge<MembershipMeta, FeatureMeta> | undefined) {
+        this._targetMember = this.swapEdgeOwnership(this._targetMember, value);
     }
 
     @enumerable
     public get assignedValue(): ParameterMembershipMeta<UsageMeta> | undefined {
         return this._assignedValue;
     }
-    public set assignedValue(value: ParameterMembershipMeta<UsageMeta>) {
-        this._assignedValue = value;
+    public set assignedValue(value: Edge<ParameterMembershipMeta, UsageMeta> | undefined) {
+        this._assignedValue = this.swapEdgeOwnership(this._assignedValue, value);
     }
 
     override ast(): AssignmentActionUsage | undefined {
@@ -85,10 +88,12 @@ export class AssignmentActionUsageMeta extends ActionUsageMeta {
     }
 
     protected static applyAssignmentActionOptions(
-        _model: AssignmentActionUsageMeta,
-        _options: AssignmentActionUsageOptions
+        model: AssignmentActionUsageMeta,
+        options: AssignmentActionUsageOptions
     ): void {
-        // empty
+        model.target = options.target;
+        model.targetMember = options.targetMember;
+        model.assignedValue = options.assignedValue;
     }
 
     static override create<T extends AstNode>(

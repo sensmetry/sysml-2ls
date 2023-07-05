@@ -38,16 +38,16 @@ test("types can be disjoint", async () => {
     class A specializes Anything disjoint from B;`
     ).toParseKerML({
         children: [
-            { element: withQualifiedName("Anything") },
-            { element: withQualifiedName("B") },
+            { target: withQualifiedName("Anything") },
+            { target: withQualifiedName("B") },
             {
-                element: {
+                target: {
                     ...withQualifiedName("A"),
                     heritage: [
-                        { $type: Subclassification, reference: qualifiedTypeReference("Anything") },
+                        { $type: Subclassification, targetRef: qualifiedTypeReference("Anything") },
                     ],
                     typeRelationships: [
-                        { $type: Disjoining, reference: qualifiedTypeReference("B") },
+                        { $type: Disjoining, targetRef: qualifiedTypeReference("B") },
                     ],
                 },
             },
@@ -60,11 +60,11 @@ test("types can conjugate", async () => {
     class A;
     class C conjugates A;`).toParseKerML({
         children: [
-            { element: withQualifiedName("A") },
+            { target: withQualifiedName("A") },
             {
-                element: {
+                target: {
                     ...withQualifiedName("C"),
-                    heritage: [{ $type: Conjugation, reference: qualifiedTypeReference("A") }],
+                    heritage: [{ $type: Conjugation, targetRef: qualifiedTypeReference("A") }],
                 },
             },
         ],
@@ -78,11 +78,11 @@ test("types can be abstract", async () => {
     abstract class A specializes Anything;`
     ).toParseKerML({
         children: [
-            { element: withQualifiedName("Anything") },
+            { target: withQualifiedName("Anything") },
             {
-                element: {
+                target: {
                     ...withQualifiedName("A"),
-                    heritage: [{ reference: qualifiedTypeReference("Anything") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("Anything") }],
                     isAbstract: "abstract",
                 },
             },
@@ -97,16 +97,16 @@ test("types can have multiplicity", async () => {
     type Singleton[1] specializes Anything;`
     ).toParseKerML({
         children: [
-            { element: withQualifiedName("Anything") },
+            { target: withQualifiedName("Anything") },
             {
-                element: {
+                target: {
                     ...withQualifiedName("Singleton"),
-                    heritage: [{ reference: qualifiedTypeReference("Anything") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("Anything") }],
                     multiplicity: {
-                        element: {
+                        target: {
                             $type: MultiplicityRange,
                             range: {
-                                element: {
+                                target: {
                                     $type: LiteralNumber,
                                     literal: 1,
                                 },
@@ -133,23 +133,23 @@ test("type children can reference private child members", async () => {
     }`
     ).toParseKerML({
         children: [
-            { element: withQualifiedName("Anything") },
+            { target: withQualifiedName("Anything") },
             {
-                element: {
+                target: {
                     ...withQualifiedName("Super"),
-                    heritage: [{ reference: qualifiedTypeReference("Anything") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("Anything") }],
                     children: [
                         {
                             visibility: "private",
-                            element: {
+                            target: {
                                 $type: Namespace,
                                 ...withQualifiedName("Super::N"),
                                 children: [
                                     {
-                                        element: {
+                                        target: {
                                             ...withQualifiedName("Super::N::Sub"),
                                             heritage: [
-                                                { reference: qualifiedTypeReference("Super") },
+                                                { targetRef: qualifiedTypeReference("Super") },
                                             ],
                                         },
                                     },
@@ -158,29 +158,29 @@ test("type children can reference private child members", async () => {
                         },
                         {
                             visibility: "protected",
-                            element: {
+                            target: {
                                 $type: Feature,
                                 ...withQualifiedName("Super::f"),
-                                heritage: [{ reference: qualifiedTypeReference("Super::N::Sub") }],
+                                heritage: [{ targetRef: qualifiedTypeReference("Super::N::Sub") }],
                             },
                         },
                         {
-                            element: {
+                            target: {
                                 $type: Feature,
                                 ...withQualifiedName("Super::f1"),
-                                heritage: [{ reference: qualifiedTypeReference("Super") }],
+                                heritage: [{ targetRef: qualifiedTypeReference("Super") }],
                                 typeRelationships: [
-                                    { reference: qualifiedTypeReference("Super::N::Sub") },
+                                    { targetRef: qualifiedTypeReference("Super::N::Sub") },
                                 ],
                             },
                         },
                         {
-                            element: {
+                            target: {
                                 $type: Feature,
                                 ...withQualifiedName("Super::f2"),
-                                heritage: [{ reference: qualifiedTypeReference("Super") }],
+                                heritage: [{ targetRef: qualifiedTypeReference("Super") }],
                                 typeRelationships: [
-                                    { reference: qualifiedTypeReference("Super::N::Sub") },
+                                    { targetRef: qualifiedTypeReference("Super::N::Sub") },
                                 ],
                             },
                         },
@@ -200,41 +200,41 @@ test("types can be sufficient", async () => {
     }`).toParseKerML({
         children: [
             {
-                element: {
+                target: {
                     $type: Class,
                     ...withQualifiedName("MaterialThing"),
                     isAbstract: "abstract",
                 },
             },
             {
-                element: {
+                target: {
                     $type: Class,
                     ...withQualifiedName("Wheel"),
                 },
             },
             {
-                element: {
+                target: {
                     $type: Class,
                     ...withQualifiedName("Car"),
                     isSufficient: true,
-                    heritage: [{ reference: qualifiedTypeReference("MaterialThing") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("MaterialThing") }],
                     children: [
                         {
-                            element: {
+                            target: {
                                 $type: Feature,
                                 ...withQualifiedName("Car::wheels"),
                                 multiplicity: {
-                                    element: {
+                                    target: {
                                         $type: MultiplicityRange,
                                         range: {
-                                            element: {
+                                            target: {
                                                 $type: LiteralNumber,
                                                 literal: 4,
                                             },
                                         },
                                     },
                                 },
-                                heritage: [{ reference: qualifiedTypeReference("Wheel") }],
+                                heritage: [{ targetRef: qualifiedTypeReference("Wheel") }],
                             },
                         },
                     ],

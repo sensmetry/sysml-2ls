@@ -22,7 +22,11 @@ export type InvocationExpressionOptions = ExpressionOptions;
 
 @metamodelOf(InvocationExpression)
 export class InvocationExpressionMeta extends ExpressionMeta {
-    args: (FeatureMeta | undefined)[] = [];
+    protected _args: (FeatureMeta | undefined)[] = [];
+
+    get args(): readonly (FeatureMeta | undefined)[] {
+        return this._args;
+    }
 
     override ast(): InvocationExpression | undefined {
         return this._ast as InvocationExpression;

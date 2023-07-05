@@ -14,15 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import { AcceptActionUsage, TransitionFeatureMembership } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
-import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { Edge, ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 
-// TODO: add payload and receiver
-export type AcceptActionUsageOptions = ActionUsageOptions;
+export interface AcceptActionUsageOptions extends ActionUsageOptions {
+    payload?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    receiver?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+}
 
 @metamodelOf(AcceptActionUsage, {
     base: "Actions::acceptActions",
@@ -36,16 +39,16 @@ export class AcceptActionUsageMeta extends ActionUsageMeta {
     public get payload(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._payload;
     }
-    public set payload(value: ParameterMembershipMeta<ReferenceUsageMeta>) {
-        this._payload = value;
+    public set payload(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
+        this._payload = this.swapEdgeOwnership(this._payload, value);
     }
 
     @enumerable
     public get receiver(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._receiver;
     }
-    public set receiver(value: ParameterMembershipMeta<ReferenceUsageMeta> | undefined) {
-        this._receiver = value;
+    public set receiver(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
+        this._receiver = this.swapEdgeOwnership(this._receiver, value);
     }
 
     override ast(): AcceptActionUsage | undefined {
@@ -72,6 +75,25 @@ export class AcceptActionUsageMeta extends ActionUsageMeta {
         super.collectDeclaration(parts);
         if (this.payload) parts.push(["payload", [this.payload]]);
         if (this.receiver) parts.push(["receiver", [this.receiver]]);
+    }
+
+    protected static applyAcceptOptions(
+        model: AcceptActionUsageMeta,
+        options: AcceptActionUsageOptions
+    ): void {
+        model.payload = options.payload;
+        model.receiver = options.receiver;
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: AcceptActionUsageOptions
+    ): T["$meta"] {
+        const usage = super.create(provider, document, options) as AcceptActionUsageMeta;
+        if (options) AcceptActionUsageMeta.applyAcceptOptions(usage, options);
+        return usage;
     }
 }
 

@@ -63,9 +63,7 @@ export class PortDefinitionMeta extends Mixin(StructureMeta, OccurrenceDefinitio
     ): T["$meta"] {
         const portDef = super.create(provider, document, options) as PortDefinitionMeta;
         const conjugated = ConjugatedPortDefinitionMeta.create(provider, document);
-        conjugated.addSpecialization(
-            PortConjugationMeta.create(provider, document, { target: portDef })
-        );
+        conjugated.addHeritage([PortConjugationMeta.create(provider, document), portDef]);
         portDef._conjugatedDefinition = OwningMembershipMeta.create(provider, document, {
             parent: portDef,
             target: conjugated,

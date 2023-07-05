@@ -179,7 +179,7 @@ export class SysMLLinker extends DefaultLinker {
             const imported = this.linkNode(impNode, document);
             if (!imported) continue;
 
-            const ref = impNode.reference;
+            const ref = impNode.targetRef;
 
             if (imp.isRecursive || imp.is(NamespaceImport)) {
                 // check that wildcard imports are valid
@@ -192,7 +192,7 @@ export class SysMLLinker extends DefaultLinker {
                         message: `Could not find Namespace referenced by ${ref?.$meta.text}`,
                         element: imp,
                         info: {
-                            property: "reference",
+                            property: "targetRef",
                             index: index,
                         },
                     });
@@ -266,14 +266,14 @@ export class SysMLLinker extends DefaultLinker {
         document: LangiumDocument
     ): ElementMeta | undefined {
         const target = this.linkReference(expr.reference, document);
-        expr.$meta.reference = target;
+        if (target) expr.$meta.reference = target;
         return target;
     }
 
     @linker(Relationship)
     linkRelationship(node: Relationship, document: LangiumDocument): ElementMeta | undefined {
-        if (!node.reference) return node.element?.$meta;
-        const target = this.linkReference(node.reference, document);
+        if (!node.targetRef) return node.target?.$meta;
+        const target = this.linkReference(node.targetRef, document);
         node.$meta["setElement"](target);
         return target;
     }

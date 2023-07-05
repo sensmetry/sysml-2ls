@@ -30,14 +30,14 @@ test.concurrent.each(["subsets", ":>"])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: Subsetting,
                         ...withQualifiedName("Sub"),
-                        source: qualifiedTypeReference("parent"),
-                        reference: qualifiedTypeReference("person"),
+                        sourceRef: qualifiedTypeReference("parent"),
+                        targetRef: qualifiedTypeReference("person"),
                         elements: [
                             {
-                                element: {
+                                source: {
                                     body: "/* doc */",
                                 },
                             },
@@ -60,10 +60,10 @@ test.concurrent.each(["specialization", ""])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: Subsetting,
-                        source: qualifiedTypeReference("parent"),
-                        reference: qualifiedTypeReference("person"),
+                        sourceRef: qualifiedTypeReference("parent"),
+                        targetRef: qualifiedTypeReference("person"),
                     },
                 },
             ],

@@ -125,7 +125,7 @@ fragment MultiplicityProperties:
 /* Annotations */
 
 Annotation returns Annotation:
-    reference=ElementReference
+    targetRef=ElementReference
 ;
 
 // Comments and documentation
@@ -190,7 +190,7 @@ EqualityOperator returns string:
 // Metadata
 
 MetadataTyping returns FeatureTyping:
-    reference=MetaclassReference
+    targetRef=MetaclassReference
 ;
 
 // Features
@@ -200,7 +200,7 @@ OwnedFeatureTyping returns FeatureTyping:
 ;
 
 fragment FeatureType:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 // Classification Expressions
@@ -210,11 +210,11 @@ MetadataReference returns MetadataAccessExpression:
 ;
 
 TypeReferenceMember returns FeatureMembership:
-    element=TypeReferenceFeature
+    target=TypeReferenceFeature
 ;
 
 TypeResultMember returns ReturnParameterMembership:
-    element=TypeReferenceFeature
+    target=TypeReferenceFeature
 ;
 
 TypeReferenceFeature returns Feature:
@@ -222,7 +222,7 @@ TypeReferenceFeature returns Feature:
 ;
 
 ReferenceTyping returns FeatureTyping:
-    reference=TypeReference
+    targetRef=TypeReference
 ;
 
 // Doesn't always work in Langium, so just disable them
@@ -245,7 +245,7 @@ FunctionReferenceExpression returns FeatureReferenceExpression:
 ;
 
 FunctionReferenceMember returns FeatureMembership:
-    element=FunctionReference
+    target=FunctionReference
 ;
 
 FunctionReference returns Expression:
@@ -253,7 +253,7 @@ FunctionReference returns Expression:
 ;
 
 FeatureChainMember returns Membership:
-    reference=FeatureReference | {OwningMembership} element=OwnedFeatureChain
+    targetRef=FeatureReference | {OwningMembership} target=OwnedFeatureChain
 ;
 
 // Invocation Expressions
@@ -271,7 +271,7 @@ FeatureChainPrefix returns Feature:
 ;
 
 OwnedFeatureChaining returns FeatureChaining:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 // Feature Reference Expressions
@@ -281,7 +281,7 @@ FeatureReferenceExpression returns FeatureReferenceExpression:
 ;
 
 FeatureReferenceMember returns Membership:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 // Metadata Access Expressions

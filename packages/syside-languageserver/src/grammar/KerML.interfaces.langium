@@ -29,8 +29,7 @@ type NonOwnerType =
 
 // Annotations
 
-interface Annotation extends Relationship {
-}
+interface Annotation extends Relationship {}
 
 interface AnnotatingElement extends Element {
     about: Annotation[];
@@ -94,11 +93,8 @@ interface SysMLFunction extends Behavior {
     result?: ResultExpressionMembership;
 }
 
-interface Predicate extends SysMLFunction {
-}
-
-interface Interaction extends Association, Behavior {
-}
+interface Predicate extends SysMLFunction {}
+interface Interaction extends Association, Behavior {}
 
 interface Feature extends Type {
     isNonunique: boolean;
@@ -116,11 +112,11 @@ interface Feature extends Type {
 
 interface MetadataFeature extends Feature, AnnotatingElement {}
 
-interface Multiplicity extends Feature {
+interface Multiplicity extends Feature {}
+
+interface MultiplicityRange extends Multiplicity {
     range?: OwningMembership;
 }
-
-interface MultiplicityRange extends Multiplicity {}
 interface ItemFeature extends Feature {}
 interface Step extends Feature {}
 
@@ -158,12 +154,13 @@ interface Relationship extends Element {
     visibility?: VisibilityKind;
     elements: (Namespace | Relationship | Feature | Annotation)[];
 // edge source
-    source?: ElementReference;
+    source?: Element;
+    sourceRef?: ElementReference;
     sourceChain?: Feature;
 
 // edge targets
-    element?: Element;
-    reference?: ElementReference;
+    target?: Element;
+    targetRef?: ElementReference;
     targetChain?: Feature;
 }
 
@@ -171,37 +168,23 @@ interface Relationship extends Element {
 // common base type as both are INHERITING relationships
 interface Inheritance extends Relationship {}
 
-interface Unioning extends Relationship {
-}
-interface Differencing extends Relationship {
-}
-interface Intersecting extends Relationship {
-}
-interface FeatureChaining extends Relationship {
-}
-interface Specialization extends Inheritance {
-}
-interface Disjoining extends Relationship {
-}
-interface FeatureInverting extends Relationship {
-}
-interface TypeFeaturing extends Featuring {
-}
-interface FeatureTyping extends Specialization {
-}
-interface Subclassification extends Specialization {
-}
-interface Subsetting extends Specialization {
-}
+interface Unioning extends Relationship {}
+interface Differencing extends Relationship {}
+interface Intersecting extends Relationship {}
+interface FeatureChaining extends Relationship {}
+interface Specialization extends Inheritance {}
+interface Disjoining extends Relationship {}
+interface FeatureInverting extends Relationship {}
+interface TypeFeaturing extends Featuring {}
+interface FeatureTyping extends Specialization {}
+interface Subclassification extends Specialization {}
+interface Subsetting extends Specialization {}
 interface Subtype extends Specialization {}
 
-interface Conjugation extends Inheritance {
-}
+interface Conjugation extends Inheritance {}
 
-interface Redefinition extends Subsetting {
-}
-interface ReferenceSubsetting extends Subsetting {
-}
+interface Redefinition extends Subsetting {}
+interface ReferenceSubsetting extends Subsetting {}
 
 interface Dependency extends Relationship {
     prefixes: Annotation[];
@@ -215,10 +198,8 @@ interface Import extends Relationship {
     isNamespace?: '::*';
 }
 
-interface MembershipImport extends Import {
-}
-interface NamespaceImport extends Import {
-}
+interface MembershipImport extends Import {}
+interface NamespaceImport extends Import {}
 
 interface Membership extends Relationship {}
 interface OwningMembership extends Membership {}
@@ -261,8 +242,7 @@ interface LiteralNumber extends LiteralExpression {
 }
 interface LiteralInfinity extends LiteralExpression {}
 interface NullExpression extends Expression {}
-interface InvocationExpression extends Expression {
-}
+interface InvocationExpression extends Expression {}
 interface OperatorExpression extends InvocationExpression {
     operator?: string;
     operands: Expression[];

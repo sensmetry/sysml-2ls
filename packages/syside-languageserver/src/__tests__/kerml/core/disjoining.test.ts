@@ -41,28 +41,28 @@ test("disjoining can be parsed", async () => {
         children: [
             ...anything(5),
             {
-                element: {
+                target: {
                     $type: Disjoining,
                     ...withQualifiedName("Disj"),
-                    source: qualifiedTypeReference("A"),
-                    reference: qualifiedTypeReference("B"),
+                    sourceRef: qualifiedTypeReference("A"),
+                    targetRef: qualifiedTypeReference("B"),
                 },
             },
             {
-                element: {
+                target: {
                     $type: Disjoining,
-                    source: qualifiedTypeReference("Mammal"),
-                    reference: qualifiedTypeReference("Mineral"),
+                    sourceRef: qualifiedTypeReference("Mammal"),
+                    targetRef: qualifiedTypeReference("Mineral"),
                 },
             },
             {
-                element: {
+                target: {
                     $type: Disjoining,
-                    source: qualifiedTypeReference("Person::parents"),
-                    reference: qualifiedTypeReference("Person::children"),
+                    sourceRef: qualifiedTypeReference("Person::parents"),
+                    targetRef: qualifiedTypeReference("Person::children"),
                     elements: [
                         {
-                            element: {
+                            source: {
                                 $type: Documentation,
                                 body: "/* No Person can be their own parent. */",
                             },
@@ -85,24 +85,24 @@ test("disjoining may be omitted without identifiers", async () => {
         children: [
             ...anything(5),
             {
-                element: {
+                target: {
                     $type: Disjoining,
-                    source: qualifiedTypeReference("A"),
-                    reference: qualifiedTypeReference("B"),
+                    sourceRef: qualifiedTypeReference("A"),
+                    targetRef: qualifiedTypeReference("B"),
                 },
             },
             {
-                element: {
+                target: {
                     $type: Disjoining,
-                    source: qualifiedTypeReference("Mammal"),
-                    reference: qualifiedTypeReference("Mineral"),
+                    sourceRef: qualifiedTypeReference("Mammal"),
+                    targetRef: qualifiedTypeReference("Mineral"),
                 },
             },
             {
-                element: {
+                target: {
                     $type: Disjoining,
-                    source: qualifiedTypeReference("Person::parents"),
-                    reference: qualifiedTypeReference("Person::children"),
+                    sourceRef: qualifiedTypeReference("Person::parents"),
+                    targetRef: qualifiedTypeReference("Person::children"),
                 },
             },
         ],
@@ -122,28 +122,28 @@ test("types can declare owned disjoinings", async () => {
         children: [
             ...anything(6),
             {
-                element: {
+                target: {
                     $type: Class,
                     ...withQualifiedName("C"),
                     heritage: [
-                        { $type: Subclassification, reference: qualifiedTypeReference("Anything") },
+                        { $type: Subclassification, targetRef: qualifiedTypeReference("Anything") },
                     ],
                     typeRelationships: [
-                        { $type: Disjoining, reference: qualifiedTypeReference("A") },
-                        { $type: Disjoining, reference: qualifiedTypeReference("B") },
+                        { $type: Disjoining, targetRef: qualifiedTypeReference("A") },
+                        { $type: Disjoining, targetRef: qualifiedTypeReference("B") },
                     ],
                 },
             },
-            { element: withQualifiedName("Animal") },
+            { target: withQualifiedName("Animal") },
             {
-                element: {
+                target: {
                     $type: Class,
                     ...withQualifiedName("Mammal2"),
                     heritage: [
-                        { $type: Subclassification, reference: qualifiedTypeReference("Animal") },
+                        { $type: Subclassification, targetRef: qualifiedTypeReference("Animal") },
                     ],
                     typeRelationships: [
-                        { $type: Disjoining, reference: qualifiedTypeReference("Mineral") },
+                        { $type: Disjoining, targetRef: qualifiedTypeReference("Mineral") },
                     ],
                 },
             },

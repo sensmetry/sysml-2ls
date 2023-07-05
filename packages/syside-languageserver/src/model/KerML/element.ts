@@ -32,8 +32,13 @@ import {
     MetadataFeatureMeta,
     MembershipImportMeta,
     TextualRepresentationMeta,
+    AnnotatingElementMeta,
+    RelationshipMeta,
+    TargetType,
 } from "./_internal";
 import { LazyGetter, enumerable } from "../../utils/common";
+import { removeIfObserved } from "../containers";
+import { SysMLInterface, SysMLType } from "../../services";
 
 /**
  * Types used in named children cache
@@ -59,8 +64,25 @@ export interface ElementOptions<Parent extends ElementMeta | undefined = Element
     declaredName?: string;
 }
 
+export type Edge<R extends RelationshipMeta, T extends TargetType<R> = TargetType<R>> = readonly [
+    R,
+    T
+];
+
+export type Edges<R extends RelationshipMeta> = {
+    [K in SysMLType]: SysMLInterface<K>["$meta"] extends R
+        ? Edge<SysMLInterface<K>["$meta"]>
+        : never;
+}[SysMLType];
+
+export type RestEdges<T extends RelationshipMeta[]> = { [I in keyof T]: Edge<T[I]> };
+
+type CleanupCallback = (() => void) & { owner: ElementMeta };
+
 @metamodelOf(Element, "abstract")
 export abstract class ElementMeta extends BasicMetamodel<Element> {
+    private static readonly CleanupToken = {};
+
     protected _comments: CommentMeta[] = [];
     protected _metadata: MetadataFeatureMeta[] = [];
     protected _docs: DocumentationMeta[] = [];
@@ -78,14 +100,91 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     protected _metaclass: MetadataFeatureMeta | undefined | LazyMetaclass | "unset" = "unset";
 
     /**
+     * Adds annotating element that annotates this element. An implementation
+     * detail used for tracking explicit annotations. All elements added through
+     * this should call {@link removeExplicitAnnotatingElement} to remove them.
+     */
+    protected addExplicitAnnotatingElement(element: AnnotatingElementMeta): void {
+        // if the element comes from a different document, register an
+        // invalidation callback to automatically remove the annotating element,
+        // preventing stale references.
+        const registerCleanup = (): void => {
+            if (element.document === this.document) return;
+            const cleanup: CleanupCallback = (): void =>
+                this.removeExplicitAnnotatingElement(element, ElementMeta.CleanupToken);
+            // attaching additionally `this` so that the callback can be removed
+            // later
+            cleanup.owner = this;
+            element.document.onInvalidated.add(element, cleanup);
+        };
+
+        switch (element.nodeType()) {
+            case "Comment":
+                this._comments.push(element as CommentMeta);
+                registerCleanup();
+                break;
+            case "Documentation":
+                this._docs.push(element as DocumentationMeta);
+                registerCleanup();
+                break;
+            case "TextualRepresentation":
+                this._reps.push(element as TextualRepresentationMeta);
+                registerCleanup();
+                break;
+            case "MetadataFeature":
+            case "MetadataUsage":
+                this._metadata.push(element as MetadataFeatureMeta);
+                registerCleanup();
+                break;
+        }
+    }
+
+    /**
+     * Reverse of {@link addExplicitAnnotatingElement} that stops tracking the
+     * annotating element. An implementation detail.
+     * @param element
+     * @param token a token to signal this called from cleanup function to avoid
+     * unnecessary work
+     */
+    protected removeExplicitAnnotatingElement(
+        element: AnnotatingElementMeta,
+        token?: typeof ElementMeta.CleanupToken
+    ): void {
+        const unregister = (): void => {
+            if (token === ElementMeta.CleanupToken) return;
+            const registry = element.document.onInvalidated;
+            const value = registry
+                .get(element)
+                .find((cb) => (cb as CleanupCallback).owner === this);
+            if (value) registry.delete(element, value);
+        };
+
+        switch (element.nodeType()) {
+            case "Comment":
+                this._comments.remove(element as CommentMeta);
+                unregister();
+                break;
+            case "Documentation":
+                this._docs.remove(element as DocumentationMeta);
+                unregister();
+                break;
+            case "TextualRepresentation":
+                this._reps.remove(element as TextualRepresentationMeta);
+                unregister();
+                break;
+            case "MetadataFeature":
+            case "MetadataUsage":
+                this._metadata.remove(element as MetadataFeatureMeta);
+                unregister();
+                break;
+        }
+    }
+
+    /**
      * Comments about this element
      */
     get comments(): readonly CommentMeta[] {
         return this._comments;
-    }
-    addComment(...comment: CommentMeta[]): this {
-        this._comments.push(...comment);
-        return this;
     }
 
     /**
@@ -94,10 +193,6 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     get documentation(): readonly DocumentationMeta[] {
         return this._docs;
     }
-    addDocumentation(...comment: DocumentationMeta[]): this {
-        this._docs.push(...comment);
-        return this;
-    }
 
     /**
      * Metadata about this element
@@ -105,20 +200,12 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     get metadata(): Stream<MetadataFeatureMeta> {
         return stream(this._metadata);
     }
-    addMetadata(...meta: MetadataFeatureMeta[]): this {
-        this._metadata.push(...meta);
-        return this;
-    }
 
     /**
      * Textual representations about this element
      */
     get textualRepresentation(): readonly TextualRepresentationMeta[] {
         return this._reps;
-    }
-    addTextualRepresentation(...rep: TextualRepresentationMeta[]): this {
-        this._reps.push(...rep);
-        return this;
     }
 
     /**
@@ -270,18 +357,37 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
         return this.metadata;
     }
 
+    protected override onOwnerSet(
+        previous: [ElementMeta, ElementMeta] | undefined,
+        current: [ElementMeta, ElementMeta] | undefined
+    ): void {
+        const oldParent = previous?.[0];
+        if (oldParent?.is(Membership)) {
+            const oldOwner = previous?.[1] as ElementMeta;
+            if (oldParent.name) oldOwner.removeLookupMemberByName(oldParent, oldParent.name);
+            if (oldParent.shortName)
+                oldOwner.removeLookupMemberByName(oldParent, oldParent.shortName);
+        }
+
+        const currentParent = current?.[0];
+        const currentOwner = current?.[1];
+        if (currentParent?.is(Membership)) currentOwner?.addLookupMember(currentParent);
+    }
+
     /**
      * Add a {@link child} to this element scope
      */
     protected addLookupMember(child: MembershipMeta<ElementMeta>): void {
-        const meta = child.element();
-        if (child.name || child.shortName) {
-            if (child.name) this._memberLookup.set(child.name, child);
-            if (child.shortName) this._memberLookup.set(child.shortName, child);
-        } else {
-            if (meta?.name) this._memberLookup.set(meta.name, child);
-            if (meta?.shortName) this._memberLookup.set(meta.shortName, child);
-        }
+        if (child.name) this._memberLookup.set(child.name, child);
+        if (child.shortName) this._memberLookup.set(child.shortName, child);
+    }
+
+    protected removeLookupMemberByName(member: ElementMeta | undefined, name: string): void {
+        if (!member) return;
+        // only remove this child if it is already cached with the name
+        const cached = this._memberLookup.get(name);
+        const isCached = cached === member || cached === "shadow";
+        if (cached && isCached) this._memberLookup.delete(name);
     }
 
     /**
@@ -299,10 +405,7 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
 
         // remove this child
         if (previousName && owner) {
-            // only remove this child if it is already cached with the old name
-            const cached = owner._memberLookup.get(previousName);
-            const isCached = cached === this.parent() || cached === "shadow";
-            if (cached && isCached) owner._memberLookup.delete(previousName);
+            owner.removeLookupMemberByName(this.parent(), previousName);
         }
 
         this._qualifiedName = computeQualifiedName(this, owner);
@@ -335,6 +438,89 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
      */
     invalidateMemberCaches(): void {
         // empty
+    }
+
+    protected swapEdgeOwnership<T extends RelationshipMeta, V extends ElementMeta>(
+        current: RelationshipMeta | undefined,
+        edge: readonly [T, V]
+    ): T & RelationshipMeta<V>;
+    protected swapEdgeOwnership<T extends RelationshipMeta, V extends ElementMeta>(
+        current: RelationshipMeta | undefined,
+        edge: readonly [T, V] | undefined
+    ): (T & RelationshipMeta<V>) | undefined;
+
+    protected swapEdgeOwnership(
+        current: RelationshipMeta | undefined,
+        edge: readonly [RelationshipMeta, ElementMeta] | undefined
+    ): RelationshipMeta | undefined {
+        if (edge) {
+            // removing the target element so that it doesn't trigger parent
+            // change twice
+            edge[0]["setElement"](undefined);
+            this.swapOwnership(current, edge[0]);
+            edge[0]["setElement"](edge[1]);
+
+            return edge[0];
+        }
+
+        return this.swapOwnership(current, undefined);
+    }
+
+    protected addOwnedEdges<E extends RelationshipMeta, T extends TargetType<E>>(
+        container: Pick<E[], "push">,
+        edges: readonly Edge<E, T>[],
+        callback?: (value: Edge<E, T>) => void
+    ): number {
+        return container.push(
+            ...edges.map(([edge, target]) => {
+                this.takeOwnership(edge);
+                edge["setElement"](target);
+                callback?.([edge, target]);
+                return edge;
+            })
+        );
+    }
+
+    protected addOwnedElements<T extends ElementMeta>(
+        container: Pick<T[], "push">,
+        children: readonly T[],
+        callback?: (value: T) => void
+    ): number {
+        children.forEach((c) => {
+            this.takeOwnership(c);
+            callback?.(c);
+        });
+        return container.push(...children);
+    }
+
+    protected removeOwnedElements<T extends ElementMeta>(
+        container: Pick<T[], "remove" | "length">,
+        children: readonly T[],
+        callback?: (value: T) => void
+    ): number {
+        children.forEach((c) => {
+            if (container.remove(c)) {
+                callback?.(c);
+                this.unsetOwnership(c);
+            }
+        });
+        return container.length;
+    }
+
+    protected removeOwnedElementsIf<T extends ElementMeta>(
+        container: Pick<T[], "removeIf" | "length">,
+        predicate: (value: T) => boolean,
+        callback?: (value: T) => void
+    ): number {
+        removeIfObserved(
+            container,
+            (v) => {
+                callback?.(v);
+                this.unsetOwnership(v);
+            },
+            predicate
+        );
+        return container.length;
     }
 
     protected static applyElementOptions(model: ElementMeta, options: ElementOptions): void {

@@ -18,20 +18,46 @@ import { AstNode, LangiumDocument } from "langium";
 import { AnnotatingElement } from "../../generated/ast";
 import { NonNullable } from "../../utils";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
-import { AnnotationMeta, ElementOptions, RelationshipMeta } from "./_internal";
+import { AnnotationMeta, Edge, ElementOptions, RelationshipMeta } from "./_internal";
 import { ElementMeta, ElementParts } from "./element";
 
-// TODO: add annotations
-export type AnnotatingElementOptions = ElementOptions<RelationshipMeta>;
+export interface AnnotatingElementOptions extends ElementOptions<RelationshipMeta> {
+    annotations?: readonly Edge<AnnotationMeta, ElementMeta>[];
+}
 
 @metamodelOf(AnnotatingElement, "abstract")
 export abstract class AnnotatingElementMeta extends ElementMeta {
     protected _annotations: AnnotationMeta[] = [];
 
-    addAnnotation(...annotation: AnnotationMeta[]): this {
-        this._annotations.push(...annotation);
-        annotation.forEach((a) => this.takeOwnership(a));
-        return this;
+    protected get unlinkAnnotation(): (a: AnnotationMeta) => void {
+        return (a) => {
+            const target = a.element();
+            if (!a.isImplied && target) target["removeExplicitAnnotatingElement"](this);
+        };
+    }
+
+    /**
+     * Adds owned annotations and returns the new number of annotations.
+     * Annotations don't own of their targets.
+     */
+    addAnnotation(...annotation: Edge<AnnotationMeta, ElementMeta>[]): number {
+        return this.addOwnedEdges(this._annotations, annotation, ([a, target]) => {
+            if (!a.isImplied) target["addExplicitAnnotatingElement"](this);
+        });
+    }
+
+    /**
+     * Removes and unlinks annotations by value and returns the new number of annotations.
+     */
+    removeAnnotation(...annotation: readonly AnnotationMeta[]): number {
+        return this.removeOwnedElements(this._annotations, annotation, this.unlinkAnnotation);
+    }
+
+    /**
+     * Removes and unlinks annotations by predicate and returns the new number of annotations.
+     */
+    removeAnnotationIf(predicate: (value: AnnotationMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._annotations, predicate, this.unlinkAnnotation);
     }
 
     annotations(): readonly AnnotationMeta[] {
@@ -54,10 +80,10 @@ export abstract class AnnotatingElementMeta extends ElementMeta {
     }
 
     protected static applyAnnotatingElementOptions(
-        _model: AnnotatingElementMeta,
-        _options: AnnotatingElementOptions
+        model: AnnotatingElementMeta,
+        options: AnnotatingElementOptions
     ): void {
-        // empty
+        if (options.annotations) model.addAnnotation(...options.annotations);
     }
 
     protected static override create<T extends AstNode>(

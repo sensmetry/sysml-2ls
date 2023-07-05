@@ -22,13 +22,14 @@ import { FeaturingMeta } from "./featuring";
 import { OwningMembershipMeta } from "./owning-membership";
 import { NamespaceMeta } from "../namespace";
 import { RelationshipOptionsBody } from "../relationship";
+import { ElementMeta } from "../_internal";
 
 export interface FeatureMembershipMeta<T extends FeatureMeta = FeatureMeta>
     extends OwningMembershipMeta<T>,
         FeaturingMeta<T> {}
 
 @metamodelOf(FeatureMembership)
-@mix(OwningMembershipMeta, FeaturingMeta)
+@mix(FeaturingMeta, OwningMembershipMeta)
 // eslint-disable-next-line unused-imports/no-unused-vars
 export class FeatureMembershipMeta<T extends FeatureMeta = FeatureMeta> {
     // eslint-disable-next-line unused-imports/no-unused-vars
@@ -39,6 +40,13 @@ export class FeatureMembershipMeta<T extends FeatureMeta = FeatureMeta> {
     protected onTargetSet(previous?: T, current?: T): void {
         // needed to fix incompatibility between OwningMembershipMeta and FeaturingMeta
         OwningMembershipMeta.prototype["onTargetSet"].call(this, previous, current);
+    }
+
+    protected onOwnerSet(
+        previous: [ElementMeta, ElementMeta] | undefined,
+        current: [ElementMeta, ElementMeta] | undefined
+    ): void {
+        OwningMembershipMeta.prototype["onOwnerSet"].call(this, previous, current);
     }
 
     ast(): FeatureMembership | undefined {

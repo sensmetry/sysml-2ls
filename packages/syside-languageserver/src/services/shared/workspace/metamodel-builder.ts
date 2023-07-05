@@ -504,17 +504,16 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 // used anyway
 
                 feature = MetadataFeatureMeta.create(this.util.idProvider, document);
-                feature.addAnnotation(
+                feature.addAnnotation([
                     AnnotationMeta.create(this.util.idProvider, document, {
                         isImplied: true,
-                        target: node,
-                    })
-                );
-                feature.addSpecialization(
-                    FeatureTypingMeta.create(this.util.idProvider, document, {
-                        target: metaclass,
-                    })
-                );
+                    }),
+                    node,
+                ]);
+                feature.addHeritage([
+                    FeatureTypingMeta.create(this.util.idProvider, document),
+                    metaclass,
+                ]);
             }
 
             return feature;
@@ -622,8 +621,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                     // can't get the factory options generically so will set
                     // up properties manually
                     specialization["_isImplied"] = true;
-                    specialization["setElement"](annotated);
-                    node.addSpecialization(specialization);
+                    node.addHeritage([specialization, annotated]);
                 }
             }
         }
@@ -653,7 +651,9 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
     @builder([Specialization, Conjugation], 100)
     protected setupSpecialization(node: InheritanceMeta, document: LangiumDocument): void {
-        this.linkTypeRelationship(node, document)?.["onSpecializationAdded"](node);
+        const source = this.linkTypeRelationship(node, document);
+        const target = node.finalElement();
+        if (target) source?.["onHeritageAdded"](node, target);
     }
 
     @builder(FeatureRelationship, 100)
@@ -717,9 +717,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             // redefinitions
             const specialization = RedefinitionMeta.create(this.util.idProvider, document, {
                 isImplied: true,
-                target,
             });
-            end.addSpecialization(specialization);
+            end.addHeritage([specialization, target]);
             return;
         });
     }
@@ -742,9 +741,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (base && node !== base && !node.allTypes().includes(base)) {
             const specialization = FeatureTypingMeta.create(this.util.idProvider, document, {
                 isImplied: true,
-                target: base,
             });
-            node.addSpecialization(specialization);
+            node.addHeritage([specialization, base]);
         }
     }
 
@@ -766,9 +764,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (base && node !== base && !node.allTypes().includes(base)) {
             const specialization = SubsettingMeta.create(this.util.idProvider, document, {
                 isImplied: true,
-                target: base,
             });
-            node.addSpecialization(specialization);
+            node.addHeritage([specialization, base]);
         }
     }
 
@@ -814,9 +811,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
                 const specialization = RedefinitionMeta.create(this.util.idProvider, document, {
                     isImplied: true,
-                    target: baseParameter.value,
                 });
-                parameter.addSpecialization(specialization);
+                parameter.addHeritage([specialization, baseParameter.value]);
             }
         }
     }
@@ -930,9 +926,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             if (feature) {
                 const specialization = RedefinitionMeta.create(this.util.idProvider, document, {
                     isImplied: true,
-                    target: feature,
                 });
-                current.addSpecialization(specialization);
+                current.addHeritage([specialization, feature]);
             }
         };
 
@@ -945,38 +940,22 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      * Setup explicit comment references
      */
     @builder(Comment)
-    protected linkComment(node: CommentMeta, document: LangiumDocument): void {
+    @builder(MetadataFeature)
+    protected linkAnnotations(
+        node: CommentMeta | MetadataFeatureMeta,
+        document: LangiumDocument
+    ): void {
         // references don't exist in model, only in parsed AST
         const ast = node.ast();
         if (!ast) return;
         const linker = this.linker(document.uri);
         ast.about.forEach((ref) => {
-            const target = ref.reference;
+            const target = ref.targetRef;
             if (!target) return;
             const element = linker.linkReference(target, document);
             if (element) {
                 ref.$meta["setElement"](element);
-                element.addComment(node);
-            }
-        });
-    }
-
-    /**
-     * Setup explicit metadata references
-     */
-    @builder(MetadataFeature)
-    protected linkMetadata(node: MetadataFeatureMeta, document: LangiumDocument): void {
-        const ast = node.ast();
-        if (!ast) return;
-
-        const linker = this.linker(document.uri);
-        ast.about.forEach((ref) => {
-            const target = ref.reference;
-            if (!target) return;
-            const element = linker.linkReference(target, document);
-            if (element) {
-                ref.$meta["setElement"](element);
-                element.addMetadata(node);
+                element["addExplicitAnnotatingElement"](node);
             }
         });
     }
@@ -1000,9 +979,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         const specialization = SubsettingMeta.create(this.util.idProvider, document, {
             isImplied: true,
-            target: type,
         });
-        node.addSpecialization(specialization);
+        node.addHeritage([specialization, type]);
 
         // TODO: feature write performance / binding connector as in spec
     }
@@ -1013,7 +991,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         // need to build all children recursively because reference resolution
         // may depend on a child left of it
         children.forEach((m) => this.buildTree(m, document));
-        node.args.push(
+        node["_args"].push(
             ...stream(children)
                 .filter(BasicMetamodel.is(Membership))
                 .map((m) => m.element())
@@ -1023,7 +1001,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
     @builder(OperatorExpression)
     protected setupOperatorArgs(node: OperatorExpressionMeta, _document: LangiumDocument): void {
-        node.args = (node["_operands"] as Array<FeatureMeta | undefined>).concat(node.args);
+        node["_args"] = (node["_operands"] as Array<FeatureMeta | undefined>).concat(node.args);
     }
 
     @builder(FeatureReferenceExpression)
@@ -1040,12 +1018,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (!ast) return;
 
         const linker = this.linker(document.uri);
-        if (ast.reference) {
-            node["setElement"](linker.linkReference(ast.reference, document));
+        if (ast.targetRef) {
+            node["setElement"](linker.linkReference(ast.targetRef, document));
         }
 
-        if (ast.source) {
-            const source = linker.linkReference(ast.source, document);
+        if (ast.sourceRef) {
+            const source = linker.linkReference(ast.sourceRef, document);
             if (source) node["setSource"](source);
         }
     }
@@ -1057,12 +1035,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     ): void {
         const expr = node.range?.element();
         if (!expr) {
-            node.setBounds(undefined);
+            node["setBounds"](undefined);
             return;
         }
 
         const evaluator = this.evaluator;
-        node.setBounds(function (): Bounds | undefined {
+        node["setBounds"](function (): Bounds | undefined {
             const range = expr ? evaluator.evaluate(expr, node.owner() ?? node) : undefined;
             if (!range || isExpressionError(range)) {
                 return undefined;
@@ -1104,14 +1082,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         const element = node.finalElement();
         if (element && owner?.isAny(Usage, Definition) && owner.isVariation) {
             const options: RelationshipOptions<UsageMeta, FeatureMeta> = {
-                // safe cast because if owner is definition, then specialization is feature typing
-                target: owner as UsageMeta,
                 isImplied: true,
             };
             const specialization = owner.is(Usage)
                 ? SubsettingMeta.create(this.util.idProvider, document, options)
                 : FeatureTypingMeta.create(this.util.idProvider, document, options);
-            element.addSpecialization(specialization);
+            element.addHeritage([specialization, owner]);
         }
     }
 
@@ -1126,17 +1102,18 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         const options: RelationshipOptions<UsageMeta, FeatureMeta> = {
             isImplied: true,
-            // fine since we won't use these options if owner is not a type
-            // anyway
-            target: owner as UsageMeta,
         };
 
         if (owner?.is(OccurrenceDefinition)) {
-            node.addSpecialization(
-                FeatureTypingMeta.create(this.util.idProvider, document, options)
-            );
+            node.addHeritage([
+                FeatureTypingMeta.create(this.util.idProvider, document, options),
+                owner,
+            ]);
         } else if (owner?.is(OccurrenceUsage)) {
-            node.addSpecialization(SubsettingMeta.create(this.util.idProvider, document, options));
+            node.addHeritage([
+                SubsettingMeta.create(this.util.idProvider, document, options),
+                owner,
+            ]);
         }
     }
 
@@ -1150,9 +1127,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (!context) return;
         const featuring = TypeFeaturingMeta.create(this.util.idProvider, document, {
             isImplied: true,
-            target: context,
         });
-        node.addFeatureRelationship(featuring);
+        node.addFeatureRelationship([featuring, context]);
     }
 
     @builder(Connector)
@@ -1171,9 +1147,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             if (!result) continue;
             const subsetting = SubsettingMeta.create(this.util.idProvider, document, {
                 isImplied: true,
-                target: result,
             });
-            end.addSpecialization(subsetting);
+            end.addHeritage([subsetting, result]);
         }
     }
 
@@ -1197,9 +1172,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             .forEach((f) => {
                 const subsetting = SubsettingMeta.create(this.util.idProvider, document, {
                     isImplied: true,
-                    target: f,
                 });
-                node.addSpecialization(subsetting);
+                node.addHeritage([subsetting, f]);
             });
     }
 
@@ -1239,9 +1213,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         const redef = RedefinitionMeta.create(this.util.idProvider, document, {
             isImplied: true,
-            target: implicit,
         });
-        feature.addSpecialization(redef);
+        feature.addHeritage([redef, implicit]);
     }
 
     @builder(TransitionUsage)
@@ -1264,9 +1237,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 if (target) {
                     const redef = RedefinitionMeta.create(this.util.idProvider, document, {
                         isImplied: true,
-                        target,
                     });
-                    link.addSpecialization(redef);
+                    link.addHeritage([redef, target]);
                 }
             }
         }
@@ -1282,9 +1254,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
                 const subsetting = SubsettingMeta.create(this.util.idProvider, document, {
                     isImplied: true,
-                    target: parameter,
                 });
-                payload.addSpecialization(subsetting);
+                payload.addHeritage([subsetting, parameter]);
                 if (parameter.name) payload["setName"](parameter.name);
             }
         }
@@ -1318,9 +1289,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 this.preLinkModel(feature, document);
                 const subsetting = ReferenceSubsettingMeta.create(this.util.idProvider, document, {
                     isImplied: true,
-                    target: feature,
                 });
-                end.addSpecialization(subsetting);
+                end.addHeritage([subsetting, feature]);
             }
         }
     }
@@ -1331,7 +1301,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         // element is imported by the name as it appears in text
         let name = ast
-            ? ast.reference?.parts.at(-1)?.$refText
+            ? ast.targetRef?.parts.at(-1)?.$refText
             : node.element()?.name ?? node.element()?.shortName;
         if (!name) return;
         name = sanitizeName(name);
@@ -1382,9 +1352,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
         const typing = FeatureTypingMeta.create(this.util.idProvider, document, {
             isImplied: true,
-            target: element,
         });
-        node.addSpecialization(typing);
+        node.addHeritage([typing, element]);
     }
 
     // @builder(Feature)
@@ -1539,8 +1508,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             if (implicit && implicit !== node) {
                 const specialization = this.constructMetamodel(kind, document) as InheritanceMeta;
                 specialization["_isImplied"] = true;
-                specialization["setElement"](implicit);
-                node.addSpecialization(specialization);
+                node.addHeritage([specialization, implicit]);
             }
         }
     }
@@ -1563,9 +1531,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             if (!baseFeature) continue;
             const specialization = RedefinitionMeta.create(this.util.idProvider, feature.document, {
                 isImplied: true,
-                target: baseFeature,
             });
-            feature.addSpecialization(specialization);
+            feature.addHeritage([specialization, baseFeature]);
             return;
         }
     }

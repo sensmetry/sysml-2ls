@@ -36,20 +36,20 @@ test("specialization can be parsed", async () => {
         children: [
             ...anything(4),
             {
-                element: {
+                target: {
                     $type: Specialization,
-                    source: qualifiedTypeReference("A"),
-                    reference: qualifiedTypeReference("B"),
+                    sourceRef: qualifiedTypeReference("A"),
+                    targetRef: qualifiedTypeReference("B"),
                 },
             },
             {
-                element: {
+                target: {
                     $type: Specialization,
-                    source: qualifiedTypeReference("x"),
-                    reference: qualifiedTypeReference("things"),
+                    sourceRef: qualifiedTypeReference("x"),
+                    targetRef: qualifiedTypeReference("things"),
                     elements: [
                         {
-                            element: {
+                            source: {
                                 $type: Documentation,
                                 body: "/* unnamed */",
                             },
@@ -70,12 +70,12 @@ test("types can specialize multiple types", async () => {
         children: [
             ...anything(2),
             {
-                element: {
+                target: {
                     $type: Class,
                     ...withQualifiedName("C"),
                     heritage: [
-                        { reference: qualifiedTypeReference("A") },
-                        { reference: qualifiedTypeReference("B") },
+                        { targetRef: qualifiedTypeReference("A") },
+                        { targetRef: qualifiedTypeReference("B") },
                     ],
                 },
             },

@@ -147,9 +147,8 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
         if (target.is(Type)) {
             const typing = FeatureTypingMeta.create(this.util.idProvider, target.document, {
                 isImplied: true,
-                target: target,
             });
-            feature.addSpecialization(typing);
+            feature.addHeritage([typing, target]);
         }
 
         return feature;

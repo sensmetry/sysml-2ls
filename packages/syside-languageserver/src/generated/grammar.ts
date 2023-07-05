@@ -348,7 +348,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "source",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -619,7 +619,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -657,7 +657,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -695,7 +695,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -733,7 +733,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -787,7 +787,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -857,7 +857,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -920,7 +920,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -988,7 +988,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -1598,7 +1598,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2315,7 +2315,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2353,7 +2353,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2408,7 +2408,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "source",
+                "feature": "sourceRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -2444,7 +2444,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -2495,7 +2495,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2562,7 +2562,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "source",
+                "feature": "sourceRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -2598,7 +2598,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -2649,7 +2649,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2716,7 +2716,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "source",
+                "feature": "sourceRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -2749,7 +2749,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -2800,7 +2800,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2842,7 +2842,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2884,7 +2884,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -2926,7 +2926,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -3195,7 +3195,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "source",
+            "feature": "sourceRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -3214,7 +3214,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -3248,7 +3248,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -3273,7 +3273,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -4185,7 +4185,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "source",
+                "feature": "sourceRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -4218,7 +4218,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -4269,7 +4269,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4333,7 +4333,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "source",
+            "feature": "sourceRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4349,7 +4349,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4383,7 +4383,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -4433,7 +4433,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "source",
+            "feature": "sourceRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4509,7 +4509,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "source",
+                "feature": "sourceRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -4545,7 +4545,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -4596,7 +4596,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4638,7 +4638,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4705,7 +4705,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "source",
+                "feature": "sourceRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -4741,7 +4741,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -4792,7 +4792,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -4865,7 +4865,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -4974,7 +4974,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -5013,7 +5013,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -5160,7 +5160,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -5240,7 +5240,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -5710,7 +5710,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -6450,7 +6450,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -6488,7 +6488,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -7007,7 +7007,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7223,7 +7223,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7297,7 +7297,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -7342,7 +7342,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7392,7 +7392,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7460,7 +7460,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "source",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7485,7 +7485,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7847,7 +7847,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -7971,7 +7971,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -8229,7 +8229,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -8339,7 +8339,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -8485,7 +8485,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -8691,7 +8691,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -9893,7 +9893,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -10116,7 +10116,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -10215,7 +10215,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -10286,7 +10286,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -10311,7 +10311,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -11264,7 +11264,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -11821,7 +11821,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -11867,7 +11867,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -11930,7 +11930,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -11955,7 +11955,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -12005,7 +12005,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -12055,7 +12055,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -12108,7 +12108,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -12129,7 +12129,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "element",
+                "feature": "target",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -12283,7 +12283,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -12333,7 +12333,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -12894,6 +12894,16 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
     },
     {
       "$type": "Interface",
+      "name": "Multiplicity",
+      "superTypes": [
+        {
+          "$ref": "#/interfaces@20"
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "$type": "Interface",
       "attributes": [
         {
           "$type": "TypeAttribute",
@@ -12907,22 +12917,12 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           }
         }
       ],
-      "name": "Multiplicity",
-      "superTypes": [
-        {
-          "$ref": "#/interfaces@20"
-        }
-      ]
-    },
-    {
-      "$type": "Interface",
       "name": "MultiplicityRange",
       "superTypes": [
         {
           "$ref": "#/interfaces@22"
         }
-      ],
-      "attributes": []
+      ]
     },
     {
       "$type": "Interface",
@@ -13180,6 +13180,17 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
+              "$ref": "#/interfaces@6"
+            }
+          }
+        },
+        {
+          "$type": "TypeAttribute",
+          "name": "sourceRef",
+          "isOptional": true,
+          "type": {
+            "$type": "SimpleType",
+            "typeRef": {
               "$ref": "#/interfaces@68"
             }
           }
@@ -13197,7 +13208,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         },
         {
           "$type": "TypeAttribute",
-          "name": "element",
+          "name": "target",
           "isOptional": true,
           "type": {
             "$type": "SimpleType",
@@ -13208,7 +13219,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
         },
         {
           "$type": "TypeAttribute",
-          "name": "reference",
+          "name": "targetRef",
           "isOptional": true,
           "type": {
             "$type": "SimpleType",
@@ -14539,7 +14550,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "source",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -14564,7 +14575,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -14738,7 +14749,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "source",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -14763,7 +14774,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -15109,7 +15120,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -15486,7 +15497,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -15524,7 +15535,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -15566,7 +15577,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -15624,7 +15635,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -15694,7 +15705,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -15757,7 +15768,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -15825,7 +15836,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -16158,7 +16169,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -16689,7 +16700,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -16731,7 +16742,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -16773,7 +16784,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -16812,7 +16823,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -16875,7 +16886,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -17233,7 +17244,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17271,7 +17282,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17313,7 +17324,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17351,7 +17362,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17389,7 +17400,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17427,7 +17438,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17465,7 +17476,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17831,7 +17842,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -17870,7 +17881,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -18833,7 +18844,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -19324,7 +19335,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -19384,7 +19395,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -19633,7 +19644,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -19716,7 +19727,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -20436,7 +20447,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -20705,7 +20716,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -20941,7 +20952,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -21015,7 +21026,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "reference",
+                "feature": "targetRef",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -21060,7 +21071,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -21110,7 +21121,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -21373,7 +21384,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -21464,7 +21475,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -21807,7 +21818,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -22341,7 +22352,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -22386,7 +22397,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -22424,7 +22435,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -22451,7 +22462,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -22909,7 +22920,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23009,7 +23020,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23113,7 +23124,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23163,7 +23174,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23310,7 +23321,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23371,7 +23382,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23490,7 +23501,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23602,7 +23613,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23678,7 +23689,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -23865,7 +23876,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -24837,7 +24848,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -24884,7 +24895,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -24931,7 +24942,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -24972,7 +24983,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "element",
+                "feature": "target",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -24991,7 +25002,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                   },
                   {
                     "$type": "Assignment",
-                    "feature": "element",
+                    "feature": "target",
                     "operator": "=",
                     "terminal": {
                       "$type": "RuleCall",
@@ -25246,7 +25257,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -25284,7 +25295,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -25730,7 +25741,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -25751,7 +25762,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "element",
+                "feature": "target",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -25792,7 +25803,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -25851,7 +25862,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -25890,7 +25901,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -26148,7 +26159,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -26369,7 +26380,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -26407,7 +26418,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -26904,7 +26915,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -26987,7 +26998,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -27128,7 +27139,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -27269,7 +27280,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -27344,7 +27355,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -27575,7 +27586,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -27625,7 +27636,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -27960,7 +27971,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -28265,7 +28276,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -28749,7 +28760,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -29032,7 +29043,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           },
           {
             "$type": "Assignment",
-            "feature": "element",
+            "feature": "target",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -29253,7 +29264,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -29511,7 +29522,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -29621,7 +29632,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -29767,7 +29778,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -29973,7 +29984,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -31175,7 +31186,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -31398,7 +31409,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -31497,7 +31508,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -31568,7 +31579,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -31593,7 +31604,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -32546,7 +32557,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33103,7 +33114,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33149,7 +33160,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -33212,7 +33223,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33237,7 +33248,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33287,7 +33298,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33337,7 +33348,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "element",
+        "feature": "target",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33390,7 +33401,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "reference",
+            "feature": "targetRef",
             "operator": "=",
             "terminal": {
               "$type": "RuleCall",
@@ -33411,7 +33422,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "element",
+                "feature": "target",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -33565,7 +33576,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -33615,7 +33626,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "Assignment",
-        "feature": "reference",
+        "feature": "targetRef",
         "operator": "=",
         "terminal": {
           "$type": "RuleCall",
@@ -34176,6 +34187,16 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
     },
     {
       "$type": "Interface",
+      "name": "Multiplicity",
+      "superTypes": [
+        {
+          "$ref": "#/interfaces@20"
+        }
+      ],
+      "attributes": []
+    },
+    {
+      "$type": "Interface",
       "attributes": [
         {
           "$type": "TypeAttribute",
@@ -34189,22 +34210,12 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           }
         }
       ],
-      "name": "Multiplicity",
-      "superTypes": [
-        {
-          "$ref": "#/interfaces@20"
-        }
-      ]
-    },
-    {
-      "$type": "Interface",
       "name": "MultiplicityRange",
       "superTypes": [
         {
           "$ref": "#/interfaces@22"
         }
-      ],
-      "attributes": []
+      ]
     },
     {
       "$type": "Interface",
@@ -34462,6 +34473,17 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
+              "$ref": "#/interfaces@6"
+            }
+          }
+        },
+        {
+          "$type": "TypeAttribute",
+          "name": "sourceRef",
+          "isOptional": true,
+          "type": {
+            "$type": "SimpleType",
+            "typeRef": {
               "$ref": "#/interfaces@68"
             }
           }
@@ -34479,7 +34501,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         },
         {
           "$type": "TypeAttribute",
-          "name": "element",
+          "name": "target",
           "isOptional": true,
           "type": {
             "$type": "SimpleType",
@@ -34490,7 +34512,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
         },
         {
           "$type": "TypeAttribute",
-          "name": "reference",
+          "name": "targetRef",
           "isOptional": true,
           "type": {
             "$type": "SimpleType",

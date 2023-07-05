@@ -50,6 +50,28 @@ export class MembershipMeta<T extends ElementMeta = ElementMeta> extends Relatio
         return Boolean(super.shortName || super.name);
     }
 
+    /**
+     * Adds new owned body elements and returns the new number of body elements.
+     */
+    addChild(...element: ElementMeta[]): number {
+        return this.addOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements and returns the new number of body elements.
+     */
+    removeChild(...element: ElementMeta[]): number {
+        return this.removeOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements by predicate and returns the new number of
+     * body elements.
+     */
+    removeChildIf(predicate: (element: ElementMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
+    }
+
     static override create<T extends AstNode>(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

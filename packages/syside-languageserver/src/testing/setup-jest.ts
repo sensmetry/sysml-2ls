@@ -98,12 +98,19 @@ export function sanitizeTree(
         return json;
     }
 
-    const o: SanitizedObject = {};
     if (cache === undefined) cache = new Map<object, SanitizedObject>();
     else {
         const cached = cache.get(node);
         if (cached !== undefined) return cached;
     }
+
+    if (Array.isArray(node)) {
+        return node.map((v) => sanitizeTree(v, cache, includeMeta));
+    }
+
+    if (typeof node !== "object") return node;
+
+    const o: SanitizedObject = {};
     cache.set(node, o);
 
     if ((node as any).$type !== undefined) o.$type = (node as any).$type;
@@ -151,10 +158,6 @@ export function sanitizeTree(
         }
 
         o[key] = value;
-    }
-
-    if (Array.isArray(node)) {
-        return Object.values(o);
     }
 
     return o;

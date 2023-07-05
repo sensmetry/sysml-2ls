@@ -38,6 +38,8 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
      */
     operator = "";
 
+    // this only exists for compatibility with AST since we don't construct the
+    // missing intermediate elements to operands
     protected _operands: ExpressionMeta[] = [];
 
     @enumerable

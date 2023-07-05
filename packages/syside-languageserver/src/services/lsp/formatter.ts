@@ -701,9 +701,9 @@ export class SysMLFormatter extends AbstractFormatter {
         }
 
         if (startsWith(node.$container, equal)) return;
-        if (node.element && node.element.$cstNode?.offset !== node.$cstNode?.offset)
+        if (node.target && node.target.$cstNode?.offset !== node.$cstNode?.offset)
             formatter
-                .node(node.element)
+                .node(node.target)
                 .prepend(
                     addIndent(
                         equal.nodes.length > 0 || node.isDefault
@@ -719,9 +719,9 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.ElementFilterMembership>
     ): void {
         if (node.$cstNode?.text.startsWith("[")) {
-            if (node.element) {
+            if (node.target) {
                 formatter.node(node).prepend(addIndent(Options.noSpace, 1));
-                this.formatBraces(formatter, "[", "]", formatter.node(node.element));
+                this.formatBraces(formatter, "[", "]", formatter.node(node.target));
             }
         } else {
             this.relationship(node, formatter, { keyword: "filter" });
@@ -744,12 +744,6 @@ export class SysMLFormatter extends AbstractFormatter {
         formatter: NodeFormatter<ast.Multiplicity>
     ): void {
         this.element(node, formatter);
-
-        if (node.range) {
-            this.formatBraces(formatter, "[", "]", formatter.node(node.range)).prepend(
-                Options.oneSpace
-            );
-        }
 
         if (node.heritage.length > 0) {
             this.formatList(node, "heritage", formatter, { keyword: ["subsets", ":>"] });
@@ -805,10 +799,10 @@ export class SysMLFormatter extends AbstractFormatter {
             formatter.keyword(">").append(Options.spaceOrIndent);
         }
 
-        const source = node.source ?? node.sourceChain;
+        const source = node.sourceRef ?? node.sourceChain;
         if (source) formatter.node(source).prepend(Options.oneSpace).append(Options.spaceOrIndent);
 
-        const target = node.reference ?? node.targetChain;
+        const target = node.targetRef ?? node.targetChain;
         if (target) formatter.node(target).prepend(Options.oneSpace);
     }
 
@@ -1163,7 +1157,7 @@ export class SysMLFormatter extends AbstractFormatter {
             braces.prepend(Options.noSpace);
             const closing = formatter.keyword(")", 0);
             if (node.children.length > 0) {
-                if ((node.children[0].element as ast.Feature).heritage.length > 0) {
+                if ((node.children[0].target as ast.Feature).heritage.length > 0) {
                     // named arguments
                     this.formatList(node, node.children, formatter, {
                         initial: Options.newLine,

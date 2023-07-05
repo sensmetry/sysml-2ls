@@ -80,7 +80,7 @@ test.concurrent.each(TABLE)(
         const result = await parseKerML(str, BUILD_OPTIONS);
         expect(result).toMatchObject(NO_ERRORS);
 
-        const type = result.value.children[1].element as Type;
+        const type = result.value.children[1].target as Type;
         expect(sanitizeTree(type.$meta.specializations())).toMatchObject([
             {
                 element: { qualifiedName: `${pack}::${klass}` },
@@ -114,7 +114,7 @@ test.skip.each(TABLE)(
 
         expect(result).toMatchObject(NO_ERRORS);
         expect(
-            sanitizeTree((result.value.children[2].element as Type).$meta.specializations())
+            sanitizeTree((result.value.children[2].target as Type).$meta.specializations())
         ).toMatchObject([
             {
                 element: { qualifiedName: "B" },
@@ -144,7 +144,7 @@ test.each(TABLE.filter((v) => !v[1].startsWith("assoc")))(
 
         expect(result).toMatchObject(NO_ERRORS);
         expect(
-            sanitizeTree((result.value.children[1].element as Feature).$meta.specializations())
+            sanitizeTree((result.value.children[1].target as Feature).$meta.specializations())
         ).toMatchObject([
             ...anything(1),
             {

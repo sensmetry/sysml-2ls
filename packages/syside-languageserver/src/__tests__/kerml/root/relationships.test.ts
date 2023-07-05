@@ -28,7 +28,7 @@ test("relationships are parseable", async () => {
         children: [
             ...anything(4),
             {
-                element: {
+                target: {
                     $type: Dependency,
                     declaredName: "R",
                     declaredShortName: "'5'",

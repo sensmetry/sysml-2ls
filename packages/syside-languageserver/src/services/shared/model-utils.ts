@@ -45,10 +45,8 @@ export class ModelUtil {
      * @returns {@link chained}
      */
     addChainingFeature(chained: FeatureMeta, chaining: FeatureMeta): FeatureMeta {
-        const relationship = FeatureChainingMeta.create(this.idProvider, chained.document, {
-            target: chaining,
-        });
-        chained.addFeatureRelationship(relationship);
+        const relationship = FeatureChainingMeta.create(this.idProvider, chained.document);
+        chained.addFeatureRelationship([relationship, chaining]);
         return chained;
     }
 

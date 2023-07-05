@@ -10,7 +10,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "DataType",
           "children": [],
           "declaredName": "Integer",
@@ -19,11 +20,11 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Feature",
           "children": [],
           "declaredName": "person",
@@ -31,7 +32,7 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
             {
               "$type": "FeatureTyping",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "TypeReference",
                 "parts": [
                   {
@@ -41,7 +42,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                       "children": [
                         {
                           "$type": "FeatureMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Feature",
                             "children": [],
                             "declaredName": "age",
@@ -49,7 +51,7 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                               {
                                 "$type": "FeatureTyping",
                                 "elements": [],
-                                "reference": {
+                                "targetRef": {
                                   "$type": "TypeReference",
                                   "parts": [
                                     {
@@ -73,7 +75,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                             "isSufficient": false,
                             "multiplicity": {
                               "$type": "OwningMembership",
-                              "element": {
+                              "elements": [],
+                              "target": {
                                 "$type": "MultiplicityRange",
                                 "children": [],
                                 "heritage": [],
@@ -83,7 +86,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                                 "prefixes": [],
                                 "range": {
                                   "$type": "OwningMembership",
-                                  "element": {
+                                  "elements": [],
+                                  "target": {
                                     "$type": "LiteralNumber",
                                     "children": [],
                                     "heritage": [],
@@ -94,22 +98,19 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                                     "prefixes": [],
                                     "typeRelationships": [],
                                   },
-                                  "elements": [],
                                 },
                                 "typeRelationships": [],
                               },
-                              "elements": [],
                             },
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "Membership",
                           "declaredName": "personAlias",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -136,7 +137,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
           "isSufficient": false,
           "multiplicity": {
             "$type": "OwningMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "MultiplicityRange",
               "children": [],
               "heritage": [],
@@ -146,7 +148,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
               "prefixes": [],
               "range": {
                 "$type": "OwningMembership",
-                "element": {
+                "elements": [],
+                "target": {
                   "$type": "LiteralInfinity",
                   "children": [],
                   "heritage": [],
@@ -156,25 +159,24 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                   "prefixes": [],
                   "typeRelationships": [],
                 },
-                "elements": [],
               },
               "typeRelationships": [],
             },
-            "elements": [],
           },
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [
             {
               "$type": "FeatureMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "age",
@@ -182,7 +184,7 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -206,7 +208,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                 "isSufficient": false,
                 "multiplicity": {
                   "$type": "OwningMembership",
-                  "element": {
+                  "elements": [],
+                  "target": {
                     "$type": "MultiplicityRange",
                     "children": [],
                     "heritage": [],
@@ -216,7 +219,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                     "prefixes": [],
                     "range": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "LiteralNumber",
                         "children": [],
                         "heritage": [],
@@ -227,22 +231,19 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "typeRelationships": [],
                   },
-                  "elements": [],
                 },
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "Membership",
               "declaredName": "personAlias",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -255,7 +256,7 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                         {
                           "$type": "FeatureTyping",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "TypeReference",
                             "parts": [
                               {
@@ -271,7 +272,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                       "isSufficient": false,
                       "multiplicity": {
                         "$type": "OwningMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "MultiplicityRange",
                           "children": [],
                           "heritage": [],
@@ -281,7 +283,8 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                           "prefixes": [],
                           "range": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "LiteralInfinity",
                               "children": [],
                               "heritage": [],
@@ -291,11 +294,9 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
                               "prefixes": [],
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                       "prefixes": [],
                       "typeRelationships": [],
@@ -311,7 +312,6 @@ exports[`features can be parsed and aliased: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -329,7 +329,8 @@ exports[`member features can be parsed: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [],
           "declaredName": "A",
@@ -338,16 +339,17 @@ exports[`member features can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [
             {
               "$type": "FeatureMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "f",
@@ -358,11 +360,11 @@ exports[`member features can be parsed: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "g",
@@ -375,7 +377,7 @@ exports[`member features can be parsed: toParseKerML 1`] = `
                   {
                     "$type": "TypeFeaturing",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -395,7 +397,6 @@ exports[`member features can be parsed: toParseKerML 1`] = `
                   },
                 ],
               },
-              "elements": [],
             },
           ],
           "declaredName": "B",
@@ -404,7 +405,6 @@ exports[`member features can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],

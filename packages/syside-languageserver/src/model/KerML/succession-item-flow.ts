@@ -17,7 +17,15 @@
 import { Mixin } from "ts-mixer";
 import { SuccessionItemFlow } from "../../generated/ast";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
-import { ItemFlowMeta, ItemFlowOptions, SuccessionMeta, SuccessionOptions } from "./_internal";
+import {
+    Edge,
+    EndFeatureMembershipMeta,
+    ItemFlowEndMeta,
+    ItemFlowMeta,
+    ItemFlowOptions,
+    SuccessionMeta,
+    SuccessionOptions,
+} from "./_internal";
 import { AstNode, LangiumDocument } from "langium";
 
 export const ImplicitSuccessionItemFlows = {
@@ -27,7 +35,9 @@ export const ImplicitSuccessionItemFlows = {
     ownedPerformance: "Objects::Object::ownedPerformances",
 };
 
-export interface SuccessionItemFlowOptions extends ItemFlowOptions, SuccessionOptions {}
+export interface SuccessionItemFlowOptions extends ItemFlowOptions, SuccessionOptions {
+    ends?: readonly Edge<EndFeatureMembershipMeta, ItemFlowEndMeta>[];
+}
 
 @metamodelOf(SuccessionItemFlow, ImplicitSuccessionItemFlows)
 export class SuccessionItemFlowMeta extends Mixin(ItemFlowMeta, SuccessionMeta) {

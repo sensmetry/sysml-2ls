@@ -23,13 +23,23 @@ import {
     metamodelOf,
 } from "../../metamodel";
 import { ElementMeta, ExpressionMeta, RelationshipMeta, TypeMeta } from "../_internal";
+import { enumerable } from "../../../utils";
 
-// TODO: add reference
-export type MetadataAcscessExpressionOptions = ModelElementOptions<RelationshipMeta>;
+export interface MetadataAccessExpressionOptions extends ModelElementOptions<RelationshipMeta> {
+    reference: ElementMeta;
+}
 
 @metamodelOf(MetadataAccessExpression)
 export class MetadataAccessExpressionMeta extends ExpressionMeta {
-    reference?: ElementMeta;
+    protected _reference?: ElementMeta;
+
+    @enumerable
+    get reference(): ElementMeta | undefined {
+        return this._reference;
+    }
+    set reference(value: ElementMeta) {
+        this._reference = value;
+    }
 
     override ast(): MetadataAccessExpression | undefined {
         return this._ast as MetadataAccessExpression;
@@ -43,9 +53,11 @@ export class MetadataAccessExpressionMeta extends ExpressionMeta {
         this: MetatypeProto<T>,
         provider: ElementIDProvider,
         document: LangiumDocument,
-        options?: MetadataAcscessExpressionOptions
+        options?: MetadataAccessExpressionOptions
     ): T["$meta"] {
-        return super.create(provider, document, options);
+        const model = super.create(provider, document, options) as MetadataAccessExpressionMeta;
+        model._reference = options?.reference;
+        return model;
     }
 }
 

@@ -19,10 +19,13 @@ import { SuccessionFlowConnectionUsage } from "../../generated/ast";
 import { SuccessionItemFlowMeta, SuccessionItemFlowOptions } from "../KerML/succession-item-flow";
 import { metamodelOf } from "../metamodel";
 import { FlowConnectionUsageMeta, FlowConnectionUsageOptions } from "./flow-connection-usage";
+import { Edge, EndFeatureMembershipMeta, ItemFlowEndMeta } from "../KerML";
 
 export interface SuccessionFlowConnectionUsageOptions
     extends SuccessionItemFlowOptions,
-        FlowConnectionUsageOptions {}
+        FlowConnectionUsageOptions {
+    ends?: readonly Edge<EndFeatureMembershipMeta, ItemFlowEndMeta>[];
+}
 
 @metamodelOf(SuccessionFlowConnectionUsage, {
     base: "Connections::successionFlowConnections",

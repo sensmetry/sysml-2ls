@@ -20,7 +20,6 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { RelationshipMeta, RelationshipOptions, TypeMeta } from "../_internal";
 
 @metamodelOf(Intersecting)
-// @ts-expect-error ignoring static inheritance error
 export class IntersectingMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
     override ast(): Intersecting | undefined {
         return this._ast as Intersecting;

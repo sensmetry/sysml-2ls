@@ -16,6 +16,7 @@
 
 import { IfActionUsage } from "../../generated/ast";
 import {
+    Edge,
     ElementParts,
     ExpressionMeta,
     FeatureMeta,
@@ -27,8 +28,11 @@ import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { NonNullable, enumerable } from "../../utils";
 import { AstNode, LangiumDocument } from "langium";
 
-// TODO: add condition, then, else
-export type IfActionUsageOptions = ActionUsageOptions;
+export interface IfActionUsageOptions extends ActionUsageOptions {
+    condition: Edge<ParameterMembershipMeta, ExpressionMeta>;
+    then: Edge<ParameterMembershipMeta, ActionUsageMeta>;
+    else?: Edge<ParameterMembershipMeta, ActionUsageMeta>;
+}
 
 @metamodelOf(IfActionUsage, {
     base: "Actions::ifThenActions",
@@ -44,24 +48,24 @@ export class IfActionUsageMeta extends ActionUsageMeta {
     public get condition(): ParameterMembershipMeta<ExpressionMeta> | undefined {
         return this._condition;
     }
-    public set condition(value: ParameterMembershipMeta<ExpressionMeta>) {
-        this._condition = value;
+    public set condition(value: Edge<ParameterMembershipMeta, ExpressionMeta> | undefined) {
+        this._condition = this.swapEdgeOwnership(this._condition, value);
     }
 
     @enumerable
     public get then(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
         return this._then;
     }
-    public set then(value: ParameterMembershipMeta<ActionUsageMeta>) {
-        this._then = value;
+    public set then(value: Edge<ParameterMembershipMeta, ActionUsageMeta> | undefined) {
+        this._then = this.swapEdgeOwnership(this._then, value);
     }
 
     @enumerable
     public get else(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
         return this._else;
     }
-    public set else(value: ParameterMembershipMeta<ActionUsageMeta> | undefined) {
-        this._else = value;
+    public set else(value: Edge<ParameterMembershipMeta, ActionUsageMeta> | undefined) {
+        this._else = this.swapEdgeOwnership(this._else, value);
     }
 
     override ast(): IfActionUsage | undefined {
@@ -92,11 +96,10 @@ export class IfActionUsageMeta extends ActionUsageMeta {
         if (this.else) parts.push(["else", [this.else]]);
     }
 
-    protected static applyIfOptions(
-        _model: IfActionUsageMeta,
-        _options: IfActionUsageOptions
-    ): void {
-        // empty
+    protected static applyIfOptions(model: IfActionUsageMeta, options: IfActionUsageOptions): void {
+        model.condition = options.condition;
+        model.then = options.then;
+        model.else = options.else;
     }
 
     static override create<T extends AstNode>(

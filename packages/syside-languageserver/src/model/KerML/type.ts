@@ -17,10 +17,10 @@
 import { AstNode, LangiumDocument, Stream, stream, TreeStreamImpl } from "langium";
 import { Mixin } from "ts-mixer";
 import {
+    Feature,
     FeatureMembership,
     FeatureRelationship,
     Inheritance,
-    Membership,
     Type,
     TypeRelationship,
 } from "../../generated/ast";
@@ -38,6 +38,9 @@ import {
 } from "../metamodel";
 import { InputParametersMixin } from "../mixins";
 import {
+    Edge,
+    EdgeContainer,
+    Edges,
     ElementParts,
     FeatureMembershipMeta,
     FeatureMeta,
@@ -49,7 +52,9 @@ import {
     NamespaceOptions,
     NonNullRelationship,
     OwningMembershipMeta,
+    RestEdges,
     SpecializationMeta,
+    TargetType,
 } from "./_internal";
 import { Class } from "ts-mixer/dist/types/types";
 
@@ -57,11 +62,29 @@ export const ImplicitTypes = {
     base: "Base::Anything",
 };
 
+export type HeritageEdge = Edges<InheritanceMeta>;
+export type TypeRelationshipMeta = TypeRelationship["$meta"];
+export type FeatureRelationshipMeta = FeatureRelationship["$meta"];
+export type TypeRelationshipEdge = Edges<TypeRelationshipMeta>;
+export type FeatureRelationshipEdge = Edges<FeatureRelationshipMeta>;
+
+export function typeHeritage<T extends InheritanceMeta[]>(
+    ...children: RestEdges<T>
+): EdgeContainer<InheritanceMeta> {
+    return EdgeContainer.make(...children);
+}
+
+export function typeRelationships<T extends TypeRelationshipMeta[]>(
+    ...children: RestEdges<T>
+): EdgeContainer<TypeRelationshipMeta> {
+    return EdgeContainer.make(...children);
+}
+
 export interface TypeOptions extends NamespaceOptions {
     isAbstract?: boolean;
-    // TODO: add heritage
-    // TODO: add multiplicity
-    // TODO: add typeRelationships
+    multiplicity?: Edge<OwningMembershipMeta, MultiplicityRangeMeta>;
+    heritage?: EdgeContainer<InheritanceMeta>;
+    typeRelationships?: EdgeContainer<TypeRelationshipMeta>;
 }
 
 @metamodelOf(Type, ImplicitTypes)
@@ -91,8 +114,8 @@ export class TypeMeta extends Mixin(
     get multiplicity(): OwningMembershipMeta<MultiplicityRangeMeta> | undefined {
         return this._multiplicity;
     }
-    set multiplicity(value) {
-        this._multiplicity = value;
+    set multiplicity(value: Edge<OwningMembershipMeta, MultiplicityRangeMeta> | undefined) {
+        this._multiplicity = this.swapEdgeOwnership(this._multiplicity, value);
     }
 
     @enumerable
@@ -100,14 +123,77 @@ export class TypeMeta extends Mixin(
         return this._heritage.all;
     }
 
+    /**
+     * Adds potentially owned heritage and returns the new number of heritage
+     * relationships. Heritage with owned sources or non-type parents are not
+     * taken ownership of.
+     */
+    addHeritage<T extends InheritanceMeta[]>(...value: RestEdges<T>): number {
+        return this.addDeclaredRelationship(
+            this._heritage,
+            value.filter(
+                ([_, target]) => !target.is(Feature) || target.basicFeature() !== (this as TypeMeta)
+            ),
+            this.onHeritageAdded,
+            this
+        );
+    }
+
+    /**
+     * Removes heritage by value and returns the new number of heritage
+     * relationships.
+     */
+    removeHeritage(...value: readonly InheritanceMeta[]): number {
+        const removed: InheritanceMeta[] = [];
+        const count = this.removeDeclaredRelationship(this._heritage, value, (v) =>
+            removed.push(v)
+        );
+
+        if (removed.length > 0) this.onHeritageRemoved(removed);
+        return count;
+    }
+
+    /**
+     * Removes heritage by predicate and returns the new number of heritage
+     * relationships.
+     */
+    removeHeritageIf(predicate: (value: InheritanceMeta) => boolean): number {
+        const removed: InheritanceMeta[] = [];
+        const count = this.removeDeclaredRelationshipIf(this._heritage, predicate, (v) =>
+            removed.push(v)
+        );
+        if (removed.length > 0) this.onHeritageRemoved(removed);
+        return count;
+    }
+
     @enumerable
-    get typeRelationships(): readonly FeatureRelationship["$meta"][] {
+    get typeRelationships(): readonly FeatureRelationshipMeta[] {
         return this._typeRelationships.all;
     }
-    addTypeRelationship(...element: TypeRelationship["$meta"][]): this {
-        this._typeRelationships.add(...element);
-        element.forEach((e) => this.maybeTakeOwnership(e));
-        return this;
+
+    /**
+     * Adds potentially owned type relationships and returns the new number of
+     * type relationships. Relationships with owned sources or non-type parents
+     * are not taken ownership of.
+     */
+    addTypeRelationship<T extends TypeRelationshipMeta[]>(...element: RestEdges<T>): number {
+        return this.addDeclaredRelationship(this._typeRelationships, element);
+    }
+
+    /**
+     * Removes type relationships by value and returns the new number of type
+     * relationships.
+     */
+    removeTypeRelationship(...element: TypeRelationshipMeta[]): number {
+        return this.removeDeclaredRelationship(this._typeRelationships, element);
+    }
+
+    /**
+     * Removes type relationships by predicate and returns the new number of type
+     * relationships.
+     */
+    removeTypeRelationshipIf(predicate: (value: FeatureRelationshipMeta) => boolean): number {
+        return this.removeDeclaredRelationshipIf(this._typeRelationships, predicate);
     }
 
     /**
@@ -335,20 +421,28 @@ export class TypeMeta extends Mixin(
     }
 
     // eslint-disable-next-line unused-imports/no-unused-vars
-    protected onSpecializationAdded(spec: InheritanceMeta): void {
+    protected onHeritageAdded(heritage: InheritanceMeta, target: TypeMeta): void {
         // empty
     }
 
-    protected maybeTakeOwnership(element: FeatureRelationship["$meta"] | InheritanceMeta): void {
-        if (!element.parent()?.is(Membership)) this.takeOwnership(element);
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    protected onHeritageRemoved(heritage: InheritanceMeta[]): void {
+        // empty
     }
 
-    addSpecialization(specialization: InheritanceMeta): void {
-        if (specialization.finalElement() === this) return;
-        this._heritage.add(specialization);
-        this.maybeTakeOwnership(specialization);
+    protected isDeclaredRelationship(element: FeatureRelationshipMeta | InheritanceMeta): boolean {
+        const source = element.source();
+        if (source && source.parent() === element) return false;
+        const parent = element.parent();
+        return Boolean(!parent || parent.is(Type));
+    }
 
-        this.onSpecializationAdded(specialization);
+    protected maybeTakeOwnership(element: FeatureRelationshipMeta | InheritanceMeta): void {
+        if (this.isDeclaredRelationship(element)) this.takeOwnership(element);
+    }
+
+    protected maybeUnsetOwnership(element: FeatureRelationshipMeta | InheritanceMeta): void {
+        if (this.isDeclaredRelationship(element)) this.unsetOwnership(element);
     }
 
     override allMetadata(): Stream<MetadataFeatureMeta> {
@@ -382,6 +476,52 @@ export class TypeMeta extends Mixin(
         return this.ownedFeatures().filter((f) => f.isParameter);
     }
 
+    protected addDeclaredRelationship<T extends InheritanceMeta | FeatureRelationshipMeta>(
+        container: Pick<T[], "push" | "length">,
+        value: Edge<T, TargetType<T>>[],
+        callback?: (relationship: T, target: TargetType<T>) => void,
+        thisObj?: unknown
+    ): number {
+        value.forEach(([relationship, target]) => {
+            this.maybeTakeOwnership(relationship);
+            relationship["setElement"](target as FeatureMeta);
+            container.push(relationship);
+            callback?.call(thisObj, relationship, target);
+        });
+
+        return container.length;
+    }
+
+    protected removeDeclaredRelationship<T extends InheritanceMeta | FeatureRelationshipMeta>(
+        container: Pick<T[], "remove" | "length">,
+        value: readonly T[],
+        callback?: (value: T) => void
+    ): number {
+        value.forEach((item) => {
+            if (container.remove(item)) {
+                this.maybeUnsetOwnership(item);
+                callback?.(item);
+            }
+        });
+
+        return container.length;
+    }
+
+    protected removeDeclaredRelationshipIf<T extends InheritanceMeta | FeatureRelationshipMeta>(
+        container: Pick<T[], "removeIf" | "length">,
+        predicate: (value: T) => boolean,
+        callback?: (value: T) => void
+    ): number {
+        return container.removeIf((value) => {
+            if (predicate(value)) {
+                this.maybeUnsetOwnership(value);
+                callback?.(value);
+                return true;
+            }
+            return false;
+        });
+    }
+
     protected collectDeclaration(parts: ElementParts): void {
         // multiplicity always appears before heritage in non-feature types
         if (this._multiplicity) {
@@ -403,6 +543,10 @@ export class TypeMeta extends Mixin(
 
     protected static applyTypeOptions(model: TypeMeta, options: TypeOptions): void {
         model._isAbstract = Boolean(options.isAbstract);
+        if (options.multiplicity) model.multiplicity = options.multiplicity;
+        if (options.heritage) model.addHeritage(...options.heritage["values"]);
+        if (options.typeRelationships)
+            model.addTypeRelationship(...options.typeRelationships["values"]);
     }
 
     static override create<T extends AstNode>(

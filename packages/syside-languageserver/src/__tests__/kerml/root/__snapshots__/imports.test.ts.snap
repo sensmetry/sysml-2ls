@@ -10,12 +10,14 @@ exports[`double wildcard recursively imports all members from a namespace and it
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "AA",
@@ -24,11 +26,11 @@ exports[`double wildcard recursively imports all members from a namespace and it
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "B",
@@ -37,16 +39,17 @@ exports[`double wildcard recursively imports all members from a namespace and it
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Namespace",
                 "children": [
                   {
                     "$type": "OwningMembership",
-                    "element": {
+                    "elements": [],
+                    "target": {
                       "$type": "Class",
                       "children": [],
                       "declaredName": "C",
@@ -55,23 +58,21 @@ exports[`double wildcard recursively imports all members from a namespace and it
                       "prefixes": [],
                       "typeRelationships": [],
                     },
-                    "elements": [],
                   },
                 ],
                 "declaredName": "M",
                 "prefixes": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "N4",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -79,19 +80,21 @@ exports[`double wildcard recursively imports all members from a namespace and it
               "elements": [],
               "importsAll": false,
               "isRecursive": true,
-              "reference": {
+              "targetRef": {
                 "$type": "MembershipReference",
                 "parts": [
                   {
                     "error": undefined,
                     "ref": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Namespace",
                         "children": [
                           {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "Class",
                               "children": [],
                               "declaredName": "AA",
@@ -100,11 +103,11 @@ exports[`double wildcard recursively imports all members from a namespace and it
                               "prefixes": [],
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "Class",
                               "children": [],
                               "declaredName": "B",
@@ -113,16 +116,17 @@ exports[`double wildcard recursively imports all members from a namespace and it
                               "prefixes": [],
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "Namespace",
                               "children": [
                                 {
                                   "$type": "OwningMembership",
-                                  "element": {
+                                  "elements": [],
+                                  "target": {
                                     "$type": "Class",
                                     "children": [],
                                     "declaredName": "C",
@@ -131,19 +135,16 @@ exports[`double wildcard recursively imports all members from a namespace and it
                                     "prefixes": [],
                                     "typeRelationships": [],
                                   },
-                                  "elements": [],
                                 },
                               ],
                               "declaredName": "M",
                               "prefixes": [],
                             },
-                            "elements": [],
                           },
                         ],
                         "declaredName": "N4",
                         "prefixes": [],
                       },
-                      "elements": [],
                     },
                   },
                 ],
@@ -153,11 +154,11 @@ exports[`double wildcard recursively imports all members from a namespace and it
           "declaredName": "N5",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -165,7 +166,7 @@ exports[`double wildcard recursively imports all members from a namespace and it
               "elements": [],
               "importsAll": false,
               "isRecursive": true,
-              "reference": {
+              "targetRef": {
                 "$type": "NamespaceReference",
                 "parts": [
                   {
@@ -175,7 +176,8 @@ exports[`double wildcard recursively imports all members from a namespace and it
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "AA",
@@ -184,11 +186,11 @@ exports[`double wildcard recursively imports all members from a namespace and it
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "B",
@@ -197,16 +199,17 @@ exports[`double wildcard recursively imports all members from a namespace and it
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Namespace",
                             "children": [
                               {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "Class",
                                   "children": [],
                                   "declaredName": "C",
@@ -215,13 +218,11 @@ exports[`double wildcard recursively imports all members from a namespace and it
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                             ],
                             "declaredName": "M",
                             "prefixes": [],
                           },
-                          "elements": [],
                         },
                       ],
                       "declaredName": "N4",
@@ -233,7 +234,8 @@ exports[`double wildcard recursively imports all members from a namespace and it
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "D",
@@ -241,7 +243,7 @@ exports[`double wildcard recursively imports all members from a namespace and it
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -266,13 +268,11 @@ exports[`double wildcard recursively imports all members from a namespace and it
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "N6",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -290,12 +290,14 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Metaclass",
                 "children": [],
                 "declaredName": "Approved",
@@ -304,27 +306,28 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "Annotations",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [
                   {
                     "$type": "OwningMembership",
-                    "element": {
+                    "elements": [],
+                    "target": {
                       "$type": "MetadataFeature",
                       "about": [],
                       "children": [],
@@ -332,7 +335,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                         {
                           "$type": "FeatureTyping",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "MetaclassReference",
                             "parts": [
                               {
@@ -342,7 +345,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                   "children": [
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "Metaclass",
                                         "children": [],
                                         "declaredName": "Approved",
@@ -351,7 +355,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                   ],
                                   "declaredName": "Annotations",
@@ -380,7 +383,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                       "prefixes": [],
                       "typeRelationships": [],
                     },
-                    "elements": [],
                   },
                 ],
                 "declaredName": "A",
@@ -389,17 +391,16 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "NA",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -407,7 +408,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
               "elements": [],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "NamespaceReference",
                 "parts": [
                   {
@@ -417,7 +418,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Metaclass",
                             "children": [],
                             "declaredName": "Approved",
@@ -426,7 +428,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                       ],
                       "declaredName": "Annotations",
@@ -438,7 +439,10 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
             },
             {
               "$type": "NamespaceImport",
-              "element": {
+              "elements": [],
+              "importsAll": false,
+              "isRecursive": false,
+              "target": {
                 "$type": "Package",
                 "children": [
                   {
@@ -446,7 +450,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                     "elements": [],
                     "importsAll": false,
                     "isRecursive": false,
-                    "reference": {
+                    "targetRef": {
                       "$type": "NamespaceReference",
                       "parts": [
                         {
@@ -456,12 +460,14 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                             "children": [
                               {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "Class",
                                   "children": [
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "MetadataFeature",
                                         "about": [],
                                         "children": [],
@@ -469,7 +475,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                           {
                                             "$type": "FeatureTyping",
                                             "elements": [],
-                                            "reference": {
+                                            "targetRef": {
                                               "$type": "MetaclassReference",
                                               "parts": [
                                                 {
@@ -479,7 +485,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                                     "children": [
                                                       {
                                                         "$type": "OwningMembership",
-                                                        "element": {
+                                                        "elements": [],
+                                                        "target": {
                                                           "$type": "Metaclass",
                                                           "children": [],
                                                           "declaredName": "Approved",
@@ -488,7 +495,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                                           "prefixes": [],
                                                           "typeRelationships": [],
                                                         },
-                                                        "elements": [],
                                                       },
                                                     ],
                                                     "declaredName": "Annotations",
@@ -517,7 +523,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                   ],
                                   "declaredName": "A",
@@ -526,7 +531,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                             ],
                             "declaredName": "NA",
@@ -538,19 +542,21 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                   },
                   {
                     "$type": "ElementFilterMembership",
-                    "element": {
+                    "elements": [],
+                    "target": {
                       "$type": "OperatorExpression",
                       "children": [
                         {
                           "$type": "FeatureMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Feature",
                             "children": [],
                             "heritage": [
                               {
                                 "$type": "FeatureTyping",
                                 "elements": [],
-                                "reference": {
+                                "targetRef": {
                                   "$type": "TypeReference",
                                   "parts": [
                                     {
@@ -575,7 +581,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                       ],
                       "heritage": [],
@@ -588,7 +593,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                           "children": [],
                           "expression": {
                             "$type": "ReturnParameterMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "Feature",
                               "children": [],
                               "heritage": [],
@@ -598,7 +604,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                               "prefixes": [],
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "heritage": [],
                           "isNonunique": false,
@@ -612,24 +617,20 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                       "prefixes": [],
                       "typeRelationships": [],
                     },
-                    "elements": [],
                   },
                 ],
                 "prefixes": [],
               },
-              "elements": [],
-              "importsAll": false,
-              "isRecursive": false,
             },
           ],
           "declaredName": "N8",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -637,7 +638,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
               "elements": [],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "NamespaceReference",
                 "parts": [
                   {
@@ -647,7 +648,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Metaclass",
                             "children": [],
                             "declaredName": "Approved",
@@ -656,7 +658,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                       ],
                       "declaredName": "Annotations",
@@ -668,7 +669,10 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
             },
             {
               "$type": "NamespaceImport",
-              "element": {
+              "elements": [],
+              "importsAll": false,
+              "isRecursive": false,
+              "target": {
                 "$type": "Package",
                 "children": [
                   {
@@ -676,7 +680,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                     "elements": [],
                     "importsAll": false,
                     "isRecursive": false,
-                    "reference": {
+                    "targetRef": {
                       "$type": "NamespaceReference",
                       "parts": [
                         {
@@ -686,12 +690,14 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                             "children": [
                               {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "Class",
                                   "children": [
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "MetadataFeature",
                                         "about": [],
                                         "children": [],
@@ -699,7 +705,7 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                           {
                                             "$type": "FeatureTyping",
                                             "elements": [],
-                                            "reference": {
+                                            "targetRef": {
                                               "$type": "MetaclassReference",
                                               "parts": [
                                                 {
@@ -709,7 +715,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                                     "children": [
                                                       {
                                                         "$type": "OwningMembership",
-                                                        "element": {
+                                                        "elements": [],
+                                                        "target": {
                                                           "$type": "Metaclass",
                                                           "children": [],
                                                           "declaredName": "Approved",
@@ -718,7 +725,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                                           "prefixes": [],
                                                           "typeRelationships": [],
                                                         },
-                                                        "elements": [],
                                                       },
                                                     ],
                                                     "declaredName": "Annotations",
@@ -747,7 +753,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                   ],
                                   "declaredName": "A",
@@ -756,7 +761,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                             ],
                             "declaredName": "NA",
@@ -768,7 +772,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                   },
                   {
                     "$type": "ElementFilterMembership",
-                    "element": {
+                    "elements": [],
+                    "target": {
                       "$type": "OperatorExpression",
                       "children": [],
                       "heritage": [],
@@ -781,14 +786,15 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                           "children": [
                             {
                               "$type": "FeatureMembership",
-                              "element": {
+                              "elements": [],
+                              "target": {
                                 "$type": "Feature",
                                 "children": [],
                                 "heritage": [
                                   {
                                     "$type": "FeatureTyping",
                                     "elements": [],
-                                    "reference": {
+                                    "targetRef": {
                                       "$type": "TypeReference",
                                       "parts": [
                                         {
@@ -813,7 +819,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                 "prefixes": [],
                                 "typeRelationships": [],
                               },
-                              "elements": [],
                             },
                           ],
                           "heritage": [],
@@ -826,7 +831,8 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                               "children": [],
                               "expression": {
                                 "$type": "ReturnParameterMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "Feature",
                                   "children": [],
                                   "heritage": [],
@@ -836,7 +842,6 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "heritage": [],
                               "isNonunique": false,
@@ -855,20 +860,15 @@ exports[`imported elements can be filtered: toParseKerML 1`] = `
                       "prefixes": [],
                       "typeRelationships": [],
                     },
-                    "elements": [],
                   },
                 ],
                 "prefixes": [],
               },
-              "elements": [],
-              "importsAll": false,
-              "isRecursive": false,
             },
           ],
           "declaredName": "N9",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -886,12 +886,14 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "A",
@@ -900,11 +902,11 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "B",
@@ -913,7 +915,6 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "Membership",
@@ -922,15 +923,15 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
               "elements": [
                 {
                   "$type": "Annotation",
-                  "element": {
+                  "elements": [],
+                  "source": {
                     "$type": "Documentation",
                     "about": [],
                     "body": "/* alias doc */",
                   },
-                  "elements": [],
                 },
               ],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -952,7 +953,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
               "$type": "Membership",
               "declaredName": "D",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -975,11 +976,11 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
           "declaredName": "N1",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -987,7 +988,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
               "elements": [],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "MembershipReference",
                 "parts": [
                   {
@@ -997,7 +998,8 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "A",
@@ -1006,11 +1008,11 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "B",
@@ -1019,7 +1021,6 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "Membership",
@@ -1028,15 +1029,15 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                           "elements": [
                             {
                               "$type": "Annotation",
-                              "element": {
+                              "elements": [],
+                              "source": {
                                 "$type": "Documentation",
                                 "about": [],
                                 "body": "/* alias doc */",
                               },
-                              "elements": [],
                             },
                           ],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -1058,7 +1059,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                           "$type": "Membership",
                           "declaredName": "D",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -1086,7 +1087,8 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                     "error": undefined,
                     "ref": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Class",
                         "children": [],
                         "declaredName": "A",
@@ -1095,7 +1097,6 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                   },
                 ],
@@ -1106,7 +1107,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
               "elements": [],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "MembershipReference",
                 "parts": [
                   {
@@ -1116,7 +1117,8 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "A",
@@ -1125,11 +1127,11 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "B",
@@ -1138,7 +1140,6 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "Membership",
@@ -1147,15 +1148,15 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                           "elements": [
                             {
                               "$type": "Annotation",
-                              "element": {
+                              "elements": [],
+                              "source": {
                                 "$type": "Documentation",
                                 "about": [],
                                 "body": "/* alias doc */",
                               },
-                              "elements": [],
                             },
                           ],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -1177,7 +1178,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                           "$type": "Membership",
                           "declaredName": "D",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -1210,15 +1211,15 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                       "elements": [
                         {
                           "$type": "Annotation",
-                          "element": {
+                          "elements": [],
+                          "source": {
                             "$type": "Documentation",
                             "about": [],
                             "body": "/* alias doc */",
                           },
-                          "elements": [],
                         },
                       ],
-                      "reference": {
+                      "targetRef": {
                         "$type": "ElementReference",
                         "parts": [
                           {
@@ -1242,7 +1243,8 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "B",
@@ -1250,7 +1252,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -1275,11 +1277,11 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Namespace",
                 "children": [
                   {
@@ -1287,7 +1289,7 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                     "elements": [],
                     "importsAll": false,
                     "isRecursive": false,
-                    "reference": {
+                    "targetRef": {
                       "$type": "MembershipReference",
                       "parts": [
                         {
@@ -1299,15 +1301,15 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                             "elements": [
                               {
                                 "$type": "Annotation",
-                                "element": {
+                                "elements": [],
+                                "source": {
                                   "$type": "Documentation",
                                   "about": [],
                                   "body": "/* alias doc */",
                                 },
-                                "elements": [],
                               },
                             ],
-                            "reference": {
+                            "targetRef": {
                               "$type": "ElementReference",
                               "parts": [
                                 {
@@ -1333,13 +1335,11 @@ exports[`namespace members can be imported with qualified names: toParseKerML 1`
                 "declaredName": "M",
                 "prefixes": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "N2",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -1357,12 +1357,14 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "A",
@@ -1371,11 +1373,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "B",
@@ -1384,7 +1386,6 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "Membership",
@@ -1393,15 +1394,15 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
               "elements": [
                 {
                   "$type": "Annotation",
-                  "element": {
+                  "elements": [],
+                  "source": {
                     "$type": "Documentation",
                     "about": [],
                     "body": "/* alias doc */",
                   },
-                  "elements": [],
                 },
               ],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -1423,7 +1424,7 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
               "$type": "Membership",
               "declaredName": "D",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -1446,16 +1447,17 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
           "declaredName": "N1",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "AA",
@@ -1464,11 +1466,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "B",
@@ -1477,16 +1479,17 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Namespace",
                 "children": [
                   {
                     "$type": "OwningMembership",
-                    "element": {
+                    "elements": [],
+                    "target": {
                       "$type": "Class",
                       "children": [],
                       "declaredName": "C",
@@ -1495,23 +1498,21 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                       "prefixes": [],
                       "typeRelationships": [],
                     },
-                    "elements": [],
                   },
                 ],
                 "declaredName": "M",
                 "prefixes": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "N4",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -1519,17 +1520,17 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
               "elements": [
                 {
                   "$type": "Annotation",
-                  "element": {
+                  "elements": [],
+                  "source": {
                     "$type": "Comment",
                     "about": [],
                     "body": "/* The imported membership is visible outside N7. */",
                   },
-                  "elements": [],
                 },
               ],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "MembershipReference",
                 "parts": [
                   {
@@ -1539,7 +1540,8 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "A",
@@ -1548,11 +1550,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "B",
@@ -1561,7 +1563,6 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "Membership",
@@ -1570,15 +1571,15 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                           "elements": [
                             {
                               "$type": "Annotation",
-                              "element": {
+                              "elements": [],
+                              "source": {
                                 "$type": "Documentation",
                                 "about": [],
                                 "body": "/* alias doc */",
                               },
-                              "elements": [],
                             },
                           ],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -1600,7 +1601,7 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                           "$type": "Membership",
                           "declaredName": "D",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -1628,7 +1629,8 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                     "error": undefined,
                     "ref": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Class",
                         "children": [],
                         "declaredName": "A",
@@ -1637,7 +1639,6 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                   },
                 ],
@@ -1649,18 +1650,18 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
               "elements": [
                 {
                   "$type": "Annotation",
-                  "element": {
+                  "elements": [],
+                  "source": {
                     "$type": "Documentation",
                     "about": [],
                     "body": "/* None of the imported memberships are visible
              * outside of N7. */",
                   },
-                  "elements": [],
                 },
               ],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "NamespaceReference",
                 "parts": [
                   {
@@ -1670,7 +1671,8 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "AA",
@@ -1679,11 +1681,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "B",
@@ -1692,16 +1694,17 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Namespace",
                             "children": [
                               {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "Class",
                                   "children": [],
                                   "declaredName": "C",
@@ -1710,13 +1713,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                             ],
                             "declaredName": "M",
                             "prefixes": [],
                           },
-                          "elements": [],
                         },
                       ],
                       "declaredName": "N4",
@@ -1731,11 +1732,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
           "declaredName": "N7",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Feature",
           "children": [],
           "declaredName": "A",
@@ -1743,7 +1744,7 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
             {
               "$type": "FeatureTyping",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "TypeReference",
                 "parts": [
                   {
@@ -1756,17 +1757,17 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                           "elements": [
                             {
                               "$type": "Annotation",
-                              "element": {
+                              "elements": [],
+                              "source": {
                                 "$type": "Comment",
                                 "about": [],
                                 "body": "/* The imported membership is visible outside N7. */",
                               },
-                              "elements": [],
                             },
                           ],
                           "importsAll": false,
                           "isRecursive": false,
-                          "reference": {
+                          "targetRef": {
                             "$type": "MembershipReference",
                             "parts": [
                               {
@@ -1776,7 +1777,8 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                   "children": [
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "Class",
                                         "children": [],
                                         "declaredName": "A",
@@ -1785,11 +1787,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "Class",
                                         "children": [],
                                         "declaredName": "B",
@@ -1798,7 +1800,6 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                     {
                                       "$type": "Membership",
@@ -1807,15 +1808,15 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                       "elements": [
                                         {
                                           "$type": "Annotation",
-                                          "element": {
+                                          "elements": [],
+                                          "source": {
                                             "$type": "Documentation",
                                             "about": [],
                                             "body": "/* alias doc */",
                                           },
-                                          "elements": [],
                                         },
                                       ],
-                                      "reference": {
+                                      "targetRef": {
                                         "$type": "ElementReference",
                                         "parts": [
                                           {
@@ -1837,7 +1838,7 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                       "$type": "Membership",
                                       "declaredName": "D",
                                       "elements": [],
-                                      "reference": {
+                                      "targetRef": {
                                         "$type": "ElementReference",
                                         "parts": [
                                           {
@@ -1865,7 +1866,8 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                 "error": undefined,
                                 "ref": {
                                   "$type": "OwningMembership",
-                                  "element": {
+                                  "elements": [],
+                                  "target": {
                                     "$type": "Class",
                                     "children": [],
                                     "declaredName": "A",
@@ -1874,7 +1876,6 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                     "prefixes": [],
                                     "typeRelationships": [],
                                   },
-                                  "elements": [],
                                 },
                               },
                             ],
@@ -1886,18 +1887,18 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                           "elements": [
                             {
                               "$type": "Annotation",
-                              "element": {
+                              "elements": [],
+                              "source": {
                                 "$type": "Documentation",
                                 "about": [],
                                 "body": "/* None of the imported memberships are visible
              * outside of N7. */",
                               },
-                              "elements": [],
                             },
                           ],
                           "importsAll": false,
                           "isRecursive": false,
-                          "reference": {
+                          "targetRef": {
                             "$type": "NamespaceReference",
                             "parts": [
                               {
@@ -1907,7 +1908,8 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                   "children": [
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "Class",
                                         "children": [],
                                         "declaredName": "AA",
@@ -1916,11 +1918,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "Class",
                                         "children": [],
                                         "declaredName": "B",
@@ -1929,16 +1931,17 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                     {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "Namespace",
                                         "children": [
                                           {
                                             "$type": "OwningMembership",
-                                            "element": {
+                                            "elements": [],
+                                            "target": {
                                               "$type": "Class",
                                               "children": [],
                                               "declaredName": "C",
@@ -1947,13 +1950,11 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
                                               "prefixes": [],
                                               "typeRelationships": [],
                                             },
-                                            "elements": [],
                                           },
                                         ],
                                         "declaredName": "M",
                                         "prefixes": [],
                                       },
-                                      "elements": [],
                                     },
                                   ],
                                   "declaredName": "N4",
@@ -1991,7 +1992,6 @@ exports[`visibility affects the visibility of imported members: toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -2009,12 +2009,14 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "A",
@@ -2023,11 +2025,11 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "B",
@@ -2036,7 +2038,6 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "Membership",
@@ -2045,15 +2046,15 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
               "elements": [
                 {
                   "$type": "Annotation",
-                  "element": {
+                  "elements": [],
+                  "source": {
                     "$type": "Documentation",
                     "about": [],
                     "body": "/* alias doc */",
                   },
-                  "elements": [],
                 },
               ],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -2075,7 +2076,7 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
               "$type": "Membership",
               "declaredName": "D",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -2098,11 +2099,11 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
           "declaredName": "N1",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
@@ -2110,7 +2111,7 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
               "elements": [],
               "importsAll": false,
               "isRecursive": false,
-              "reference": {
+              "targetRef": {
                 "$type": "NamespaceReference",
                 "parts": [
                   {
@@ -2120,7 +2121,8 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                       "children": [
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "A",
@@ -2129,11 +2131,11 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "Class",
                             "children": [],
                             "declaredName": "B",
@@ -2142,7 +2144,6 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         {
                           "$type": "Membership",
@@ -2151,15 +2152,15 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                           "elements": [
                             {
                               "$type": "Annotation",
-                              "element": {
+                              "elements": [],
+                              "source": {
                                 "$type": "Documentation",
                                 "about": [],
                                 "body": "/* alias doc */",
                               },
-                              "elements": [],
                             },
                           ],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -2181,7 +2182,7 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                           "$type": "Membership",
                           "declaredName": "D",
                           "elements": [],
-                          "reference": {
+                          "targetRef": {
                             "$type": "ElementReference",
                             "parts": [
                               {
@@ -2210,7 +2211,8 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "D",
@@ -2218,7 +2220,7 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -2243,11 +2245,11 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "E",
@@ -2255,7 +2257,7 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -2280,13 +2282,11 @@ exports[`wildcard imports all public members from a namespace: toParseKerML 1`] 
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "N3",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],

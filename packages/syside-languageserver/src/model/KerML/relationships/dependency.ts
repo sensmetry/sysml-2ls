@@ -20,6 +20,7 @@ import { NonNullable, enumerable } from "../../../utils";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import {
     AnnotationMeta,
+    Edge,
     ElementMeta,
     ElementOptions,
     ElementParts,
@@ -37,6 +38,8 @@ export interface DependencyOptions extends ElementOptions<RelationshipMeta> {
      * Should be at least length 1
      */
     supplier: ElementMeta[];
+
+    prefixes?: readonly Edge<AnnotationMeta, MetadataFeatureMeta>[];
 }
 
 @metamodelOf(Dependency)
@@ -61,9 +64,65 @@ export class DependencyMeta extends RelationshipMeta {
         return this._prefixes;
     }
 
-    protected addPrefix(...prefix: AnnotationMeta<MetadataFeatureMeta>[]): this {
-        this._prefixes.push(...prefix);
-        return this;
+    /**
+     * Adds new owned metadata prefixes and return the new number of prefixes.
+     * Note that the annotations take ownership of the metadata.
+     */
+    addPrefix(...prefix: Edge<AnnotationMeta, MetadataFeatureMeta>[]): number {
+        return this.addOwnedElements(
+            this._prefixes,
+            prefix.map(([edge, target]) => {
+                // different from all the other relationships that the owned
+                // element is the source, also these annotations own their
+                // sources
+                edge["setSource"](target);
+                edge["takeOwnership"](target);
+                return edge;
+            })
+        );
+    }
+
+    /**
+     * Removes metadata prefixes by their annotations and returns the new number
+     * of prefixes.
+     */
+    removePrefix(...prefix: AnnotationMeta[]): number {
+        return this.removeOwnedElements(this._prefixes, prefix, (annotation) => {
+            // break ownership of the metadata
+            const target = annotation.source();
+            if (target) annotation["unsetOwnership"](target);
+        });
+    }
+
+    /**
+     * Removes metadata prefixes by a predicate and returns the new number of
+     * prefixes.
+     * @see {@link removePrefix}
+     */
+    removePrefixIf(predicate: (element: AnnotationMeta<MetadataFeatureMeta>) => boolean): number {
+        return this.removeOwnedElementsIf(this._prefixes, predicate);
+    }
+
+    /**
+     * Adds new owned body elements and returns the new number of body elements.
+     */
+    addChild(...element: ElementMeta[]): number {
+        return this.addOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements and returns the new number of body elements.
+     */
+    removeChild(...element: ElementMeta[]): number {
+        return this.removeOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements by predicate and returns the new number of
+     * body elements.
+     */
+    removeChildIf(predicate: (element: ElementMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
     }
 
     @enumerable
@@ -105,6 +164,7 @@ export class DependencyMeta extends RelationshipMeta {
         if (options) {
             model._client.push(...options.client);
             model._supplier.push(...options.supplier);
+            if (options.prefixes) model.addPrefix(...options.prefixes);
         }
         return model;
     }

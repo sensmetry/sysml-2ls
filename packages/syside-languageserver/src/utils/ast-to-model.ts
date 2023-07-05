@@ -20,6 +20,7 @@ import * as ast from "../generated/ast";
 import {
     ActionUsageMeta,
     BasicMetamodel,
+    ElementMeta,
     ExpressionMeta,
     FeatureMeta,
     MembershipMeta,
@@ -35,6 +36,7 @@ import {
     prettyAnnotationBody,
     typeIndex,
 } from "../model";
+import { streamModel } from "./ast-util";
 
 type AstToModelFunction<T extends AstNode = AstNode> = (
     model: NonNullable<T["$meta"]>,
@@ -88,7 +90,7 @@ const AstToModel: {
     },
 
     [ast.AnnotatingElement](model, node) {
-        model.addAnnotation(...node.about.map((a) => a.$meta));
+        model["_annotations"] = node.about.map((a) => a.$meta);
     },
 
     [ast.Connector](model, node) {
@@ -109,7 +111,7 @@ const AstToModel: {
     },
 
     [ast.Feature](model, node) {
-        model.value = node.value?.$meta;
+        model["_value"] = node.value?.$meta;
         model.isOrdered = node.isOrdered;
 
         model.direction = getFeatureDirectionKind(node.direction);
@@ -142,18 +144,19 @@ const AstToModel: {
         model["_prefixes"].push(
             ...node.prefixes.map((m) => m.$meta as OwningMembershipMeta<MetadataFeatureMeta>)
         );
-        model["_children"].add(...node.children.map((child) => child.$meta));
+        model["_children"].push(...node.children.map((child) => child.$meta));
     },
 
     [ast.Relationship](model, node) {
         model["_visibility"] = getVisibility(node.visibility);
-        if (node.element) model["_element"] = node.element.$meta;
+
+        if (node.target) model["_element"] = node.target.$meta;
         else if (node.targetChain) model["_element"] = node.targetChain.$meta;
-        else model["_element"] = undefined;
 
-        if (node.sourceChain) model["_source"] = node.sourceChain.$meta;
+        if (node.source) model["_source"] = node.source.$meta;
+        else if (node.sourceChain) model["_source"] = node.sourceChain.$meta;
 
-        model["_children"].add(...node.elements.map((e) => e.$meta));
+        model["_children"].push(...node.elements.map((e) => e.$meta));
     },
 
     [ast.TextualAnnotatingElement](model, node) {
@@ -171,10 +174,10 @@ const AstToModel: {
             ?.$meta as OwningMembershipMeta<MultiplicityRangeMeta>;
 
         model["_heritage"].clear();
-        model["_heritage"].add(...node.heritage.map((e) => e.$meta));
+        model["_heritage"].push(...node.heritage.map((e) => e.$meta));
 
         model["_typeRelationships"].clear();
-        model["_typeRelationships"].add(...node.typeRelationships.map((e) => e.$meta));
+        model["_typeRelationships"].push(...node.typeRelationships.map((e) => e.$meta));
     },
 
     [ast.RequirementConstraintMembership](model, node) {
@@ -186,7 +189,7 @@ const AstToModel: {
     },
 
     [ast.TransitionFeatureMembership](model, node) {
-        model.kind = getTransitionFeatureKind(node);
+        model["_kind"] = getTransitionFeatureKind(node);
     },
 
     [ast.AcceptActionUsage](model, node) {
@@ -199,8 +202,8 @@ const AstToModel: {
     },
 
     [ast.AssignmentActionUsage](model, node) {
-        (model.targetMember as RelationshipMeta) = node.targetMember.$meta;
-        (model.assignedValue as RelationshipMeta) = node.assignedValue.$meta;
+        (model["_targetMember"] as RelationshipMeta) = node.targetMember.$meta;
+        (model["_assignedValue"] as RelationshipMeta) = node.assignedValue.$meta;
     },
 
     [ast.Definition](model, node) {
@@ -209,9 +212,9 @@ const AstToModel: {
     },
 
     [ast.ForLoopActionUsage](model, node) {
-        (model.variable as RelationshipMeta) = node.variable.$meta;
-        (model.sequence as RelationshipMeta) = node.sequence.$meta;
-        (model.body as RelationshipMeta) = node.body.$meta;
+        (model["_variable"] as RelationshipMeta) = node.variable.$meta;
+        (model["_sequence"] as RelationshipMeta) = node.sequence.$meta;
+        (model["_body"] as RelationshipMeta) = node.body.$meta;
     },
 
     [ast.IfActionUsage](model, node) {
@@ -225,9 +228,9 @@ const AstToModel: {
     },
 
     [ast.SendActionUsage](model, node) {
-        (model.payload as RelationshipMeta | undefined) = node.payload.$meta;
-        (model.sender as RelationshipMeta | undefined) = node.sender?.$meta;
-        (model.receiver as RelationshipMeta | undefined) = node.receiver?.$meta;
+        (model["_payload"] as RelationshipMeta | undefined) = node.payload.$meta;
+        (model["_sender"] as RelationshipMeta | undefined) = node.sender?.$meta;
+        (model["_receiver"] as RelationshipMeta | undefined) = node.receiver?.$meta;
     },
 
     [ast.StateDefinition](model, node) {
@@ -245,14 +248,14 @@ const AstToModel: {
         // Only needed so that linking can be resolved...
         if (node.payload) {
             node.payload.$meta = model["_payload"];
-            if (node.payload.element)
-                node.payload.element.$meta = model["_payload"].element() as ReferenceUsageMeta;
+            if (node.payload.target)
+                node.payload.target.$meta = model["_payload"].element() as ReferenceUsageMeta;
         }
 
         if (node.transitionLinkSource) {
             node.transitionLinkSource.$meta = model["_transitionLinkSource"];
-            if (node.transitionLinkSource.element)
-                node.transitionLinkSource.element.$meta = model[
+            if (node.transitionLinkSource.target)
+                node.transitionLinkSource.target.$meta = model[
                     "_transitionLinkSource"
                 ].element() as ReferenceUsageMeta;
         }
@@ -266,9 +269,9 @@ const AstToModel: {
     },
 
     [ast.WhileLoopActionUsage](model, node) {
-        (model.condition as RelationshipMeta | undefined) = node.condition?.$meta;
-        (model.body as RelationshipMeta | undefined) = node.body.$meta;
-        (model.until as RelationshipMeta | undefined) = node.until?.$meta;
+        (model["_condition"] as RelationshipMeta | undefined) = node.condition?.$meta;
+        (model["_body"] as RelationshipMeta | undefined) = node.body.$meta;
+        (model["_until"] as RelationshipMeta | undefined) = node.until?.$meta;
     },
 };
 
@@ -303,6 +306,8 @@ const ClearArtifacts: { [K in SysMLType]?: ClearArtifactsFunction<SysMLInterface
         // reset effective names
         model["setName"](model.declaredName);
         model["setShortName"](model.declaredShortName);
+        model["_impliedIsOrdered"] = false;
+        model["typings"] = undefined;
     },
 
     [ast.ElementReference](model) {
@@ -325,13 +330,13 @@ const ClearArtifacts: { [K in SysMLType]?: ClearArtifactsFunction<SysMLInterface
         // remove implicit and out-of-line relationships
         const heritage = model.heritage.filter((e) => !e.isImplied && e.parent() === model);
         model["_heritage"].clear();
-        model["_heritage"].add(...heritage);
+        model["_heritage"].push(...heritage);
 
         const typeRelationships = model.typeRelationships.filter(
             (e) => !e.isImplied && e.parent() === model
         );
         model["_typeRelationships"].clear();
-        model["_typeRelationships"].add(...typeRelationships);
+        model["_typeRelationships"].push(...typeRelationships);
 
         model["resetInputParameters"]();
     },
@@ -383,4 +388,12 @@ export function clearArtifacts(model: BasicMetamodel): void {
     }
 
     ClearArtifactsChains.get(model.nodeType())?.forEach((fn) => fn(model));
+}
+
+/**
+ * Clear build artifacts from model tree starting at `model` as its root
+ * @param model
+ */
+export function clearTreeArtifacts(model: ElementMeta): void {
+    streamModel(model).forEach(clearArtifacts);
 }

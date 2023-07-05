@@ -19,7 +19,7 @@ import { ConnectionUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
 import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
 import { PartUsageMeta, PartUsageOptions } from "./part-usage";
-import { FeatureMeta, InheritanceMeta, MembershipMeta } from "../KerML";
+import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta } from "../KerML";
 
 export interface ConnectionUsageOptions extends PartUsageOptions, ConnectorAsUsageOptions {}
 
@@ -36,9 +36,14 @@ export class ConnectionUsageMeta extends Mixin(ConnectorAsUsageMeta, PartUsageMe
         return this._ast as ConnectionUsage;
     }
 
-    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+    protected override onHeritageAdded(heritage: InheritanceMeta, target: TypeMeta): void {
         this.resetEnds();
-        PartUsageMeta.prototype["onSpecializationAdded"].call(this, specialization);
+        PartUsageMeta.prototype["onHeritageAdded"].call(this, heritage, target);
+    }
+
+    protected override onHeritageRemoved(heritage: InheritanceMeta[]): void {
+        this.resetEnds();
+        PartUsageMeta.prototype["onHeritageRemoved"].call(this, heritage);
     }
 
     override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {

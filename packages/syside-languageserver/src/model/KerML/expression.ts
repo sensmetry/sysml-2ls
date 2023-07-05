@@ -20,14 +20,16 @@ import { isModelLevelEvaluable } from "../expressions/util";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
 import {
+    Edge,
     ElementParts,
     FeatureMeta,
     FunctionMeta,
+    ResultExpressionMembershipMeta,
     StepMeta,
     StepOptions,
     TypeMeta,
 } from "./_internal";
-import { NonNullable } from "../../utils/common";
+import { NonNullable, enumerable } from "../../utils/common";
 import { AstNode, LangiumDocument } from "langium";
 
 export const ImplicitExpressions = {
@@ -35,11 +37,20 @@ export const ImplicitExpressions = {
     enclosedPerformance: "Performances::Performance::enclosedPerformances",
 };
 
-// TODO: add result
-export type ExpressionOptions = StepOptions;
+export interface ExpressionOptions extends StepOptions {
+    result?: Edge<ResultExpressionMembershipMeta>;
+}
 
 @metamodelOf(Expression, ImplicitExpressions)
 export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
+    @enumerable
+    get result(): ResultExpressionMembershipMeta | undefined {
+        return this._result;
+    }
+    set result(value: Edge<ResultExpressionMembershipMeta> | undefined) {
+        this._result = this.swapEdgeOwnership(this._result, value);
+    }
+
     override get featuredBy(): readonly TypeMeta[] {
         const featurings = super.typeFeaturings;
         if (featurings.length > 0) return featurings.map((f) => f.element()).filter(NonNullable);
@@ -90,10 +101,10 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
     }
 
     protected static applyExpressionOptions(
-        _model: ExpressionMeta,
-        _options: ExpressionOptions
+        model: ExpressionMeta,
+        options: ExpressionOptions
     ): void {
-        // TODO: assign result
+        model.result = options.result;
     }
 
     static override create<T extends AstNode>(

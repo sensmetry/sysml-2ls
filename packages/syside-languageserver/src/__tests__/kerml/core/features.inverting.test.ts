@@ -30,14 +30,14 @@ test("feature inverting can be parsed", async () => {
         children: [
             ...anything(1),
             {
-                element: {
+                target: {
                     $type: FeatureInverting,
                     ...withQualifiedName("parent_child"),
-                    source: qualifiedTypeReference("Person::parent"),
-                    reference: qualifiedTypeReference("Person::child"),
+                    sourceRef: qualifiedTypeReference("Person::parent"),
+                    targetRef: qualifiedTypeReference("Person::child"),
                     elements: [
                         {
-                            element: {
+                            source: {
                                 body: "/* doc */",
                             },
                         },
@@ -61,10 +61,10 @@ test.concurrent.each(["inverting", ""])(
             children: [
                 ...anything(1),
                 {
-                    element: {
+                    target: {
                         $type: FeatureInverting,
-                        source: qualifiedTypeReference("Person::parent"),
-                        reference: qualifiedTypeReference("Person::child"),
+                        sourceRef: qualifiedTypeReference("Person::parent"),
+                        targetRef: qualifiedTypeReference("Person::child"),
                     },
                 },
             ],
@@ -80,17 +80,17 @@ test("features can own invertings", async () => {
     }`).toParseKerML({
         children: [
             {
-                element: {
+                target: {
                     children: [
                         ...anything(1),
                         {
-                            element: {
+                            target: {
                                 $type: Feature,
                                 ...withQualifiedName("Person::parents"),
                                 typeRelationships: [
                                     {
                                         $type: FeatureInverting,
-                                        reference: qualifiedTypeReference("Person::children"),
+                                        targetRef: qualifiedTypeReference("Person::children"),
                                     },
                                 ],
                             },
@@ -118,21 +118,21 @@ test("inverse features can be arbitrarily nested", async () => {
         children: [
             ...anything(2),
             {
-                element: {
+                target: {
                     $type: Classifier,
                     ...withQualifiedName("C"),
                     children: [
                         {
-                            element: {
+                            target: {
                                 ...withQualifiedName("C::b"),
                                 children: [
                                     {
-                                        element: {
+                                        target: {
                                             ...withQualifiedName("C::b::a"),
                                             typeRelationships: [
                                                 {
                                                     $type: FeatureInverting,
-                                                    reference: qualifiedTypeReference("A::b::c"),
+                                                    targetRef: qualifiedTypeReference("A::b::c"),
                                                 },
                                             ],
                                         },

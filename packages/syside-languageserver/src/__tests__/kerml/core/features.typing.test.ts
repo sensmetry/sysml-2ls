@@ -36,14 +36,14 @@ test.concurrent.each(["typed by", ":"])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: FeatureTyping,
                         ...withQualifiedName("t"),
-                        source: qualifiedTypeReference("customer"),
-                        reference: qualifiedTypeReference("Person"),
+                        sourceRef: qualifiedTypeReference("customer"),
+                        targetRef: qualifiedTypeReference("Person"),
                         elements: [
                             {
-                                element: {
+                                source: {
                                     body: "/* doc */",
                                 },
                             },
@@ -66,10 +66,10 @@ test.concurrent.each(["specialization", ""])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: FeatureTyping,
-                        source: qualifiedTypeReference("customer"),
-                        reference: qualifiedTypeReference("Person"),
+                        sourceRef: qualifiedTypeReference("customer"),
+                        targetRef: qualifiedTypeReference("Person"),
                     },
                 },
             ],
@@ -89,16 +89,16 @@ test("features typed by aliases resolve to aliased types", async () => {
         children: [
             ...anything(2),
             {
-                element: {
+                target: {
                     ...withQualifiedName("a"),
-                    heritage: [{ reference: qualifiedTypeReference("A") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("A") }],
                 },
             },
         ],
     });
 
     const typings = Array.from(
-        (result.value.children[2].element as Feature).$meta.specializations(FeatureTyping)
+        (result.value.children[2].target as Feature).$meta.specializations(FeatureTyping)
     );
 
     expect(typings).toHaveLength(1);

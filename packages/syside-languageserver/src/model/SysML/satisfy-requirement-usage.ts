@@ -21,14 +21,14 @@ import { AssertConstraintUsageMeta, AssertConstraintUsageOptions } from "./asser
 import { RequirementUsageMeta, RequirementUsageOptions } from "./requirement-usage";
 import { SubjectMembershipMeta } from "./relationships";
 import { NonNullable, enumerable } from "../../utils";
-import { ElementParts, FeatureMeta, MembershipMeta } from "../KerML";
+import { Edge, ElementParts, FeatureMeta, MembershipMeta } from "../KerML";
 import { OccurrenceUsageMeta } from "./occurrence-usage";
 import { AstNode, LangiumDocument } from "langium";
 
 export interface SatisfyRequirementUsageOptions
     extends RequirementUsageOptions,
         AssertConstraintUsageOptions {
-    // TODO: add subject parameter
+    satisfactionSubject?: Edge<SubjectMembershipMeta>;
 }
 
 @metamodelOf(SatisfyRequirementUsage, {
@@ -45,8 +45,8 @@ export class SatisfyRequirementUsageMeta extends Mixin(
     public get satisfactionSubject(): SubjectMembershipMeta | undefined {
         return this._satisfactionSubject;
     }
-    public set satisfactionSubject(value: SubjectMembershipMeta | undefined) {
-        this._satisfactionSubject = value;
+    public set satisfactionSubject(value: Edge<SubjectMembershipMeta> | undefined) {
+        this._satisfactionSubject = this.swapEdgeOwnership(this._satisfactionSubject, value);
     }
 
     override defaultSupertype(): string {
@@ -71,10 +71,10 @@ export class SatisfyRequirementUsageMeta extends Mixin(
     }
 
     protected static applySatisfyRequirementOptions(
-        _model: SatisfyRequirementUsageMeta,
-        _options: SatisfyRequirementUsageOptions
+        model: SatisfyRequirementUsageMeta,
+        options: SatisfyRequirementUsageOptions
     ): void {
-        // empty
+        model.satisfactionSubject = options.satisfactionSubject;
     }
 
     static override create<T extends AstNode>(

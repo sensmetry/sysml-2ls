@@ -21,11 +21,14 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
 import { AstNode, LangiumDocument } from "langium";
+import { Edge, EndFeatureMembershipMeta, ItemFlowEndMeta } from "../KerML";
 
 export interface FlowConnectionUsageOptions
     extends ConnectionUsageOptions,
         ActionUsageOptions,
-        ItemFlowOptions {}
+        ItemFlowOptions {
+    ends?: readonly Edge<EndFeatureMembershipMeta, ItemFlowEndMeta>[];
+}
 
 @metamodelOf(FlowConnectionUsage, {
     base: "Connections::flowConnections",

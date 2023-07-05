@@ -49,11 +49,11 @@ Dependency returns Dependency:
 // ===================================================================================================
 
 OwnedAnnotation returns Annotation:
-    element=AnnotatingElement
+    source=AnnotatingElement
 ;
 
 AnnotatingMember returns OwningMembership:
-    element=AnnotatingElement
+    target=AnnotatingElement
 ;
 
 AnnotatingElement returns AnnotatingElement:
@@ -79,11 +79,11 @@ MetadataDefinition returns MetadataDefinition:
 ;
 
 PrefixMetadataAnnotation returns Annotation:
-    element=PrefixMetadataUsage
+    source=PrefixMetadataUsage
 ;
 
 PrefixMetadataMember returns OwningMembership:
-    element=PrefixMetadataUsage
+    target=PrefixMetadataUsage
 ;
 
 fragment PrefixMetadata:
@@ -119,7 +119,7 @@ fragment MetadataBodyItems:
 ;
 
 MetadataBodyUsageMember returns FeatureMembership:
-    element=MetadataBodyUsage
+    target=MetadataBodyUsage
 ;
 
 MetadataBodyUsage returns ReferenceUsage:
@@ -164,19 +164,19 @@ fragment PackageBodyElement:
 ;
 
 UsageMember returns OwningMembership:
-    Visibility? element=UsageElement
+    Visibility? target=UsageElement
 ;
 
 RelationshipMember returns OwningMembership:
-    Visibility? element=Dependency
+    Visibility? target=Dependency
 ;
 
 ElementFilterMember returns ElementFilterMembership:
-    Visibility? 'filter' element=OwnedExpression ';'
+    Visibility? 'filter' target=OwnedExpression ';'
 ;
 
 AliasMember returns Membership:
-    Visibility? 'alias' Identification? 'for' reference=ElementReference RelationshipBody
+    Visibility? 'alias' Identification? 'for' targetRef=ElementReference RelationshipBody
 ;
 
 // Imports
@@ -187,11 +187,11 @@ fragment ImportPrefix:
 
 // see KerML.langium for the change
 fragment ImportedReference:
-    reference=ElementReference (isNamespace='::*')? ( isRecursive?='::**' )?
+    targetRef=ElementReference (isNamespace='::*')? ( isRecursive?='::**' )?
 ;
 
 Import returns Import:
-    ImportPrefix ImportedReference (element=FilterPackage)? RelationshipBody
+    ImportPrefix ImportedReference (target=FilterPackage)? RelationshipBody
 ;
 
 FilterPackage returns Package:
@@ -200,7 +200,7 @@ FilterPackage returns Package:
 ;
 
 FilterPackageMember returns ElementFilterMembership:
-    '[' element=OwnedExpression ']'
+    '[' target=OwnedExpression ']'
 ;
 
 // Package elements
@@ -253,7 +253,7 @@ fragment SubclassificationPart:
 ;
 
 OwnedSubclassification returns Subclassification:
-    reference=ClassifierReference
+    targetRef=ClassifierReference
 ;
 
 // Features
@@ -317,15 +317,15 @@ FeatureTyping returns FeatureTyping:
 // OwnedFeatureTyping inherited from Expression syntax.
 
 OwnedSubsetting returns Subsetting:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 OwnedReferenceSubsetting returns ReferenceSubsetting:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 OwnedRedefinition returns Redefinition:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 
@@ -333,7 +333,7 @@ OwnedRedefinition returns Redefinition:
 // ---------------------------------------------------------------------------------------------------
 
 OwnedMultiplicity returns OwningMembership:
-    element=MultiplicityRange
+    target=MultiplicityRange
 ;
 
 MultiplicityRange returns MultiplicityRange:
@@ -341,7 +341,7 @@ MultiplicityRange returns MultiplicityRange:
 ;
 
 MultiplicityExpressionMember returns OwningMembership:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 // Definition and Usage
@@ -390,31 +390,31 @@ fragment DefinitionBodyItem:
 ;
 
 DefinitionMember returns OwningMembership:
-    Visibility? element=DefinitionElement
+    Visibility? target=DefinitionElement
 ;
 
 VisibleAnnotatingMember returns OwningMembership:
-    Visibility? element=AnnotatingElement
+    Visibility? target=AnnotatingElement
 ;
 
 VariantUsageMember returns VariantMembership:
-    Visibility? 'variant' element=VariantUsageElement
+    Visibility? 'variant' target=VariantUsageElement
 ;
 
 NonOccurrenceUsageMember returns FeatureMembership:
-    Visibility? element=NonOccurrenceUsageElement
+    Visibility? target=NonOccurrenceUsageElement
 ;
 
 OccurrenceUsageMember returns FeatureMembership:
-    Visibility? element=OccurrenceUsageElement
+    Visibility? target=OccurrenceUsageElement
 ;
 
 StructureUsageMember returns FeatureMembership:
-    Visibility? element=StructureUsageElement
+    Visibility? target=StructureUsageElement
 ;
 
 BehaviorUsageMember returns FeatureMembership:
-    Visibility? element=BehaviorUsageElement
+    Visibility? target=BehaviorUsageElement
 ;
 
 // Usages
@@ -464,15 +464,15 @@ fragment ValuePart:
 ;
 
 FeatureValue returns FeatureValue:
-    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) element=OwnedExpression
+    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) target=OwnedExpression
 ;
 
 FeatureValueExpression returns FeatureValue:
-    isInitial?=':=' element=OwnedExpression
+    isInitial?=':=' target=OwnedExpression
 ;
 
 // EmptyAssignmentActionMember returns OwningMembership:
-//     element=EmptyAssignmentAction
+//     target=EmptyAssignmentAction
 // ;
 
 // EmptyAssignmentAction returns AssignmentActionUsage:
@@ -481,7 +481,7 @@ FeatureValueExpression returns FeatureValue:
 // ;
 
 // EmptyTargetMember returns ParameterMembership:
-//     element=EmptyTargetParameter
+//     target=EmptyTargetParameter
 // ;
 
 // EmptyTargetParameter returns ReferenceUsage:
@@ -619,7 +619,7 @@ fragment EnumerationItems:
 ;
 
 EnumerationUsageMember returns VariantMembership:
-    Visibility? element=EnumeratedValue
+    Visibility? target=EnumeratedValue
 ;
 
 EnumeratedValue returns EnumerationUsage:
@@ -654,7 +654,7 @@ IndividualDefinition returns OccurrenceDefinition:
 ;
 
 // LifeClassMembership returns OwningMembership:
-//     element=LifeClass
+//     target=LifeClass
 // ;
 
 // LifeClass returns LifeClass:
@@ -690,7 +690,7 @@ EventOccurrenceUsage returns EventOccurrenceUsage:
 // Occurrence Succession
 
 EmptySuccessionMember returns FeatureMembership:
-    element=EmptySuccession
+    target=EmptySuccession
 ;
 
 EmptySuccession returns SuccessionAsUsage:
@@ -699,7 +699,7 @@ EmptySuccession returns SuccessionAsUsage:
 ;
 
 MultiplicitySourceEndMember returns EndFeatureMembership:
-    element=MultiplicitySourceEnd
+    target=MultiplicitySourceEnd
 ;
 
 MultiplicitySourceEnd returns Feature:
@@ -710,7 +710,7 @@ MultiplicitySourceEnd returns Feature:
 // out to show that they are handled in code instead
 
 // EmptyTargetEndMember returns EndFeatureMembership:
-//     element=EmptyTargetEnd
+//     target=EmptyTargetEnd
 // ;
 
 // EmptyTargetEnd returns Feature:
@@ -751,7 +751,7 @@ PortDefinition returns PortDefinition:
 // constructed in the model, no need to parse 
 /*
 ConjugatedPortDefinitionMember returns OwningMembership:
-    element=ConjugatedPortDefinition
+    target=ConjugatedPortDefinition
 ;
 
 ConjugatedPortDefinition returns ConjugatedPortDefinition:
@@ -764,7 +764,7 @@ PortConjugation returns PortConjugation:
 */
 
 ConjugatedPortTyping returns ConjugatedPortTyping:
-    '~' reference=ConjugatedPortReference
+    '~' targetRef=ConjugatedPortReference
 ;
 
 ConjugatedPortReference returns ConjugatedPortReference:
@@ -783,7 +783,7 @@ PortUsage returns PortUsage:
 // Connectors
 
 ConnectorEndMember returns EndFeatureMembership:
-    element=ConnectorEnd
+    target=ConnectorEnd
 ;
 
 ConnectorEnd returns Feature:
@@ -834,7 +834,7 @@ fragment NaryConnectorPart:
 ;
 
 // EmptySourceEndMember returns EndFeatureMembership:
-//     element=EmptySourceEnd
+//     target=EmptySourceEnd
 // ;
 
 // EmptySourceEnd returns Feature:
@@ -864,7 +864,7 @@ fragment MessageDeclaration:
 ;
 
 MessageEventMember returns ParameterMembership:
-    element=MessageEvent
+    target=MessageEvent
 ;
 
 MessageEvent returns EventOccurrenceUsage:
@@ -890,7 +890,7 @@ fragment FlowConnectionDeclaration:
 // Flow Members
 
 ItemFeatureMember returns FeatureMembership:
-    element=ItemFeature
+    target=ItemFeature
 ;
 
 ItemFeature returns ItemFeature:
@@ -910,7 +910,7 @@ fragment PayloadFeatureSpecializationPart:
 ;
 
 FlowEndMember returns EndFeatureMembership:
-    element=FlowEnd
+    target=FlowEnd
 ;
 
 FlowEnd returns ItemFlowEnd:
@@ -918,11 +918,11 @@ FlowEnd returns ItemFlowEnd:
 ;
 
 FlowEndSubsetting returns ReferenceSubsetting:
-    reference=FeatureReference '.' | targetChain=FeatureChainPrefix
+    targetRef=FeatureReference '.' | targetChain=FeatureChainPrefix
 ;
 
 FlowFeatureMember returns FeatureMembership:
-    element=FlowFeature
+    target=FlowFeature
 ;
 
 FlowFeature returns ReferenceUsage:
@@ -930,7 +930,7 @@ FlowFeature returns ReferenceUsage:
 ;
 
 FlowRedefinition returns Redefinition:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 
@@ -964,7 +964,7 @@ fragment InterfaceBodyItem:
 ;
 
 InterfaceNonOccurrenceUsageMember returns FeatureMembership:
-    Visibility? element=InterfaceNonOccurrenceUsageElement
+    Visibility? target=InterfaceNonOccurrenceUsageElement
 ;
 
 InterfaceNonOccurrenceUsageElement returns Usage:
@@ -976,7 +976,7 @@ InterfaceNonOccurrenceUsageElement returns Usage:
 ;
 
 InterfaceOccurrenceUsageMember returns FeatureMembership:
-    Visibility? element=InterfaceOccurrenceUsageElement
+    Visibility? target=InterfaceOccurrenceUsageElement
 ;
 
 InterfaceOccurrenceUsageElement returns Usage:
@@ -1010,7 +1010,7 @@ fragment NaryInterfacePart:
 ;
 
 InterfaceEndMember returns EndFeatureMembership:
-    element=InterfaceEnd
+    target=InterfaceEnd
 ;
 
 InterfaceEnd returns PortUsage:
@@ -1067,20 +1067,20 @@ fragment ActionBodyItem:
 ;
 
 InitialNodeMember returns Membership:
-    Visibility? 'first' reference=FeatureReference
+    Visibility? 'first' targetRef=FeatureReference
     RelationshipBody
 ;
 
 ActionNodeMember returns FeatureMembership:
-    Visibility? element=ActionNode
+    Visibility? target=ActionNode
 ;
 
 TargetSuccessionMember returns FeatureMembership:
-    Visibility? element=ActionTargetSuccession
+    Visibility? target=ActionTargetSuccession
 ;
 
 GuardedSuccessionMember returns FeatureMembership:
-    element=GuardedSuccession
+    target=GuardedSuccession
 ;
 
 // Action Usages
@@ -1141,7 +1141,7 @@ fragment AcceptParameterPart:
 ;
 
 PayloadParameterMember returns ParameterMembership:
-    element=PayloadParameter
+    target=PayloadParameter
 ;
 
 PayloadParameter returns ReferenceUsage:
@@ -1154,7 +1154,7 @@ fragment TriggerValuePart:
 ;
 
 TriggerFeatureValue returns FeatureValue:
-    element=TriggerExpression
+    target=TriggerExpression
 ;
 
 TriggerExpression returns TriggerInvocationExpression:
@@ -1163,7 +1163,7 @@ TriggerExpression returns TriggerInvocationExpression:
 ;
 
 ChangeExpressionMember returns FeatureMembership:
-    element=ChangeExpression
+    target=ChangeExpression
 ;
 
 ChangeExpression returns Expression:
@@ -1171,7 +1171,7 @@ ChangeExpression returns Expression:
 ;
 
 ChangeResultExpressionMember returns ResultExpressionMembership:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 SendNode returns SendActionUsage:
@@ -1185,7 +1185,7 @@ fragment SendNodeDeclaration:
 ;
 
 NodeParameterMember returns ParameterMembership:
-    element=NodeParameter
+    target=NodeParameter
 ;
 
 NodeParameter returns Usage:
@@ -1193,7 +1193,7 @@ NodeParameter returns Usage:
 ;
 
 FeatureBinding returns FeatureValue:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 AssignmentNode returns AssignmentActionUsage:
@@ -1211,7 +1211,7 @@ fragment AssignmentNodeDeclaration:
 // currently doesn't work in langium
 /*
 AssignmentTargetMember returns ParameterMembership:
-    element=TargetParameter
+    target=TargetParameter
 ;
 
 TargetParameter returns ReferenceUsage:
@@ -1221,7 +1221,7 @@ TargetParameter returns ReferenceUsage:
 ;
 
 TargetFeatureMember returns FeatureMembership:
-    element=TargetFeature
+    target=TargetFeature
 ;
 
 TargetFeature returns ReferenceUsage:
@@ -1229,11 +1229,11 @@ TargetFeature returns ReferenceUsage:
 ;
 
 TargetAccessedFeatureMember returns FeatureMembership:
-    element=EmptyUsage
+    target=EmptyUsage
 ;
 
 TargetBinding returns FeatureValue:
-    element=TargetExpression
+    target=TargetExpression
 ;
 
 TargetExpression returns Expression:
@@ -1253,7 +1253,7 @@ TargetExpression returns Expression:
 */
 
 ExpressionParameterMember returns ParameterMembership:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 IfNode returns IfActionUsage:
@@ -1264,7 +1264,7 @@ IfNode returns IfActionUsage:
 ;
 
 ActionBodyParameterMember returns ParameterMembership:
-    element=ActionBodyParameter
+    target=ActionBodyParameter
 ;
 
 ActionBodyParameter returns ActionUsage:
@@ -1272,7 +1272,7 @@ ActionBodyParameter returns ActionUsage:
 ;
 
 IfNodeParameterMember returns ParameterMembership:
-    element=IfNode
+    target=IfNode
 ;
 
 WhileLoopNode returns WhileLoopActionUsage:
@@ -1292,7 +1292,7 @@ ForLoopNode returns ForLoopActionUsage:
 ;
 
 ForVariableDeclarationMember returns FeatureMembership:
-    element=ForVariableDeclaration
+    target=ForVariableDeclaration
 ;
 
 ForVariableDeclaration returns ReferenceUsage:
@@ -1335,7 +1335,7 @@ fragment ActionNodeItems:
 ;
 
 // EmptyParameterMember returns ParameterMembership:
-//     element=EmptyUsage
+//     target=EmptyUsage
 // ;
 
 // EmptyUsage returns Usage:
@@ -1412,21 +1412,21 @@ fragment StateBodyItem:
 ;
 
 EntryActionMember returns StateSubactionMembership:
-    Visibility? kind='entry' element=StateActionUsage
+    Visibility? kind='entry' target=StateActionUsage
 ;
 
 DoActionMember returns StateSubactionMembership:
-    Visibility? kind='do' element=StateActionUsage
+    Visibility? kind='do' target=StateActionUsage
 ;
 
 ExitActionMember returns StateSubactionMembership:
-    Visibility? kind='exit' element=StateActionUsage
+    Visibility? kind='exit' target=StateActionUsage
 ;
 
 EntryTransitionMember returns FeatureMembership:
     Visibility? 
-    ( element=GuardedTargetSuccession 
-    | 'then' element=TransitionSuccession 
+    ( target=GuardedTargetSuccession 
+    | 'then' target=TransitionSuccession 
     ) ';'
 ;
 
@@ -1457,11 +1457,11 @@ StateActionUsage returns ActionUsage:
 ;
 
 TransitionUsageMember returns FeatureMembership:
-    Visibility? element=TransitionUsage
+    Visibility? target=TransitionUsage
 ;
 
 TargetTransitionUsageMember returns FeatureMembership:
-    Visibility? element=TargetTransitionUsage
+    Visibility? target=TargetTransitionUsage
 ;
 
 // State Usages
@@ -1510,12 +1510,12 @@ TargetTransitionUsage returns TransitionUsage:
 ;
 
 TransitionSourceMember returns Membership:
-    reference=FeatureReference
-    | {OwningMembership} element=OwnedFeatureChain
+    targetRef=FeatureReference
+    | {OwningMembership} target=OwnedFeatureChain
 ;
 
 TriggerActionMember returns TransitionFeatureMembership:
-    kind='accept' element=TriggerAction
+    kind='accept' target=TriggerAction
 ;
 
 TriggerAction returns AcceptActionUsage:
@@ -1523,11 +1523,11 @@ TriggerAction returns AcceptActionUsage:
 ;
 
 GuardExpressionMember returns TransitionFeatureMembership:
-    kind='if' element=OwnedExpression
+    kind='if' target=OwnedExpression
 ;
 
 EffectBehaviorMember returns TransitionFeatureMembership:
-    kind='do' element=EffectBehaviorUsage
+    kind='do' target=EffectBehaviorUsage
 ;
 
 fragment EffectBehaviorUsageBody:
@@ -1558,7 +1558,7 @@ EffectBehaviorUsage returns ActionUsage:
 ;
 
 TransitionSuccessionMember returns OwningMembership:
-    element=TransitionSuccession
+    target=TransitionSuccession
 ;
 
 TransitionSuccession returns SuccessionAsUsage:
@@ -1588,11 +1588,11 @@ fragment CalculationBodyItem:
 ;
 
 ReturnParameterMember returns ReturnParameterMembership:
-    Visibility? 'return' element=UsageElement
+    Visibility? 'return' target=UsageElement
 ;
 
 ResultExpressionMember returns ResultExpressionMembership:
-    Visibility? element=OwnedExpression
+    Visibility? target=OwnedExpression
 ;
 
 // Calculation Usages
@@ -1648,7 +1648,7 @@ fragment RequirementBodyItem:
 ;
 
 SubjectMember returns SubjectMembership:
-    Visibility? 'subject' element=SubjectUsage
+    Visibility? 'subject' target=SubjectUsage
 ;
 
 SubjectUsage returns ReferenceUsage:
@@ -1657,7 +1657,7 @@ SubjectUsage returns ReferenceUsage:
 
 RequirementConstraintMember returns RequirementConstraintMembership:
     Visibility? kind=RequirementConstraintKind 
-    element=RequirementConstraintUsage
+    target=RequirementConstraintUsage
 ;
 
 RequirementConstraintUsage returns ConstraintUsage:
@@ -1666,7 +1666,7 @@ RequirementConstraintUsage returns ConstraintUsage:
 ;
 
 FramedConcernMember returns FramedConcernMembership:
-    Visibility? 'frame' element=FramedConcernUsage
+    Visibility? 'frame' target=FramedConcernUsage
 ;
 
 FramedConcernUsage returns ConcernUsage:
@@ -1676,7 +1676,7 @@ FramedConcernUsage returns ConcernUsage:
 ;
 
 ActorMember returns ActorMembership:
-    Visibility? 'actor' element=ActorUsage
+    Visibility? 'actor' target=ActorUsage
 ;
 
 ActorUsage returns PartUsage:
@@ -1684,7 +1684,7 @@ ActorUsage returns PartUsage:
 ;
 
 StakeholderMember returns StakeholderMembership:
-    Visibility? 'stakeholder' element=StakeholderUsage
+    Visibility? 'stakeholder' target=StakeholderUsage
 ;
 
 StakeholderUsage returns PartUsage:
@@ -1706,7 +1706,7 @@ SatisfyRequirementUsage returns SatisfyRequirementUsage:
 ;
 
 SatisfactionSubjectMember returns SubjectMembership:
-    element=SatisfactionParameter
+    target=SatisfactionParameter
 ;
 
 SatisfactionParameter returns ReferenceUsage:
@@ -1714,7 +1714,7 @@ SatisfactionParameter returns ReferenceUsage:
 ;
 
 SatisfactionFeatureValue returns FeatureValue:
-    element=SatisfactionReferenceExpression
+    target=SatisfactionReferenceExpression
 ;
 
 SatisfactionReferenceExpression returns FeatureReferenceExpression:
@@ -1757,7 +1757,7 @@ fragment CaseBodyItem:
 ;
 
 ObjectiveMember returns ObjectiveMembership:
-    Visibility? 'objective' element=ObjectiveRequirementUsage
+    Visibility? 'objective' target=ObjectiveRequirementUsage
 ;
 
 ObjectiveRequirementUsage returns RequirementUsage:
@@ -1792,7 +1792,7 @@ VerificationCaseUsage returns VerificationCaseUsage:
 ;
 
 RequirementVerificationMember returns RequirementVerificationMembership:
-    Visibility? 'verify' element=RequirementVerificationUsage
+    Visibility? 'verify' target=RequirementVerificationUsage
 ;
 
 RequirementVerificationUsage returns RequirementUsage:
@@ -1840,7 +1840,7 @@ fragment ViewDefinitionBodyItem:
 ;
 
 ViewRenderingMember returns ViewRenderingMembership:
-    Visibility? 'render' element=ViewRenderingUsage
+    Visibility? 'render' target=ViewRenderingUsage
 ;
 
 ViewRenderingUsage returns RenderingUsage:
@@ -1871,7 +1871,7 @@ fragment ExposePrefix:
     Visibility? 'expose';
 
 Expose returns Expose:
-    ExposePrefix ImportedReference (element=FilterPackage)?
+    ExposePrefix ImportedReference (target=FilterPackage)?
     RelationshipBody
 ;
 
@@ -1908,7 +1908,7 @@ ExpressionBody returns Expression:
 // Operator Expressions
 
 OwnedExpressionMember returns FeatureMembership:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 OwnedExpression returns Expression:
@@ -1940,7 +1940,7 @@ ImpliesExpressionReference returns FeatureReferenceExpression:
 ;
 
 ImpliesExpressionMember returns FeatureMembership:
-    element=ImpliesExpression
+    target=ImpliesExpression
 ;
 
 ImpliesExpression returns Expression:
@@ -1952,7 +1952,7 @@ OrExpressionReference returns FeatureReferenceExpression:
 ;
 
 OrExpressionMember returns FeatureMembership:
-    element=OrExpression
+    target=OrExpression
 ;
 
 OrExpression returns Expression:
@@ -1968,7 +1968,7 @@ XorExpressionReference returns FeatureReferenceExpression:
 ;
 
 XorExpressionMember returns FeatureMembership:
-    element=XorExpression
+    target=XorExpression
 ;
 
 XorExpression returns Expression:
@@ -1990,7 +1990,7 @@ EqualityExpressionReference returns FeatureReferenceExpression:
 ;
 
 EqualityExpressionMember returns FeatureMembership:
-    element=EqualityExpression
+    target=EqualityExpression
 ;
 
 EqualityExpression returns Expression:
@@ -2091,7 +2091,7 @@ BodyExpression returns FeatureReferenceExpression:
 ;
 
 ExpressionBodyMember returns FeatureMembership:
-    element=ExpressionBody
+    target=ExpressionBody
 ;
 
 // Sequence Expressions
@@ -2118,7 +2118,7 @@ fragment PositionalArgumentList:
 ;
 
 ArgumentMember returns ParameterMembership:
-    element=Argument
+    target=Argument
 ;
 
 Argument returns Feature:
@@ -2130,7 +2130,7 @@ fragment NamedArgumentList:
 ;
 
 NamedArgumentMember returns ParameterMembership:
-    element=NamedArgument
+    target=NamedArgument
 ;
 
 NamedArgument returns Feature:
@@ -2138,9 +2138,9 @@ NamedArgument returns Feature:
 ;
 
 ParameterRedefinition returns Redefinition:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 ArgumentValue returns FeatureValue:
-    element=OwnedExpression
+    target=OwnedExpression
 ;

@@ -14,28 +14,45 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { AstNode, LangiumDocument } from "langium";
 import {
     Expression,
     FeatureMembership,
     FeatureReferenceExpression,
     SysMLFunction,
 } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
-import { ElementParts, ExpressionMeta, FeatureMeta, MembershipMeta, TypeMeta } from "../_internal";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
+import {
+    Edge,
+    ElementParts,
+    ExpressionMeta,
+    ExpressionOptions,
+    FeatureMeta,
+    MembershipMeta,
+    TypeMeta,
+} from "../_internal";
 
-// TODO:add expression
-export type FeatureReferenceExpressionOptions = ExpressionMeta;
+export interface FeatureReferenceExpressionOptions extends ExpressionOptions {
+    expression: Edge<MembershipMeta, FeatureMeta>;
+}
 
 @metamodelOf(FeatureReferenceExpression)
 export class FeatureReferenceExpressionMeta extends ExpressionMeta {
     private _expression?: MembershipMeta<FeatureMeta> | undefined;
 
+    /**
+     * Membership to the feature this expression evaluates as
+     */
     get expression(): MembershipMeta<FeatureMeta> | undefined {
         return this._expression;
     }
-    setExpression(value: MembershipMeta<FeatureMeta>): this {
-        this._expression = value;
-        return this;
+    /**
+     * Takes ownership of the membership and breaks its ownership to the
+     * previous expression membership. Use `FeatureMembership` to return the
+     * target directly, otherwise the target will be evaluated.
+     */
+    set expression(value: Edge<MembershipMeta, FeatureMeta> | undefined) {
+        this._expression = this.swapEdgeOwnership(this._expression, value);
     }
 
     override ast(): FeatureReferenceExpression | undefined {
@@ -56,6 +73,17 @@ export class FeatureReferenceExpressionMeta extends ExpressionMeta {
         super.collectDeclaration(parts);
 
         if (this.expression) parts.push(["expression", [this.expression]]);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: FeatureReferenceExpressionOptions
+    ): T["$meta"] {
+        const model = super.create(provider, document, options) as FeatureReferenceExpressionMeta;
+        if (options) model.expression = options.expression;
+        return model;
     }
 }
 

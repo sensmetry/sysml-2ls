@@ -81,7 +81,7 @@ function fixOperatorExpression(expr: OperatorExpression, services: SysMLDefaultS
 
         reflection.createNode(Feature, {
             $container: member,
-            $containerProperty: "element",
+            $containerProperty: "target",
         });
     }
 }
@@ -96,7 +96,7 @@ function addLoopMember(node: WhileLoopActionUsage, services: SysMLDefaultService
 
         reflection.createNode(Usage, {
             $container: membership,
-            $containerProperty: "element",
+            $containerProperty: "target",
         });
     }
 }
@@ -104,16 +104,16 @@ function addLoopMember(node: WhileLoopActionUsage, services: SysMLDefaultService
 function finalizeImport(node: Import, services: SysMLDefaultServices): void {
     const type: string = node.$type;
     if (type !== Import && type !== Expose) return;
-    if (node.isNamespace || node.element) {
-        if (node.reference) {
-            (node.reference as Mutable<AstNode>).$type = node.isNamespace
+    if (node.isNamespace || node.target) {
+        if (node.targetRef) {
+            (node.targetRef as Mutable<AstNode>).$type = node.isNamespace
                 ? NamespaceReference
                 : MembershipReference;
         }
         (node as Mutable<Import>).$type = type === Expose ? NamespaceExpose : NamespaceImport;
-        if (node.element && node.reference) {
+        if (node.target && node.targetRef) {
             // need to reparent `node.reference`
-            const pack = node.element as Package;
+            const pack = node.target as Package;
             const imp = services.shared.AstReflection.createNode(
                 node.isNamespace ? NamespaceImport : MembershipImport,
                 {
@@ -123,18 +123,18 @@ function finalizeImport(node: Import, services: SysMLDefaultServices): void {
                     isRecursive: node.isRecursive,
                 }
             );
-            services.shared.AstReflection.assignNode(node.reference, {
+            services.shared.AstReflection.assignNode(node.targetRef, {
                 $container: imp,
-                $containerProperty: "reference",
+                $containerProperty: "targetRef",
             });
-            erase(node.$children, node.reference);
-            delete node.reference;
+            erase(node.$children, node.targetRef);
+            delete node.targetRef;
         }
 
         // remove unneeded property
         delete node.isNamespace;
     } else {
-        if (node.reference) (node.reference as Mutable<AstNode>).$type = MembershipReference;
+        if (node.targetRef) (node.targetRef as Mutable<AstNode>).$type = MembershipReference;
         (node as Mutable<Import>).$type = type === Expose ? MembershipExpose : MembershipImport;
     }
 }
@@ -154,7 +154,7 @@ function createEmptyParametersInTransitionUsage(
 
         reflection.createNode(ReferenceUsage, {
             $container: membership,
-            $containerProperty: "element",
+            $containerProperty: "target",
         });
     }
 
@@ -167,7 +167,7 @@ function createEmptyParametersInTransitionUsage(
 
         reflection.createNode(ReferenceUsage, {
             $container: membership,
-            $containerProperty: "element",
+            $containerProperty: "target",
         });
     }
 }
@@ -196,7 +196,7 @@ function createMissingEndsInSuccessionAsUsage(
         });
         reflection.createNode(Feature, {
             $container: member,
-            $containerProperty: "element",
+            $containerProperty: "target",
             $cstNode: node.$cstNode,
         });
     }

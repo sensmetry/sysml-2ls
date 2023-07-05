@@ -65,7 +65,7 @@ const N7 = `namespace N7 {
 test("membership imports only import the reference element", async () => {
     const result = await parseKerML(N1 + N4);
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.children[1].element as Namespace)).toEqual([
+    expect(childrenNames(result.value.children[1].target as Namespace)).toEqual([
         "N4::C",
         "N1::N2::B",
     ]);
@@ -73,7 +73,7 @@ test("membership imports only import the reference element", async () => {
 
 test("namespace imports only import elements in the direct scope", async () => {
     const namespace = (await parseKerML(N1 + N5)).value;
-    expect(childrenNames(namespace.children[1].element as Namespace)).toEqual([
+    expect(childrenNames(namespace.children[1].target as Namespace)).toEqual([
         "N5::C",
         "N1::N2::B",
     ]);
@@ -81,7 +81,7 @@ test("namespace imports only import elements in the direct scope", async () => {
 
 test("recursive membership imports import namespaces recursively", async () => {
     const namespace = (await parseKerML(N1 + N6)).value;
-    expect(childrenNames(namespace.children[1].element as Namespace)).toEqual([
+    expect(childrenNames(namespace.children[1].target as Namespace)).toEqual([
         "N6::C",
         "N1",
         "N1::A",
@@ -92,7 +92,7 @@ test("recursive membership imports import namespaces recursively", async () => {
 
 test("recursive namespace imports import namespaces recursively excluding the referenced namespace", async () => {
     const namespace = (await parseKerML(N1 + N7)).value;
-    expect(childrenNames(namespace.children[1].element as Namespace)).toEqual([
+    expect(childrenNames(namespace.children[1].target as Namespace)).toEqual([
         "N7::C",
         "N1::A",
         "N1::N2",
@@ -118,7 +118,7 @@ test.concurrent.each(["specializes", "conjugates"])(
     async (token: string) => {
         const result = await parseKerML(formatString(InheritanceDoc, token));
         expect(result).toMatchObject({ parserErrors: [], diagnostics: [], lexerErrors: [] });
-        expect(directScopeNames(result.value.children[1].element as Namespace)).toEqual([
+        expect(directScopeNames(result.value.children[1].target as Namespace)).toEqual([
             "B::x",
             "B::y",
             "B::z",
@@ -133,7 +133,7 @@ test.concurrent.each(["specializes", "conjugates"])(
     async (token: string) => {
         const result = await parseKerML(formatString(InheritanceDoc, token));
         expect(result).toMatchObject({ parserErrors: [], diagnostics: [], lexerErrors: [] });
-        expect(childrenNames(result.value.children[1].element as Namespace)).toEqual([
+        expect(childrenNames(result.value.children[1].target as Namespace)).toEqual([
             "B::x",
             "A::a",
         ]);
@@ -166,12 +166,12 @@ test("implicitly inherited members are visible", async () => {
     expect(result).toMatchObject(NO_ERRORS);
     expect(
         Array.from(
-            stream((result.value.children[1].element as Type).$meta.types()).map(
+            stream((result.value.children[1].target as Type).$meta.types()).map(
                 (t) => t.qualifiedName
             )
         )
     ).toEqual(["Base::Anything"]);
-    expect(directScopeNames(result.value.children[1].element as Namespace)).toEqual([
+    expect(directScopeNames(result.value.children[1].target as Namespace)).toEqual([
         "A::a",
         "A::b",
         "A::c",
@@ -193,8 +193,8 @@ test("redefined features are hidden", async () => {
     }
     `);
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.children[1].element as Namespace)).toEqual(["B::y"]);
-    expect(childrenNames(result.value.children[2].element as Namespace)).toEqual(["C::z"]);
+    expect(childrenNames(result.value.children[1].target as Namespace)).toEqual(["B::y"]);
+    expect(childrenNames(result.value.children[2].target as Namespace)).toEqual(["C::z"]);
 });
 
 test("redefined features cannot be referenced by other elements", async () => {
@@ -222,7 +222,7 @@ test("circular imports are resolved without infinite loops", async () => {
     }
     `);
     expect(result).toMatchObject(NO_ERRORS);
-    const p1 = (result.value.children[0].element as Package).children[0].element as Package;
+    const p1 = (result.value.children[0].target as Package).children[0].target as Package;
     expect(childrenNames(p1)).toEqual(["Circular::P1::A", "Circular::P2::B"]);
 });
 
@@ -232,6 +232,6 @@ test("circular specializations are resolved without infinite loops", async () =>
     type B :> A { feature x; protected y; private z; }
     `);
     expect(result).toMatchObject(NO_ERRORS);
-    const a = result.value.children[0].element as Type;
+    const a = result.value.children[0].target as Type;
     expect(directScopeNames(a)).toEqual(["A::a", "A::b", "A::c", "B::x", "B::y"]);
 });

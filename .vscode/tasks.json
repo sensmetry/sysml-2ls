@@ -11,6 +11,17 @@
                 // TODO:
                 "command": ""
             },
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false,
+                "revealProblems": "never",
+                "close": false
+            },
+            "hide": true,
         }
     ]
 }

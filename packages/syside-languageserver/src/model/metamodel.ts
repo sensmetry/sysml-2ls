@@ -267,13 +267,43 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
         element.setParent(this);
     }
 
+    protected unsetOwnership(element: BasicMetamodel): void {
+        element.setParent(undefined);
+    }
+
+    /**
+     * @param previous if set, a tuple of previous `[parent, owner]`
+     * @param current if set, a tuple of current `[parent, owner]`
+     */
+    protected onOwnerSet(
+        previous: [ElementMeta, ElementMeta] | undefined,
+        current: [ElementMeta, ElementMeta] | undefined
+    ): void {
+        // empty
+    }
+
     protected setParent(parent: Metamodel | undefined): void {
         const previous = this._parent;
         this._parent = parent;
-        if (parent) this._owner = parent.is(NonOwnerType) ? parent.parent() : parent;
-        else this._owner = undefined;
+        if (previous !== parent) this.onParentSet(previous as ElementMeta, parent as ElementMeta);
 
-        this.onParentSet(previous as ElementMeta, parent as ElementMeta);
+        this.setOwner(parent?.is(NonOwnerType) ? parent.parent() : parent, previous);
+    }
+
+    protected setOwner(owner: Metamodel | undefined, previousParent?: Metamodel): void {
+        const previousOwner = this._owner;
+        this._owner = owner;
+
+        if (previousOwner !== owner)
+            this.onOwnerSet(
+                previousOwner
+                    ? [
+                          (previousParent ?? this._parent) as ElementMeta,
+                          previousOwner as ElementMeta,
+                      ]
+                    : undefined,
+                owner ? [this._parent as ElementMeta, owner as ElementMeta] : undefined
+            );
     }
 
     protected onParentSet(

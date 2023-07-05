@@ -15,7 +15,6 @@
  ********************************************************************************/
 
 import { Expression, ReturnParameterMembership, SysMLFunction } from "../../generated/ast";
-import { enumerable } from "../../utils";
 import {
     ExpressionMeta,
     FunctionMeta,
@@ -27,14 +26,6 @@ import { BasicMetamodel } from "../metamodel";
 
 export class FunctionMixin {
     protected _result: ResultExpressionMembershipMeta | undefined;
-
-    @enumerable
-    get result(): ResultExpressionMembershipMeta | undefined {
-        return this._result;
-    }
-    set result(value) {
-        this._result = value;
-    }
 
     /**
      * @returns owned or inherited result parameter if one exists, otherwise undefined

@@ -57,12 +57,12 @@ test.concurrent.each([
         children: [
             ...anything(4),
             {
-                element: {
+                target: {
                     $type: Feature,
                     ...withQualifiedName("x"),
                     heritage: expect.arrayContaining(
                         ["A", "B", "f", "g"].map((name) =>
-                            recursiveObjectContaining({ reference: qualifiedTypeReference(name) })
+                            recursiveObjectContaining({ targetRef: qualifiedTypeReference(name) })
                         )
                     ),
                 },
@@ -93,16 +93,16 @@ test("features without subsetting, redefinition and conjugation relationships su
         }
     );
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.children[2].element, Visibility.private)).toEqual([
+    expect(childrenNames(result.value.children[2].target, Visibility.private)).toEqual([
         "Base::things::that", // from things
     ]);
-    expect(
-        sanitizeTree(result.value.children[2].element, undefined, "include $meta")
-    ).toMatchObject({
-        $type: Feature,
-        ...withQualifiedName("person"),
-        heritage: [{ reference: qualifiedTypeReference("Person") }],
-    });
+    expect(sanitizeTree(result.value.children[2].target, undefined, "include $meta")).toMatchObject(
+        {
+            $type: Feature,
+            ...withQualifiedName("person"),
+            heritage: [{ targetRef: qualifiedTypeReference("Person") }],
+        }
+    );
 });
 
 test.concurrent.each([
@@ -118,7 +118,7 @@ test.concurrent.each([
 ])("feature prefix '%s' is parsed", async (prefix: string, property: string, value: unknown) => {
     const result = await parseKerML(prefix + " feature a;");
     expect(result).toMatchObject(NO_ERRORS);
-    return expect(result.value.children[0].element?.$meta).toMatchObject({
+    return expect(result.value.children[0].target?.$meta).toMatchObject({
         qualifiedName: "a",
         [property]: value,
     });
@@ -138,20 +138,20 @@ test("feature multiplicity can be specified after identification", async () => {
         children: [
             ...anything(1),
             {
-                element: {
+                target: {
                     ...withQualifiedName("parent"),
                     multiplicity: {
-                        element: {
+                        target: {
                             $type: MultiplicityRange,
                             range: {
-                                element: {
+                                target: {
                                     $type: LiteralNumber,
                                     literal: 2,
                                 },
                             },
                         },
                     },
-                    heritage: [{ reference: qualifiedTypeReference("Person") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("Person") }],
                 },
             },
         ],
@@ -166,20 +166,20 @@ test("feature multiplicity can be specified after one specialization", async () 
         children: [
             ...anything(1),
             {
-                element: {
+                target: {
                     ...withQualifiedName("parent"),
                     multiplicity: {
-                        element: {
+                        target: {
                             $type: MultiplicityRange,
                             range: {
-                                element: {
+                                target: {
                                     $type: LiteralNumber,
                                     literal: 2,
                                 },
                             },
                         },
                     },
-                    heritage: [{ reference: qualifiedTypeReference("Person") }],
+                    heritage: [{ targetRef: qualifiedTypeReference("Person") }],
                 },
             },
         ],
@@ -200,14 +200,14 @@ test.concurrent.each([
             children: [
                 ...anything(1),
                 {
-                    element: {
+                    target: {
                         $type: Feature,
                         ...withQualifiedName("readings"),
                         multiplicity: {
-                            element: {
+                            target: {
                                 $type: MultiplicityRange,
                                 range: {
-                                    element: {
+                                    target: {
                                         $type: LiteralInfinity,
                                     },
                                 },
@@ -235,7 +235,7 @@ test.concurrent.each([
         children: [
             ...anything(1),
             {
-                element: {
+                target: {
                     ...withQualifiedName("b"),
                     typeRelationships: expect.arrayContaining([
                         recursiveObjectContaining({
@@ -256,12 +256,12 @@ test("feature can be featured", async () => {
         children: [
             ...anything(1),
             {
-                element: {
+                target: {
                     ...withQualifiedName("b"),
                     typeRelationships: [
                         {
                             $type: TypeFeaturing,
-                            reference: qualifiedTypeReference("a"),
+                            targetRef: qualifiedTypeReference("a"),
                         },
                     ],
                 },

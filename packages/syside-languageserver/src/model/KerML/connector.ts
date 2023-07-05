@@ -20,6 +20,7 @@ import { Connector, ReferenceSubsetting } from "../../generated/ast";
 import { ElementID, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
 import {
+    Edge,
     ElementParts,
     EndFeatureMembershipMeta,
     FeatureMeta,
@@ -39,8 +40,9 @@ export const ImplicitConnectors = {
     binaryObject: "Objects::binaryLinkObjects",
 };
 
-// TODO: add ends
-export type ConnectorOptions = FeatureOptions;
+export interface ConnectorOptions extends FeatureOptions {
+    ends?: readonly Edge<EndFeatureMembershipMeta>[];
+}
 
 @metamodelOf(Connector, ImplicitConnectors)
 // @ts-expect-error stop it with static inheritance errors
@@ -55,8 +57,29 @@ export class ConnectorMeta extends Mixin(
     public get ends(): EndFeatureMembershipMeta[] {
         return this._ends;
     }
-    public set ends(value: EndFeatureMembershipMeta[]) {
-        this._ends = value;
+
+    /**
+     * Adds owned end members and returns the new number of end members.
+     */
+    addEnd(...value: Edge<EndFeatureMembershipMeta>[]): number {
+        this.resetEnds();
+        return this.addOwnedEdges(this._ends, value);
+    }
+
+    /**
+     * Removes ends by value and returns the new number of end members.
+     */
+    removeEnd(...value: readonly EndFeatureMembershipMeta[]): number {
+        this.resetEnds();
+        return this.removeOwnedElements(this._ends, value);
+    }
+
+    /**
+     * Removes ends by predicate and returns the new number of end members.
+     */
+    removeEndIf(predicate: (value: EndFeatureMembershipMeta) => boolean): number {
+        this.resetEnds();
+        return this.removeOwnedElementsIf(this._ends, predicate);
     }
 
     override defaultSupertype(): string {
@@ -73,9 +96,14 @@ export class ConnectorMeta extends Mixin(
         return this._ast as Connector;
     }
 
-    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+    protected override onHeritageAdded(heritage: InheritanceMeta, target: TypeMeta): void {
         this.resetEnds();
-        FeatureMeta.prototype["onSpecializationAdded"].call(this, specialization);
+        FeatureMeta.prototype["onHeritageAdded"].call(this, heritage, target);
+    }
+
+    protected override onHeritageRemoved(heritage: InheritanceMeta[]): void {
+        this.resetEnds();
+        FeatureMeta.prototype["onHeritageRemoved"].call(this, heritage);
     }
 
     override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
@@ -135,13 +163,18 @@ export class ConnectorMeta extends Mixin(
         parts.push(["ends", this.ends]);
     }
 
+    protected static applyConnectorOptions(model: ConnectorMeta, options: ConnectorOptions): void {
+        if (options.ends) model.addEnd(...options.ends);
+    }
+
     static override create<T extends AstNode>(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,
         document: LangiumDocument,
         options?: ConnectorOptions
     ): T["$meta"] {
-        const model = super.create(provider, document, options) as TypeMeta;
+        const model = super.create(provider, document, options) as ConnectorMeta;
+        if (options) ConnectorMeta.applyConnectorOptions(model, options);
         return model;
     }
 }

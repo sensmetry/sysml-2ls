@@ -8,6 +8,7 @@
 
 ### Chores
 
+- Added methods to add and remove owned child elements
 - Refactored model building and validation to work on internal model elements
   instead
 - Refactored AST and internal model to store order dependent child nodes in
