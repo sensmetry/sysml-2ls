@@ -290,7 +290,7 @@ export abstract class ImportScope extends ElementScope {
                 (child) =>
                     child.$children
                         .filter(isOwningMembership)
-                        .map((m) => m.element)
+                        .map((m) => m.target)
                         .filter(isNamespace),
                 {
                     includeRoot: true,

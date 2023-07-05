@@ -26,7 +26,6 @@ import {
 } from "../_internal";
 
 @metamodelOf(TypeFeaturing)
-// @ts-expect-error ignoring static inheritance error
 export class TypeFeaturingMeta<T extends TypeMeta = TypeMeta> extends FeaturingMeta<T> {
     override ast(): TypeFeaturing | undefined {
         return this._ast as TypeFeaturing;

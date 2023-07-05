@@ -14,26 +14,33 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AstNode, LangiumDocument } from "langium";
 import { TransitionFeatureKind, TransitionFeatureMembership } from "../../../generated/ast";
 import { ExpressionMeta, RelationshipOptionsBody } from "../../KerML";
 import { FeatureMembershipMeta } from "../../KerML/relationships/feature-membership";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { ActionUsageMeta } from "../action-usage";
 import { TransitionUsageMeta } from "../transition-usage";
+import { enumerable } from "../../../utils";
+import { AstNode, LangiumDocument } from "langium";
 
 type Transition = ActionUsageMeta | ExpressionMeta;
 
-export interface TransitionFeatureMembershipOptions
-    extends RelationshipOptionsBody<Transition, TransitionUsageMeta> {
-    kind?: TransitionFeatureKind;
-}
+export type TransitionFeatureMembershipOptions = RelationshipOptionsBody<
+    Transition,
+    TransitionUsageMeta
+>;
 
 @metamodelOf(TransitionFeatureMembership)
 export class TransitionFeatureMembershipMeta<
     T extends Transition = Transition
 > extends FeatureMembershipMeta<T> {
-    kind: TransitionFeatureKind = "trigger";
+    // read-only as it depends on the assigned slot in TransitionUsage
+    protected _kind: TransitionFeatureKind = "trigger";
+
+    @enumerable
+    get kind(): TransitionFeatureKind {
+        return this._kind;
+    }
 
     override ast(): TransitionFeatureMembership | undefined {
         return this._ast as TransitionFeatureMembership;
@@ -46,7 +53,6 @@ export class TransitionFeatureMembershipMeta<
         options?: TransitionFeatureMembershipOptions
     ): T["$meta"] {
         const model = super.create(provider, document, options) as TransitionFeatureMembershipMeta;
-        if (options?.kind) model.kind = options.kind;
         return model;
     }
 }

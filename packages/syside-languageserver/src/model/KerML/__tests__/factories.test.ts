@@ -18,8 +18,7 @@ import { LangiumDocument } from "langium";
 import { TypeClassifier } from "../../enums";
 import { basicIdProvider } from "../../metamodel";
 import { AssociationStructMeta } from "../association-structure";
-import { patchDocument, services } from "../../../testing/utils";
-import { URI } from "vscode-uri";
+import { emptyDocument } from "../../../testing/utils";
 import { DataTypeMeta } from "../data-type";
 import { TypeMeta } from "../type";
 import { ClassMeta } from "../class";
@@ -52,12 +51,7 @@ describe("Element factories", () => {
     let document: LangiumDocument;
 
     beforeAll(() => {
-        document = services.shared.workspace.LangiumDocumentFactory.fromString(
-            "",
-            URI.file("factory_test.kerml")
-        );
-
-        patchDocument(document);
+        document = emptyDocument("factory_test", ".kerml");
     });
 
     it.each([

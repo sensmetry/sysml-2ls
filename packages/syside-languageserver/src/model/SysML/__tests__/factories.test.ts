@@ -16,22 +16,16 @@
 
 import { LangiumDocument } from "langium";
 import { basicIdProvider } from "../../metamodel";
-import { patchDocument, services } from "../../../testing/utils";
-import { URI } from "vscode-uri";
-import { MembershipMeta, NamespaceMeta } from "../../KerML";
+import { emptyDocument } from "../../../testing/utils";
 import {
     MembershipExposeMeta,
     NamespaceExposeMeta,
     RequirementConstraintMembershipMeta,
     StateSubactionMembershipMeta,
-    TransitionFeatureMembershipMeta,
 } from "../relationships";
-import { ConstraintUsageMeta } from "../constraint-usage";
-import { ActionUsageMeta } from "../action-usage";
 import { AssertConstraintUsageMeta } from "../assert-constraint-usage";
 import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "../connector-as-usage";
-import { UsageMeta } from "../usage";
-import { ConnectionDefinitionOptions } from "../connection-definition";
+import { UsageMeta, UsageOptions } from "../usage";
 import { PortDefinitionMeta } from "../port-definition";
 import { StateDefinitionMeta } from "../state-definition";
 import { StateUsageMeta } from "../state-usage";
@@ -43,18 +37,11 @@ describe("Element factories", () => {
     let document: LangiumDocument;
 
     beforeAll(() => {
-        document = services.shared.workspace.LangiumDocumentFactory.fromString(
-            "",
-            URI.file("factory_test.kerml")
-        );
-
-        patchDocument(document);
+        document = emptyDocument("factory_test", ".kerml");
     });
 
     it("should construct namespace expose", () => {
-        const target = NamespaceMeta.create(id, document);
         const imp = NamespaceExposeMeta.create(id, document, {
-            target,
             importsAll: false,
             isRecursive: true,
         });
@@ -63,9 +50,7 @@ describe("Element factories", () => {
     });
 
     it("should construct membership expose", () => {
-        const target = MembershipMeta.create(id, document);
         const imp = MembershipExposeMeta.create(id, document, {
-            target,
             importsAll: false,
             isRecursive: true,
         });
@@ -76,7 +61,6 @@ describe("Element factories", () => {
     it("should assign kind to requirement constraint membership", () => {
         expect(
             RequirementConstraintMembershipMeta.create(id, document, {
-                target: ConstraintUsageMeta.create(id, document),
                 kind: "assumption",
             })
         ).toMatchObject({ kind: "assumption" });
@@ -85,19 +69,9 @@ describe("Element factories", () => {
     it("should assign kind to state subaction membership", () => {
         expect(
             StateSubactionMembershipMeta.create(id, document, {
-                target: ActionUsageMeta.create(id, document),
                 kind: "exit",
             })
         ).toMatchObject({ kind: "exit" });
-    });
-
-    it("should assign kind to transition feature membership", () => {
-        expect(
-            TransitionFeatureMembershipMeta.create(id, document, {
-                target: ConstraintUsageMeta.create(id, document),
-                kind: "guard",
-            })
-        ).toMatchObject({ kind: "guard" });
     });
 
     it("should apply invariant options to assert constraint usage", () => {
@@ -118,7 +92,7 @@ describe("Element factories", () => {
     });
 
     it("should apply definition options", () => {
-        const options: ConnectionDefinitionOptions = {
+        const options: UsageOptions = {
             isIndividual: true,
             isVariation: true,
         };

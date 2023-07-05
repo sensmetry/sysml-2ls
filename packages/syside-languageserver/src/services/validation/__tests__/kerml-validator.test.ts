@@ -503,3 +503,15 @@ describe("Subsettings", () => {
         );
     });
 });
+
+test("implicit annotations should not trigger validation", async () => {
+    return expectValidations(
+        `
+        alias A for B {
+            /* comment about alias */
+        }
+    `,
+        /related elements/,
+        0
+    );
+});

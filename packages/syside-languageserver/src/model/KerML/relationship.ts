@@ -45,7 +45,9 @@ export type NonNullRelationship<
     element(): NonNullable<never extends T ? ReturnType<R["element"]> : T>;
 };
 
-export type TargetType<T extends RelationshipMeta = RelationshipMeta> = ReturnType<T["element"]>;
+export type TargetType<T extends RelationshipMeta = RelationshipMeta> = NonNullable<
+    ReturnType<T["element"]>
+>;
 
 export type SourcePart<
     Parent extends ElementMeta | undefined = undefined,
@@ -56,7 +58,9 @@ export interface RelationshipOptionsBody<
     Target extends ElementMeta | undefined,
     Parent extends ElementMeta | undefined = undefined
 > extends ModelElementOptions<Parent> {
-    target: Target;
+    // target is optional since API always consumes `[edge, target]` pairs
+    // anyway
+    target?: Target;
     isImplied?: boolean;
     visibility?: Visibility;
 }
@@ -68,14 +72,16 @@ export type RelationshipOptions<
 > = RelationshipOptionsBody<Target, Parent> & SourcePart<Parent, Source>;
 
 @metamodelOf(Relationship, "abstract")
-export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> extends ElementMeta {
+export abstract class RelationshipMeta<
+    Target extends ElementMeta = ElementMeta
+> extends ElementMeta {
     protected _children = new ElementContainer<Element>();
 
     protected _visibility?: Visibility;
     protected _isImplied = false;
 
     protected _source?: ElementMeta;
-    protected _element?: T;
+    protected _element?: Target;
 
     override get comments(): readonly CommentMeta[] {
         return this._children.get(Comment).concat(this._comments);
@@ -112,7 +118,7 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
     }
 
     source(): ElementMeta | undefined {
-        return this._source || (this._owner as ElementMeta | undefined);
+        return this._source;
     }
 
     protected setSource(s: ElementMeta): void {
@@ -146,14 +152,14 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
      * The element at the end of this relationship, check for ownership by `element().owner()`
      * @see {@link setElement}
      */
-    element(): T | undefined {
+    element(): Target | undefined {
         return this._element;
     }
 
     /**
      * @see {@link element}
      */
-    protected setElement(e?: T): void {
+    protected setElement(e?: Target): void {
         if (this._element === e) return;
         const previous = this._element;
         this._element = e;
@@ -162,7 +168,7 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
     }
 
     // eslint-disable-next-line unused-imports/no-unused-vars
-    protected onTargetSet(previous?: T, current?: T): void {
+    protected onTargetSet(previous?: Target, current?: Target): void {
         // empty
     }
 
@@ -174,7 +180,7 @@ export abstract class RelationshipMeta<T extends ElementMeta = ElementMeta> exte
      * @returns final target of this relationship after following any existing
      * chaining features
      */
-    finalElement(): T | FeatureMeta | undefined {
+    finalElement(): Target | FeatureMeta | undefined {
         const target = this.element();
         return target?.is(Feature) && target.chainings.length > 0
             ? target.chainings.at(-1)?.element()

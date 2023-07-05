@@ -38,14 +38,14 @@ test.concurrent.each(["redefines", ":>>"])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: Redefinition,
                         ...withQualifiedName("Redef"),
-                        source: qualifiedTypeReference("a"),
-                        reference: qualifiedTypeReference("b"),
+                        sourceRef: qualifiedTypeReference("a"),
+                        targetRef: qualifiedTypeReference("b"),
                         elements: [
                             {
-                                element: {
+                                source: {
                                     body: "/* doc */",
                                 },
                             },
@@ -68,10 +68,10 @@ test.concurrent.each(["specialization", ""])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: Redefinition,
-                        source: qualifiedTypeReference("a"),
-                        reference: qualifiedTypeReference("b"),
+                        sourceRef: qualifiedTypeReference("a"),
+                        targetRef: qualifiedTypeReference("b"),
                     },
                 },
             ],
@@ -87,12 +87,12 @@ test("features can have multiple owned redefinitions", async () => {
         children: [
             ...anything(2),
             {
-                element: {
+                target: {
                     $type: Feature,
                     ...withQualifiedName("c"),
                     heritage: [
-                        { $type: Redefinition, reference: qualifiedTypeReference("a") },
-                        { $type: Redefinition, reference: qualifiedTypeReference("b") },
+                        { $type: Redefinition, targetRef: qualifiedTypeReference("a") },
+                        { $type: Redefinition, targetRef: qualifiedTypeReference("b") },
                     ],
                 },
             },
@@ -111,7 +111,7 @@ test("unnamed redefining features implicitly have the same name as the redefined
         feature :>> x;
     }`);
     expect(result).toMatchObject(NO_ERRORS);
-    expect(childrenNames(result.value.children[1].element, Visibility.private)).toStrictEqual([
+    expect(childrenNames(result.value.children[1].target, Visibility.private)).toStrictEqual([
         "B::x",
     ]);
 });

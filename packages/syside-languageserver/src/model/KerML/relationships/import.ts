@@ -19,6 +19,7 @@ import { Import } from "../../../generated/ast";
 import { enumerable } from "../../../utils";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import {
+    ElementMeta,
     MembershipMeta,
     NamespaceMeta,
     RelationshipMeta,
@@ -51,6 +52,28 @@ export abstract class ImportMeta<T extends Importable = Importable> extends Rela
     }
     set importsAll(value) {
         this._importsAll = value;
+    }
+
+    /**
+     * Adds new owned body elements and returns the new number of body elements.
+     */
+    addChild(...element: ElementMeta[]): number {
+        return this.addOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements and returns the new number of body elements.
+     */
+    removeChild(...element: ElementMeta[]): number {
+        return this.removeOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements by predicate and returns the new number of
+     * body elements.
+     */
+    removeChildIf(predicate: (element: ElementMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
     }
 
     override ast(): Import | undefined {

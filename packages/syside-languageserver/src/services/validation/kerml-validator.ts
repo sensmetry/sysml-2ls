@@ -216,7 +216,7 @@ export class KerMLValidator {
         if (func && !expr.isModelLevelEvaluable())
             accept("error", "Invalid filter expression, must be model-level evaluable", {
                 element: node,
-                property: "element",
+                property: "target",
             });
         else {
             const isBoolean = (expr: ExpressionMeta): boolean => {
@@ -243,7 +243,7 @@ export class KerMLValidator {
             if (!isBoolean(expr)) {
                 accept("error", "Invalid filter expression, must return boolean", {
                     element: node,
-                    property: "element",
+                    property: "target",
                 });
             }
         }
@@ -513,7 +513,7 @@ export class KerMLValidator {
     @validateKerML(ast.Relationship, { bounds: [ast.Type, ast.TypeRelationship, ast.Dependency] })
     /* istanbul ignore next (grammar doesn't allow triggering this validation) */
     validateRelationshipEnds(node: RelationshipMeta, accept: ModelValidationAcceptor): void {
-        if (!node.element() && !node.ast()?.reference) {
+        if (!node.element() && !node.ast()?.targetRef) {
             accept("error", "Invalid relationship, must have at least 2 related elements", {
                 element: node,
             });
@@ -527,7 +527,7 @@ export class KerMLValidator {
         node: ast.FeatureRelationship["$meta"] | InheritanceMeta,
         accept: ModelValidationAcceptor
     ): void {
-        if (!node.element() && !node.ast()?.reference) {
+        if (!node.element() && !node.ast()?.targetRef) {
             accept("error", "Invalid relationship, must have at least 2 related elements", {
                 element: node,
             });

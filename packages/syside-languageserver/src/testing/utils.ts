@@ -227,3 +227,17 @@ export function patchDocument(doc: LangiumDocument): LangiumDocument {
 
     return doc;
 }
+
+export function emptyDocument(
+    name?: string,
+    suffix: ".kerml" | ".sysml" = ".sysml"
+): LangiumDocument {
+    const document = services.shared.workspace.LangiumDocumentFactory.fromString(
+        "",
+        URI.file((name ?? generateString(8)) + suffix)
+    );
+
+    patchDocument(document);
+
+    return document;
+}

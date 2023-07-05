@@ -18,6 +18,7 @@ import { AstNode, LangiumDocument } from "langium";
 import { WhileLoopActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import {
+    Edge,
     ElementParts,
     ExpressionMeta,
     FeatureMeta,
@@ -28,8 +29,11 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 import { LoopActionUsageMeta, LoopActionUsageOptions } from "./loop-action-usage";
 
-// TODO: add condition, body, until
-export type WhileLoopActionUsageOptions = LoopActionUsageOptions;
+export interface WhileLoopActionUsageOptions extends LoopActionUsageOptions {
+    condition?: Edge<ParameterMembershipMeta, ExpressionMeta>;
+    body?: Edge<ParameterMembershipMeta, ActionUsageMeta>;
+    until?: Edge<ParameterMembershipMeta, ExpressionMeta>;
+}
 
 @metamodelOf(WhileLoopActionUsage, {
     base: "Actions::whileLoopActions",
@@ -44,24 +48,24 @@ export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
     public get condition(): ParameterMembershipMeta<ExpressionMeta> | undefined {
         return this._condition;
     }
-    public set condition(value: ParameterMembershipMeta<ExpressionMeta> | undefined) {
-        this._condition = value;
+    public set condition(value: Edge<ParameterMembershipMeta, ExpressionMeta> | undefined) {
+        this._condition = this.swapEdgeOwnership(this._condition, value);
     }
 
     @enumerable
     public get body(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
         return this._body;
     }
-    public set body(value: ParameterMembershipMeta<ActionUsageMeta>) {
-        this._body = value;
+    public set body(value: Edge<ParameterMembershipMeta, ActionUsageMeta> | undefined) {
+        this._body = this.swapEdgeOwnership(this._body, value);
     }
 
     @enumerable
     public get until(): ParameterMembershipMeta<ExpressionMeta> | undefined {
         return this._until;
     }
-    public set until(value: ParameterMembershipMeta<ExpressionMeta> | undefined) {
-        this._until = value;
+    public set until(value: Edge<ParameterMembershipMeta, ExpressionMeta> | undefined) {
+        this._until = this.swapEdgeOwnership(this._until, value);
     }
 
     override ast(): WhileLoopActionUsage | undefined {
@@ -85,10 +89,12 @@ export class WhileLoopActionUsageMeta extends LoopActionUsageMeta {
     }
 
     protected static applyWhileLoopOptions(
-        _model: WhileLoopActionUsageMeta,
-        _options: WhileLoopActionUsageOptions
+        model: WhileLoopActionUsageMeta,
+        options: WhileLoopActionUsageOptions
     ): void {
-        // empty
+        model.condition = options.condition;
+        model.body = options.body;
+        model.until = options.until;
     }
 
     static override create<T extends AstNode>(

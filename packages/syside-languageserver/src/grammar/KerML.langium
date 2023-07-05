@@ -48,7 +48,7 @@ Dependency returns Dependency:
 /* Annotations */
 
 OwnedAnnotation returns Annotation:
-    element=AnnotatingElement
+    source=AnnotatingElement
 ;
 
 AnnotatingElement returns AnnotatingElement:
@@ -82,23 +82,23 @@ fragment NamespaceBodyElement:
 ;
 
 NonFeatureMember returns OwningMembership:
-    Visibility? element=NonFeatureElement
+    Visibility? target=NonFeatureElement
 ;
 
 NamespaceFeatureMember returns OwningMembership:
-    Visibility? element=FeatureElement
+    Visibility? target=FeatureElement
 ;
 
 RelationshipMember returns OwningMembership:
-    Visibility? element=RelationshipElement
+    Visibility? target=RelationshipElement
 ;
 
 AnnotatingMember returns OwningMembership:
-    Visibility? element=AnnotatingElement
+    Visibility? target=AnnotatingElement
 ;
 
 AliasMember returns Membership:
-    Visibility? 'alias' Identification? 'for' reference=ElementReference RelationshipBody
+    Visibility? 'alias' Identification? 'for' targetRef=ElementReference RelationshipBody
 ;
 
 // Imports
@@ -110,14 +110,14 @@ fragment ImportPrefix:
 fragment ImportedReference:
     // TODO: split '::**' into 2 tokens,
     // https://github.com/langium/chevrotain-allstar/issues/1
-    reference=ElementReference (isNamespace='::*')? ( isRecursive?='::**' )?
+    targetRef=ElementReference (isNamespace='::*')? ( isRecursive?='::**' )?
 ;
 
 // modified import to work with Langium parser and completion suggestions,
 // the original rule is not parsed on reference errors and thus cannot
 // compute completions. Postprocessed in code to fit the spec AST
 Import returns Import:
-    ImportPrefix ImportedReference (element=FilterPackage)? RelationshipBody
+    ImportPrefix ImportedReference (target=FilterPackage)? RelationshipBody
 ;
 
 // MembershipImport returns MembershipImport:
@@ -125,18 +125,18 @@ Import returns Import:
 // ;
 
 // fragment ImportedMembership:
-//     reference=MembershipReference ( isRecursive?='::**' )?
+//     targetRef=MembershipReference ( isRecursive?='::**' )?
 // ;
 
 // NamespaceImport returns NamespaceImport:
 //     ImportPrefix
 //     ( ImportedNamespace
-// 	| element=FilterPackage
+// 	| target=FilterPackage
 // 	)
 // ;
 
 // fragment ImportedNamespace:
-//     reference=NamespaceReference '::*' ( isRecursive?='::**' )?
+//     targetRef=NamespaceReference '::*' ( isRecursive?='::**' )?
 // ;
 
 FilterPackage returns Package:
@@ -157,7 +157,7 @@ FilterPackage returns Package:
 // ;
 
 FilterPackageMember returns ElementFilterMembership:
-    '[' element=OwnedExpression ']'
+    '[' target=OwnedExpression ']'
 ;
 
 /* Namespace Elements */
@@ -236,7 +236,7 @@ fragment PackageBodyElement:
 ;
 
 ElementFilterMember returns ElementFilterMembership:
-    Visibility? 'filter' element=OwnedExpression ';'
+    Visibility? 'filter' target=OwnedExpression ';'
 ;
 
 /* Types */
@@ -306,67 +306,67 @@ FeatureMember returns OwningMembership:
 ;
 
 TypeFeatureMember returns OwningMembership:
-    Visibility? 'member' element=FeatureElement
+    Visibility? 'member' target=FeatureElement
 ;
 
 OwnedFeatureMember returns FeatureMembership:
-    Visibility? element=FeatureElement
+    Visibility? target=FeatureElement
 ;
 
 /* Specialization */
 
 Specialization returns Specialization:
     ( 'specialization' Identification? )? 'subtype' 
-    ( source=TypeReference | sourceChain=OwnedFeatureChain )
+    ( sourceRef=TypeReference | sourceChain=OwnedFeatureChain )
     SpecializesToken
-    ( reference=TypeReference | targetChain=OwnedFeatureChain )
+    ( targetRef=TypeReference | targetChain=OwnedFeatureChain )
     RelationshipBody
 ;
 
 OwnedSpecialization returns Specialization:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 /* Conjugation */
 
 Conjugation returns Conjugation:
     ( 'conjugation' Identification? )? 'conjugate' 
-    ( source=TypeReference | sourceChain=OwnedFeatureChain )
+    ( sourceRef=TypeReference | sourceChain=OwnedFeatureChain )
     ConjugatesToken
-    ( reference=TypeReference | targetChain=OwnedFeatureChain )
+    ( targetRef=TypeReference | targetChain=OwnedFeatureChain )
     RelationshipBody
 ;
 
 OwnedConjugation returns Conjugation:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 /* Disjoining */
 
 Disjoining returns Disjoining:
     ( 'disjoining' Identification? )? 'disjoint' 
-    ( source=TypeReference  | sourceChain=OwnedFeatureChain )
+    ( sourceRef=TypeReference  | sourceChain=OwnedFeatureChain )
     'from' 
-    ( reference=TypeReference | targetChain=OwnedFeatureChain )
+    ( targetRef=TypeReference | targetChain=OwnedFeatureChain )
     RelationshipBody
 ;
 
 OwnedDisjoining returns Disjoining:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 /* Unioning, Intersecting and Differencing */
 
 Unioning returns Unioning:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 Intersecting returns Intersecting:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 Differencing returns Differencing:
-    reference=TypeReference | targetChain=OwnedFeatureChain
+    targetRef=TypeReference | targetChain=OwnedFeatureChain
 ;
 
 /* CLASSIFIERS */
@@ -395,19 +395,19 @@ fragment ClassifierConjugationPart:
 
 Subclassification returns Subclassification:
     ( 'specialization' Identification? )?
-    'subclassifier' source=ClassifierReference
-    SpecializesToken reference=ClassifierReference
+    'subclassifier' sourceRef=ClassifierReference
+    SpecializesToken targetRef=ClassifierReference
     RelationshipBody
 ;
 
 OwnedSubclassification returns Subclassification:
-    reference=ClassifierReference
+    targetRef=ClassifierReference
 ;
 
 /* Classifier Conjugation */
 
 ClassifierConjugation returns Conjugation:
-    reference=ClassifierReference
+    targetRef=ClassifierReference
 ;
 
 /* FEATURES */
@@ -502,32 +502,32 @@ fragment Redefines:
 
 FeatureInverting returns FeatureInverting:
     ( 'inverting' Identification? )? 'inverse' 
-    ( source=FeatureReference | sourceChain=OwnedFeatureChain )
-    'of' ( reference=FeatureReference | targetChain=OwnedFeatureChain )
+    ( sourceRef=FeatureReference | sourceChain=OwnedFeatureChain )
+    'of' ( targetRef=FeatureReference | targetChain=OwnedFeatureChain )
     RelationshipBody
 ;
 
 OwnedFeatureInverting returns FeatureInverting:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 /* Type Featuring */
 
 TypeFeaturing returns TypeFeaturing:
-    'featuring' ( Identification? 'of')? source=FeatureReference
-    'by' reference=TypeReference
+    'featuring' ( Identification? 'of')? sourceRef=FeatureReference
+    'by' targetRef=TypeReference
     RelationshipBody
 ;
 
 OwnedTypeFeaturing returns TypeFeaturing:
-    reference=TypeReference
+    targetRef=TypeReference
 ;
 
 /* Feature Typing */
 
 FeatureTyping returns FeatureTyping:
     ( 'specialization' Identification? )?
-    'typing' source=FeatureReference
+    'typing' sourceRef=FeatureReference
     TypedByToken FeatureType
     RelationshipBody
 ;
@@ -536,32 +536,32 @@ FeatureTyping returns FeatureTyping:
 
 Subsetting returns Subsetting:
     ( 'specialization' Identification? )? 'subset' 
-    ( source=FeatureReference | sourceChain=OwnedFeatureChain )
+    ( sourceRef=FeatureReference | sourceChain=OwnedFeatureChain )
     SubsetsToken
-    ( reference=FeatureReference | targetChain=OwnedFeatureChain )
+    ( targetRef=FeatureReference | targetChain=OwnedFeatureChain )
     RelationshipBody
 ;
 
 OwnedSubsetting returns Subsetting:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 OwnedReferenceSubsetting returns ReferenceSubsetting:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 /* Redefinition */
 
 Redefinition returns Redefinition:
     ( 'specialization' Identification? )? 'redefinition' 
-    ( source=FeatureReference | sourceChain=OwnedFeatureChain )
+    ( sourceRef=FeatureReference | sourceChain=OwnedFeatureChain )
     RedefinesToken
-    ( reference=FeatureReference | targetChain=OwnedFeatureChain )
+    ( targetRef=FeatureReference | targetChain=OwnedFeatureChain )
     RelationshipBody
 ;
 
 OwnedRedefinition returns Redefinition:
-    reference=FeatureReference | targetChain=OwnedFeatureChain
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
 /* Feature Conjugation */
@@ -571,7 +571,7 @@ fragment FeatureConjugationPart:
 ;
 
 FeatureConjugation returns Conjugation:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 /* FEATURE VALUES */
@@ -584,15 +584,15 @@ fragment ValuePart:
 ;
 
 FeatureValue returns FeatureValue:
-    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) element=OwnedExpression
+    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) target=OwnedExpression
 ;
 
 FeatureValueExpression returns FeatureValue:
-    isInitial?=':=' element=OwnedExpression
+    isInitial?=':=' target=OwnedExpression
 ;
 
 // EmptyFeatureWriteMember returns OwningMembership:
-//     element=EmptyFeatureWrite
+//     target=EmptyFeatureWrite
 // ;
 
 // EmptyFeatureWrite returns Step:
@@ -601,7 +601,7 @@ FeatureValueExpression returns FeatureValue:
 // ;
 
 // EmptyTargetMember returns ParameterMembership:
-//     element=EmptyTargetParameter
+//     target=EmptyTargetParameter
 // ;
 
 // SysML type in KerML? Really?
@@ -610,7 +610,7 @@ FeatureValueExpression returns FeatureValue:
 // ;
 
 // TargetFeatureMember returns FeatureMembership:
-//     element=TargetFeature
+//     target=TargetFeature
 // ;
 
 // TargetFeature returns Feature:
@@ -618,11 +618,11 @@ FeatureValueExpression returns FeatureValue:
 // ;
 
 // EmptyFeatureMember returns FeatureMembership:
-//     element=EmptyFeature
+//     target=EmptyFeature
 // ;
 
 // EmptyParameterMember returns ParameterMembership:
-//     element=EmptyFeature
+//     target=EmptyFeature
 // ;
 
 /* MULTIPLICITIES */
@@ -640,7 +640,7 @@ MultiplicityRange returns MultiplicityRange:
 ;
 
 OwnedMultiplicity returns OwningMembership:
-    element=OwnedMultiplicityRange
+    target=OwnedMultiplicityRange
 ;
 
 OwnedMultiplicityRange returns MultiplicityRange:
@@ -652,7 +652,7 @@ fragment MultiplicityBounds:
 ;
 
 MultiplicityExpressionMember returns OwningMembership:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 /* CLASSIFICATION */
@@ -710,7 +710,7 @@ fragment NaryConnectorDeclaration:
 ;
 
 ConnectorEndMember returns EndFeatureMembership:
-    element=ConnectorEnd
+    target=ConnectorEnd
 ;
 
 ConnectorEnd returns Feature:
@@ -783,11 +783,11 @@ fragment FunctionBodyPart:
 ;
 
 ReturnFeatureMember returns ReturnParameterMembership:
-    Visibility? 'return' element=FeatureElement
+    Visibility? 'return' target=FeatureElement
 ;
 
 ResultExpressionMember returns ResultExpressionMembership:
-    Visibility? element=OwnedExpression
+    Visibility? target=OwnedExpression
 ;
 
 /* Expressions */
@@ -843,7 +843,7 @@ fragment ItemFlowDeclaration:
 ;
 
 ItemFeatureMember returns FeatureMembership:
-    element=ItemFeature
+    target=ItemFeature
 ;
 
 ItemFeature returns ItemFeature:
@@ -858,7 +858,7 @@ fragment ItemFeatureSpecializationPart:
 ;
 
 ItemFlowEndMember returns EndFeatureMembership:
-    element=ItemFlowEnd
+    target=ItemFlowEnd
 ;
 
 ItemFlowEnd returns ItemFlowEnd:
@@ -866,11 +866,11 @@ ItemFlowEnd returns ItemFlowEnd:
 ;
 
 ItemFlowEndSubsetting returns ReferenceSubsetting:
-    reference=FeatureReference '.' | targetChain=FeatureChainPrefix
+    targetRef=FeatureReference '.' | targetChain=FeatureChainPrefix
 ;
 
 ItemFlowFeatureMember returns FeatureMembership:
-    element=ItemFlowFeature
+    target=ItemFlowFeature
 ;
 
 ItemFlowFeature returns Feature:
@@ -878,7 +878,7 @@ ItemFlowFeature returns Feature:
 ;
 
 ItemFlowRedefinition returns Redefinition:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 /* METADATA */
@@ -888,11 +888,11 @@ Metaclass returns Metaclass:
 ;
 
 PrefixMetadataAnnotation returns Annotation:
-    element=PrefixMetadataFeature
+    source=PrefixMetadataFeature
 ;
 
 PrefixMetadataMember returns OwningMembership:
-    element=PrefixMetadataFeature
+    target=PrefixMetadataFeature
 ;
 
 fragment PrefixMetadata:
@@ -931,7 +931,7 @@ fragment MetadataBodyElement:
 ;
 
 MetadataBodyFeatureMember returns FeatureMembership:
-    element=MetadataBodyFeature
+    target=MetadataBodyFeature
 ;
 
 MetadataBodyFeature returns Feature:
@@ -950,7 +950,7 @@ ExpressionBody returns Expression:
 // Operator Expressions
 
 OwnedExpressionMember returns FeatureMembership:
-    element=OwnedExpression
+    target=OwnedExpression
 ;
 
 OwnedExpression returns Expression:
@@ -982,7 +982,7 @@ ImpliesExpressionReference returns FeatureReferenceExpression:
 ;
 
 ImpliesExpressionMember returns FeatureMembership:
-    element=ImpliesExpression
+    target=ImpliesExpression
 ;
 
 ImpliesExpression returns Expression:
@@ -994,7 +994,7 @@ OrExpressionReference returns FeatureReferenceExpression:
 ;
 
 OrExpressionMember returns FeatureMembership:
-    element=OrExpression
+    target=OrExpression
 ;
 
 OrExpression returns Expression:
@@ -1010,7 +1010,7 @@ XorExpressionReference returns FeatureReferenceExpression:
 ;
 
 XorExpressionMember returns FeatureMembership:
-    element=XorExpression
+    target=XorExpression
 ;
 
 XorExpression returns Expression:
@@ -1032,7 +1032,7 @@ EqualityExpressionReference returns FeatureReferenceExpression:
 ;
 
 EqualityExpressionMember returns FeatureMembership:
-    element=EqualityExpression
+    target=EqualityExpression
 ;
 
 EqualityExpression returns Expression:
@@ -1133,7 +1133,7 @@ BodyExpression returns FeatureReferenceExpression:
 ;
 
 ExpressionBodyMember returns FeatureMembership:
-    element=ExpressionBody
+    target=ExpressionBody
 ;
 
 // Sequence Expressions
@@ -1160,7 +1160,7 @@ fragment PositionalArgumentList:
 ;
 
 ArgumentMember returns ParameterMembership:
-    element=Argument
+    target=Argument
 ;
 
 Argument returns Feature:
@@ -1172,7 +1172,7 @@ fragment NamedArgumentList:
 ;
 
 NamedArgumentMember returns ParameterMembership:
-    element=NamedArgument
+    target=NamedArgument
 ;
 
 NamedArgument returns Feature:
@@ -1180,9 +1180,9 @@ NamedArgument returns Feature:
 ;
 
 ParameterRedefinition returns Redefinition:
-    reference=FeatureReference
+    targetRef=FeatureReference
 ;
 
 ArgumentValue returns FeatureValue:
-    element=OwnedExpression
+    target=OwnedExpression
 ;

@@ -18,14 +18,21 @@ import { AstNode, LangiumDocument } from "langium";
 import { Classifier, Inheritance, Subclassification } from "../../generated/ast";
 import { SubtypeKeys } from "../../services";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
-import { TypeMeta, TypeOptions } from "./_internal";
+import {
+    ConjugationMeta,
+    EdgeContainer,
+    SubclassificationMeta,
+    TypeMeta,
+    TypeOptions,
+} from "./_internal";
 
 export const ImplicitClassifiers = {
     base: "Base::Anything",
 };
 
-// TODO: add constrained heritage
-export type ClassifierOptions = TypeOptions;
+export interface ClassifierOptions extends TypeOptions {
+    heritage?: EdgeContainer<ConjugationMeta<ClassifierMeta> | SubclassificationMeta>;
+}
 
 @metamodelOf(Classifier, ImplicitClassifiers)
 export class ClassifierMeta extends TypeMeta {

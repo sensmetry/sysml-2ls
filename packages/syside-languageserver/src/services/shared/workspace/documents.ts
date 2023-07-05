@@ -72,6 +72,12 @@ declare module "langium" {
          * Model element diagnostics
          */
         modelDiagnostics: MultiMap<ElementMeta, ModelDiagnostic>;
+
+        /**
+         * Register additional clean up callbacks to be called on document
+         * invalidation
+         */
+        onInvalidated: MultiMap<ElementMeta, () => void>;
     }
 }
 
@@ -112,6 +118,7 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
         doc.namedElements = new Map();
         doc.astNodes = streamAst(doc.parseResult.value).toArray();
         doc.modelDiagnostics = new MultiMap();
+        doc.onInvalidated = new MultiMap();
 
         this.metamodelBuilder.onParsed(doc);
         return doc;
@@ -134,9 +141,18 @@ export class SysMLDocuments extends DefaultLangiumDocuments {
             doc.exports.clear();
             doc.namedElements.clear();
             doc.modelDiagnostics.clear();
+            doc.onInvalidated.values().forEach((cb) => cb());
+            doc.onInvalidated.clear();
             // no need to invalidate cached AST nodes since the document is not
             // reparsed here
         }
+
+        return doc;
+    }
+
+    override deleteDocument(uri: URI): LangiumDocument<AstNode> | undefined {
+        const doc = super.deleteDocument(uri);
+        doc?.onInvalidated.values().forEach((cb) => cb());
 
         return doc;
     }

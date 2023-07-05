@@ -19,6 +19,7 @@ import { MultiplicityRange } from "../../generated/ast";
 import { enumerable, LazyGetter } from "../../utils";
 import { ElementIDProvider, metamodelOf, MetatypeProto } from "../metamodel";
 import {
+    Edge,
     ElementParts,
     ExpressionMeta,
     MultiplicityMeta,
@@ -36,8 +37,9 @@ export interface Bounds {
     upper?: number;
 }
 
-// TODO: add range
-export type MultiplicityRangeOptions = MultiplicityOptions;
+export interface MultiplicityRangeOptions extends MultiplicityOptions {
+    range: Edge<OwningMembershipMeta, ExpressionMeta>;
+}
 
 @metamodelOf(MultiplicityRange, ImplicitMultiplicityRanges)
 export class MultiplicityRangeMeta extends MultiplicityMeta {
@@ -47,9 +49,8 @@ export class MultiplicityRangeMeta extends MultiplicityMeta {
     get range(): OwningMembershipMeta<ExpressionMeta> | undefined {
         return this._range;
     }
-    setRange(value: OwningMembershipMeta<ExpressionMeta>): this {
-        this._range = value;
-        return this;
+    set range(value: Edge<OwningMembershipMeta, ExpressionMeta> | undefined) {
+        this._range = this.swapEdgeOwnership(this._range, value);
     }
 
     @enumerable
@@ -57,7 +58,7 @@ export class MultiplicityRangeMeta extends MultiplicityMeta {
         if (typeof this._bounds === "function") return (this._bounds = this._bounds());
         return this._bounds === "unset" ? undefined : this._bounds;
     }
-    setBounds(value: Bounds | undefined | LazyGetter<Bounds | undefined>): this {
+    protected setBounds(value: Bounds | undefined | LazyGetter<Bounds | undefined>): this {
         this._bounds = value;
         return this;
     }
@@ -78,6 +79,7 @@ export class MultiplicityRangeMeta extends MultiplicityMeta {
         options?: MultiplicityRangeOptions
     ): T["$meta"] {
         const model = super.create(provider, document, options) as MultiplicityRangeMeta;
+        if (options) model.range = options.range;
         return model;
     }
 }

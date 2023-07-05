@@ -28,14 +28,14 @@ test("type featuring can be parsed", async () => {
         children: [
             ...anything(2),
             {
-                element: {
+                target: {
                     $type: TypeFeaturing,
                     ...withQualifiedName("engine_by_Vehicle"),
-                    source: qualifiedTypeReference("engine"),
-                    reference: qualifiedTypeReference("Vehicle"),
+                    sourceRef: qualifiedTypeReference("engine"),
+                    targetRef: qualifiedTypeReference("Vehicle"),
                     elements: [
                         {
-                            element: {
+                            source: {
                                 body: "/* doc */",
                             },
                         },
@@ -57,10 +57,10 @@ test.each(["of", ""])(
             children: [
                 ...anything(2),
                 {
-                    element: {
+                    target: {
                         $type: TypeFeaturing,
-                        source: qualifiedTypeReference("engine"),
-                        reference: qualifiedTypeReference("Vehicle"),
+                        sourceRef: qualifiedTypeReference("engine"),
+                        targetRef: qualifiedTypeReference("Vehicle"),
                     },
                 },
             ],
@@ -77,14 +77,14 @@ test("features can own type featurings", async () => {
         children: [
             ...anything(2),
             {
-                element: {
+                target: {
                     $type: Feature,
                     ...withQualifiedName("engine"),
                     heritage: [
-                        { $type: FeatureTyping, reference: qualifiedTypeReference("Engine") },
+                        { $type: FeatureTyping, targetRef: qualifiedTypeReference("Engine") },
                     ],
                     typeRelationships: [
-                        { $type: TypeFeaturing, reference: qualifiedTypeReference("Vehicle") },
+                        { $type: TypeFeaturing, targetRef: qualifiedTypeReference("Vehicle") },
                     ],
                 },
             },

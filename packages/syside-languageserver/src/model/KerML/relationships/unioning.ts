@@ -20,7 +20,6 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import { RelationshipMeta, RelationshipOptions, TypeMeta } from "../_internal";
 
 @metamodelOf(Unioning)
-// @ts-expect-error ignoring static inheritance error
 export class UnioningMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
     override ast(): Unioning | undefined {
         return this._ast as Unioning;

@@ -25,6 +25,10 @@ import { BasicMetamodel } from "./metamodel";
 export class ElementContainer<T extends Element = Element>
     implements Iterable<T["$meta"]>, JSONConvertible<readonly T["$meta"][]>
 {
+    constructor(...items: T["$meta"][]) {
+        this.elements = items;
+    }
+
     toJSON(): readonly T["$meta"][] {
         return this.all;
     }
@@ -33,8 +37,6 @@ export class ElementContainer<T extends Element = Element>
         return this.elements.values()[Symbol.iterator]();
     }
 
-    // we don't (allow to) remove stored elements at the moment so use array
-    // here
     protected readonly elements: T["$meta"][] = [];
     protected caches = new Map<string | object, T["$meta"][]>();
 
@@ -47,16 +49,29 @@ export class ElementContainer<T extends Element = Element>
      */
     clear(): void {
         this.elements.length = 0;
-        this.caches.clear();
+        this.invalidateCaches();
     }
 
     /**
      * Add a new element
      * @param element
      */
-    add(...element: T["$meta"][]): void {
-        this.elements.push(...element);
-        this.caches.clear();
+    push(...element: T["$meta"][]): number {
+        this.invalidateCaches();
+        return this.elements.push(...element);
+    }
+
+    remove(value: T["$meta"]): boolean {
+        return removeObserved(this.elements, () => this.invalidateCaches(), value);
+    }
+
+    removeIf(predicate: (value: T["$meta"], index: number) => boolean): number {
+        if (this.elements.length !== this.elements.removeIf(predicate)) this.invalidateCaches();
+        return this.elements.length;
+    }
+
+    get length(): number {
+        return this.elements.length;
     }
 
     /**
@@ -101,4 +116,77 @@ export class ElementContainer<T extends Element = Element>
     get all(): readonly T["$meta"][] {
         return this.elements;
     }
+}
+
+declare global {
+    interface Array<T> {
+        /**
+         * Remove a specific value from an array
+         * @param value value to remove
+         * @returns true if `value` was removed
+         */
+        remove(value: T): boolean;
+
+        /**
+         * Remove all values matching `predicate`. For small number of values to
+         * remove (up to about 10), {@link remove} on each will be faster.
+         * @param predicate predicate that returns `true` for values that should
+         * be removed
+         * @returns the new length of the array
+         */
+        removeIf(predicate: (value: T, index: number) => boolean): number;
+    }
+}
+
+Array.prototype.removeIf = function (this, predicate): number {
+    const total = this.length;
+
+    let from = 0,
+        to = 0;
+    while (from < total) {
+        const value = this[from];
+        if (!predicate(value, from)) {
+            this[to] = value;
+            to++;
+        }
+        from++;
+    }
+    this.length = to;
+
+    return this.length;
+};
+
+Array.prototype.remove = function (this, value): boolean {
+    const index = this.indexOf(value);
+    if (index !== -1) {
+        this.splice(index, 1);
+        return true;
+    }
+    return false;
+};
+
+export function removeObserved<T>(
+    array: Pick<T[], "remove">,
+    observer: (value: T) => void,
+    value: T
+): boolean {
+    if (array.remove(value)) {
+        observer(value);
+        return true;
+    }
+    return false;
+}
+
+export function removeIfObserved<T>(
+    array: Pick<T[], "removeIf">,
+    observer: (value: T, index: number) => void,
+    predicate: (value: T, index: number) => boolean
+): number {
+    return array.removeIf((value, index) => {
+        if (predicate(value, index)) {
+            observer(value, index);
+            return true;
+        }
+        return false;
+    });
 }

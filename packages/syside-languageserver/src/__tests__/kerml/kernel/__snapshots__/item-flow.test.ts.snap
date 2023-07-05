@@ -8,19 +8,21 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
   "ends": [
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -34,7 +36,7 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -44,7 +46,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -53,7 +56,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -72,7 +74,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -82,7 +85,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -93,11 +97,9 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -113,14 +115,13 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -130,7 +131,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelOut",
@@ -139,7 +141,7 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -149,7 +151,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -158,7 +161,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -177,7 +179,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -187,7 +190,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -198,16 +202,13 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "fuelTank",
@@ -218,7 +219,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -228,7 +230,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -239,11 +242,9 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -259,23 +260,24 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -289,7 +291,7 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -299,7 +301,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -308,7 +311,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -327,7 +329,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -337,7 +340,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -348,11 +352,9 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -368,14 +370,13 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -385,7 +386,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelIn",
@@ -394,7 +396,7 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -404,7 +406,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -413,7 +416,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -432,7 +434,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -442,7 +445,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -453,16 +457,13 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "engine",
@@ -473,7 +474,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -483,7 +485,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -494,11 +497,9 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -514,7 +515,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
   ],
   "heritage": [],
@@ -523,14 +523,15 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
   "isSufficient": false,
   "item": {
     "$type": "FeatureMembership",
-    "element": {
+    "elements": [],
+    "target": {
       "$type": "ItemFeature",
       "children": [],
       "heritage": [
         {
           "$type": "FeatureTyping",
           "elements": [],
-          "reference": {
+          "targetRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -540,7 +541,8 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                   "children": [
                     {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Class",
                         "children": [],
                         "declaredName": "SubFuel",
@@ -549,7 +551,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                   ],
                   "declaredName": "Fuel",
@@ -569,7 +570,6 @@ exports[`explicit declaration with name only is treated as typing 1`] = `
       "prefixes": [],
       "typeRelationships": [],
     },
-    "elements": [],
   },
   "prefixes": [],
   "typeRelationships": [],
@@ -584,19 +584,21 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
   "ends": [
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -610,7 +612,7 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -620,7 +622,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -629,7 +632,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -648,7 +650,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -658,7 +661,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -669,11 +673,9 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -689,14 +691,13 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -706,7 +707,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelOut",
@@ -715,7 +717,7 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -725,7 +727,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -734,7 +737,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -753,7 +755,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -763,7 +766,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -774,16 +778,13 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "fuelTank",
@@ -794,7 +795,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -804,7 +806,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -815,11 +818,9 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -835,23 +836,24 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -865,7 +867,7 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -875,7 +877,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -884,7 +887,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -903,7 +905,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -913,7 +916,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -924,11 +928,9 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -944,14 +946,13 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -961,7 +962,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelIn",
@@ -970,7 +972,7 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -980,7 +982,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -989,7 +992,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1008,7 +1010,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1018,7 +1021,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1029,16 +1033,13 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "engine",
@@ -1049,7 +1050,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -1059,7 +1061,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -1070,11 +1073,9 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -1090,7 +1091,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
   ],
   "heritage": [],
@@ -1099,14 +1099,15 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
   "isSufficient": false,
   "item": {
     "$type": "FeatureMembership",
-    "element": {
+    "elements": [],
+    "target": {
       "$type": "ItemFeature",
       "children": [],
       "heritage": [
         {
           "$type": "FeatureTyping",
           "elements": [],
-          "reference": {
+          "targetRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -1116,7 +1117,8 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                   "children": [
                     {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Class",
                         "children": [],
                         "declaredName": "SubFuel",
@@ -1125,7 +1127,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                   ],
                   "declaredName": "Fuel",
@@ -1157,7 +1158,6 @@ exports[`explicit declaration with qualified name only is treated as typing 1`] 
       "prefixes": [],
       "typeRelationships": [],
     },
-    "elements": [],
   },
   "prefixes": [],
   "typeRelationships": [],
@@ -1172,19 +1172,21 @@ exports[`flow declaration can also include an explicit declaration of the type 1
   "ends": [
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -1198,7 +1200,7 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -1208,7 +1210,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -1217,7 +1220,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1236,7 +1238,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1246,7 +1249,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1257,11 +1261,9 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -1277,14 +1279,13 @@ exports[`flow declaration can also include an explicit declaration of the type 1
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -1294,7 +1295,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelOut",
@@ -1303,7 +1305,7 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -1313,7 +1315,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -1322,7 +1325,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1341,7 +1343,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1351,7 +1354,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1362,16 +1366,13 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "fuelTank",
@@ -1382,7 +1383,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -1392,7 +1394,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -1403,11 +1406,9 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -1423,23 +1424,24 @@ exports[`flow declaration can also include an explicit declaration of the type 1
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -1453,7 +1455,7 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -1463,7 +1465,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -1472,7 +1475,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1491,7 +1493,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1501,7 +1504,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1512,11 +1516,9 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -1532,14 +1534,13 @@ exports[`flow declaration can also include an explicit declaration of the type 1
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -1549,7 +1550,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelIn",
@@ -1558,7 +1560,7 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -1568,7 +1570,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -1577,7 +1580,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1596,7 +1598,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1606,7 +1609,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1617,16 +1621,13 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "engine",
@@ -1637,7 +1638,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -1647,7 +1649,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -1658,11 +1661,9 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -1678,7 +1679,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
   ],
   "heritage": [],
@@ -1687,7 +1687,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
   "isSufficient": false,
   "item": {
     "$type": "FeatureMembership",
-    "element": {
+    "elements": [],
+    "target": {
       "$type": "ItemFeature",
       "children": [],
       "declaredName": "fuelFlow",
@@ -1695,7 +1696,7 @@ exports[`flow declaration can also include an explicit declaration of the type 1
         {
           "$type": "FeatureTyping",
           "elements": [],
-          "reference": {
+          "targetRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -1705,7 +1706,8 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                   "children": [
                     {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Class",
                         "children": [],
                         "declaredName": "SubFuel",
@@ -1714,7 +1716,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                   ],
                   "declaredName": "Fuel",
@@ -1734,7 +1735,6 @@ exports[`flow declaration can also include an explicit declaration of the type 1
       "prefixes": [],
       "typeRelationships": [],
     },
-    "elements": [],
   },
   "prefixes": [],
   "typeRelationships": [],
@@ -1749,19 +1749,21 @@ exports[`flow identification can be omitted 1`] = `
   "ends": [
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -1775,7 +1777,7 @@ exports[`flow identification can be omitted 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -1785,7 +1787,8 @@ exports[`flow identification can be omitted 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -1794,7 +1797,6 @@ exports[`flow identification can be omitted 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1813,7 +1815,8 @@ exports[`flow identification can be omitted 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1823,7 +1826,8 @@ exports[`flow identification can be omitted 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1834,11 +1838,9 @@ exports[`flow identification can be omitted 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -1854,14 +1856,13 @@ exports[`flow identification can be omitted 1`] = `
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -1871,7 +1872,8 @@ exports[`flow identification can be omitted 1`] = `
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelOut",
@@ -1880,7 +1882,7 @@ exports[`flow identification can be omitted 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -1890,7 +1892,8 @@ exports[`flow identification can be omitted 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -1899,7 +1902,6 @@ exports[`flow identification can be omitted 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -1918,7 +1920,8 @@ exports[`flow identification can be omitted 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -1928,7 +1931,8 @@ exports[`flow identification can be omitted 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -1939,16 +1943,13 @@ exports[`flow identification can be omitted 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "fuelTank",
@@ -1959,7 +1960,8 @@ exports[`flow identification can be omitted 1`] = `
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -1969,7 +1971,8 @@ exports[`flow identification can be omitted 1`] = `
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -1980,11 +1983,9 @@ exports[`flow identification can be omitted 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -2000,23 +2001,24 @@ exports[`flow identification can be omitted 1`] = `
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -2030,7 +2032,7 @@ exports[`flow identification can be omitted 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2040,7 +2042,8 @@ exports[`flow identification can be omitted 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -2049,7 +2052,6 @@ exports[`flow identification can be omitted 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -2068,7 +2070,8 @@ exports[`flow identification can be omitted 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2078,7 +2081,8 @@ exports[`flow identification can be omitted 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2089,11 +2093,9 @@ exports[`flow identification can be omitted 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -2109,14 +2111,13 @@ exports[`flow identification can be omitted 1`] = `
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -2126,7 +2127,8 @@ exports[`flow identification can be omitted 1`] = `
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelIn",
@@ -2135,7 +2137,7 @@ exports[`flow identification can be omitted 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2145,7 +2147,8 @@ exports[`flow identification can be omitted 1`] = `
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -2154,7 +2157,6 @@ exports[`flow identification can be omitted 1`] = `
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -2173,7 +2175,8 @@ exports[`flow identification can be omitted 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2183,7 +2186,8 @@ exports[`flow identification can be omitted 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2194,16 +2198,13 @@ exports[`flow identification can be omitted 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "engine",
@@ -2214,7 +2215,8 @@ exports[`flow identification can be omitted 1`] = `
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -2224,7 +2226,8 @@ exports[`flow identification can be omitted 1`] = `
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -2235,11 +2238,9 @@ exports[`flow identification can be omitted 1`] = `
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -2255,7 +2256,6 @@ exports[`flow identification can be omitted 1`] = `
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
   ],
   "heritage": [],
@@ -2276,19 +2276,21 @@ exports[`flow source and output targets can be specified using feature chains 1`
   "ends": [
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -2302,7 +2304,7 @@ exports[`flow source and output targets can be specified using feature chains 1`
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2312,7 +2314,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -2321,7 +2324,6 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -2340,7 +2342,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2350,7 +2353,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2361,11 +2365,9 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -2381,14 +2383,13 @@ exports[`flow source and output targets can be specified using feature chains 1`
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -2398,7 +2399,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelOut",
@@ -2407,7 +2409,7 @@ exports[`flow source and output targets can be specified using feature chains 1`
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2417,7 +2419,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -2426,7 +2429,6 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -2445,7 +2447,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2455,7 +2458,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2466,16 +2470,13 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "fuelTank",
@@ -2486,7 +2487,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -2496,7 +2498,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -2507,11 +2510,9 @@ exports[`flow source and output targets can be specified using feature chains 1`
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -2527,23 +2528,24 @@ exports[`flow source and output targets can be specified using feature chains 1`
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -2557,7 +2559,7 @@ exports[`flow source and output targets can be specified using feature chains 1`
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2567,7 +2569,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -2576,7 +2579,6 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -2595,7 +2597,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2605,7 +2608,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2616,11 +2620,9 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -2636,14 +2638,13 @@ exports[`flow source and output targets can be specified using feature chains 1`
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [
           {
             "$type": "ReferenceSubsetting",
             "elements": [],
-            "reference": {
+            "targetRef": {
               "$type": "FeatureReference",
               "parts": [
                 {
@@ -2653,7 +2654,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                     "children": [
                       {
                         "$type": "FeatureMembership",
-                        "element": {
+                        "elements": [],
+                        "target": {
                           "$type": "Feature",
                           "children": [],
                           "declaredName": "fuelIn",
@@ -2662,7 +2664,7 @@ exports[`flow source and output targets can be specified using feature chains 1`
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2672,7 +2674,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                       "children": [
                                         {
                                           "$type": "OwningMembership",
-                                          "element": {
+                                          "elements": [],
+                                          "target": {
                                             "$type": "Class",
                                             "children": [],
                                             "declaredName": "SubFuel",
@@ -2681,7 +2684,6 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                             "prefixes": [],
                                             "typeRelationships": [],
                                           },
-                                          "elements": [],
                                         },
                                       ],
                                       "declaredName": "Fuel",
@@ -2700,7 +2702,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2710,7 +2713,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2721,16 +2725,13 @@ exports[`flow source and output targets can be specified using feature chains 1`
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
                         },
-                        "elements": [],
                       },
                     ],
                     "declaredName": "engine",
@@ -2741,7 +2742,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                     "isSufficient": false,
                     "multiplicity": {
                       "$type": "OwningMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "MultiplicityRange",
                         "children": [],
                         "heritage": [],
@@ -2751,7 +2753,8 @@ exports[`flow source and output targets can be specified using feature chains 1`
                         "prefixes": [],
                         "range": {
                           "$type": "OwningMembership",
-                          "element": {
+                          "elements": [],
+                          "target": {
                             "$type": "LiteralNumber",
                             "children": [],
                             "heritage": [],
@@ -2762,11 +2765,9 @@ exports[`flow source and output targets can be specified using feature chains 1`
                             "prefixes": [],
                             "typeRelationships": [],
                           },
-                          "elements": [],
                         },
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                     "prefixes": [],
                     "typeRelationships": [],
@@ -2782,7 +2783,6 @@ exports[`flow source and output targets can be specified using feature chains 1`
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
   ],
   "heritage": [],
@@ -2803,19 +2803,21 @@ exports[`named item flows are parsed 1`] = `
   "ends": [
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -2825,7 +2827,8 @@ exports[`named item flows are parsed 1`] = `
                           "children": [
                             {
                               "$type": "FeatureMembership",
-                              "element": {
+                              "elements": [],
+                              "target": {
                                 "$type": "Feature",
                                 "children": [],
                                 "declaredName": "fuelOut",
@@ -2834,7 +2837,7 @@ exports[`named item flows are parsed 1`] = `
                                   {
                                     "$type": "FeatureTyping",
                                     "elements": [],
-                                    "reference": {
+                                    "targetRef": {
                                       "$type": "TypeReference",
                                       "parts": [
                                         {
@@ -2858,7 +2861,8 @@ exports[`named item flows are parsed 1`] = `
                                 "isSufficient": false,
                                 "multiplicity": {
                                   "$type": "OwningMembership",
-                                  "element": {
+                                  "elements": [],
+                                  "target": {
                                     "$type": "MultiplicityRange",
                                     "children": [],
                                     "heritage": [],
@@ -2868,7 +2872,8 @@ exports[`named item flows are parsed 1`] = `
                                     "prefixes": [],
                                     "range": {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "LiteralNumber",
                                         "children": [],
                                         "heritage": [],
@@ -2879,16 +2884,13 @@ exports[`named item flows are parsed 1`] = `
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                     "typeRelationships": [],
                                   },
-                                  "elements": [],
                                 },
                                 "prefixes": [],
                                 "typeRelationships": [],
                               },
-                              "elements": [],
                             },
                           ],
                           "declaredName": "fuelTank",
@@ -2899,7 +2901,8 @@ exports[`named item flows are parsed 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2909,7 +2912,8 @@ exports[`named item flows are parsed 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2920,11 +2924,9 @@ exports[`named item flows are parsed 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -2941,7 +2943,7 @@ exports[`named item flows are parsed 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -2965,7 +2967,8 @@ exports[`named item flows are parsed 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -2975,7 +2978,8 @@ exports[`named item flows are parsed 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -2986,11 +2990,9 @@ exports[`named item flows are parsed 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -3006,7 +3008,6 @@ exports[`named item flows are parsed 1`] = `
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [],
@@ -3016,23 +3017,24 @@ exports[`named item flows are parsed 1`] = `
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
     {
       "$type": "EndFeatureMembership",
-      "element": {
+      "elements": [],
+      "target": {
         "$type": "ItemFlowEnd",
         "children": [
           {
             "$type": "FeatureMembership",
-            "element": {
+            "elements": [],
+            "target": {
               "$type": "Feature",
               "children": [],
               "heritage": [
                 {
                   "$type": "Redefinition",
                   "elements": [],
-                  "reference": {
+                  "targetRef": {
                     "$type": "FeatureReference",
                     "parts": [
                       {
@@ -3042,7 +3044,8 @@ exports[`named item flows are parsed 1`] = `
                           "children": [
                             {
                               "$type": "FeatureMembership",
-                              "element": {
+                              "elements": [],
+                              "target": {
                                 "$type": "Feature",
                                 "children": [],
                                 "declaredName": "fuelIn",
@@ -3051,7 +3054,7 @@ exports[`named item flows are parsed 1`] = `
                                   {
                                     "$type": "FeatureTyping",
                                     "elements": [],
-                                    "reference": {
+                                    "targetRef": {
                                       "$type": "TypeReference",
                                       "parts": [
                                         {
@@ -3075,7 +3078,8 @@ exports[`named item flows are parsed 1`] = `
                                 "isSufficient": false,
                                 "multiplicity": {
                                   "$type": "OwningMembership",
-                                  "element": {
+                                  "elements": [],
+                                  "target": {
                                     "$type": "MultiplicityRange",
                                     "children": [],
                                     "heritage": [],
@@ -3085,7 +3089,8 @@ exports[`named item flows are parsed 1`] = `
                                     "prefixes": [],
                                     "range": {
                                       "$type": "OwningMembership",
-                                      "element": {
+                                      "elements": [],
+                                      "target": {
                                         "$type": "LiteralNumber",
                                         "children": [],
                                         "heritage": [],
@@ -3096,16 +3101,13 @@ exports[`named item flows are parsed 1`] = `
                                         "prefixes": [],
                                         "typeRelationships": [],
                                       },
-                                      "elements": [],
                                     },
                                     "typeRelationships": [],
                                   },
-                                  "elements": [],
                                 },
                                 "prefixes": [],
                                 "typeRelationships": [],
                               },
-                              "elements": [],
                             },
                           ],
                           "declaredName": "engine",
@@ -3129,7 +3131,7 @@ exports[`named item flows are parsed 1`] = `
                             {
                               "$type": "FeatureTyping",
                               "elements": [],
-                              "reference": {
+                              "targetRef": {
                                 "$type": "TypeReference",
                                 "parts": [
                                   {
@@ -3153,7 +3155,8 @@ exports[`named item flows are parsed 1`] = `
                           "isSufficient": false,
                           "multiplicity": {
                             "$type": "OwningMembership",
-                            "element": {
+                            "elements": [],
+                            "target": {
                               "$type": "MultiplicityRange",
                               "children": [],
                               "heritage": [],
@@ -3163,7 +3166,8 @@ exports[`named item flows are parsed 1`] = `
                               "prefixes": [],
                               "range": {
                                 "$type": "OwningMembership",
-                                "element": {
+                                "elements": [],
+                                "target": {
                                   "$type": "LiteralNumber",
                                   "children": [],
                                   "heritage": [],
@@ -3174,11 +3178,9 @@ exports[`named item flows are parsed 1`] = `
                                   "prefixes": [],
                                   "typeRelationships": [],
                                 },
-                                "elements": [],
                               },
                               "typeRelationships": [],
                             },
-                            "elements": [],
                           },
                           "prefixes": [],
                           "typeRelationships": [],
@@ -3194,7 +3196,6 @@ exports[`named item flows are parsed 1`] = `
               "prefixes": [],
               "typeRelationships": [],
             },
-            "elements": [],
           },
         ],
         "heritage": [],
@@ -3204,7 +3205,6 @@ exports[`named item flows are parsed 1`] = `
         "prefixes": [],
         "typeRelationships": [],
       },
-      "elements": [],
     },
   ],
   "heritage": [],

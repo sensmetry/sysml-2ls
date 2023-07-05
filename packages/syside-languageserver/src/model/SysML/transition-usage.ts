@@ -24,6 +24,7 @@ import {
 } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import {
+    Edge,
     ElementParts,
     ExpressionMeta,
     FeatureMeta,
@@ -37,10 +38,17 @@ import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 import { TransitionFeatureMembershipMeta } from "./relationships";
 import { SuccessionAsUsageMeta } from "./succession-as-usage";
-import { UsageMeta } from "./usage";
 
-// TODO: add source, accepter, guard, effect, then, else
-export type TransitionUsageOptions = ActionUsageOptions;
+export interface TransitionUsageOptions extends ActionUsageOptions {
+    source?: Edge<MembershipMeta, FeatureMeta>;
+    transitionLinkSource?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    payload?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    accepter?: Edge<TransitionFeatureMembershipMeta, AcceptActionUsageMeta>;
+    guard?: Edge<TransitionFeatureMembershipMeta, ExpressionMeta>;
+    effect?: Edge<TransitionFeatureMembershipMeta, ActionUsageMeta>;
+    then?: Edge<OwningMembershipMeta, SuccessionAsUsageMeta>;
+    else?: Edge<OwningMembershipMeta, SuccessionAsUsageMeta>;
+}
 
 @metamodelOf(TransitionUsage, {
     base: "Actions::transitionActions",
@@ -49,8 +57,8 @@ export type TransitionUsageOptions = ActionUsageOptions;
 })
 export class TransitionUsageMeta extends ActionUsageMeta {
     private _source?: MembershipMeta<FeatureMeta> | undefined;
-    private _transitionLinkSource: ParameterMembershipMeta<UsageMeta>;
-    private _payload: ParameterMembershipMeta<UsageMeta>;
+    private _transitionLinkSource: ParameterMembershipMeta<ReferenceUsageMeta>;
+    private _payload: ParameterMembershipMeta<ReferenceUsageMeta>;
     private _accepter?: TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined;
     private _guard?: TransitionFeatureMembershipMeta<ExpressionMeta> | undefined;
     private _effect?: TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined;
@@ -61,56 +69,70 @@ export class TransitionUsageMeta extends ActionUsageMeta {
     public get source(): MembershipMeta<FeatureMeta> | undefined {
         return this._source;
     }
-    public set source(value: MembershipMeta<FeatureMeta> | undefined) {
-        this._source = value;
+    public set source(value: Edge<MembershipMeta, FeatureMeta> | undefined) {
+        this._source = this.swapEdgeOwnership(this._source, value);
     }
 
-    public get transitionLinkSource(): ParameterMembershipMeta<UsageMeta> {
+    public get transitionLinkSource(): ParameterMembershipMeta<ReferenceUsageMeta> {
         return this._transitionLinkSource;
     }
+    // this is not optional since it will always be created implicitly and
+    // shouldn't be modified interactively anyway
+    public set transitionLinkSource(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta>) {
+        this._transitionLinkSource = this.swapEdgeOwnership(this._transitionLinkSource, value);
+    }
 
-    public get payload(): ParameterMembershipMeta<UsageMeta> | undefined {
+    public get payload(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._accepter ? this._payload : undefined;
+    }
+    // same non-optional as transitionLinkSource
+    public set payload(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta>) {
+        this._payload = this.swapEdgeOwnership(this._payload, value);
     }
 
     @enumerable
     public get accepter(): TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined {
         return this._accepter;
     }
-    public set accepter(value: TransitionFeatureMembershipMeta<AcceptActionUsageMeta> | undefined) {
-        this._accepter = value;
+    public set accepter(
+        value: Edge<TransitionFeatureMembershipMeta, AcceptActionUsageMeta> | undefined
+    ) {
+        this._accepter = this.swapEdgeOwnership(this._accepter, value);
+        if (this._accepter) this._accepter["_kind"] = "trigger";
     }
 
     @enumerable
     public get guard(): TransitionFeatureMembershipMeta<ExpressionMeta> | undefined {
         return this._guard;
     }
-    public set guard(value: TransitionFeatureMembershipMeta<ExpressionMeta> | undefined) {
-        this._guard = value;
+    public set guard(value: Edge<TransitionFeatureMembershipMeta, ExpressionMeta> | undefined) {
+        this._guard = this.swapEdgeOwnership(this._guard, value);
+        if (this._guard) this._guard["_kind"] = "guard";
     }
 
     @enumerable
     public get effect(): TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined {
         return this._effect;
     }
-    public set effect(value: TransitionFeatureMembershipMeta<ActionUsageMeta> | undefined) {
-        this._effect = value;
+    public set effect(value: Edge<TransitionFeatureMembershipMeta, ActionUsageMeta> | undefined) {
+        this._effect = this.swapEdgeOwnership(this._effect, value);
+        if (this._effect) this._effect["_kind"] = "effect";
     }
 
     @enumerable
     public get then(): OwningMembershipMeta<SuccessionAsUsageMeta> | undefined {
         return this._then;
     }
-    public set then(value: OwningMembershipMeta<SuccessionAsUsageMeta> | undefined) {
-        this._then = value;
+    public set then(value: Edge<OwningMembershipMeta, SuccessionAsUsageMeta> | undefined) {
+        this._then = this.swapEdgeOwnership(this._then, value);
     }
 
     @enumerable
     public get else(): OwningMembershipMeta<SuccessionAsUsageMeta> | undefined {
         return this._else;
     }
-    public set else(value: OwningMembershipMeta<SuccessionAsUsageMeta> | undefined) {
-        this._else = value;
+    public set else(value: Edge<OwningMembershipMeta, SuccessionAsUsageMeta> | undefined) {
+        this._else = this.swapEdgeOwnership(this._else, value);
     }
 
     override defaultSupertype(): string {
@@ -186,10 +208,17 @@ export class TransitionUsageMeta extends ActionUsageMeta {
     }
 
     protected static applyTransitionOptions(
-        _model: TransitionUsageMeta,
-        _options: TransitionUsageOptions
+        model: TransitionUsageMeta,
+        options: TransitionUsageOptions
     ): void {
-        // empty
+        model.source = options.source;
+        if (options.transitionLinkSource) model.transitionLinkSource = options.transitionLinkSource;
+        if (options.payload) model.payload = options.payload;
+        model.accepter = options.accepter;
+        model.guard = options.guard;
+        model.effect = options.effect;
+        model.then = options.then;
+        model.else = options.else;
     }
 
     static override create<T extends AstNode>(
@@ -202,6 +231,7 @@ export class TransitionUsageMeta extends ActionUsageMeta {
         if (options) TransitionUsageMeta.applyTransitionOptions(usage, options);
 
         for (const prop of ["_transitionLinkSource", "_payload"] as const) {
+            if (usage[prop]) continue;
             const target = ReferenceUsageMeta.create(provider, document);
             const member = ParameterMembershipMeta.create(provider, document, { target });
 

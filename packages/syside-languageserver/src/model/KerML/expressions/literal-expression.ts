@@ -46,7 +46,7 @@ export class LiteralExpressionMeta extends ExpressionMeta {
         document: LangiumDocument,
         options?: LiteralExpressionOptions
     ): T["$meta"] {
-        return super.create(provider, document, options);
+        return super.create(provider, document, { ...options, value: undefined });
     }
 }
 

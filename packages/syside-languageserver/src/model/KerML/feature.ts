@@ -24,7 +24,6 @@ import {
     Feature,
     FeatureChaining,
     FeatureMembership,
-    FeatureRelationship,
     FeatureTyping,
     Inheritance,
     ParameterMembership,
@@ -40,15 +39,23 @@ import {
 import { FeatureDirectionKind, TypeClassifier } from "../enums";
 import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import {
+    ConjugationMeta,
+    Edge,
+    EdgeContainer,
     ElementMeta,
     ElementParts,
     FeatureChainingMeta,
+    FeatureRelationshipMeta,
+    FeatureTypingMeta,
     FeatureValueMeta,
     InheritanceMeta,
     OwningMembershipMeta,
+    RestEdges,
+    SubsettingMeta,
     TypeFeaturingMeta,
     TypeMeta,
     TypeOptions,
+    TypeRelationshipMeta,
 } from "./_internal";
 import { SubtypeKeys, SysMLType } from "../../services/sysml-ast-reflection";
 import { AstNode, EMPTY_STREAM, LangiumDocument, stream, Stream } from "langium";
@@ -70,6 +77,17 @@ export const ImplicitFeatures = {
         "FeatureReferencingPerformances::FeatureAccessPerformance::onOccurrence::startingAt::accessedFeature",
 };
 
+// typing needs some help
+type FeatureRelationshipContainer = EdgeContainer<FeatureRelationshipMeta> &
+    EdgeContainer<TypeRelationshipMeta>;
+
+export function featureRelationships<T extends FeatureRelationshipMeta[]>(
+    ...children: RestEdges<T>
+): FeatureRelationshipContainer {
+    // disable type checking here since tsc chokes on it
+    return EdgeContainer.make(...children) as unknown as FeatureRelationshipContainer;
+}
+
 export interface FeatureOptions extends TypeOptions {
     direction?: FeatureDirectionKind;
     isComposite?: boolean;
@@ -79,7 +97,14 @@ export interface FeatureOptions extends TypeOptions {
     isEnd?: boolean;
     isOrdered?: boolean;
     isNonUnique?: boolean;
+
+    heritage?: EdgeContainer<SubsettingMeta | FeatureTypingMeta | ConjugationMeta<FeatureMeta>>;
+    typeRelationships?: FeatureRelationshipContainer;
+    value?: Edge<FeatureValueMeta>;
 }
+
+// TODO: isOrdered, name, shortName, typings can become stale if heritage
+// targets are mutated
 
 @metamodelOf(Feature, ImplicitFeatures)
 export class FeatureMeta extends TypeMeta {
@@ -150,13 +175,49 @@ export class FeatureMeta extends TypeMeta {
         this._isEnd = value;
     }
 
-    isOrdered = false;
-    isNonUnique = false;
+    protected _isOrdered = false;
+    protected _impliedIsOrdered = false;
+    protected _isNonUnique = false;
 
-    addFeatureRelationship(...element: FeatureRelationship["$meta"][]): this {
-        this._typeRelationships.add(...element);
-        element.forEach((e) => this.maybeTakeOwnership(e));
-        return this;
+    @enumerable
+    get isOrdered(): boolean {
+        return this._isOrdered || this._impliedIsOrdered;
+    }
+    set isOrdered(value) {
+        this._isOrdered = value;
+    }
+
+    @enumerable
+    get isNonUnique(): boolean {
+        return this._isNonUnique;
+    }
+    set isNonUnique(value) {
+        this._isNonUnique = value;
+    }
+
+    /**
+     * Adds potentially owned feature relationships and returns the new number of
+     * feature relationships. Relationships with owned sources or non-type parents
+     * are not taken ownership of.
+     */
+    addFeatureRelationship<T extends FeatureRelationshipMeta[]>(...element: RestEdges<T>): number {
+        return this.addDeclaredRelationship(this._typeRelationships, element);
+    }
+
+    /**
+     * Removes feature relationships by value and returns the new number of feature
+     * relationships.
+     */
+    removeFeatureRelationship(...element: FeatureRelationshipMeta[]): number {
+        return this.removeDeclaredRelationship(this._typeRelationships, element);
+    }
+
+    /**
+     * Removes feature relationships by predicate and returns the new number of feature
+     * relationships.
+     */
+    removeFeatureRelationshipIf(predicate: (value: FeatureRelationshipMeta) => boolean): number {
+        return this.removeDeclaredRelationshipIf(this._typeRelationships, predicate);
     }
 
     get typeFeaturings(): readonly TypeFeaturingMeta[] {
@@ -183,8 +244,8 @@ export class FeatureMeta extends TypeMeta {
     get value(): FeatureValueMeta | undefined {
         return this._value;
     }
-    set value(value: FeatureValueMeta | undefined) {
-        this._value = value;
+    set value(value: Edge<FeatureValueMeta> | undefined) {
+        this._value = this.swapEdgeOwnership(this._value, value);
     }
 
     protected _write?: OwningMembershipMeta<FeatureMeta> | undefined;
@@ -203,13 +264,20 @@ export class FeatureMeta extends TypeMeta {
     ): void {
         super.onParentSet(previous, current);
 
-        const owner = current?.parent();
-        if (current?.is(FeatureMembership) && owner?.is(Type)) {
-            this._owningType = owner;
-        }
-
         this._isImpliedEnd = Boolean(current?.is(EndFeatureMembership));
         this.computedImpliedDirection();
+    }
+
+    protected override onOwnerSet(
+        previous: [ElementMeta, ElementMeta] | undefined,
+        current: [ElementMeta, ElementMeta] | undefined
+    ): void {
+        if (current?.[0].is(FeatureMembership) && current?.[1].is(Type)) {
+            this._owningType = current[1];
+        } else {
+            this._owningType = undefined;
+        }
+        super.onOwnerSet(previous, current);
     }
 
     get owningType(): TypeMeta | undefined {
@@ -348,27 +416,39 @@ export class FeatureMeta extends TypeMeta {
         return Boolean(this.parent()?.is(ReturnParameterMembership));
     }
 
-    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
-        super.onSpecializationAdded(specialization);
+    recomputeEffectiveNames(): void {
+        if (this.declaredName || this.declaredShortName) return;
+        this.updateEffectiveNames();
+    }
+
+    protected updateEffectiveNames(): void {
+        const namingFeature = this.namingFeature();
+        if (namingFeature) {
+            if (namingFeature.name) this.setName(namingFeature.name);
+            if (namingFeature.shortName) this.setShortName(namingFeature.shortName);
+        } else {
+            if (this.name) this.setName(undefined);
+            if (this.shortName) this.setShortName(undefined);
+        }
+    }
+
+    protected override onHeritageAdded(heritage: InheritanceMeta, target: TypeMeta): void {
+        super.onHeritageAdded(heritage, target);
 
         this.typings = undefined;
 
-        if (!this.isOrdered && specialization.is(Subsetting)) {
-            if (specialization.element()?.isOrdered) this.isOrdered = true;
+        if (!this._impliedIsOrdered && heritage.is(Subsetting)) {
+            if (heritage.finalElement()?.isOrdered) this._impliedIsOrdered = true;
         }
 
         if (!this.name && !this.shortName) {
-            const namingFeature = this.namingFeature();
-            if (namingFeature) {
-                if (namingFeature.name) this.setName(namingFeature.name);
-                if (namingFeature.shortName) this.setShortName(namingFeature.shortName);
-            }
+            this.updateEffectiveNames();
         }
 
-        if (specialization.is(Redefinition)) {
+        if (heritage.is(Redefinition)) {
             // add a tombstone to the owning type children to signify that the
             // redefined feature is no longer accessible through it
-            const feature = specialization.finalElement();
+            const feature = heritage.finalElement();
             const owner = this.owningType;
             if (owner && feature) {
                 const addShadow = (name: string): void => {
@@ -380,6 +460,38 @@ export class FeatureMeta extends TypeMeta {
                 if (feature.shortName) addShadow(feature.shortName);
             }
         }
+    }
+
+    protected override onHeritageRemoved(heritage: InheritanceMeta[]): void {
+        super.onHeritageRemoved(heritage);
+        this.typings = undefined;
+
+        if (
+            this._impliedIsOrdered &&
+            heritage.some((h) => h.is(Subsetting) && h.finalElement()?.isOrdered)
+        ) {
+            this._impliedIsOrdered = this.heritage.some(
+                (h) => h.is(Subsetting) && h.finalElement()?.isOrdered
+            );
+        }
+
+        this.recomputeEffectiveNames();
+
+        const lookup = this.owningType?.["_memberLookup"];
+        if (!lookup) return;
+        heritage
+            .filter(BasicMetamodel.is(Redefinition))
+            .map((r) => r.finalElement())
+            .filter(NonNullable)
+            .forEach((feature) => {
+                const removeShadow = (name: string): void => {
+                    const existing = lookup.get(name);
+                    if (existing === "shadow") lookup.delete(name);
+                };
+
+                if (feature.name) removeShadow(feature.name);
+                if (feature.shortName) removeShadow(feature.shortName);
+            });
     }
 
     override specializationKind(): SubtypeKeys<Inheritance> {
@@ -483,6 +595,8 @@ export class FeatureMeta extends TypeMeta {
         model._isEnd = Boolean(options.isEnd);
         model.isOrdered = Boolean(options.isOrdered);
         model.isNonUnique = Boolean(options.isNonUnique);
+
+        if (options.value) model.value = options.value;
     }
 
     static override create<T extends AstNode>(

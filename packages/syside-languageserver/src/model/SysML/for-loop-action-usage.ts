@@ -17,14 +17,17 @@
 import { AstNode, LangiumDocument } from "langium";
 import { ForLoopActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
-import { ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import { Edge, ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 import { LoopActionUsageMeta, LoopActionUsageOptions } from "./loop-action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 
-// TODO: add variable, sequence and body
-export type ForLoopActionUsageOptions = LoopActionUsageOptions;
+export interface ForLoopActionUsageOptions extends LoopActionUsageOptions {
+    variable?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    sequence?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    body?: Edge<ParameterMembershipMeta, ActionUsageMeta>;
+}
 
 @metamodelOf(ForLoopActionUsage, {
     base: "Actions::forLoopActions",
@@ -40,24 +43,24 @@ export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
     public get variable(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._variable;
     }
-    public set variable(value: ParameterMembershipMeta<ReferenceUsageMeta>) {
-        this._variable = value;
+    public set variable(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
+        this._variable = this.swapEdgeOwnership(this._variable, value);
     }
 
     @enumerable
     public get sequence(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._sequence;
     }
-    public set sequence(value: ParameterMembershipMeta<ReferenceUsageMeta>) {
-        this._sequence = value;
+    public set sequence(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
+        this._sequence = this.swapEdgeOwnership(this._sequence, value);
     }
 
     @enumerable
     public get body(): ParameterMembershipMeta<ActionUsageMeta> | undefined {
         return this._body;
     }
-    public set body(value: ParameterMembershipMeta<ActionUsageMeta>) {
-        this._body = value;
+    public set body(value: Edge<ParameterMembershipMeta, ActionUsageMeta> | undefined) {
+        this._body = this.swapEdgeOwnership(this._body, value);
     }
 
     override ast(): ForLoopActionUsage | undefined {
@@ -81,10 +84,12 @@ export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
     }
 
     protected static applyForLoopOptions(
-        _model: ForLoopActionUsageMeta,
-        _options: ForLoopActionUsageOptions
+        model: ForLoopActionUsageMeta,
+        options: ForLoopActionUsageOptions
     ): void {
-        // empty
+        model.variable = options.variable;
+        model.sequence = options.sequence;
+        model.body = options.body;
     }
 
     static override create<T extends AstNode>(

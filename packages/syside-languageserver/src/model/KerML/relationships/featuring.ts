@@ -16,10 +16,32 @@
 
 import { Featuring } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { RelationshipMeta, TypeMeta } from "../_internal";
+import { ElementMeta, RelationshipMeta, TypeMeta } from "../_internal";
 
 @metamodelOf(Featuring, "abstract")
 export abstract class FeaturingMeta<T extends TypeMeta = TypeMeta> extends RelationshipMeta<T> {
+    /**
+     * Adds new owned body elements and returns the new number of body elements.
+     */
+    addChild(...element: ElementMeta[]): number {
+        return this.addOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements and returns the new number of body elements.
+     */
+    removeChild(...element: ElementMeta[]): number {
+        return this.removeOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements by predicate and returns the new number of
+     * body elements.
+     */
+    removeChildIf(predicate: (element: ElementMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
+    }
+
     override ast(): Featuring | undefined {
         return this._ast as Featuring;
     }

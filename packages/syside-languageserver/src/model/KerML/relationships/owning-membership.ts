@@ -22,8 +22,19 @@ import { ElementMeta, MembershipMeta, NamespaceMeta, RelationshipOptionsBody } f
 @metamodelOf(OwningMembership)
 export class OwningMembershipMeta<T extends ElementMeta = ElementMeta> extends MembershipMeta<T> {
     protected override onTargetSet(previous?: T, target?: T): void {
-        if (previous) previous["setParent"](undefined);
+        if (previous) this.unsetOwnership(previous);
         if (target) this.takeOwnership(target);
+    }
+
+    protected override onOwnerSet(
+        previous: [ElementMeta, ElementMeta] | undefined,
+        current: [ElementMeta, ElementMeta] | undefined
+    ): void {
+        // need to propagate owner to the target
+        if (this._element) {
+            if (current) this._element["setOwner"](current[1]);
+            else this.unsetOwnership(this._element);
+        }
     }
 
     override ast(): OwningMembership | undefined {

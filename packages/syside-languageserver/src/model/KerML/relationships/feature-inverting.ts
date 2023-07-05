@@ -17,11 +17,32 @@
 import { AstNode, LangiumDocument } from "langium";
 import { FeatureInverting } from "../../../generated/ast";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
-import { FeatureMeta, RelationshipMeta, RelationshipOptions } from "../_internal";
+import { ElementMeta, FeatureMeta, RelationshipMeta, RelationshipOptions } from "../_internal";
 
 @metamodelOf(FeatureInverting)
-// @ts-expect-error ignoring static inheritance error
 export class FeatureInvertingMeta<T extends FeatureMeta = FeatureMeta> extends RelationshipMeta<T> {
+    /**
+     * Adds new owned body elements and returns the new number of body elements.
+     */
+    addChild(...element: ElementMeta[]): number {
+        return this.addOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements and returns the new number of body elements.
+     */
+    removeChild(...element: ElementMeta[]): number {
+        return this.removeOwnedElements(this._children, element);
+    }
+
+    /**
+     * Removes owned body elements by predicate and returns the new number of
+     * body elements.
+     */
+    removeChildIf(predicate: (element: ElementMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
+    }
+
     override ast(): FeatureInverting | undefined {
         return this._ast as FeatureInverting;
     }

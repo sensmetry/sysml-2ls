@@ -19,18 +19,35 @@ import { SysMLFunction } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
-import { BehaviorMeta, BehaviorOptions, ElementParts, TypeMeta } from "./_internal";
+import {
+    BehaviorMeta,
+    BehaviorOptions,
+    Edge,
+    ElementParts,
+    ResultExpressionMembershipMeta,
+    TypeMeta,
+} from "./_internal";
 import { AstNode, LangiumDocument } from "langium";
+import { enumerable } from "../../utils";
 
 export const ImplicitFunctions = {
     base: "Performances::Evaluation",
 };
 
-// TODO: add result
-export type FunctionOptions = BehaviorOptions;
+export interface FunctionOptions extends BehaviorOptions {
+    result?: Edge<ResultExpressionMembershipMeta>;
+}
 
 @metamodelOf(SysMLFunction, ImplicitFunctions)
 export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
+    @enumerable
+    get result(): ResultExpressionMembershipMeta | undefined {
+        return this._result;
+    }
+    set result(value: Edge<ResultExpressionMembershipMeta> | undefined) {
+        this._result = this.swapEdgeOwnership(this._result, value);
+    }
+
     override ast(): SysMLFunction | undefined {
         return this._ast as SysMLFunction;
     }
@@ -52,8 +69,8 @@ export class FunctionMeta extends Mixin(BehaviorMeta, FunctionMixin) {
         return parts;
     }
 
-    protected static applyFunctionOptions(_model: FunctionMeta, _options: FunctionOptions): void {
-        // TODO: assign result
+    protected static applyFunctionOptions(model: FunctionMeta, options: FunctionOptions): void {
+        model.result = options.result;
     }
 
     static override create<T extends AstNode>(

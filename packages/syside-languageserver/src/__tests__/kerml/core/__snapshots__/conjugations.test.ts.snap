@@ -10,12 +10,14 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [
             {
               "$type": "FeatureMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "Input",
@@ -27,7 +29,6 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "Original",
@@ -36,11 +37,11 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate1",
@@ -49,11 +50,11 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate2",
@@ -62,49 +63,15 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Conjugation",
           "declaredName": "c1",
           "elements": [],
-          "reference": {
-            "$type": "TypeReference",
-            "parts": [
-              {
-                "error": undefined,
-                "ref": {
-                  "$type": "Class",
-                  "children": [
-                    {
-                      "$type": "FeatureMembership",
-                      "element": {
-                        "$type": "Feature",
-                        "children": [],
-                        "declaredName": "Input",
-                        "direction": "in",
-                        "heritage": [],
-                        "isNonunique": false,
-                        "isOrdered": false,
-                        "isSufficient": false,
-                        "prefixes": [],
-                        "typeRelationships": [],
-                      },
-                      "elements": [],
-                    },
-                  ],
-                  "declaredName": "Original",
-                  "heritage": [],
-                  "isSufficient": false,
-                  "prefixes": [],
-                  "typeRelationships": [],
-                },
-              },
-            ],
-          },
-          "source": {
+          "sourceRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -121,26 +88,7 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
               },
             ],
           },
-        },
-        "elements": [],
-      },
-      {
-        "$type": "OwningMembership",
-        "element": {
-          "$type": "Conjugation",
-          "declaredName": "c2",
-          "elements": [
-            {
-              "$type": "Annotation",
-              "element": {
-                "$type": "Documentation",
-                "about": [],
-                "body": "/* same as c1 */",
-              },
-              "elements": [],
-            },
-          ],
-          "reference": {
+          "targetRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -150,7 +98,8 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
                   "children": [
                     {
                       "$type": "FeatureMembership",
-                      "element": {
+                      "elements": [],
+                      "target": {
                         "$type": "Feature",
                         "children": [],
                         "declaredName": "Input",
@@ -162,7 +111,6 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
                         "prefixes": [],
                         "typeRelationships": [],
                       },
-                      "elements": [],
                     },
                   ],
                   "declaredName": "Original",
@@ -174,7 +122,26 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
               },
             ],
           },
-          "source": {
+        },
+      },
+      {
+        "$type": "OwningMembership",
+        "elements": [],
+        "target": {
+          "$type": "Conjugation",
+          "declaredName": "c2",
+          "elements": [
+            {
+              "$type": "Annotation",
+              "elements": [],
+              "source": {
+                "$type": "Documentation",
+                "about": [],
+                "body": "/* same as c1 */",
+              },
+            },
+          ],
+          "sourceRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -191,8 +158,41 @@ exports[`conjugation can be parsed: toParseKerML 1`] = `
               },
             ],
           },
+          "targetRef": {
+            "$type": "TypeReference",
+            "parts": [
+              {
+                "error": undefined,
+                "ref": {
+                  "$type": "Class",
+                  "children": [
+                    {
+                      "$type": "FeatureMembership",
+                      "elements": [],
+                      "target": {
+                        "$type": "Feature",
+                        "children": [],
+                        "declaredName": "Input",
+                        "direction": "in",
+                        "heritage": [],
+                        "isNonunique": false,
+                        "isOrdered": false,
+                        "isSufficient": false,
+                        "prefixes": [],
+                        "typeRelationships": [],
+                      },
+                    },
+                  ],
+                  "declaredName": "Original",
+                  "heritage": [],
+                  "isSufficient": false,
+                  "prefixes": [],
+                  "typeRelationships": [],
+                },
+              },
+            ],
+          },
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -210,12 +210,14 @@ exports[`conjugation may be omitted without identifiers with '~': toParseKerML 1
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [
             {
               "$type": "FeatureMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "Input",
@@ -227,7 +229,6 @@ exports[`conjugation may be omitted without identifiers with '~': toParseKerML 1
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "Original",
@@ -236,11 +237,11 @@ exports[`conjugation may be omitted without identifiers with '~': toParseKerML 1
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate1",
@@ -249,11 +250,11 @@ exports[`conjugation may be omitted without identifiers with '~': toParseKerML 1
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate2",
@@ -262,48 +263,14 @@ exports[`conjugation may be omitted without identifiers with '~': toParseKerML 1
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Conjugation",
           "elements": [],
-          "reference": {
-            "$type": "TypeReference",
-            "parts": [
-              {
-                "error": undefined,
-                "ref": {
-                  "$type": "Class",
-                  "children": [
-                    {
-                      "$type": "FeatureMembership",
-                      "element": {
-                        "$type": "Feature",
-                        "children": [],
-                        "declaredName": "Input",
-                        "direction": "in",
-                        "heritage": [],
-                        "isNonunique": false,
-                        "isOrdered": false,
-                        "isSufficient": false,
-                        "prefixes": [],
-                        "typeRelationships": [],
-                      },
-                      "elements": [],
-                    },
-                  ],
-                  "declaredName": "Original",
-                  "heritage": [],
-                  "isSufficient": false,
-                  "prefixes": [],
-                  "typeRelationships": [],
-                },
-              },
-            ],
-          },
-          "source": {
+          "sourceRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -320,8 +287,41 @@ exports[`conjugation may be omitted without identifiers with '~': toParseKerML 1
               },
             ],
           },
+          "targetRef": {
+            "$type": "TypeReference",
+            "parts": [
+              {
+                "error": undefined,
+                "ref": {
+                  "$type": "Class",
+                  "children": [
+                    {
+                      "$type": "FeatureMembership",
+                      "elements": [],
+                      "target": {
+                        "$type": "Feature",
+                        "children": [],
+                        "declaredName": "Input",
+                        "direction": "in",
+                        "heritage": [],
+                        "isNonunique": false,
+                        "isOrdered": false,
+                        "isSufficient": false,
+                        "prefixes": [],
+                        "typeRelationships": [],
+                      },
+                    },
+                  ],
+                  "declaredName": "Original",
+                  "heritage": [],
+                  "isSufficient": false,
+                  "prefixes": [],
+                  "typeRelationships": [],
+                },
+              },
+            ],
+          },
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -339,12 +339,14 @@ exports[`conjugation may be omitted without identifiers with 'conjugates': toPar
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [
             {
               "$type": "FeatureMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "Input",
@@ -356,7 +358,6 @@ exports[`conjugation may be omitted without identifiers with 'conjugates': toPar
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "Original",
@@ -365,11 +366,11 @@ exports[`conjugation may be omitted without identifiers with 'conjugates': toPar
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate1",
@@ -378,11 +379,11 @@ exports[`conjugation may be omitted without identifiers with 'conjugates': toPar
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate2",
@@ -391,48 +392,14 @@ exports[`conjugation may be omitted without identifiers with 'conjugates': toPar
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Conjugation",
           "elements": [],
-          "reference": {
-            "$type": "TypeReference",
-            "parts": [
-              {
-                "error": undefined,
-                "ref": {
-                  "$type": "Class",
-                  "children": [
-                    {
-                      "$type": "FeatureMembership",
-                      "element": {
-                        "$type": "Feature",
-                        "children": [],
-                        "declaredName": "Input",
-                        "direction": "in",
-                        "heritage": [],
-                        "isNonunique": false,
-                        "isOrdered": false,
-                        "isSufficient": false,
-                        "prefixes": [],
-                        "typeRelationships": [],
-                      },
-                      "elements": [],
-                    },
-                  ],
-                  "declaredName": "Original",
-                  "heritage": [],
-                  "isSufficient": false,
-                  "prefixes": [],
-                  "typeRelationships": [],
-                },
-              },
-            ],
-          },
-          "source": {
+          "sourceRef": {
             "$type": "TypeReference",
             "parts": [
               {
@@ -449,8 +416,41 @@ exports[`conjugation may be omitted without identifiers with 'conjugates': toPar
               },
             ],
           },
+          "targetRef": {
+            "$type": "TypeReference",
+            "parts": [
+              {
+                "error": undefined,
+                "ref": {
+                  "$type": "Class",
+                  "children": [
+                    {
+                      "$type": "FeatureMembership",
+                      "elements": [],
+                      "target": {
+                        "$type": "Feature",
+                        "children": [],
+                        "declaredName": "Input",
+                        "direction": "in",
+                        "heritage": [],
+                        "isNonunique": false,
+                        "isOrdered": false,
+                        "isSufficient": false,
+                        "prefixes": [],
+                        "typeRelationships": [],
+                      },
+                    },
+                  ],
+                  "declaredName": "Original",
+                  "heritage": [],
+                  "isSufficient": false,
+                  "prefixes": [],
+                  "typeRelationships": [],
+                },
+              },
+            ],
+          },
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -468,7 +468,8 @@ exports[`type can declare owned conjugations with '~': toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Original",
@@ -477,11 +478,11 @@ exports[`type can declare owned conjugations with '~': toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate1",
@@ -489,7 +490,7 @@ exports[`type can declare owned conjugations with '~': toParseKerML 1`] = `
             {
               "$type": "Conjugation",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ClassifierReference",
                 "parts": [
                   {
@@ -512,7 +513,6 @@ exports[`type can declare owned conjugations with '~': toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -530,7 +530,8 @@ exports[`type can declare owned conjugations with 'conjugates': toParseKerML 1`]
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Original",
@@ -539,11 +540,11 @@ exports[`type can declare owned conjugations with 'conjugates': toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Conjugate1",
@@ -551,7 +552,7 @@ exports[`type can declare owned conjugations with 'conjugates': toParseKerML 1`]
             {
               "$type": "Conjugation",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ClassifierReference",
                 "parts": [
                   {
@@ -574,7 +575,6 @@ exports[`type can declare owned conjugations with 'conjugates': toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],

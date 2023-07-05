@@ -15,9 +15,22 @@
  ********************************************************************************/
 
 import { AstNode, LangiumDocument } from "langium";
-import { Annotation } from "../../../generated/ast";
+import { AnnotatingElement, Annotation } from "../../../generated/ast";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
-import { ElementMeta, RelationshipMeta, RelationshipOptions } from "../_internal";
+import {
+    AnnotatingElementMeta,
+    ElementMeta,
+    RelationshipMeta,
+    RelationshipOptionsBody,
+} from "../_internal";
+
+export type AnnotationOptions<Parent extends ElementMeta | undefined = ElementMeta> =
+    Parent extends AnnotatingElementMeta | undefined
+        ? RelationshipOptionsBody<ElementMeta, Parent> & { source?: never } // parent is the source
+        : Omit<RelationshipOptionsBody<ElementMeta, Parent>, "target"> & {
+              target?: never;
+              source: AnnotatingElementMeta;
+          };
 
 @metamodelOf(Annotation)
 export class AnnotationMeta<T extends ElementMeta = ElementMeta> extends RelationshipMeta<T> {
@@ -25,13 +38,38 @@ export class AnnotationMeta<T extends ElementMeta = ElementMeta> extends Relatio
         return this._ast as Annotation;
     }
 
+    protected override onParentSet(
+        previous: ElementMeta | undefined,
+        current: ElementMeta | undefined
+    ): void {
+        // annotating elements are implicitly sources of annotation
+        // clear previous parent member
+
+        if (previous) {
+            if (previous === this._source) this._source = undefined;
+            else this._element = undefined;
+        }
+
+        if (current?.is(AnnotatingElement)) this._source = current;
+        else (this._element as ElementMeta | undefined) = current;
+    }
+
     static override create<T extends AstNode, P extends ElementMeta | undefined>(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,
         document: LangiumDocument,
-        options?: RelationshipOptions<ElementMeta, P, ElementMeta> | undefined
+        options?: AnnotationOptions<P>
     ): T["$meta"] {
-        return super.create(provider, document, options);
+        const self = ElementMeta.create.call(this, provider, document, options) as AnnotationMeta;
+
+        if (options) {
+            self._visibility = options.visibility;
+            self._isImplied = Boolean(options.isImplied);
+            // type inference breaks down...
+            if (options.source) self._source = options.source;
+            if (options.target) self.setElement(options.target);
+        }
+        return self;
     }
 }
 

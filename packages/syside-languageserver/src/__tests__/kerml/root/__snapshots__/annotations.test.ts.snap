@@ -10,31 +10,31 @@ exports[`Multiple comments are parsed: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* comment 1 */",
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* comment 2 */",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -52,23 +52,23 @@ exports[`elements are parseable with annotations with a named single line commen
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is a comment */",
                 "declaredName": "Comment",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -86,24 +86,24 @@ exports[`elements are parseable with annotations with multi line comment: toPars
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is
              * a comment
              */",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -121,23 +121,23 @@ exports[`elements are parseable with annotations with named documentation: toPar
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* this is a doc */",
                 "declaredName": "Doc",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -155,22 +155,22 @@ exports[`elements are parseable with annotations with single line comment withou
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is a comment */",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -188,22 +188,22 @@ exports[`elements are parseable with annotations with single line comment: toPar
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* this is a comment */",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -221,13 +221,13 @@ exports[`elements are parseable with annotations with textual representation wit
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "TextualRepresentation",
           "about": [],
           "body": "/* self.x > 0.0 */",
           "language": ""OCL"",
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -245,14 +245,14 @@ exports[`elements are parseable with annotations with textual representation wit
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "TextualRepresentation",
           "about": [],
           "body": "/* self.x > 0.0 */",
           "declaredName": "inOCL",
           "language": ""OCL"",
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -270,24 +270,24 @@ exports[`elements are parseable with annotations with textual representation wit
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "TextualRepresentation",
                 "about": [],
                 "body": "/* <a href="https://plm.elsewhere.com/part?id="1234"/> */",
                 "language": ""HTML"",
               },
-              "elements": [],
             },
           ],
           "declaredName": "B",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -305,22 +305,22 @@ exports[`elements are parseable with annotations with unnamed documentation: toP
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* this is a doc */",
               },
-              "elements": [],
             },
           ],
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],

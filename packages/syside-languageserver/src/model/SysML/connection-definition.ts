@@ -19,7 +19,7 @@ import { ConnectionDefinition } from "../../generated/ast";
 import { AssociationStructMeta, AssociationStructureOptions } from "../KerML/association-structure";
 import { metamodelOf } from "../metamodel";
 import { PartDefinitionMeta, PartDefinitionOptions } from "./part-definition";
-import { InheritanceMeta } from "../KerML";
+import { InheritanceMeta, TypeMeta } from "../KerML";
 
 export interface ConnectionDefinitionOptions
     extends AssociationStructureOptions,
@@ -38,9 +38,14 @@ export class ConnectionDefinitionMeta extends Mixin(AssociationStructMeta, PartD
         return this._ast as ConnectionDefinition;
     }
 
-    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+    protected override onHeritageAdded(heritage: InheritanceMeta, target: TypeMeta): void {
         this.resetEnds();
-        PartDefinitionMeta.prototype["onSpecializationAdded"].call(this, specialization);
+        PartDefinitionMeta.prototype["onHeritageAdded"].call(this, heritage, target);
+    }
+
+    protected override onHeritageRemoved(heritage: InheritanceMeta[]): void {
+        this.resetEnds();
+        PartDefinitionMeta.prototype["onHeritageRemoved"].call(this, heritage);
     }
 }
 

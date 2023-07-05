@@ -66,7 +66,7 @@ export class SysMLScopeComputation extends DefaultScopeComputation {
         for (const node of document.parseResult.value.$children) {
             await interruptAndCheck(cancelToken);
             if (isMembership(node)) {
-                exports.push(this.createDescription(node.element ?? node, document));
+                exports.push(this.createDescription(node.target ?? node, document));
             }
         }
 

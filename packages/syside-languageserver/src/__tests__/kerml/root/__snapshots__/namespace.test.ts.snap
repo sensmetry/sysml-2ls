@@ -10,12 +10,14 @@ exports[`aliases are parseable: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "A",
@@ -24,11 +26,11 @@ exports[`aliases are parseable: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "B",
@@ -37,7 +39,6 @@ exports[`aliases are parseable: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "Membership",
@@ -46,15 +47,15 @@ exports[`aliases are parseable: toParseKerML 1`] = `
               "elements": [
                 {
                   "$type": "Annotation",
-                  "element": {
+                  "elements": [],
+                  "source": {
                     "$type": "Documentation",
                     "about": [],
                     "body": "/* alias doc */",
                   },
-                  "elements": [],
                 },
               ],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -76,7 +77,7 @@ exports[`aliases are parseable: toParseKerML 1`] = `
               "$type": "Membership",
               "declaredName": "D",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ElementReference",
                 "parts": [
                   {
@@ -99,7 +100,6 @@ exports[`aliases are parseable: toParseKerML 1`] = `
           "declaredName": "N1",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -117,16 +117,17 @@ exports[`all top-level elements are in the root namespace: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Documentation",
           "about": [],
           "body": "/* root doc */",
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "A",
@@ -135,11 +136,11 @@ exports[`all top-level elements are in the root namespace: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "C",
@@ -148,11 +149,11 @@ exports[`all top-level elements are in the root namespace: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "DataType",
           "children": [],
           "declaredName": "D",
@@ -161,11 +162,11 @@ exports[`all top-level elements are in the root namespace: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Feature",
           "children": [],
           "declaredName": "f",
@@ -173,7 +174,7 @@ exports[`all top-level elements are in the root namespace: toParseKerML 1`] = `
             {
               "$type": "FeatureTyping",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "TypeReference",
                 "parts": [
                   {
@@ -198,17 +199,16 @@ exports[`all top-level elements are in the root namespace: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Package",
           "children": [],
           "declaredName": "P",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -226,12 +226,14 @@ exports[`namespace elements can have visibility: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "C",
@@ -240,12 +242,12 @@ exports[`namespace elements can have visibility: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
               "visibility": "public",
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "DataType",
                 "children": [],
                 "declaredName": "D",
@@ -254,12 +256,12 @@ exports[`namespace elements can have visibility: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
               "visibility": "private",
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "f",
@@ -267,7 +269,7 @@ exports[`namespace elements can have visibility: toParseKerML 1`] = `
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -292,14 +294,12 @@ exports[`namespace elements can have visibility: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
               "visibility": "protected",
             },
           ],
           "declaredName": "N",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -317,32 +317,34 @@ exports[`namespaces are parseable: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [],
           "declaredName": "N1",
           "declaredShortName": "'1.1'",
           "prefixes": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* This is an example of a namespace body. */",
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "C",
@@ -351,11 +353,11 @@ exports[`namespaces are parseable: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "DataType",
                 "children": [],
                 "declaredName": "D",
@@ -364,11 +366,11 @@ exports[`namespaces are parseable: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Feature",
                 "children": [],
                 "declaredName": "f",
@@ -376,7 +378,7 @@ exports[`namespaces are parseable: toParseKerML 1`] = `
                   {
                     "$type": "FeatureTyping",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "TypeReference",
                       "parts": [
                         {
@@ -401,24 +403,22 @@ exports[`namespaces are parseable: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Namespace",
                 "children": [],
                 "declaredName": "N3",
                 "prefixes": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "N2",
           "declaredShortName": "'1.2'",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -436,12 +436,14 @@ exports[`namespaces can have comments: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Namespace",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "A",
@@ -450,17 +452,17 @@ exports[`namespaces can have comments: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [
                   {
                     "$type": "Annotation",
                     "elements": [],
-                    "reference": {
+                    "targetRef": {
                       "$type": "ElementReference",
                       "parts": [
                         {
@@ -482,42 +484,40 @@ exports[`namespaces can have comments: toParseKerML 1`] = `
                 "body": "/* comment about A */",
                 "declaredName": "Comment1",
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* comment about N9 */",
                 "declaredName": "Comment2",
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Comment",
                 "about": [],
                 "body": "/* also comment about N9 */",
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* doc about N9 */",
                 "declaredName": "N9_Doc",
               },
-              "elements": [],
             },
           ],
           "declaredName": "N9",
           "prefixes": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],

@@ -19,7 +19,13 @@ import { Association } from "../../generated/ast";
 import { TypeClassifier } from "../enums";
 import { ElementID, metamodelOf } from "../metamodel";
 import { ConnectorMixin } from "../mixins/connector";
-import { ClassifierMeta, ClassifierOptions, InheritanceMeta, RelationshipMeta } from "./_internal";
+import {
+    ClassifierMeta,
+    ClassifierOptions,
+    InheritanceMeta,
+    RelationshipMeta,
+    TypeMeta,
+} from "./_internal";
 import { Class } from "ts-mixer/dist/types/types";
 
 export const ImplicitAssociations = {
@@ -46,9 +52,14 @@ export class AssociationMeta extends Mixin(
         return this._ast as Association;
     }
 
-    protected override onSpecializationAdded(specialization: InheritanceMeta): void {
+    protected override onHeritageAdded(heritage: InheritanceMeta, target: TypeMeta): void {
         this.resetEnds();
-        ClassifierMeta.prototype["onSpecializationAdded"].call(this, specialization);
+        ClassifierMeta.prototype["onHeritageAdded"].call(this, heritage, target);
+    }
+
+    protected override onHeritageRemoved(heritage: InheritanceMeta[]): void {
+        this.resetEnds();
+        ClassifierMeta.prototype["onHeritageRemoved"].call(this, heritage);
     }
 }
 

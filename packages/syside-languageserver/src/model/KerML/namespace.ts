@@ -34,6 +34,8 @@ import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from ".
 import {
     CommentMeta,
     DocumentationMeta,
+    Edge,
+    Edges,
     ElementFilterMembershipMeta,
     ElementMeta,
     ElementOptions,
@@ -44,6 +46,7 @@ import {
     MetadataFeatureMeta,
     OwningMembershipMeta,
     RelationshipMeta,
+    RestEdges,
     TextualRepresentationMeta,
 } from "./_internal";
 import { ElementContainer } from "../containers";
@@ -66,9 +69,36 @@ const CommentMembers = makeMemberFilter(Comment);
 const MetaMembers = makeMemberFilter(MetadataFeature);
 const RepMembers = makeMemberFilter(TextualRepresentation);
 
-// TODO: add prefixes
-// TODO: add children
-export type NamespaceOptions = ElementOptions<RelationshipMeta>;
+export type NamespaceRelationship = MembershipMeta | ImportMeta;
+
+/**
+ * A wrapper for array with hidden constructor and a fully type-checked factory
+ * method to ensure valid edge targets
+ */
+export class EdgeContainer<E extends RelationshipMeta> {
+    protected values: Edges<E>[];
+    private constructor(edges: Edges<E>[]) {
+        this.values = edges;
+    }
+
+    static make<E extends RelationshipMeta, T extends E[]>(
+        ...edges: RestEdges<T>
+    ): EdgeContainer<E> {
+        return new EdgeContainer(edges as Edges<E>[]);
+    }
+}
+
+export function namespaceChildren<T extends NamespaceRelationship[]>(
+    ...children: RestEdges<T>
+): EdgeContainer<NamespaceRelationship> {
+    return EdgeContainer.make(...children);
+}
+
+export interface NamespaceOptions extends ElementOptions<RelationshipMeta> {
+    prefixes?: readonly [OwningMembershipMeta, MetadataFeatureMeta][];
+
+    children?: EdgeContainer<NamespaceRelationship>;
+}
 
 @metamodelOf(Namespace)
 export class NamespaceMeta extends ElementMeta {
@@ -108,13 +138,31 @@ export class NamespaceMeta extends ElementMeta {
     }
 
     @enumerable
-    get children(): readonly (MembershipMeta | ImportMeta)[] {
+    get children(): readonly NamespaceRelationship[] {
         return this._children.all;
     }
 
-    protected addChild(...element: (MembershipMeta | ImportMeta)[]): this {
-        this._children.add(...element);
-        return this;
+    /**
+     * Adds owned members or imports and returns the new number of children.
+     */
+    addChild<T extends NamespaceRelationship[]>(...children: RestEdges<T>): number {
+        return this.addOwnedEdges(this._children, children);
+    }
+
+    /**
+     * Removes owned members or imports by value and returns the new number of
+     * children.
+     */
+    removeChild(...children: readonly NamespaceRelationship[]): number {
+        return this.removeOwnedElements(this._children, children);
+    }
+
+    /**
+     * Removes owned members or imports by predicate and returns the new number of
+     * children.
+     */
+    removeChildIf(predicate: (child: NamespaceRelationship) => boolean): number {
+        return this.removeOwnedElementsIf(this._children, predicate);
     }
 
     /**
@@ -125,9 +173,27 @@ export class NamespaceMeta extends ElementMeta {
         return this._prefixes;
     }
 
-    protected addPrefix(...prefix: OwningMembershipMeta<MetadataFeatureMeta>[]): this {
-        this._prefixes.push(...prefix);
-        return this;
+    /**
+     * Adds owned metadata prefixes and returns the new number of prefixes.
+     */
+    addPrefix(...children: readonly Edge<OwningMembershipMeta, MetadataFeatureMeta>[]): number {
+        return this.addOwnedEdges(this._prefixes, children);
+    }
+
+    /**
+     * Removes owned metadata prefixes by value and returns the new number of
+     * prefixes.
+     */
+    removePrefix(...children: readonly OwningMembershipMeta[]): number {
+        return this.removeOwnedElements(this._prefixes, children);
+    }
+
+    /**
+     * Removes owned metadata prefixes by predicate and returns the new number of
+     * prefixes.
+     */
+    removePrefixIf(predicate: (child: OwningMembershipMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._prefixes, predicate);
     }
 
     /**
@@ -197,6 +263,11 @@ export class NamespaceMeta extends ElementMeta {
         this._children.invalidateCaches();
     }
 
+    protected static applyNamespaceOptions(model: NamespaceMeta, options: NamespaceOptions): void {
+        if (options.prefixes) model.addPrefix(...options.prefixes);
+        if (options.children) model.addChild(...options.children["values"]);
+    }
+
     static override create<T extends AstNode>(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,
@@ -204,6 +275,7 @@ export class NamespaceMeta extends ElementMeta {
         options?: NamespaceOptions
     ): T["$meta"] {
         const model = super.create(provider, document, options) as NamespaceMeta;
+        if (options) NamespaceMeta.applyNamespaceOptions(model, options);
         return model;
     }
 }

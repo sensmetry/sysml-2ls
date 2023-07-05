@@ -10,7 +10,8 @@ exports[`elements are parseable without bodies with both names: toParseKerML 1`]
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Any",
@@ -20,7 +21,6 @@ exports[`elements are parseable without bodies with both names: toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -38,7 +38,8 @@ exports[`elements are parseable without bodies with name: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "Any_",
@@ -47,7 +48,6 @@ exports[`elements are parseable without bodies with name: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -65,7 +65,8 @@ exports[`elements are parseable without bodies with no names: toParseKerML 1`] =
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "heritage": [],
@@ -73,7 +74,6 @@ exports[`elements are parseable without bodies with no names: toParseKerML 1`] =
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -91,7 +91,8 @@ exports[`elements are parseable without bodies with short name: toParseKerML 1`]
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredShortName": "any",
@@ -100,7 +101,6 @@ exports[`elements are parseable without bodies with short name: toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -118,7 +118,8 @@ exports[`elements are parseable without bodies with unrestricted name: toParseKe
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [],
           "declaredName": "'arbitrary/ name+'",
@@ -127,7 +128,6 @@ exports[`elements are parseable without bodies with unrestricted name: toParseKe
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -145,17 +145,20 @@ exports[`elements can be nested: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Class",
           "children": [
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [
                   {
                     "$type": "OwningMembership",
-                    "element": {
+                    "elements": [],
+                    "target": {
                       "$type": "Class",
                       "children": [],
                       "declaredName": "C",
@@ -164,7 +167,6 @@ exports[`elements can be nested: toParseKerML 1`] = `
                       "prefixes": [],
                       "typeRelationships": [],
                     },
-                    "elements": [],
                   },
                 ],
                 "declaredName": "B",
@@ -173,11 +175,11 @@ exports[`elements can be nested: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
             {
               "$type": "OwningMembership",
-              "element": {
+              "elements": [],
+              "target": {
                 "$type": "Class",
                 "children": [],
                 "declaredName": "D",
@@ -186,7 +188,6 @@ exports[`elements can be nested: toParseKerML 1`] = `
                 "prefixes": [],
                 "typeRelationships": [],
               },
-              "elements": [],
             },
           ],
           "declaredName": "A",
@@ -195,7 +196,6 @@ exports[`elements can be nested: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],

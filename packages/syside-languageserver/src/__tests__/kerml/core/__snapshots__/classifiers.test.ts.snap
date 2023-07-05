@@ -10,7 +10,8 @@ exports[`classifiers can specialize multiple other classifiers: toParseKerML 1`]
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [],
           "declaredName": "A",
@@ -19,11 +20,11 @@ exports[`classifiers can specialize multiple other classifiers: toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [],
           "declaredName": "B",
@@ -32,11 +33,11 @@ exports[`classifiers can specialize multiple other classifiers: toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [],
           "declaredName": "C",
@@ -44,7 +45,7 @@ exports[`classifiers can specialize multiple other classifiers: toParseKerML 1`]
             {
               "$type": "Subclassification",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ClassifierReference",
                 "parts": [
                   {
@@ -65,7 +66,7 @@ exports[`classifiers can specialize multiple other classifiers: toParseKerML 1`]
             {
               "$type": "Subclassification",
               "elements": [],
-              "reference": {
+              "targetRef": {
                 "$type": "ClassifierReference",
                 "parts": [
                   {
@@ -88,7 +89,6 @@ exports[`classifiers can specialize multiple other classifiers: toParseKerML 1`]
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
@@ -106,7 +106,8 @@ exports[`specializations can be parsed: toParseKerML 1`] = `
     "children": [
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [],
           "declaredName": "A",
@@ -115,11 +116,11 @@ exports[`specializations can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Classifier",
           "children": [],
           "declaredName": "B",
@@ -128,32 +129,15 @@ exports[`specializations can be parsed: toParseKerML 1`] = `
           "prefixes": [],
           "typeRelationships": [],
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Subclassification",
           "declaredName": "Super",
           "elements": [],
-          "reference": {
-            "$type": "ClassifierReference",
-            "parts": [
-              {
-                "error": undefined,
-                "ref": {
-                  "$type": "Classifier",
-                  "children": [],
-                  "declaredName": "B",
-                  "heritage": [],
-                  "isSufficient": false,
-                  "prefixes": [],
-                  "typeRelationships": [],
-                },
-              },
-            ],
-          },
-          "source": {
+          "sourceRef": {
             "$type": "ClassifierReference",
             "parts": [
               {
@@ -170,42 +154,42 @@ exports[`specializations can be parsed: toParseKerML 1`] = `
               },
             ],
           },
+          "targetRef": {
+            "$type": "ClassifierReference",
+            "parts": [
+              {
+                "error": undefined,
+                "ref": {
+                  "$type": "Classifier",
+                  "children": [],
+                  "declaredName": "B",
+                  "heritage": [],
+                  "isSufficient": false,
+                  "prefixes": [],
+                  "typeRelationships": [],
+                },
+              },
+            ],
+          },
         },
-        "elements": [],
       },
       {
         "$type": "OwningMembership",
-        "element": {
+        "elements": [],
+        "target": {
           "$type": "Subclassification",
           "elements": [
             {
               "$type": "Annotation",
-              "element": {
+              "elements": [],
+              "source": {
                 "$type": "Documentation",
                 "about": [],
                 "body": "/* unnamed */",
               },
-              "elements": [],
             },
           ],
-          "reference": {
-            "$type": "ClassifierReference",
-            "parts": [
-              {
-                "error": undefined,
-                "ref": {
-                  "$type": "Classifier",
-                  "children": [],
-                  "declaredName": "A",
-                  "heritage": [],
-                  "isSufficient": false,
-                  "prefixes": [],
-                  "typeRelationships": [],
-                },
-              },
-            ],
-          },
-          "source": {
+          "sourceRef": {
             "$type": "ClassifierReference",
             "parts": [
               {
@@ -222,8 +206,24 @@ exports[`specializations can be parsed: toParseKerML 1`] = `
               },
             ],
           },
+          "targetRef": {
+            "$type": "ClassifierReference",
+            "parts": [
+              {
+                "error": undefined,
+                "ref": {
+                  "$type": "Classifier",
+                  "children": [],
+                  "declaredName": "A",
+                  "heritage": [],
+                  "isSufficient": false,
+                  "prefixes": [],
+                  "typeRelationships": [],
+                },
+              },
+            ],
+          },
         },
-        "elements": [],
       },
     ],
     "prefixes": [],
