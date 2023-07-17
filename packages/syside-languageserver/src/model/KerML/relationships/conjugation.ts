@@ -28,7 +28,7 @@ export class ConjugationMeta<T extends TypeMeta = TypeMeta> extends InheritanceM
 
     static override create<
         T extends AstNode,
-        Parent extends TypeMeta | RelationshipMeta | undefined
+        Parent extends TypeMeta | RelationshipMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

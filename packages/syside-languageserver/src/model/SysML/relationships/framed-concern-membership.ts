@@ -25,7 +25,7 @@ import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(FramedConcernMembership)
 export class FramedConcernMembershipMeta<
-    T extends ConcernUsageMeta = ConcernUsageMeta
+    T extends ConcernUsageMeta = ConcernUsageMeta,
 > extends RequirementConstraintMembershipMeta<T> {
     override ast(): FramedConcernMembership | undefined {
         return this._ast as FramedConcernMembership;

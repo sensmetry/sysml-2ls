@@ -38,7 +38,7 @@ type Metatype<T extends ElementMeta = ElementMeta> = MetatypeProto<T> & {
 export interface EditCaseBase<
     T extends ElementMeta = ElementMeta,
     E extends RelationshipMeta = RelationshipMeta,
-    V extends ElementMeta = ElementMeta
+    V extends ElementMeta = ElementMeta,
 > {
     proto: Metatype<T>;
     edgeProto: Metatype<E>;
@@ -50,7 +50,7 @@ export interface EditCaseBase<
 export interface ArrayEditCase<
     T extends ElementMeta = ElementMeta,
     E extends RelationshipMeta = RelationshipMeta,
-    V extends ElementMeta = ElementMeta
+    V extends ElementMeta = ElementMeta,
 > extends EditCaseBase<T, E, V> {
     push(this: T, ...edges: readonly (readonly [E, V])[]): number;
     remove(this: T, ...edges: readonly E[]): number;
@@ -88,7 +88,7 @@ function expectFactoryAssigned(
 export function testChildrenArray<
     T extends ElementMeta = ElementMeta,
     E extends RelationshipMeta = RelationshipMeta,
-    V extends ElementMeta = ElementMeta
+    V extends ElementMeta = ElementMeta,
 >(info: ArrayEditCase<T, E, V>): void {
     const id = basicIdProvider();
     let document: LangiumDocument;
@@ -138,7 +138,7 @@ export function testChildrenArray<
 export interface PropertyEditCase<
     T extends ElementMeta = ElementMeta,
     E extends RelationshipMeta = RelationshipMeta,
-    V extends ElementMeta = ElementMeta
+    V extends ElementMeta = ElementMeta,
 > extends EditCaseBase<T, E, V> {
     property: keyof T;
 }
@@ -146,7 +146,7 @@ export interface PropertyEditCase<
 export function testChildProperty<
     T extends ElementMeta = ElementMeta,
     E extends RelationshipMeta = RelationshipMeta,
-    V extends ElementMeta = ElementMeta
+    V extends ElementMeta = ElementMeta,
 >(info: PropertyEditCase<T, E, V>): void {
     const id = basicIdProvider();
     let document: LangiumDocument;

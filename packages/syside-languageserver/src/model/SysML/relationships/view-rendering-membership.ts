@@ -25,7 +25,7 @@ import { ViewUsageMeta } from "../view-usage";
 
 @metamodelOf(ViewRenderingMembership)
 export class ViewRenderingMembershipMeta<
-    T extends RenderingUsageMeta = RenderingUsageMeta
+    T extends RenderingUsageMeta = RenderingUsageMeta,
 > extends FeatureMembershipMeta<T> {
     override ast(): ViewRenderingMembership | undefined {
         return this._ast as ViewRenderingMembership;

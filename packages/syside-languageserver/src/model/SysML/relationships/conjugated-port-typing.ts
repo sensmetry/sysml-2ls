@@ -23,7 +23,7 @@ import { ConjugatedPortDefinitionMeta } from "../port-definition";
 @metamodelOf(ConjugatedPortTyping)
 // @ts-expect-error ignoring static inheritance error
 export class ConjugatedPortTypingMeta<
-    T extends ConjugatedPortDefinitionMeta = ConjugatedPortDefinitionMeta
+    T extends ConjugatedPortDefinitionMeta = ConjugatedPortDefinitionMeta,
 > extends FeatureTypingMeta<T> {
     override ast(): ConjugatedPortTyping | undefined {
         return this._ast as ConjugatedPortTyping;

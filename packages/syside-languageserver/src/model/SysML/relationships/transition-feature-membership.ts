@@ -32,7 +32,7 @@ export type TransitionFeatureMembershipOptions = RelationshipOptionsBody<
 
 @metamodelOf(TransitionFeatureMembership)
 export class TransitionFeatureMembershipMeta<
-    T extends Transition = Transition
+    T extends Transition = Transition,
 > extends FeatureMembershipMeta<T> {
     // read-only as it depends on the assigned slot in TransitionUsage
     protected _kind: TransitionFeatureKind = "trigger";

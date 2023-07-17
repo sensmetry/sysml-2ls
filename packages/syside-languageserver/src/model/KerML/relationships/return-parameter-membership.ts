@@ -27,7 +27,7 @@ import {
 
 @metamodelOf(ReturnParameterMembership)
 export class ReturnParameterMembershipMeta<
-    T extends FeatureMeta = FeatureMeta
+    T extends FeatureMeta = FeatureMeta,
 > extends ParameterMembershipMeta<T> {
     override ast(): ReturnParameterMembership | undefined {
         return this._ast as ReturnParameterMembership;

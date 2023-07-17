@@ -47,7 +47,7 @@ export type ModelDiagnosticInfo<M extends BasicMetamodel, P = Properties<ModelAs
 export type Severity = "error" | "warning" | "info" | "hint";
 export interface TypedModelDiagnostic<
     T extends ElementMeta = ElementMeta,
-    P = Properties<ModelAst<T>>
+    P = Properties<ModelAst<T>>,
 > {
     element: ElementMeta;
     severity: Severity;

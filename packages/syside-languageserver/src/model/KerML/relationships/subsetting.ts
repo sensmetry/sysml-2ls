@@ -33,7 +33,7 @@ export class SubsettingMeta<T extends FeatureMeta = FeatureMeta> extends Special
 
     static override create<
         T extends AstNode,
-        Parent extends FeatureMeta | RelationshipMeta | undefined
+        Parent extends FeatureMeta | RelationshipMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

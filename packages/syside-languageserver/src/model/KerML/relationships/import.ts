@@ -30,7 +30,7 @@ export type Importable = MembershipMeta | NamespaceMeta;
 
 export interface ImportOptions<
     T extends Importable = Importable,
-    P extends NamespaceMeta = NamespaceMeta
+    P extends NamespaceMeta = NamespaceMeta,
 > extends RelationshipOptionsBody<T, P> {
     isRecursive?: boolean;
     importsAll?: boolean;

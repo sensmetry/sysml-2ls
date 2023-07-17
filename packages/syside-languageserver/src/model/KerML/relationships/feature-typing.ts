@@ -34,7 +34,7 @@ export class FeatureTypingMeta<T extends TypeMeta = TypeMeta> extends Specializa
 
     static override create<
         T extends AstNode,
-        Parent extends RelationshipMeta | FeatureMeta | undefined
+        Parent extends RelationshipMeta | FeatureMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

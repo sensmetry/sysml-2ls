@@ -27,7 +27,7 @@ import {
 
 @metamodelOf(ElementFilterMembership)
 export class ElementFilterMembershipMeta<
-    T extends ExpressionMeta = ExpressionMeta
+    T extends ExpressionMeta = ExpressionMeta,
 > extends OwningMembershipMeta<T> {
     @enumerable
     override get visibility(): Visibility {

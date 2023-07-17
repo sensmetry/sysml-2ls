@@ -27,7 +27,7 @@ import {
 @metamodelOf(Subclassification)
 // @ts-expect-error ignoring static inheritance error
 export class SubclassificationMeta<
-    T extends ClassifierMeta = ClassifierMeta
+    T extends ClassifierMeta = ClassifierMeta,
 > extends SpecializationMeta<T> {
     override ast(): Subclassification | undefined {
         return this._ast as Subclassification;
@@ -35,7 +35,7 @@ export class SubclassificationMeta<
 
     static override create<
         T extends AstNode,
-        Parent extends ClassifierMeta | RelationshipMeta | undefined
+        Parent extends ClassifierMeta | RelationshipMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

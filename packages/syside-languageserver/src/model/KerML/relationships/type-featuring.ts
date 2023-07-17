@@ -33,7 +33,7 @@ export class TypeFeaturingMeta<T extends TypeMeta = TypeMeta> extends FeaturingM
 
     static override create<
         T extends AstNode,
-        Parent extends FeatureMeta | RelationshipMeta | undefined
+        Parent extends FeatureMeta | RelationshipMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

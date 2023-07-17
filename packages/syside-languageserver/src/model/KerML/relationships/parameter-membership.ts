@@ -28,7 +28,7 @@ import type { ActionUsageMeta } from "../../SysML";
 
 @metamodelOf(ParameterMembership)
 export class ParameterMembershipMeta<
-    T extends FeatureMeta = FeatureMeta
+    T extends FeatureMeta = FeatureMeta,
 > extends FeatureMembershipMeta<T> {
     override ast(): ParameterMembership | undefined {
         return this._ast as ParameterMembership;

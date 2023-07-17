@@ -222,7 +222,10 @@ export class GlobalScope extends SysMLScope {
 
     wrapForLang(langId?: string): SysMLScope {
         class GlobalLangScope extends SysMLScope {
-            constructor(readonly scope: GlobalScope, readonly langId?: string) {
+            constructor(
+                readonly scope: GlobalScope,
+                readonly langId?: string
+            ) {
                 super();
             }
 

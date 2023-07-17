@@ -25,7 +25,7 @@ import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(ObjectiveMembership)
 export class ObjectiveMembershipMeta<
-    T extends RequirementUsageMeta = RequirementUsageMeta
+    T extends RequirementUsageMeta = RequirementUsageMeta,
 > extends FeatureMembershipMeta<T> {
     override ast(): ObjectiveMembership | undefined {
         return this._ast as ObjectiveMembership;

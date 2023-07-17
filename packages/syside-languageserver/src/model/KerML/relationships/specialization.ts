@@ -28,7 +28,7 @@ export class SpecializationMeta<T extends TypeMeta = TypeMeta> extends Inheritan
 
     static override create<
         T extends AstNode,
-        Parent extends TypeMeta | RelationshipMeta | undefined
+        Parent extends TypeMeta | RelationshipMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

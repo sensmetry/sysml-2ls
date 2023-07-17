@@ -27,7 +27,7 @@ import {
 
 @metamodelOf(EndFeatureMembership)
 export class EndFeatureMembershipMeta<
-    T extends FeatureMeta = FeatureMeta
+    T extends FeatureMeta = FeatureMeta,
 > extends FeatureMembershipMeta<T> {
     override ast(): EndFeatureMembership | undefined {
         return this._ast as EndFeatureMembership;

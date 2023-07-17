@@ -129,7 +129,7 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
     createNode<
         V extends SysMLType,
         T extends AstParent<SysMLInterface<V>>,
-        P extends AstPropertiesFor<SysMLInterface<V>, T>
+        P extends AstPropertiesFor<SysMLInterface<V>, T>,
     >(type: V, values: ConstructParams<SysMLInterface<V>, T, P>): SysMLInterface<V> {
         const partialNode = { $type: type, ...values };
 
@@ -214,7 +214,7 @@ export class SysMLAstReflection extends ast.SysMlAstReflection {
 export type ConstructParams<
     V extends AstNode,
     T extends AstParent<V>,
-    P extends AstPropertiesFor<V, T>
+    P extends AstPropertiesFor<V, T>,
 > = Omit<Partial<V>, "$type" | "$container" | "$containerProperty" | "$containerIndex"> &
     AstContainer<V, T, P>;
 

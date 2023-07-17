@@ -30,7 +30,7 @@ export interface StateSubactionMembershipOptions
 
 @metamodelOf(StateSubactionMembership)
 export class StateSubactionMembershipMeta<
-    T extends ActionUsageMeta = ActionUsageMeta
+    T extends ActionUsageMeta = ActionUsageMeta,
 > extends FeatureMembershipMeta<T> {
     kind: StateSubactionKind = "entry";
 
