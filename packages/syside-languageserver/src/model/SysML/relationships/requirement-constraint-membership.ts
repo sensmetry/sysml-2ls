@@ -34,7 +34,7 @@ export interface RequirementConstraintMembershipOptions
 
 @metamodelOf(RequirementConstraintMembership)
 export class RequirementConstraintMembershipMeta<
-    T extends ConstraintUsageMeta = ConstraintUsageMeta
+    T extends ConstraintUsageMeta = ConstraintUsageMeta,
 > extends FeatureMembershipMeta<T> {
     kind: RequirementConstraintKind = "requirement";
 

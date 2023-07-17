@@ -30,7 +30,7 @@ import { RequirementDefinitionMeta } from "../requirement-definition";
 
 @metamodelOf(RequirementVerificationMembership)
 export class RequirementVerificationMembershipMeta<
-    T extends RequirementUsageMeta = RequirementUsageMeta
+    T extends RequirementUsageMeta = RequirementUsageMeta,
 > extends RequirementConstraintMembershipMeta<T> {
     override ast(): RequirementVerificationMembership | undefined {
         return this._ast as RequirementVerificationMembership;

@@ -23,7 +23,7 @@ import { ConjugatedPortDefinitionMeta, PortDefinitionMeta } from "../port-defini
 @metamodelOf(PortConjugation)
 // @ts-expect-error ignoring static inheritance error
 export class PortConjugationMeta<
-    T extends PortDefinitionMeta = PortDefinitionMeta
+    T extends PortDefinitionMeta = PortDefinitionMeta,
 > extends ConjugationMeta<T> {
     override ast(): PortConjugation | undefined {
         return this._ast as PortConjugation;

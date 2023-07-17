@@ -66,7 +66,7 @@ export interface ElementOptions<Parent extends ElementMeta | undefined = Element
 
 export type Edge<R extends RelationshipMeta, T extends TargetType<R> = TargetType<R>> = readonly [
     R,
-    T
+    T,
 ];
 
 export type Edges<R extends RelationshipMeta> = {

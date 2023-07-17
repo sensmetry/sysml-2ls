@@ -49,7 +49,7 @@ export abstract class InheritanceMeta<T extends TypeMeta = TypeMeta> extends Rel
 
     protected static override create<
         T extends AstNode,
-        Parent extends TypeMeta | RelationshipMeta | undefined
+        Parent extends TypeMeta | RelationshipMeta | undefined,
     >(
         this: MetatypeProto<T>,
         provider: ElementIDProvider,

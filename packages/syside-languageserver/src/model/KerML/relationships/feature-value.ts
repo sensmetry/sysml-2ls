@@ -32,7 +32,7 @@ export interface FeatureValueOptions
 
 @metamodelOf(FeatureValue)
 export class FeatureValueMeta<
-    T extends ExpressionMeta = ExpressionMeta
+    T extends ExpressionMeta = ExpressionMeta,
 > extends OwningMembershipMeta<T> {
     isDefault = false;
     isInitial = false;

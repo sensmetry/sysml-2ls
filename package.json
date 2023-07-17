@@ -53,6 +53,8 @@
         "concurrently": "^8.0.1",
         "esbuild": "^0.17.10",
         "eslint": "^8.34.0",
+        "eslint-config-prettier": "^8.8.0",
+        "eslint-plugin-prettier": "^5.0.0",
         "eslint-plugin-unused-imports": "^2.0.0",
         "expect": "^29.4.3",
         "fs-extra": "^11.1.0",
@@ -61,6 +63,7 @@
         "jest-matcher-utils": "^29.4.3",
         "jest-snapshot": "^29.5.0",
         "octokit": "^2.0.14",
+        "prettier": "^3.0.0",
         "shx": "^0.3.4",
         "tsx": "^3.12.3",
         "typescript": "^5.1.3"

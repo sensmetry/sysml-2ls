@@ -26,7 +26,7 @@ import { ActionUsageMeta } from "../action-usage";
 
 @metamodelOf(VariantMembership)
 export class VariantMembershipMeta<
-    T extends UsageMeta = UsageMeta
+    T extends UsageMeta = UsageMeta,
 > extends OwningMembershipMeta<T> {
     override ast(): VariantMembership | undefined {
         return this._ast as VariantMembership;

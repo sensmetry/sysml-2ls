@@ -72,7 +72,7 @@ export type AstPropertiesFor<V extends AstNode, T extends AstParent<V>> = AstKey
 export type AstContainer<
     V extends AstNode,
     T extends AstParent<V>,
-    P extends AstPropertiesFor<V, T>
+    P extends AstPropertiesFor<V, T>,
 > = {
     /**
      * The container node in the AST; every node except the root node has a

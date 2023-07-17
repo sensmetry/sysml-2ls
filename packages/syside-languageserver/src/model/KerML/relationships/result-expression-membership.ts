@@ -26,7 +26,7 @@ import {
 
 @metamodelOf(ResultExpressionMembership)
 export class ResultExpressionMembershipMeta<
-    T extends ExpressionMeta = ExpressionMeta
+    T extends ExpressionMeta = ExpressionMeta,
 > extends FeatureMembershipMeta<T> {
     override ast(): ResultExpressionMembership | undefined {
         return this._ast as ResultExpressionMembership;

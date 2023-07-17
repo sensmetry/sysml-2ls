@@ -40,7 +40,7 @@ import {
 
 export type NonNullRelationship<
     R extends RelationshipMeta = RelationshipMeta,
-    T extends ElementMeta | never = never
+    T extends ElementMeta | never = never,
 > = R & {
     element(): NonNullable<never extends T ? ReturnType<R["element"]> : T>;
 };
@@ -51,12 +51,12 @@ export type TargetType<T extends RelationshipMeta = RelationshipMeta> = NonNulla
 
 export type SourcePart<
     Parent extends ElementMeta | undefined = undefined,
-    Source extends ElementMeta = ElementMeta
+    Source extends ElementMeta = ElementMeta,
 > = Parent extends RelationshipMeta ? { source: Source } : { source?: never };
 
 export interface RelationshipOptionsBody<
     Target extends ElementMeta | undefined,
-    Parent extends ElementMeta | undefined = undefined
+    Parent extends ElementMeta | undefined = undefined,
 > extends ModelElementOptions<Parent> {
     // target is optional since API always consumes `[edge, target]` pairs
     // anyway
@@ -68,12 +68,12 @@ export interface RelationshipOptionsBody<
 export type RelationshipOptions<
     Target extends ElementMeta | undefined,
     Parent extends ElementMeta | undefined = undefined,
-    Source extends ElementMeta = ElementMeta
+    Source extends ElementMeta = ElementMeta,
 > = RelationshipOptionsBody<Target, Parent> & SourcePart<Parent, Source>;
 
 @metamodelOf(Relationship, "abstract")
 export abstract class RelationshipMeta<
-    Target extends ElementMeta = ElementMeta
+    Target extends ElementMeta = ElementMeta,
 > extends ElementMeta {
     protected _children = new ElementContainer<Element>();
 

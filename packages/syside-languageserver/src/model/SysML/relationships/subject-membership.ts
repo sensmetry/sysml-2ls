@@ -27,7 +27,7 @@ import { CaseUsageMeta } from "../case-usage";
 
 @metamodelOf(SubjectMembership)
 export class SubjectMembershipMeta<
-    T extends ReferenceUsageMeta = ReferenceUsageMeta
+    T extends ReferenceUsageMeta = ReferenceUsageMeta,
 > extends ParameterMembershipMeta<T> {
     override ast(): SubjectMembership | undefined {
         return this._ast as SubjectMembership;

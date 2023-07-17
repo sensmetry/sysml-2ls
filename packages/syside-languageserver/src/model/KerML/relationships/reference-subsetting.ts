@@ -20,7 +20,7 @@ import { FeatureMeta, SubsettingMeta } from "../_internal";
 
 @metamodelOf(ReferenceSubsetting)
 export class ReferenceSubsettingMeta<
-    T extends FeatureMeta = FeatureMeta
+    T extends FeatureMeta = FeatureMeta,
 > extends SubsettingMeta<T> {
     override ast(): ReferenceSubsetting | undefined {
         return this._ast as ReferenceSubsetting;

@@ -27,7 +27,7 @@ import { RequirementUsageMeta } from "../requirement-usage";
 
 @metamodelOf(ActorMembership)
 export class ActorMembershipMeta<
-    T extends PartUsageMeta = PartUsageMeta
+    T extends PartUsageMeta = PartUsageMeta,
 > extends ParameterMembershipMeta<T> {
     override ast(): ActorMembership | undefined {
         return this._ast as ActorMembership;
