@@ -16,13 +16,10 @@
 
 import {
     AbstractSemanticTokenProvider,
-    AllSemanticTokenModifiers,
-    AllSemanticTokenTypes,
     AstNode,
     DocumentState,
     LangiumDocument,
     SemanticTokenAcceptor,
-    DefaultSemanticTokenOptions,
     isOperationCancelled,
 } from "langium";
 import {
@@ -33,15 +30,10 @@ import {
     Comment,
     TextualRepresentation,
     OperatorExpression,
-    Type,
-    Classifier,
-    Feature,
     Membership,
 } from "../../generated/ast";
 import {
     CancellationToken,
-    SemanticTokenModifiers,
-    SemanticTokenTypes,
     SemanticTokens,
     SemanticTokensDelta,
     SemanticTokensDeltaParams,
@@ -49,120 +41,25 @@ import {
     SemanticTokensRangeParams,
     Connection,
     SemanticTokensRefreshRequest,
-    SemanticTokensOptions,
     ResponseError,
 } from "vscode-languageserver";
 import { SysMLDefaultServices } from "../services";
-import { TypeMap, typeIndex, ElementMeta } from "../../model";
+import { TypeMap, typeIndex } from "../../model";
 import { SysMLDocumentBuilder } from "../shared/workspace/document-builder";
 import { SysMLType, SysMLTypeList } from "../sysml-ast-reflection";
+import {
+    SysMLSemanticTokenModifiers,
+    SysMLSemanticTokenTypes,
+    tokenModifiers,
+    tokenType,
+} from "../../model/semantic-tokens";
 
 type ReturnType = void | "prune" | undefined;
 
-//! Changes to the following need to be reflected in package.json
-/**
- * Semantic token types used by the SysML language server
- */
-export const SysMLSemanticTokenTypes = {
-    // builtin
-    class: SemanticTokenTypes.class,
-    comment: SemanticTokenTypes.comment,
-    enum: SemanticTokenTypes.enum,
-    enumMember: SemanticTokenTypes.enumMember,
-    event: SemanticTokenTypes.event,
-    function: SemanticTokenTypes.function,
-    interface: SemanticTokenTypes.interface,
-    keyword: SemanticTokenTypes.keyword,
-    macro: SemanticTokenTypes.macro,
-    method: SemanticTokenTypes.method,
-    modifier: SemanticTokenTypes.modifier,
-    namespace: SemanticTokenTypes.namespace,
-    number: SemanticTokenTypes.number,
-    operator: SemanticTokenTypes.operator,
-    parameter: SemanticTokenTypes.parameter,
-    property: SemanticTokenTypes.property,
-    regexp: SemanticTokenTypes.regexp,
-    string: SemanticTokenTypes.string,
-    struct: SemanticTokenTypes.struct,
-    type: SemanticTokenTypes.type,
-    typeParameter: SemanticTokenTypes.typeParameter,
-    variable: SemanticTokenTypes.variable,
-    decorator: SemanticTokenTypes.decorator,
-
-    // custom, need to be registered in package.json
-    annotation: "annotation",
-    annotationBody: "annotationBody",
-    relationship: "relationship",
-    metaclass: "metaclass",
-};
-
-/**
- * Semantic token modifiers used by the SysML language server
- */
-export const SysMLSemanticTokenModifiers = {
-    // builtin
-    abstract: SemanticTokenModifiers.abstract,
-    async: SemanticTokenModifiers.async,
-    declaration: SemanticTokenModifiers.declaration,
-    defaultLibrary: SemanticTokenModifiers.defaultLibrary,
-    definition: SemanticTokenModifiers.definition,
-    deprecated: SemanticTokenModifiers.deprecated,
-    documentation: SemanticTokenModifiers.documentation,
-    modification: SemanticTokenModifiers.modification,
-    readonly: SemanticTokenModifiers.readonly,
-    static: SemanticTokenModifiers.static,
-
-    // custom, need to be registered in package.json
-};
-//! -------------------------------------------------------------------
-
-// register custom types and modifiers, have to do it on global variables...
-Object.values(SysMLSemanticTokenTypes).forEach(
-    (name, index) => (AllSemanticTokenTypes[name] = index)
-);
-
-Object.values(SysMLSemanticTokenModifiers).forEach(
-    (name, index) => (AllSemanticTokenModifiers[name] = 1 << index)
-);
-
-/**
- * Default semantic tokens options implemented by the SysML language server
- */
-export const DefaultSysMLSemanticTokenOptions: SemanticTokensOptions = {
-    ...DefaultSemanticTokenOptions,
-    legend: {
-        tokenTypes: Object.keys(SysMLSemanticTokenTypes),
-        tokenModifiers: Object.keys(SysMLSemanticTokenModifiers),
-    },
-};
-
-/**
- * Basic types to semantic tokens map for name and reference highlighting
- */
-const TYPE_TOKENS: { readonly [K in SysMLType]?: string } = {
-    Namespace: SysMLSemanticTokenTypes.namespace,
-    Type: SysMLSemanticTokenTypes.type,
-    Feature: SysMLSemanticTokenTypes.variable,
-    Class: SysMLSemanticTokenTypes.class,
-    Structure: SysMLSemanticTokenTypes.struct,
-    Comment: SysMLSemanticTokenTypes.annotation,
-    TextualRepresentation: SysMLSemanticTokenTypes.annotation,
-    EnumerationDefinition: SysMLSemanticTokenTypes.enum,
-    EnumerationUsage: SysMLSemanticTokenTypes.enumMember,
-    SysMLFunction: SysMLSemanticTokenTypes.function,
-    Expression: SysMLSemanticTokenTypes.method,
-    LiteralNumber: SysMLSemanticTokenTypes.number,
-    LiteralString: SysMLSemanticTokenTypes.string,
-    Relationship: SysMLSemanticTokenTypes.relationship,
-    Metaclass: SysMLSemanticTokenTypes.metaclass,
-    Association: SysMLSemanticTokenTypes.type,
-    AssociationStructure: SysMLSemanticTokenTypes.struct,
-};
 type HighlightFunction<T = AstNode> = (node: T, acceptor: SemanticTokenAcceptor) => ReturnType;
 type HighlightMap = { [K in SysMLType]?: HighlightFunction<SysMLTypeList[K]>[] };
 
 export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
-    protected readonly tokenMap;
     protected readonly highlightMap: Map<string, HighlightFunction[]>;
     protected readonly connection: Connection | undefined;
     protected readonly builder: SysMLDocumentBuilder;
@@ -191,7 +88,6 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
         this.connection = services.shared.lsp.Connection;
         this.builder = services.shared.workspace.DocumentBuilder;
 
-        this.tokenMap = typeIndex.expandToDerivedTypes(TYPE_TOKENS);
         this.highlightMap = typeIndex.expandAndMerge({
             Element: [this.element],
             ElementReference: [this.elementReference],
@@ -286,39 +182,15 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
     }
 
     /**
-     * Compute semantic token modifiers for {@link node}
-     * @param node
-     * @returns array of modifier names
-     */
-    protected elementModifiers(node: ElementMeta): string[] {
-        const mods: string[] = [];
-
-        if (node.is(Type) && node.isAbstract) {
-            mods.push(SysMLSemanticTokenModifiers.abstract);
-        }
-        if (node.is(Classifier)) {
-            mods.push(SysMLSemanticTokenModifiers.definition);
-        }
-        if (node.isStandardElement) {
-            mods.push(SysMLSemanticTokenModifiers.defaultLibrary);
-        }
-        if (node.is(Feature) && node.isReadonly) {
-            mods.push(SysMLSemanticTokenModifiers.readonly);
-        }
-
-        return mods;
-    }
-
-    /**
      * Highlight {@link node} name and short name
      * @param node
      * @param acceptor
      * @param type optional semantic token type override
      */
     protected element(node: Element, acceptor: SemanticTokenAcceptor, type?: string): ReturnType {
-        type ??= this.tokenMap.get(node.$type);
+        type ??= tokenType(node.$meta);
         if (!type || !(node.declaredName || node.declaredShortName)) return;
-        const mods = this.elementModifiers(node.$meta);
+        const mods = tokenModifiers(node.$meta);
 
         // this is also a declaration
         mods.push(SysMLSemanticTokenModifiers.declaration);
@@ -360,14 +232,14 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
             let target = ref.ref?.$meta;
             if (target?.is(Membership)) target = target.element();
             if (!target) continue;
-            const type = this.tokenMap.get(target.nodeType());
+            const type = tokenType(target);
             if (!type) continue;
             acceptor({
                 node: node,
                 property: "parts",
                 index: index,
                 type: type,
-                modifier: this.elementModifiers(target),
+                modifier: tokenModifiers(target),
             });
         }
     }

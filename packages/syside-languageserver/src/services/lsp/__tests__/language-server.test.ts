@@ -51,9 +51,12 @@ import { SETTINGS_KEY } from "../../shared/workspace/configuration-provider";
 import { SysMLEmptyFileSystem } from "../../shared/workspace/file-system-provider";
 import { SUPPORTED_TRIGGER_CHARACTERS } from "../completion-provider";
 import { SysMLExecuteCommandHandler } from "../execute-command-handler";
-import { SysMLSemanticTokenTypes, SysMLSemanticTokenModifiers } from "../semantic-token-provider";
 import { ClientConfig, GenericLanguageClient, SysMLClientExtender } from "syside-languageclient";
 import { startServer } from "../../../launch/server";
+import {
+    SysMLSemanticTokenTypes,
+    SysMLSemanticTokenModifiers,
+} from "../../../model/semantic-tokens";
 
 class NullLogger implements Logger {
     error(_message: string): void {}
