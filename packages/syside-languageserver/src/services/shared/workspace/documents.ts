@@ -78,6 +78,12 @@ declare module "langium" {
          * invalidation
          */
         onInvalidated: MultiMap<ElementMeta, () => void>;
+
+        /**
+         * If true, comments have been attached to model elements and should not
+         * be attached again.
+         */
+        commentsAttached: boolean;
     }
 }
 
@@ -119,6 +125,7 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
         doc.astNodes = streamAst(doc.parseResult.value).toArray();
         doc.modelDiagnostics = new MultiMap();
         doc.onInvalidated = new MultiMap();
+        doc.commentsAttached = false;
 
         this.metamodelBuilder.onParsed(doc);
         return doc;

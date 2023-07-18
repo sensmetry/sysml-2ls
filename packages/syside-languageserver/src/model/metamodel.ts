@@ -25,6 +25,7 @@ import { Inheritance, NonOwnerType, Specialization } from "../generated/ast";
 import type { ElementMeta } from "./KerML";
 import * as mixer from "ts-mixer";
 import { Class } from "ts-mixer/dist/types/types";
+import { TextComment } from "../utils";
 
 export type ElementID = number;
 export type ElementIDProvider = () => ElementID;
@@ -157,6 +158,11 @@ export interface Metamodel<T extends AstNode = AstNode> {
     document: LangiumDocument;
 
     /**
+     * Notes attached to this element
+     */
+    notes: TextComment[];
+
+    /**
      * AST node associated with this metamodel
      */
     ast(): T | undefined;
@@ -240,6 +246,7 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
 
     setupState: BuildState = "none";
     isStandardElement = false;
+    notes: TextComment[] = [];
 
     protected constructor(id: ElementID, document: LangiumDocument) {
         this.elementId = id;

@@ -344,7 +344,9 @@ declare global {
 /**
  * Docs are wrong and {@link expect.objectContaining} is not recursive, use this instead
  */
-export function recursiveObjectContaining(value: unknown): unknown {
+export function recursiveObjectContaining<T extends object = object>(
+    value: T
+): ReturnType<(typeof expect)["objectContaining"]> {
     if (typeof value !== "object") return value;
     if (!value) return value;
 

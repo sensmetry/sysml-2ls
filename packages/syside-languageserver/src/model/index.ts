@@ -23,6 +23,7 @@ export * from "./implicits";
 export * from "./metamodel";
 export * from "./mixins";
 export * from "./naming";
+export * from "./notes";
 export * from "./semantic-tokens";
 export * from "./types";
 export * from "./util";

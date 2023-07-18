@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { CstNode, streamCst } from "langium";
+import { CstNode, DocumentSegment, streamCst } from "langium";
 import { Range } from "vscode-languageserver";
 
 export function getPreviousNode(node: CstNode, hidden = true): CstNode | undefined {
@@ -73,4 +73,27 @@ export function findChildren(node: CstNode, range: Range = node.range): CstNode[
     }
 
     return children;
+}
+
+/**
+ * Returns the number of line breaks between the start of `right` and the end of
+ * `left`.
+ */
+export function newLineCount(
+    left: DocumentSegment | undefined,
+    right: DocumentSegment | undefined
+): number {
+    if (!left || !right) return 0;
+    return right.range.start.line - left.range.end.line;
+}
+
+/**
+ * Returns the distance between the end of `left` and start of `right`.
+ */
+export function distance(
+    left: DocumentSegment | undefined,
+    right: DocumentSegment | undefined
+): number {
+    if (!left || !right) return 0;
+    return right.offset - left.end;
 }
