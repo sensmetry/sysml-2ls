@@ -148,7 +148,7 @@ export interface ModelLevelExpressionEvaluator {
 }
 
 export const BUILTIN_FUNCTIONS: Record<string, BuiltinFunction> = {};
-export const OPERATOR_FUNCTIONS: Record<string, string> = {};
+export const OPERATOR_FUNCTIONS: Partial<Record<meta.Operator, string>> = {};
 
 // TODO: Allow multiple packages to account for specializations
 export function functionFor(
@@ -158,7 +158,7 @@ export function functionFor(
     const functions: string[] = [];
     const add = (op: string): void => {
         const name = concatNames(pack, op);
-        if (op.startsWith("'")) OPERATOR_FUNCTIONS[op] = name;
+        if (op.startsWith("'")) OPERATOR_FUNCTIONS[op as meta.Operator] = name;
         functions.push(name);
     };
 

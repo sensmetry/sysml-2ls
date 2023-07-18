@@ -991,17 +991,7 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         // need to build all children recursively because reference resolution
         // may depend on a child left of it
         children.forEach((m) => this.buildTree(m, document));
-        node["_args"].push(
-            ...stream(children)
-                .filter(BasicMetamodel.is(Membership))
-                .map((m) => m.element())
-                .filter(BasicMetamodel.is(Feature))
-        );
-    }
-
-    @builder(OperatorExpression)
-    protected setupOperatorArgs(node: OperatorExpressionMeta, _document: LangiumDocument): void {
-        node["_args"] = (node["_operands"] as Array<FeatureMeta | undefined>).concat(node.args);
+        node["_args"] = node.arguments();
     }
 
     @builder(FeatureReferenceExpression)

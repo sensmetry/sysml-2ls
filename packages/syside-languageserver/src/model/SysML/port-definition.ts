@@ -45,14 +45,14 @@ export class PortDefinitionMeta extends Mixin(StructureMeta, OccurrenceDefinitio
         super.setName(name);
 
         const def = this._conjugatedDefinition?.element();
-        if (def) def.declaredName = this.name ? `'~${this.name}'` : undefined;
+        if (def) def.declaredName = this.name ? `~${this.name}` : undefined;
     }
 
     protected override setShortName(name: string | undefined): void {
         super.setShortName(name);
 
         const def = this._conjugatedDefinition?.element();
-        if (def) def.declaredShortName = this.shortName ? `'~${this.shortName}'` : undefined;
+        if (def) def.declaredShortName = this.shortName ? `~${this.shortName}` : undefined;
     }
 
     static override create<T extends AstNode>(

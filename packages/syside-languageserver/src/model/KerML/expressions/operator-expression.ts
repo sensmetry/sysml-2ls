@@ -22,13 +22,64 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import {
     ElementParts,
     ExpressionMeta,
+    FeatureMeta,
     InvocationExpressionMeta,
     InvocationExpressionOptions,
     TypeMeta,
 } from "../_internal";
 
+export const OPERATORS = {
+    IF: "'if'",
+    NULL_COALESCING: "'??'",
+    IMPLIES: "'implies'",
+    OR: "'or'",
+    BITWISE_OR: "'|'",
+    XOR: "'xor'",
+    AND: "'and'",
+    BITWISE_AND: "'&'",
+    EQUALS: "'=='",
+    SAME: "'==='",
+    NOT_EQUALS: "'!='",
+    NOT_SAME: "'!=='",
+    IS_TYPE: "'istype'",
+    HAS_TYPE: "'hastype'",
+    AT: "'@'",
+    AT_AT: "'@@'",
+    AS: "'as'",
+    META: "'meta'",
+    LESS: "'<'",
+    LESS_EQUAL: "'<='",
+    GREATER: "'>'",
+    GREATER_EQUAL: "'>='",
+    RANGE: "'..'",
+    PLUS: "'+'",
+    MINUS: "'-'",
+    MULTIPLY: "'*'",
+    DIVIDE: "'/'",
+    MODULO: "'%'",
+    EXPONENT_1: "'**'",
+    EXPONENT_2: "'^'",
+    BITWISE_NOT: "'~'",
+    NOT: "'not'",
+    ALL: "'all'",
+    INDEX: "'#'",
+    QUANTITY: "'['",
+    COMMA: "','",
+    NONE: "",
+} as const;
+
+export const IMPLICIT_OPERATORS = {
+    DOT: "'.'",
+    ARROW: "'->'",
+    SELECT: "'.?'",
+    METADATA: "'.metadata'",
+} as const;
+
+export type Operator = (typeof OPERATORS)[keyof typeof OPERATORS];
+export type AnyOperator = Operator | (typeof IMPLICIT_OPERATORS)[keyof typeof IMPLICIT_OPERATORS];
+
 export interface OperatorExpressionOptions extends InvocationExpressionOptions {
-    operator?: string;
+    operator?: Operator;
 }
 
 @metamodelOf(OperatorExpression)
@@ -36,7 +87,7 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     /**
      * The escaped operator name used in this expression, i.e. `'+'`
      */
-    operator = "";
+    operator: Operator = OPERATORS.NONE;
 
     // this only exists for compatibility with AST since we don't construct the
     // missing intermediate elements to operands
@@ -45,6 +96,10 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     @enumerable
     get operands(): readonly ExpressionMeta[] {
         return this._operands;
+    }
+
+    override arguments(): readonly FeatureMeta[] {
+        return [...this.operands, ...super.arguments()];
     }
 
     override ast(): OperatorExpression | undefined {

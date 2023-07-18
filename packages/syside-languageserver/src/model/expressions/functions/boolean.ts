@@ -16,7 +16,7 @@
 
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ElementMeta, OperatorExpressionMeta } from "../../KerML";
+import { ElementMeta, OPERATORS, OperatorExpressionMeta } from "../../KerML";
 import {
     BuiltinFunction,
     ModelLevelExpressionEvaluator,
@@ -48,28 +48,28 @@ abstract class BooleanFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'&'")
+@functionFor(PACKAGE, OPERATORS.BITWISE_AND)
 export class AndFunction extends BooleanFunction {
     protected override binary(x: boolean, y: boolean): ExpressionResultValue {
         return x && y;
     }
 }
 
-@functionFor(PACKAGE, "'|'")
+@functionFor(PACKAGE, OPERATORS.BITWISE_OR)
 export class OrFunction extends BooleanFunction {
     protected override binary(x: boolean, y: boolean): ExpressionResultValue {
         return x || y;
     }
 }
 
-@functionFor(PACKAGE, "'not'")
+@functionFor(PACKAGE, OPERATORS.NOT)
 export class NotFunction extends BooleanFunction {
     protected override unary(x: boolean): ExpressionResultValue {
         return !x;
     }
 }
 
-@functionFor(PACKAGE, "'xor'")
+@functionFor(PACKAGE, OPERATORS.XOR)
 export class XorFunction extends BooleanFunction {
     protected override binary(x: boolean, y: boolean): ExpressionResultValue {
         return x !== y;

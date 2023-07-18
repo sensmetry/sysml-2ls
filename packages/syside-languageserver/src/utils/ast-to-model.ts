@@ -26,6 +26,7 @@ import {
     MembershipMeta,
     MetadataFeatureMeta,
     MultiplicityRangeMeta,
+    Operator,
     OwningMembershipMeta,
     ParameterMembershipMeta,
     ReferenceUsageMeta,
@@ -34,6 +35,7 @@ import {
     getTransitionFeatureKind,
     getVisibility,
     prettyAnnotationBody,
+    sanitizeName,
     typeIndex,
 } from "../model";
 import { streamModel } from "./ast-util";
@@ -70,7 +72,7 @@ const AstToModel: {
     },
 
     [ast.OperatorExpression](model, node) {
-        if (node.operator) model.operator = `'${node.operator}'`;
+        if (node.operator) model.operator = `'${node.operator}'` as Operator;
         model["_operands"] = node.operands.map((e) => e.$meta);
     },
 
@@ -98,8 +100,8 @@ const AstToModel: {
     },
 
     [ast.Element](model, node) {
-        model.declaredName = node.declaredName;
-        model.declaredShortName = node.declaredShortName;
+        model.declaredName = sanitizeName(node.declaredName);
+        model.declaredShortName = sanitizeName(node.declaredShortName);
     },
 
     [ast.Expression](model, node) {

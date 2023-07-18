@@ -8,7 +8,7 @@ terminal fragment FLOAT: DECIMAL FRACTION? | FRACTION;
 terminal fragment EXPONENT: /[eE][\-\+]*/ DECIMAL;
 terminal NUMBER returns number: FLOAT EXPONENT?;
 terminal ID returns string: /[_a-zA-Z][\w_\d]*/;
-terminal UNRESTRICTED_NAME returns string: /'(\\['"bftn\\]|[^'\\])*'/;
+terminal UNRESTRICTED_NAME returns string: /'(\\['"bftnr\\]|[^'\\])*'/;
 terminal STRING_VALUE returns string: /"[^"]*"/;
 terminal REGULAR_COMMENT: /\/\*[\s\S]*?\*\//;
 

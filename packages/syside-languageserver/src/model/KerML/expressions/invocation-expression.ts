@@ -14,18 +14,35 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Expression, InvocationExpression, SysMLFunction } from "../../../generated/ast";
-import { metamodelOf } from "../../metamodel";
+import {
+    Expression,
+    Feature,
+    InvocationExpression,
+    Membership,
+    SysMLFunction,
+} from "../../../generated/ast";
+import { BasicMetamodel, metamodelOf } from "../../metamodel";
 import { ExpressionMeta, ExpressionOptions, FeatureMeta, TypeMeta } from "../_internal";
 
 export type InvocationExpressionOptions = ExpressionOptions;
 
 @metamodelOf(InvocationExpression)
 export class InvocationExpressionMeta extends ExpressionMeta {
-    protected _args: (FeatureMeta | undefined)[] = [];
+    protected _args: readonly FeatureMeta[] = [];
 
-    get args(): readonly (FeatureMeta | undefined)[] {
+    /**
+     * Cached version of {@link arguments} that is populated during model build
+     * time
+     */
+    get args(): readonly FeatureMeta[] {
         return this._args;
+    }
+
+    arguments(): readonly FeatureMeta[] {
+        return this.children
+            .filter(BasicMetamodel.is(Membership))
+            .map((m) => m.element())
+            .filter(BasicMetamodel.is(Feature));
     }
 
     override ast(): InvocationExpression | undefined {

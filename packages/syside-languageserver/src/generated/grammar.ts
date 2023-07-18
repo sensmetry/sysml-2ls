@@ -10469,7 +10469,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       },
       "definition": {
         "$type": "RegexToken",
-        "regex": "'(\\\\\\\\['\\"bftn\\\\\\\\]|[^'\\\\\\\\])*'"
+        "regex": "'(\\\\\\\\['\\"bftnr\\\\\\\\]|[^'\\\\\\\\])*'"
       },
       "fragment": false,
       "hidden": false
@@ -31762,7 +31762,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       },
       "definition": {
         "$type": "RegexToken",
-        "regex": "'(\\\\\\\\['\\"bftn\\\\\\\\]|[^'\\\\\\\\])*'"
+        "regex": "'(\\\\\\\\['\\"bftnr\\\\\\\\]|[^'\\\\\\\\])*'"
       },
       "fragment": false,
       "hidden": false
