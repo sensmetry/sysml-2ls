@@ -58,6 +58,7 @@
         "chevrotain": "^9.1.0",
         "commander": "^10.0.1",
         "langium": "^1.2.0",
+        "string-width": "^6.1.0",
         "syside-protocol": "workspace:*",
         "ts-mixer": "^6.0.3",
         "vscode-languageserver": "~8.0.2",

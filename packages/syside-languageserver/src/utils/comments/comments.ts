@@ -12,6 +12,8 @@
  * available at https://www.gnu.org/software/classpath/license.html.
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ *
+ * Based on prettier
  ********************************************************************************/
 
 import {
@@ -24,7 +26,22 @@ import {
     isLeafCstNode,
     streamCst,
 } from "langium";
-import { distance } from "../cst-util";
+import { distance, newLineCount } from "../cst-util";
+import {
+    Doc,
+    breakParent,
+    hardline,
+    indent,
+    inheritLabel,
+    join,
+    line,
+    lineSuffix,
+    literalline,
+    literals,
+    text,
+} from "../printer/doc";
+import { SemanticTokenTypes } from "vscode-languageserver";
+import { getNextNode, getPreviousNode } from "../cst-util";
 
 export type TextCommentKind = "line" | "block";
 
@@ -85,6 +102,12 @@ export interface TextComment {
      * * `trailing`: this comment is after the element ends
      */
     localPlacement: "leading" | "inner" | "trailing";
+
+    /**
+     * Optional label that may be set during attachment to mark specific comment
+     * position. May be useful for coarse ASTs.
+     */
+    label?: string;
 }
 
 export interface CstTextComment extends Omit<TextComment, "localPlacement"> {
@@ -291,4 +314,211 @@ export abstract class AbstractKerMLCommentVisitor implements CommentVisitor {
     }
 
     abstract visit(comment: CstTextComment): void;
+}
+
+const HighlightComment = { type: SemanticTokenTypes.comment };
+const SL_NOTE = {
+    start: text("//", HighlightComment),
+};
+const ML_NOTE = {
+    start: text("//*", HighlightComment),
+    end: text("*/", HighlightComment),
+};
+
+/**
+ * Default prints KerML and SysML notes to `Doc`.
+ */
+export function printKerMLNote(comment: TextComment): Doc {
+    if (comment.kind === "line") return [SL_NOTE.start, text(comment.text, HighlightComment)];
+
+    const lines = comment.text.split("\n");
+    const lastLine = lines.at(-1)?.trim();
+    const indentable =
+        lines.length > 1 &&
+        lines.slice(1, lines.length - 1).every((line) => line.trimStart()[0] === "*") &&
+        (lastLine?.[0] === "*" || lastLine === "");
+
+    if (indentable) {
+        return [
+            ML_NOTE.start,
+            join(
+                [hardline, text("  ")],
+                lines.map((line, index) => {
+                    if (index === 0) return text(line.trimEnd(), HighlightComment);
+                    if (index < lines.length - 1) return text(line.trim(), HighlightComment);
+                    return text(line.trimStart(), HighlightComment);
+                }),
+                lastLine !== ""
+            ),
+            ML_NOTE.end,
+        ];
+    }
+
+    return [
+        ML_NOTE.start,
+        join(
+            literalline,
+            lines.map((line) => text(line, HighlightComment))
+        ),
+        ML_NOTE.end,
+    ];
+}
+
+export interface PrintCommentContext {
+    printComment: typeof printKerMLNote;
+    printed?: Set<TextComment>;
+}
+
+export function printComment(
+    comment: TextComment,
+    context: PrintCommentContext = { printComment: printKerMLNote }
+): Doc {
+    context.printed?.add(comment);
+    return context.printComment(comment);
+}
+
+export function printLeadingComment(
+    comment: TextComment,
+    context: PrintCommentContext = { printComment: printKerMLNote }
+): Doc {
+    const parts = [printComment(comment, context)];
+
+    let newLinebreaks = 0;
+    if (comment.$cstNode) {
+        newLinebreaks = newLineCount(comment.segment, getNextNode(comment.$cstNode, true));
+    }
+
+    if (comment.kind === "block") {
+        if (newLinebreaks <= 0) parts.push(literals.space);
+        else {
+            let prevLinebreaks = 0;
+            if (comment.$cstNode) {
+                prevLinebreaks = newLineCount(
+                    getPreviousNode(comment.$cstNode, true),
+                    comment.segment
+                );
+            }
+            parts.push(prevLinebreaks > 0 ? hardline : line);
+        }
+    } else {
+        parts.push(hardline);
+    }
+
+    if (newLinebreaks > 1) parts.push(hardline);
+
+    return parts;
+}
+
+export interface TrailingComment {
+    doc: Doc;
+    comment: TextComment;
+    hasLineSuffix: boolean;
+}
+
+export function printTrailingComment(
+    comment: TextComment,
+    context: PrintCommentContext = { printComment: printKerMLNote },
+    previousComment?: TrailingComment
+): TrailingComment {
+    const doc = printComment(comment, context);
+
+    let prevLinebreaks = 0;
+    if (comment.$cstNode) {
+        prevLinebreaks = newLineCount(getPreviousNode(comment.$cstNode, true), comment.segment);
+    }
+
+    if (
+        (previousComment?.hasLineSuffix && previousComment.comment.kind === "line") ||
+        prevLinebreaks > 0
+    ) {
+        return {
+            doc: lineSuffix([hardline, prevLinebreaks > 1 ? hardline : literals.emptytext, doc]),
+            comment,
+            hasLineSuffix: true,
+        };
+    }
+
+    if (comment.kind === "line" || previousComment?.hasLineSuffix) {
+        return {
+            doc: [lineSuffix([literals.space, doc]), breakParent],
+            comment,
+            hasLineSuffix: true,
+        };
+    }
+
+    return { doc: [literals.space, doc], comment, hasLineSuffix: false };
+}
+
+export function printOuterComments(
+    comments: readonly TextComment[],
+    context: PrintCommentContext = { printComment: printKerMLNote }
+): { leading: Doc; trailing: Doc } | undefined {
+    if (comments.length === 0) return;
+
+    const leading: Doc[] = [];
+    const trailing: Doc[] = [];
+
+    let trailingComment: TrailingComment | undefined = undefined;
+    comments
+        .filter((comment) => !context.printed?.has(comment))
+        .forEach((comment) => {
+            if (comment.localPlacement === "leading") {
+                leading.push(printLeadingComment(comment, context));
+            } else if (comment.localPlacement === "trailing") {
+                trailingComment = printTrailingComment(comment, context, trailingComment);
+                trailing.push(trailingComment.doc);
+            } else {
+                // a logic error - catch unprinted inner comments so as not to
+                // lose source file information
+                throw new Error(
+                    `Unprinted inner ${comment.kind} comment '${comment.text}' at ${comment.segment}`
+                );
+            }
+        });
+
+    if (leading.length === 0 && trailing.length === 0) return;
+    return { leading, trailing };
+}
+
+export function surroundWithComments(
+    doc: Doc,
+    comments: readonly TextComment[],
+    context: PrintCommentContext = { printComment: printKerMLNote }
+): Doc {
+    const printed = printOuterComments(comments, context);
+    if (!printed) return doc;
+    return inheritLabel(doc, (contents) => [printed.leading, contents, printed.trailing]);
+}
+
+export interface InnerCommentContext extends PrintCommentContext {
+    indent?: boolean;
+    label?: string;
+    filter?: (comment: TextComment) => boolean;
+}
+
+const alwaysTrue = (): boolean => true;
+
+export function printInnerComments(
+    comments: readonly TextComment[],
+    context: InnerCommentContext = { printComment: printKerMLNote },
+    suffix?: (comment: TextComment) => Doc | undefined
+): Doc {
+    if (comments.length === 0) return literals.emptytext;
+
+    const { label, filter = alwaysTrue } = context;
+
+    const inner = comments.filter(
+        (comment) =>
+            comment.localPlacement === "inner" && comment.label === label && filter(comment)
+    );
+    const parts = inner.map((comment) => printComment(comment, context));
+
+    if (parts.length === 0) return literals.emptytext;
+
+    let printed = join(hardline, parts);
+    if (suffix) {
+        const ending = suffix(inner[inner.length - 1]);
+        if (ending) printed = [printed, ending];
+    }
+    return context.indent ? indent(printed) : printed;
 }
