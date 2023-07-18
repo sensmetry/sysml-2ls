@@ -15,7 +15,13 @@
  ********************************************************************************/
 
 import { Feature, Type } from "../../../generated/ast";
-import { ElementMeta, FeatureMeta, OperatorExpressionMeta } from "../../KerML";
+import {
+    ElementMeta,
+    FeatureMeta,
+    IMPLICIT_OPERATORS,
+    OPERATORS,
+    OperatorExpressionMeta,
+} from "../../KerML";
 import { RangeGenerator } from "../range";
 import {
     BuiltinFunction,
@@ -43,7 +49,7 @@ abstract class ConditionalLogicalFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'and'")
+@functionFor(PACKAGE, OPERATORS.AND)
 export class ConditionalAndFunction extends ConditionalLogicalFunction {
     protected override test(value: boolean): boolean {
         return !value;
@@ -54,7 +60,7 @@ export class ConditionalAndFunction extends ConditionalLogicalFunction {
     }
 }
 
-@functionFor(PACKAGE, "'implies'")
+@functionFor(PACKAGE, OPERATORS.IMPLIES)
 export class ConditionalImpliesFunction extends ConditionalLogicalFunction {
     protected override test(value: boolean): boolean {
         return !value;
@@ -65,7 +71,7 @@ export class ConditionalImpliesFunction extends ConditionalLogicalFunction {
     }
 }
 
-@functionFor(PACKAGE, "'or'")
+@functionFor(PACKAGE, OPERATORS.OR)
 export class ConditionalOrFunction extends ConditionalLogicalFunction {
     protected override test(value: boolean): boolean {
         return value;
@@ -76,7 +82,7 @@ export class ConditionalOrFunction extends ConditionalLogicalFunction {
     }
 }
 
-@functionFor(PACKAGE, "'if'")
+@functionFor(PACKAGE, OPERATORS.IF)
 export class ConditionalFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -88,7 +94,7 @@ export class ConditionalFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'.'")
+@functionFor(PACKAGE, IMPLICIT_OPERATORS.DOT)
 export class DotFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -115,7 +121,7 @@ export class DotFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'??'")
+@functionFor(PACKAGE, OPERATORS.NULL_COALESCING)
 export class NullCoalescingFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,

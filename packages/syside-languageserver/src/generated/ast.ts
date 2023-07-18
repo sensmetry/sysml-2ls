@@ -33,7 +33,7 @@ export function isInlineExpression(item: unknown): item is InlineExpression {
 export type Name = string;
 
 export function isName(item: unknown): item is Name {
-    return (typeof item === 'string' && (/[_a-zA-Z][\w_\d]*/.test(item) || /'(\\['"bftn\\]|[^'\\])*'/.test(item)));
+    return (typeof item === 'string' && (/[_a-zA-Z][\w_\d]*/.test(item) || /'(\\['"bftnr\\]|[^'\\])*'/.test(item)));
 }
 
 export type NonOwnerType = Annotation | Membership;

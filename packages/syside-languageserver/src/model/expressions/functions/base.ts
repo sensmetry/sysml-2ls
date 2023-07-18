@@ -16,7 +16,7 @@
 
 import { Type } from "langium/lib/grammar/generated/ast";
 import { Feature } from "../../../generated/ast";
-import { ElementMeta, FeatureMeta, OperatorExpressionMeta, TypeMeta } from "../../KerML";
+import { ElementMeta, FeatureMeta, OPERATORS, OperatorExpressionMeta, TypeMeta } from "../../KerML";
 import { RangeGenerator } from "../range";
 import {
     BuiltinFunction,
@@ -38,7 +38,7 @@ function getTypeArgument(expression: OperatorExpressionMeta): TypeMeta {
     return type;
 }
 
-@functionFor(PACKAGE, ["'as'", "'meta'"])
+@functionFor(PACKAGE, [OPERATORS.AS, OPERATORS.META])
 export class AsFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -55,7 +55,7 @@ export class AsFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, ["'@'", "'@@'"])
+@functionFor(PACKAGE, [OPERATORS.AT, OPERATORS.AT_AT])
 export class AtFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -68,7 +68,7 @@ export class AtFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, ["'=='", "'==='"])
+@functionFor(PACKAGE, [OPERATORS.EQUALS, OPERATORS.SAME])
 export class EqualsFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -83,7 +83,7 @@ export class EqualsFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'hastype'")
+@functionFor(PACKAGE, OPERATORS.HAS_TYPE)
 export class HasTypeFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -96,7 +96,7 @@ export class HasTypeFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'#'")
+@functionFor(PACKAGE, OPERATORS.INDEX)
 export class IndexFunction extends BuiltinFunction {
     protected isCollection(values: ExpressionResult, name: string): boolean {
         return (
@@ -202,7 +202,7 @@ export class IndexFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "'istype'")
+@functionFor(PACKAGE, OPERATORS.IS_TYPE)
 export class IsTypeFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -215,7 +215,7 @@ export class IsTypeFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, "','")
+@functionFor(PACKAGE, OPERATORS.COMMA)
 export class ListConcatFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
@@ -228,7 +228,7 @@ export class ListConcatFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, ["'!='", "'!=='"])
+@functionFor(PACKAGE, [OPERATORS.NOT_EQUALS, OPERATORS.NOT_SAME])
 export class NotEqualsFunction extends BuiltinFunction {
     override call(
         expression: OperatorExpressionMeta,
