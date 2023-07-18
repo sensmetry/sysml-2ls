@@ -14,12 +14,4 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * from "./ast-to-model";
-export * from "./ast-util";
-export * from "./comments";
-export * from "./common";
-export * from "./containers";
-export * from "./cst-util";
-export * from "./global-scope";
-export * from "./scope-util";
-export * from "./scopes";
+export * from "./attach";
