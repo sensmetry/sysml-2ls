@@ -22,6 +22,7 @@ import {
     visitComments,
 } from "../../utils";
 import { BasicMetamodel } from "../metamodel";
+import { ElementReference } from "../../generated/ast";
 
 export class KerMLCommentAttachVisitor extends AbstractKerMLCommentVisitor {
     override visit(comment: CstTextComment): void {
@@ -36,41 +37,63 @@ export class KerMLCommentAttachVisitor extends AbstractKerMLCommentVisitor {
         let target = model;
         // attachment is similar to prettier but we don't have to do any source
         // file scanning
+        const onLeft = (left: BasicMetamodel): void => {
+            if (note.$previous?.text === "{" && !right) {
+                // trails prefix element but is actually inside a
+                // children block
+                note.localPlacement = "inner";
+            } else {
+                note.localPlacement = "trailing";
+                target = left;
+            }
+        };
+
+        const onDefaultEndOfLine = (): void => {
+            if (left) {
+                onLeft(left);
+            } else if (right) {
+                note.localPlacement = "leading";
+                target = right;
+            } else if (model) {
+                note.localPlacement = "inner";
+            }
+        };
+
+        const onOverride = (method: (note: TextComment) => BasicMetamodel | undefined): boolean => {
+            const candidate = method.call(this, note);
+            if (candidate) {
+                target = candidate;
+                return true;
+            }
+            return false;
+        };
+
         switch (note.placement) {
             case "endOfLine": {
-                if (this.onEndOfLine(note)) break;
-                if (left) {
-                    note.localPlacement = "trailing";
-                    target = left;
-                } else if (right) {
-                    note.localPlacement = "leading";
-                    target = right;
-                } else if (model) {
-                    note.localPlacement = "inner";
-                }
+                if (onOverride(this.onEndOfLine)) break;
+                onDefaultEndOfLine();
                 break;
             }
             case "ownLine": {
                 // own line is fairly simple, just attach one of the
                 // neighbouring nodes, prefering leading, or the enclosing node
-                if (this.onOwnLine(note)) break;
+                if (onOverride(this.onOwnLine)) break;
                 if (right) {
                     note.localPlacement = "leading";
                     target = right;
                 } else if (left) {
-                    note.localPlacement = "trailing";
-                    target = left;
+                    onLeft(left);
                 } else if (model) {
                     note.localPlacement = "inner";
                 }
                 break;
             }
             case "remaining": {
-                if (this.onRemaining(note)) break;
+                if (onOverride(this.onRemaining)) break;
                 if (left && right) {
                     // no need to scan text as `prettier` does since we have the
                     // CST nodes around the comment
-                    if (comment.$next?.element === comment.$followingNode) {
+                    if (comment.$next?.offset === comment.$followingNode.$cstNode?.offset) {
                         // if AST nodes match then were no gaps to the following
                         // node
                         note.localPlacement = "leading";
@@ -79,35 +102,48 @@ export class KerMLCommentAttachVisitor extends AbstractKerMLCommentVisitor {
                         note.localPlacement = "trailing";
                         target = left;
                     }
-                } else if (left) {
-                    note.localPlacement = "trailing";
-                    target = left;
-                } else if (right) {
-                    note.localPlacement = "leading";
-                    target = right;
-                } else if (model) {
-                    note.localPlacement = "inner";
+                } else {
+                    onDefaultEndOfLine();
                 }
                 break;
             }
         }
 
         target.notes.push(note);
+        this.onAttached(target, note);
     }
 
     // eslint-disable-next-line unused-imports/no-unused-vars
-    protected onOwnLine(note: TextComment): boolean {
-        return false;
+    protected onOwnLine(note: TextComment): BasicMetamodel | undefined {
+        return;
     }
 
     // eslint-disable-next-line unused-imports/no-unused-vars
-    protected onEndOfLine(note: TextComment): boolean {
-        return false;
+    protected onEndOfLine(note: TextComment): BasicMetamodel | undefined {
+        return;
     }
 
     // eslint-disable-next-line unused-imports/no-unused-vars
-    protected onRemaining(note: TextComment): boolean {
-        return false;
+    protected onRemaining(note: TextComment): BasicMetamodel | undefined {
+        return;
+    }
+
+    protected onAttached(target: BasicMetamodel, note: TextComment): void {
+        if (note.localPlacement !== "inner" || !target.is(ElementReference)) return;
+
+        let part = note.$next?.text === "::" ? note.$previous : note.$next;
+
+        /* istanbul ignore next */
+        if (!part) return;
+
+        let index = target.ast()?.parts.findIndex((ref) => ref.$refText === part?.text);
+        /* istanbul ignore next */
+        if (index === undefined || index === -1) return;
+        if (index !== 0 && note.placement === "endOfLine" && part !== note.$previous) {
+            index--;
+            part = note.$previous;
+        }
+        note.label = `${index}-${part === note.$next ? "leading" : "trailing"}`;
     }
 }
 

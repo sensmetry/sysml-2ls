@@ -15,7 +15,14 @@
  ********************************************************************************/
 
 import { DeepPartial } from "langium";
-import { Classifier, Feature, FeatureReference, NullExpression } from "../../../generated/ast";
+import {
+    Class,
+    ClassifierReference,
+    FeatureValue,
+    NullExpression,
+    OwningMembership,
+    Subsetting,
+} from "../../../generated/ast";
 import { SysMLType } from "../../../services";
 import { parseKerML, parseSysML, recursiveObjectContaining } from "../../../testing";
 import { TextComment } from "../../../utils";
@@ -26,6 +33,7 @@ async function expectNotes(
     options: {
         lang?: "sysml" | "kerml";
         node: SysMLType;
+        index?: number;
     }
 ): Promise<jest.JestMatchers<TextComment[] | undefined>> {
     const lang = options.lang ?? "kerml";
@@ -36,7 +44,12 @@ async function expectNotes(
     attachNotes(doc);
 
     expect(doc.commentsAttached).toBeTruthy();
-    return expect(doc.astNodes.find((node) => node.$type === options.node)?.$meta?.notes);
+    let current = -1;
+    const index = options.index ?? 0;
+    return expect(
+        doc.astNodes.find((node) => node.$type === options.node && ++current === index)?.$meta
+            ?.notes
+    );
 }
 
 type TextCommentMatch = DeepPartial<Required<TextComment>>;
@@ -65,7 +78,7 @@ describe("notes", () => {
     });
 
     it("should attach trailing note", async () => {
-        (await expectNotes("feature a = () //* a note */;", { node: NullExpression })).toEqual([
+        (await expectNotes("feature a = () //* a note */;", { node: FeatureValue })).toEqual([
             recursiveObjectContaining<TextCommentMatch>({
                 kind: "block",
                 text: " a note ",
@@ -76,7 +89,7 @@ describe("notes", () => {
     });
 
     it("should attach EOL trailing note", async () => {
-        (await expectNotes("feature a = (); //* a note */", { node: Feature })).toEqual([
+        (await expectNotes("feature a = (); //* a note */", { node: OwningMembership })).toEqual([
             recursiveObjectContaining<TextCommentMatch>({
                 kind: "block",
                 text: " a note ",
@@ -98,7 +111,7 @@ describe("notes", () => {
     });
 
     it("should attach own line trailing note", async () => {
-        (await expectNotes("feature a = ();\n//* a note */", { node: Feature })).toEqual([
+        (await expectNotes("feature a = ();\n//* a note */", { node: OwningMembership })).toEqual([
             recursiveObjectContaining<TextCommentMatch>({
                 kind: "block",
                 text: " a note ",
@@ -148,7 +161,8 @@ describe("notes", () => {
     it("should attach remaining leading note 2", async () => {
         (
             await expectNotes("class a { class b; //* a note */ classifier c; }", {
-                node: Classifier,
+                node: OwningMembership,
+                index: 2,
             })
         ).toEqual([
             recursiveObjectContaining<TextCommentMatch>({
@@ -163,7 +177,7 @@ describe("notes", () => {
     it("should attach remaining trailing note", async () => {
         (
             await expectNotes("class a { feature b :> c //* a note */ :>> d; }", {
-                node: FeatureReference,
+                node: Subsetting,
             })
         ).toEqual([
             recursiveObjectContaining<TextCommentMatch>({
@@ -173,5 +187,84 @@ describe("notes", () => {
                 placement: "remaining",
             }),
         ]);
+    });
+
+    it("should attach end of line notes inside bodies to the enclosing node", async () => {
+        (
+            await expectNotes("#prefix class a { // note \n }", {
+                node: Class,
+            })
+        ).toEqual([
+            recursiveObjectContaining<TextCommentMatch>({
+                kind: "line",
+                text: " note ",
+                localPlacement: "inner",
+                placement: "endOfLine",
+            }),
+        ]);
+    });
+
+    it("should attach own line notes inside bodies to the enclosing node", async () => {
+        (
+            await expectNotes("#prefix class a { \n// note \n }", {
+                node: Class,
+            })
+        ).toEqual([
+            recursiveObjectContaining<TextCommentMatch>({
+                kind: "line",
+                text: " note ",
+                localPlacement: "inner",
+                placement: "ownLine",
+            }),
+        ]);
+    });
+
+    it("should attach remaining notes inside bodies to the enclosing node", async () => {
+        (
+            await expectNotes("#prefix class a { //* note */ }", {
+                node: Class,
+            })
+        ).toEqual([
+            recursiveObjectContaining<TextCommentMatch>({
+                kind: "block",
+                text: " note ",
+                localPlacement: "inner",
+                placement: "remaining",
+            }),
+        ]);
+    });
+
+    describe("inner reference notes", () => {
+        it("should attach remaining note with a label", async () => {
+            (
+                await expectNotes("class a :> b:: //* note */ c; }", {
+                    node: ClassifierReference,
+                })
+            ).toEqual([
+                recursiveObjectContaining<TextCommentMatch>({
+                    kind: "block",
+                    text: " note ",
+                    localPlacement: "inner",
+                    placement: "remaining",
+                    label: "1-leading",
+                }),
+            ]);
+        });
+
+        it("should attach end of line note with a label", async () => {
+            (
+                await expectNotes("class a :> b:: //* note */ \nc; }", {
+                    node: ClassifierReference,
+                })
+            ).toEqual([
+                recursiveObjectContaining<TextCommentMatch>({
+                    kind: "block",
+                    text: " note ",
+                    localPlacement: "inner",
+                    placement: "endOfLine",
+                    label: "0-trailing",
+                }),
+            ]);
+        });
     });
 });
