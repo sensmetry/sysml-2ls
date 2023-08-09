@@ -16,24 +16,24 @@
 
 describe("elements are parseable without bodies", () => {
     test("with no names", async () => {
-        return expect("class;").toParseKerML("snapshot");
+        return expect("class;").toParseKerML();
     });
 
     test("with name", async () => {
-        return expect("class Any_;").toParseKerML("snapshot");
+        return expect("class Any_;").toParseKerML();
     });
 
     test("with short name", async () => {
-        return expect("class <any>;").toParseKerML("snapshot");
+        return expect("class <any>;").toParseKerML();
     });
 
     test("with both names", async () => {
-        return expect("class <'1.1'> Any;").toParseKerML("snapshot");
+        return expect("class <'1.1'> Any;").toParseKerML();
     });
 
     // might be best to keep '' around unrestricted names, names could then be written as is when generating code from AST
     test("with unrestricted name", async () => {
-        return expect("class 'arbitrary/ name+';").toParseKerML("snapshot");
+        return expect("class 'arbitrary/ name+';").toParseKerML();
     });
 });
 
@@ -44,5 +44,5 @@ test("elements can be nested", async () => {
     }
 
     class D;
-}`).toParseKerML("snapshot");
+}`).toParseKerML();
 });

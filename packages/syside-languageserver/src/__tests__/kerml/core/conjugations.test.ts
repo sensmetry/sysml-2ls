@@ -14,6 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Class, Conjugation } from "../../../generated/ast";
+import { parsedNode } from "../../../testing";
+
 const Common = `
 class Original {
     in feature Input;
@@ -30,13 +33,13 @@ test("conjugation can be parsed", async () => {
     conjugation c2 conjugate Conjugate2 ~ Original {
         doc /* same as c1 */
     }`
-    ).toParseKerML("snapshot");
+    ).toParseKerML();
 });
 
 test.each(["conjugates", "~"])(
     "conjugation may be omitted without identifiers with '%s'",
     async (token: string) => {
-        return expect(Common + `conjugate Conjugate1 ${token} Original;`).toParseKerML("snapshot");
+        return expect(Common + `conjugate Conjugate1 ${token} Original;`).toParseKerML();
     }
 );
 
@@ -44,8 +47,11 @@ test.each(["conjugates", "~"])(
     "type can declare owned conjugations with '%s'",
     async (token: string) => {
         return expect(
-            `class Original;
-    class Conjugate1 ${token} Original;`
-        ).toParseKerML("snapshot");
+            parsedNode(
+                `class Original;
+    class Conjugate1 ${token} Original;`,
+                { node: Class, index: 1 }
+            )
+        ).resolves.toMatchObject({ heritage: [expect.objectContaining({ $type: Conjugation })] });
     }
 );

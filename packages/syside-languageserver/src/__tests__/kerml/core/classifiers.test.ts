@@ -14,7 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { anything, defaultLinkingErrorTo } from "../../../testing";
+import { Classifier } from "../../../generated/ast";
+import { anything, defaultLinkingErrorTo, parsedNode, qualifiedTarget } from "../../../testing";
 
 describe.each(["specializes", "conjugates"])(
     "classifiers can only specialize other classifiers with '%s'",
@@ -34,9 +35,14 @@ describe.each(["specializes", "conjugates"])(
 
         test("specializing classifiers is successful", async () => {
             return expect(
-                `classifier A;
-        classifier Child ${token} A;`
-            ).toParseKerML({});
+                parsedNode(
+                    `classifier A;
+        classifier Child ${token} A;`,
+                    { node: Classifier, index: 1, build: true }
+                )
+            ).resolves.toMatchObject({
+                heritage: [{ targetRef: qualifiedTarget("A") }],
+            });
         });
     }
 );
@@ -48,12 +54,17 @@ test("specializations can be parsed", async () => {
     specialization Super subclassifier A specializes B;
     specialization subclassifier B :> A {
         doc /* unnamed */
-    }`).toParseKerML("snapshot");
+    }`).toParseKerML();
 });
 
 test("classifiers can specialize multiple other classifiers", async () => {
-    return expect(`
+    return expect(
+        parsedNode(
+            `
     classifier A;
     classifier B;
-    classifier C specializes A, B;`).toParseKerML("snapshot");
+    classifier C specializes A, B;`,
+            { node: Classifier, index: 2 }
+        )
+    ).resolves.toMatchObject({ heritage: anything(2) });
 });

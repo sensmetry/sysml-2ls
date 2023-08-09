@@ -30,7 +30,8 @@ import { makeLinkingScope, makeScope, SysMLScope } from "../utils/scopes";
 import { SysMLConfig } from "../services/config";
 import { Visibility } from "../utils/scope-util";
 import { expect } from "@jest/globals";
-import { BasicMetamodel, RelationshipMeta } from "../model";
+import { BasicMetamodel, RelationshipMeta, attachNotes } from "../model";
+import { SysMLType, SysMLInterface } from "../services";
 
 export const TEST_SERVER_OPTIONS: DeepPartial<SysMLConfig> = {
     // don't parse the standard library
@@ -126,6 +127,10 @@ export function qualifiedReference(name: string): object {
 
 export function qualifiedTypeReference(name: string): object {
     return { $meta: { to: { qualifiedName: name } } };
+}
+
+export function qualifiedTarget(name: string): object {
+    return { $meta: { to: { target: { qualifiedName: name } } } };
 }
 
 export function defaultLinkingErrorTo(name: string): object {
@@ -245,4 +250,30 @@ export function emptyDocument(
     patchDocument(document);
 
     return document;
+}
+
+export async function parsedNode<K extends SysMLType>(
+    text: string,
+    options: {
+        build?: boolean;
+        lang?: "sysml" | "kerml";
+        node: K;
+        index?: number;
+    }
+): Promise<SysMLInterface<K>> {
+    const lang = options.lang ?? "kerml";
+    const doc = await (lang === "kerml" ? parseKerML : parseSysML)(text, {
+        document: true,
+        build: options.build ? true : false,
+    });
+    expect(doc.parseResult.lexerErrors).toHaveLength(0);
+    expect(doc.parseResult.parserErrors).toHaveLength(0);
+
+    attachNotes(doc);
+
+    const index = options.index ?? 0;
+    let current = -1;
+    const node = doc.astNodes.find((node) => node.$type === options.node && ++current === index);
+    expect(node).toBeDefined();
+    return node as SysMLInterface<K>;
 }

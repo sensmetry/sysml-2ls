@@ -43,7 +43,7 @@ test("namespace members can be imported with qualified names", async () => {
             import C; // "C" is re-imported from N2 into M;
         }
     }`
-    ).toParseKerML("snapshot");
+    ).toParseKerML();
 });
 
 test("wildcard imports all public members from a namespace", async () => {
@@ -54,7 +54,7 @@ test("wildcard imports all public members from a namespace", async () => {
         feature D : A;
         feature E : B;
     }`
-    ).toParseKerML("snapshot");
+    ).toParseKerML();
 });
 
 test("double wildcard recursively imports all members from a namespace and its children", async () => {
@@ -77,7 +77,7 @@ test("double wildcard recursively imports all members from a namespace and its c
         // (Note that N4 itself is not imported.)
         feature D : C; // N4::M::C
     }`
-    ).toParseKerML("snapshot");
+    ).toParseKerML();
 });
 
 test("visibility affects the visibility of imported members", async () => {
@@ -94,7 +94,7 @@ test("visibility affects the visibility of imported members", async () => {
     }
     }
     feature A : N7::A;`
-    ).toParseKerML("snapshot");
+    ).toParseKerML();
 });
 
 test("imported elements can be filtered", async () => {
@@ -115,5 +115,5 @@ test("imported elements can be filtered", async () => {
     namespace N9 {
         import Annotations::*;
         import NA::*[not (@Approved)];
-    }`).toParseKerML("snapshot");
+    }`).toParseKerML();
 });

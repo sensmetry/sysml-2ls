@@ -28,7 +28,7 @@ import chalk from "chalk";
 import { Diagnostic } from "vscode-languageserver";
 import { SysMLBuildOptions } from "../services/shared/workspace/document-builder";
 import { isJSONConvertible, JSONType, stringify } from "../utils/common";
-import { toMatchSnapshot, Context } from "jest-snapshot";
+import { Context } from "jest-snapshot";
 
 // Omit colon and one or more spaces, so can call getLabelPrinter.
 const EXPECTED_LABEL = "Expected";
@@ -169,7 +169,7 @@ async function parses(
     fn: (text: string, options?: SysMLBuildOptions) => Promise<ParseResult>,
     context: MatcherContext,
     received: any,
-    value: DeepPartial<Namespace> | "snapshot",
+    value: DeepPartial<Namespace> | undefined,
     { parserErrors, lexerErrors, diagnostics, buildOptions }: MatchOptions
 ): Promise<CustomMatchResult> {
     // the body is modified from https://github.com/facebook/jest/blob/a20bd2c31e126fc998c2407cfc6c1ecf39ead709/packages/expect/src/matchers.ts#L872-L923
@@ -181,10 +181,7 @@ async function parses(
         promise: context.promise,
     };
 
-    if (
-        (typeof value === "object" && value === null) ||
-        (typeof value === "string" && value !== "snapshot")
-    ) {
+    if (typeof value === "object" && value === null) {
         throw new Error(
             context.utils.matcherErrorMessage(
                 context.utils.matcherHint(matcherName, undefined, undefined, options),
@@ -228,21 +225,13 @@ async function parses(
         parserErrors: parseResult.parserErrors,
         lexerErrors: parseResult.lexerErrors,
         diagnostics: parseResult.diagnostics,
-        value: sanitizeTree(
-            parseResult.value,
-            undefined,
-            value === "snapshot" ? undefined : "include $meta"
-        ), // sanitize most cyclic references to avoid jest hanging on failure
+        value: value ? sanitizeTree(parseResult.value, undefined, "include $meta") : undefined,
     };
-
-    if (value === "snapshot") {
-        return toMatchSnapshot.call(this, result, matcherName);
-    }
     const expected = {
         parserErrors: parserErrors,
         lexerErrors: lexerErrors,
         diagnostics: diagnostics,
-        value: value,
+        value,
     };
 
     const pass = context.equals(result, expected, [
@@ -278,7 +267,7 @@ async function parses(
 expect.extend({
     async toParseKerML(
         received: any,
-        value: DeepPartial<Namespace> | object | "snapshot",
+        value: DeepPartial<Namespace> | object,
         {
             parserErrors = [],
             lexerErrors = [],
@@ -298,7 +287,7 @@ expect.extend({
 
     async toParseSysML(
         received: any,
-        value: DeepPartial<Namespace> | object | "snapshot",
+        value: DeepPartial<Namespace> | object,
         {
             parserErrors = [],
             lexerErrors = [],
@@ -328,8 +317,8 @@ export type DeepPartial<T> = T[keyof T] extends Function
           -readonly [P in keyof T]?: DeepPartial<T[P]>;
       };
 interface CustomMatchers<R = unknown> {
-    toParseKerML(ast: DeepPartial<Namespace> | object | "snapshot", options?: MatchOptions): R;
-    toParseSysML(ast: DeepPartial<Namespace> | object | "snapshot", options?: MatchOptions): R;
+    toParseKerML(ast?: DeepPartial<Namespace> | object, options?: MatchOptions): R;
+    toParseSysML(ast?: DeepPartial<Namespace> | object, options?: MatchOptions): R;
 }
 
 declare global {
