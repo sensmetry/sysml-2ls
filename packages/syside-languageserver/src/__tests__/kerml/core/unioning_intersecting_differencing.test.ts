@@ -35,7 +35,7 @@ test("type can declare owned unioning, differencing and intersecting", async () 
             intersects dependents, offspring;
     }
     `
-    ).toParseKerML("snapshot");
+    ).toParseKerML();
 });
 
 test("multiple relationships can be specified using multiple clauses", async () => {

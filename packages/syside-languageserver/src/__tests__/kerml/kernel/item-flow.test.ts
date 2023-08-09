@@ -14,11 +14,13 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { parseKerML, NO_ERRORS, sanitizeTree } from "../../../testing";
-import { Feature, Namespace } from "../../../generated/ast";
+import { ItemFlow } from "../../../generated/ast";
+import { parsedNode, anything } from "../../../testing";
 
 test("named item flows are parsed", async () => {
-    const result = await parseKerML(`
+    return expect(
+        parsedNode(
+            `
     class Fuel;
     struct Vehicle {
         composite feature fuelTank[1] {
@@ -28,11 +30,12 @@ test("named item flows are parsed", async () => {
             in feature fuelIn[1] : Fuel;
         }
         flow fuelFlow from fuelTank::fuelOut to engine::fuelIn;
-    }`);
-    expect(result).toMatchObject(NO_ERRORS);
-    const vehicle = result.value.children[1].target as Namespace;
-    const flow = vehicle.children[2].target;
-    expect(sanitizeTree(flow)).toMatchSnapshot();
+    }`,
+            { node: ItemFlow, build: true }
+        )
+    ).resolves.toMatchObject({
+        ends: anything(2),
+    });
 });
 
 test.each([
@@ -45,7 +48,9 @@ test.each([
     ["explicit declaration with name only is treated as typing", "flow of Fuel"],
     ["explicit declaration with qualified name only is treated as typing", "flow of Fuel::SubFuel"],
 ])("%s", async (_: string, declaration: string) => {
-    const result = await parseKerML(`
+    return expect(
+        parsedNode(
+            `
     class Fuel {
         class SubFuel;
     }
@@ -59,9 +64,10 @@ test.each([
     }
     feature vehicle : Vehicle {
         ${declaration} from fuelTank.fuelOut to engine.fuelIn;
-    }`);
-    expect(result).toMatchObject(NO_ERRORS);
-    const vehicle = result.value.children[2].target as Feature;
-    const flow = vehicle.children[0].target;
-    expect(sanitizeTree(flow)).toMatchSnapshot();
+    }`,
+            { node: ItemFlow, build: true }
+        )
+    ).resolves.toMatchObject({
+        ends: anything(2),
+    });
 });

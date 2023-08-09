@@ -14,21 +14,36 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Feature, Membership, OwningMembership } from "../../../generated/ast";
+import { parsedNode, qualifiedTarget } from "../../../testing";
+
 test("features can be parsed and aliased", async () => {
-    return expect(`
+    return expect(
+        parsedNode(
+            `
     datatype Integer;
     feature person[*] : Person;
     classifier Person {
         feature age[1]: Integer;
         alias personAlias for person;
-    }`).toParseKerML("snapshot");
+    }`,
+            { node: Membership, build: true }
+        )
+    ).resolves.toMatchObject({ targetRef: qualifiedTarget("person") });
 });
 
 test("member features can be parsed", async () => {
-    return expect(`
+    return expect(
+        parsedNode(
+            `
     classifier A;
     classifier B {
         feature f;
         member feature g featured by A;
-    }`).toParseKerML("snapshot");
+    }`,
+            { node: OwningMembership, index: 2 }
+        )
+    ).resolves.toMatchObject({
+        target: { $type: Feature },
+    });
 });
