@@ -17,6 +17,7 @@
  ********************************************************************************/
 
 import stringWidth from "string-width";
+import { SemanticTokenTypes } from "vscode-languageserver";
 
 /**
  * Group ID type.
@@ -45,32 +46,27 @@ export interface HighlightCommand {
 export interface Indent {
     readonly kind: "indent";
     contents: Doc;
-    immediate: boolean;
 }
 
 /**
  * Increases the level of indentation.
- * @param immediate if false, indentation will be emitted on the next
- * line break instead of the first text on an empty line. `false` matches
- * `prettier` behaviour.
  */
-export function indent(contents: Doc, immediate = true): Indent {
-    return { kind: "indent", contents, immediate };
+export function indent(contents: Doc): Indent {
+    return { kind: "indent", contents };
 }
 
 /**
  * Decreases the level of indentation.
  * @see {@link indent}
  */
-export function dedent(contents: Doc, immediate = true): Align {
-    return align(-1, contents, immediate);
+export function dedent(contents: Doc): Align {
+    return align(-1, contents);
 }
 
 export interface Align {
     readonly kind: "align";
     prefix: number | Text;
     contents: Doc;
-    immediate: boolean;
 }
 
 /**
@@ -79,12 +75,9 @@ export interface Align {
  * tabs as possible.
  * @see {@link indent}
  * @param prefix number of spaces or text to icrease the indentation with.
- * @param immediate if false, alignment will be emitted on the next line break
- * instead of the first text on an empty line. `false` matches `prettier`
- * behaviour.
  */
-export function align(prefix: number | Text, contents: Doc, immediate = true): Align {
-    return { kind: "align", prefix, contents, immediate };
+export function align(prefix: number | Text, contents: Doc): Align {
+    return { kind: "align", prefix, contents };
 }
 
 export interface Group {
@@ -168,8 +161,8 @@ export function markAsRoot(contents: Doc): Root {
  * @see {@link markAsRoot}
  * @see {@link dedent}
  */
-export function dedentToRoot(contents: Doc, immediate = true): Align {
-    return align(Number.NEGATIVE_INFINITY, contents, immediate);
+export function dedentToRoot(contents: Doc): Align {
+    return align(Number.NEGATIVE_INFINITY, contents);
 }
 
 export interface Fill {
@@ -394,6 +387,14 @@ export function text(contents: string, semantic: HighlightCommand = {}): Text {
     };
 }
 
+/**
+ * Convenience function to keywords.
+ * @see {@link text}
+ */
+export function keyword(contents: string): Text {
+    return text(contents, { type: SemanticTokenTypes.keyword });
+}
+
 export const brackets = {
     round: {
         open: text("("),
@@ -414,11 +415,14 @@ export const brackets = {
 } as const;
 
 export const literals = {
-    true: text("true"),
-    false: text("false"),
-    null: text("null"),
+    true: text("true", { type: SemanticTokenTypes.keyword }),
+    false: text("false", { type: SemanticTokenTypes.keyword }),
+    null: text("null", { type: SemanticTokenTypes.keyword }),
     dot: text("."),
     comma: text(","),
+    colon: text(":"),
+    semicolon: text(";"),
+    tilde: text("~"),
     doublecolon: text("::"),
     emptytext: text(""),
     space: text(" "),
@@ -464,18 +468,18 @@ export function join(separator: Doc, docs: Doc[], trailing = false): Doc[] {
     return joined;
 }
 
-export function addAlignment(doc: Doc, size: number, tabWidth: number, immediate = true): Doc {
+export function addAlignment(doc: Doc, size: number, tabWidth: number): Doc {
     if (size <= 0) return doc;
 
     const level = Math.floor(size / tabWidth);
     let aligned = doc;
-    for (let i = 0; i < level; i++) aligned = indent(doc);
 
     const spaces = size % tabWidth;
     if (spaces > 0) {
-        aligned = align(spaces, aligned, immediate);
+        aligned = align(spaces, aligned);
     }
-    return align(Number.NEGATIVE_INFINITY, aligned, immediate);
+    for (let i = 0; i < level; i++) aligned = indent(aligned);
+    return align(Number.NEGATIVE_INFINITY, aligned);
 }
 
 export interface PrinterConfig {
@@ -625,9 +629,43 @@ export function visitDoc(doc: Doc, visitor: DocVisitor): void {
     }
 }
 
+export function inheritLabel(doc: Label, contents: (doc: Doc) => Doc): Label;
+export function inheritLabel<R extends Doc>(doc: Doc, contents: (doc: Doc) => R): R;
+
 export function inheritLabel(doc: Doc, contents: (doc: Doc) => Doc): Doc {
     const command = doc as DocCommand;
     return command.kind === "label"
         ? label(command.label, contents(command.contents))
         : contents(doc);
+}
+
+export function getLabel(doc: Label): unknown;
+export function getLabel(doc: Doc): undefined | unknown;
+
+export function getLabel(doc: Doc): unknown {
+    const command = doc as DocCommand;
+    return command.kind === "label" ? command.label : undefined;
+}
+
+/**
+ * Appends `items` to `left` if it is `Fill`, otherwise returns a new fill of
+ * `[left, ...items]`
+ */
+export function appendFill(left: Doc, ...items: Doc[]): Fill {
+    const lhs = left as DocCommand;
+    if (lhs.kind === "fill") {
+        lhs.parts.push(...items);
+        return lhs;
+    }
+    return fill([left, ...items]);
+}
+
+/**
+ * Returns `doc` with `Indent` and `Align` unwrapped.
+ */
+export function unwrapIndent(doc: Doc): Doc {
+    const d = doc as DocCommand;
+    if (d.kind === "indent") return d.contents;
+    if (d.kind === "align") return d.contents;
+    return d;
 }

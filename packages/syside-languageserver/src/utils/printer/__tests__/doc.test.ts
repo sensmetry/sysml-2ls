@@ -39,6 +39,7 @@ import {
     lineSuffixBoundary,
     markAsRoot,
     dedentToRoot,
+    addAlignment,
 } from "..";
 
 const Options: PrinterConfig = {
@@ -53,19 +54,41 @@ function print(doc: Doc, options?: Partial<PrinterConfig>): string {
 
 describe("align", () => {
     it("should align using spaces", () => {
-        expect(print(group(align(4, text("aligned"))))).toEqual("    aligned");
+        expect(print(group(align(4, [hardline, text("aligned")])))).toEqual("\n    aligned");
     });
 
     it("should align using text", () => {
-        expect(print(group(align(text("----"), text("aligned"))))).toEqual("----aligned");
+        expect(print(group(align(text("----"), [hardline, text("aligned")])))).toEqual(
+            "\n----aligned"
+        );
     });
 
     it("should replace middle spaces with tabs if printing with tabs", () => {
-        expect(print(align(6, text("aligned")), { useSpaces: false })).toEqual("\t  aligned");
+        expect(print(align(6, [hardline, text("aligned")]), { useSpaces: false })).toEqual(
+            "\n\t  aligned"
+        );
     });
 
     it("should not align the first line if it is not immediate", () => {
-        expect(print(group(align(text("----"), text("aligned"), false)))).toEqual("aligned");
+        expect(print(group(align(text("----"), text("aligned"))))).toEqual("aligned");
+    });
+
+    it("should add arbitrary alignment", () => {
+        expect(
+            print(addAlignment([hardline, text("42")], 10, 4), {
+                useSpaces: false,
+                tabWidth: 4,
+            })
+        ).toEqual("\n\t\t  42");
+    });
+
+    it("should not negative arbitrary alignment", () => {
+        expect(
+            print(addAlignment(indent([hardline, text("42")]), -10, 4), {
+                useSpaces: false,
+                tabWidth: 4,
+            })
+        ).toEqual("\n\t42");
     });
 });
 
@@ -171,8 +194,10 @@ describe("dedent to root", () => {
 
     it("should remove all indentation up to the root level", () => {
         expect(
-            print(align(text("> "), markAsRoot(indent(indent(dedentToRoot(text("42")))))))
-        ).toEqual("> 42");
+            print(
+                align(text("> "), [hardline, markAsRoot(indent(indent(dedentToRoot(text("42")))))])
+            )
+        ).toEqual("\n> 42");
     });
 });
 
@@ -292,8 +317,8 @@ describe("line", () => {
         });
 
         it("should not indent text on new lines without root indents", () => {
-            expect(print(indent([text("hello,"), literalline, text("  world")]))).toEqual(
-                "    hello,\n  world"
+            expect(print(indent([hardline, text("hello,"), literalline, text("  world")]))).toEqual(
+                "\n    hello,\n  world"
             );
         });
 
@@ -302,10 +327,10 @@ describe("line", () => {
                 print(
                     align(
                         text(">"),
-                        markAsRoot(indent([text("hello,"), literalline, text("  world")]))
+                        markAsRoot(indent([hardline, text("hello,"), literalline, text("  world")]))
                     )
                 )
-            ).toEqual(">    hello,\n>  world");
+            ).toEqual("\n>    hello,\n>  world");
         });
     });
 });
@@ -326,11 +351,13 @@ describe("if break", () => {
 
 describe("indent", () => {
     it("should indent", () => {
-        expect(print(indent([text("indented")]), { useSpaces: false })).toEqual("\tindented");
+        expect(print(indent([hardline, text("indented")]), { useSpaces: false })).toEqual(
+            "\n\tindented"
+        );
     });
 
     it("should not indent the first line if it is not immediate", () => {
-        expect(print(indent([text("indented")], false), { useSpaces: false })).toEqual("indented");
+        expect(print(indent([text("indented")]), { useSpaces: false })).toEqual("indented");
     });
 
     describe("array items", () => {
@@ -377,8 +404,8 @@ describe("indent", () => {
         it("should indent nested items", () => {
             const subitem = group([
                 text("["),
-                hardline,
                 indent([
+                    hardline,
                     join([text(","), line], [text("itemA"), text("itemB")]),
                     ifBreak(text(","), text("")),
                 ]),
@@ -476,5 +503,13 @@ describe("line suffix", () => {
 describe("trim", () => {
     it("should trim trailing whitespace", () => {
         expect(print([text("  hello, world!  \t"), trim])).toEqual("  hello, world!");
+    });
+
+    it("should fit doc into trimmed space", () => {
+        expect(
+            print(group([text("hello,                        "), trim, text(" world!")]), {
+                lineWidth: 20,
+            })
+        ).toEqual("hello, world!");
     });
 });

@@ -66,7 +66,8 @@ export interface TextComment {
     readonly segment?: DocumentSegment;
 
     /**
-     * AST node that precedes this comment
+     * AST node that precedes this comment. Always an immediate child of
+     * `$enclosingNode` if set.
      */
     readonly $precedingNode?: AstNode;
     /**
@@ -74,7 +75,8 @@ export interface TextComment {
      */
     readonly $enclosingNode?: AstNode;
     /**
-     * AST node that follows this comment
+     * AST node that follows this comment. Always an immediate child of
+     * `$enclosingNode` if set.
      */
     readonly $followingNode?: AstNode;
 
@@ -107,7 +109,7 @@ export interface TextComment {
      * Optional label that may be set during attachment to mark specific comment
      * position. May be useful for coarse ASTs.
      */
-    label?: string;
+    label?: unknown;
 }
 
 export interface CstTextComment extends Omit<TextComment, "localPlacement"> {
@@ -153,18 +155,24 @@ export function visitComments(root: CstNode, visitor: CommentVisitor): void {
         const isLeaf = node && isLeafCstNode(node);
 
         const ast = node?.element;
-        let last = path.at(-1);
+        const last = path.at(-1);
         if (last !== ast) {
             const astChanged = !node?.hidden && (!ast || !path.includes(ast));
             if (ast) {
                 following = ast;
-                if (ast.$container !== last) {
-                    preceding = last;
-                    while (ast.$container !== last && path.length > 0) {
-                        path.pop();
-                        last = path.at(-1);
-                    }
+
+                // `ast.$container` for descending and `ast` for ascending
+                const ancestorIdx = path.findLastIndex(
+                    (node) => node === ast.$container || node === ast
+                );
+
+                // preceding node is the last child in enclosing node scope
+                if (ancestorIdx === -1) {
+                    preceding = undefined;
+                } else {
+                    preceding = path.at(ancestorIdx + 1);
                 }
+                path.length = ancestorIdx + 1;
                 path.push(ast);
             } else {
                 path.length = 0;
@@ -174,8 +182,17 @@ export function visitComments(root: CstNode, visitor: CommentVisitor): void {
 
             if (astChanged) {
                 stack.forEach((item) => {
-                    // mark comment as ready to set following node
-                    item.following = true;
+                    const { comment } = item;
+                    if (!item.following) {
+                        // following node only counts if it's a child of the
+                        // enclosing node, i.e. it starts and ends inside of the
+                        // enclosing node
+                        if (distance(comment.$enclosingNode?.$cstNode, following?.$cstNode) <= 0)
+                            // following is guaranteed to be the deepest node at
+                            // this position since `node` is a leaf CST node
+                            comment.$followingNode = following;
+                        item.following = true;
+                    }
                 });
             }
         }
@@ -216,21 +233,10 @@ export function visitComments(root: CstNode, visitor: CommentVisitor): void {
         if (!node || isLeaf) {
             stack.forEach((item) => {
                 const { comment } = item;
-                if (item.following && !item.ready) {
-                    // following node is always at the $next node or further so
-                    // when this is reached, the comment is ready to be passed
-                    // to the visitor
-                    item.ready = true;
-
-                    // following node only counts if it's a child of the
-                    // enclosing node, i.e. it starts and ends inside of the
-                    // enclosing node
-                    if (distance(comment.$enclosingNode?.$cstNode, following?.$cstNode) <= 0)
-                        // following is guaranteed to be the deepest node at
-                        // this position since `node` is a leaf CST node
-                        comment.$followingNode = following;
-                }
-
+                // following node is always at the $next node or further so
+                // when this is reached, the comment is ready to be passed
+                // to the visitor
+                item.ready = true;
                 if (item.next) return;
                 comment.$next = node;
 
@@ -252,7 +258,7 @@ export function visitComments(root: CstNode, visitor: CommentVisitor): void {
         }
 
         stack = stack.filter((item) => {
-            if (!item.ready) return true;
+            if (!item.ready || !item.following) return true;
             visitor.visit(item.comment);
             return false;
         });
@@ -480,11 +486,11 @@ export function printOuterComments(
     return { leading, trailing };
 }
 
-export function surroundWithComments(
-    doc: Doc,
+export function surroundWithComments<T extends Doc>(
+    doc: T,
     comments: readonly TextComment[],
     context: PrintCommentContext = { printComment: printKerMLNote }
-): Doc {
+): T | Doc[] {
     const printed = printOuterComments(comments, context);
     if (!printed) return doc;
     return inheritLabel(doc, (contents) => [printed.leading, contents, printed.trailing]);
@@ -492,7 +498,7 @@ export function surroundWithComments(
 
 export interface InnerCommentContext extends PrintCommentContext {
     indent?: boolean;
-    label?: string;
+    label?: unknown;
     filter?: (comment: TextComment) => boolean;
 }
 
@@ -515,10 +521,11 @@ export function printInnerComments(
 
     if (parts.length === 0) return literals.emptytext;
 
-    let printed = join(hardline, parts);
+    let printed: Doc = join(hardline, parts);
+    if (context.indent) printed = indent(printed);
     if (suffix) {
         const ending = suffix(inner[inner.length - 1]);
-        if (ending) printed = [printed, ending];
+        if (ending) return [printed, ending];
     }
-    return context.indent ? indent(printed) : printed;
+    return printed;
 }

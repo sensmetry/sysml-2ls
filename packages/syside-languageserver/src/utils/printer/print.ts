@@ -30,10 +30,14 @@ import {
     getDocKind,
     hardlineWithoutBreakParent,
     indent,
+    join,
+    literalline,
     literals,
     text,
     visitDoc,
 } from "./doc";
+import { DocumentSegment, Stream } from "langium";
+import { TextComment } from "../comments";
 
 type Indentation = "indent" | "dedent" | Text | number;
 
@@ -42,7 +46,6 @@ type Indent = {
     length: number;
     queue: Indent[];
     kind: Indentation;
-    immediate: boolean;
     root?: Indent;
 };
 
@@ -96,15 +99,14 @@ function generateIndent(indent: Indent, newIndent: Indent, config: PrinterConfig
         value: text(value.join("")),
         queue,
         kind: newIndent.kind,
-        immediate: newIndent.immediate,
         root: indent.root,
     };
 }
 
-function makeIndent(indent: Indent, config: PrinterConfig, immediate: boolean): Indent {
+function makeIndent(indent: Indent, config: PrinterConfig): Indent {
     return generateIndent(
         indent,
-        { kind: "indent", length: 0, queue: [], value: literals.emptytext, immediate },
+        { kind: "indent", length: 0, queue: [], value: literals.emptytext },
         config
     );
 }
@@ -151,12 +153,7 @@ function trim(out: Out): number {
     return trimmed;
 }
 
-function makeAlign(
-    indent: Indent,
-    amount: Text | number,
-    config: PrinterConfig,
-    immediate: boolean
-): Indent {
+function makeAlign(indent: Indent, amount: Text | number, config: PrinterConfig): Indent {
     if (typeof amount === "number") {
         if (amount === Number.NEGATIVE_INFINITY) {
             return indent.root ?? rootIndent();
@@ -165,7 +162,7 @@ function makeAlign(
         if (amount < 0)
             return generateIndent(
                 indent,
-                { kind: "dedent", length: 0, queue: [], value: literals.emptytext, immediate },
+                { kind: "dedent", length: 0, queue: [], value: literals.emptytext },
                 config
             );
     }
@@ -177,7 +174,6 @@ function makeAlign(
             length: 0,
             queue: [],
             value: literals.emptytext,
-            immediate,
         },
         config
     );
@@ -192,7 +188,7 @@ type FitsContext = {
 };
 
 function rootIndent(): Indent {
-    return { kind: 0, value: literals.emptytext, length: 0, queue: [], immediate: true };
+    return { kind: 0, value: literals.emptytext, length: 0, queue: [] };
 }
 
 const Fits: {
@@ -205,7 +201,6 @@ const Fits: {
 } = {
     text([_, __, text], stack, out, context) {
         context.width -= text.width;
-        if (context.width < 0) return false;
         out.push(text);
         return;
     },
@@ -229,21 +224,17 @@ const Fits: {
         stack.push([indent, mode, doc.contents]);
     },
     indent([indent, mode, doc], stack, out, context) {
-        stack.push([makeIndent(indent, context.config, doc.immediate), mode, doc.contents]);
+        stack.push([makeIndent(indent, context.config), mode, doc.contents]);
     },
     ["indent-if-break"]([indent, mode, doc], stack) {
         stack.push([indent, mode, doc.contents]);
     },
     align([indent, mode, doc], stack, out, context) {
-        stack.push([
-            makeAlign(indent, doc.prefix, context.config, doc.immediate),
-            mode,
-            doc.contents,
-        ]);
+        stack.push([makeAlign(indent, doc.prefix, context.config), mode, doc.contents]);
     },
-    group([indent, _, doc], stack, out, context) {
+    group([indent, mode, doc], stack, out, context) {
         if (context.mustBeFlat && doc.break) return false;
-        const groupMode: Mode = doc.break ? "break" : "flat";
+        const groupMode: Mode = doc.break ? "break" : mode;
         const contents =
             doc.expandedStates && doc.expandedStates.length > 0 && groupMode === "break"
                 ? doc.expandedStates[doc.expandedStates.length - 1]
@@ -277,18 +268,18 @@ const Fits: {
         return;
     },
     trim(_, stack, out, context) {
-        context.width -= trim(out);
+        context.width += trim(out);
     },
     line([_, mode, doc], stack, out, context) {
         if (mode === "break" || doc.mode === "hard" || doc.mode === "hard-literal") return true;
         if (doc.mode !== "soft") {
-            out.push(text(" "));
+            out.push(literals.space);
             context.width--;
         }
         return;
     },
     ["break-parent"]() {
-        return false;
+        /* empty */
     },
 };
 
@@ -308,8 +299,9 @@ function fits(next: Command, restCommands: Commands, context: FitsContext): bool
         }
 
         const command = commands.pop() as Command;
+        const kind = getDocKind(command[2]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fits = Fits[getDocKind(command[2])](command as any, commands, out, context);
+        const fits = Fits[kind](command as any, commands, out, context);
         if (typeof fits === "boolean") return fits;
     }
 
@@ -397,14 +389,6 @@ type FormatContext = {
     config: PrinterConfig;
 };
 
-function selectIndent(context: FormatContext, indent: Indent): Indent | undefined {
-    if (indent.immediate && context.position === 0)
-        return context.out.length === 0 || context.out.at(-1) === context.lineEnd
-            ? indent
-            : indent.root;
-    return;
-}
-
 type FormatFunction<T extends Doc = Doc> = (
     indent: Indent,
     mode: Mode,
@@ -416,17 +400,6 @@ const Formatter: {
     [K in DocKind]: FormatFunction<DocTypes[K]>;
 } = {
     text(indent, mode, doc, context): void {
-        // Unlike `prettier`, print indents on a first new-line text. This way
-        // all new text will use the most recent indent whereas in prettier the
-        // indent is taken from the last line break. `hard-literal` lines output
-        // a new line end token which compares to false by reference and
-        // preserves literal line breaks. Also, indent works on the first line
-        // now.
-        const newIndent = selectIndent(context, indent);
-        if (newIndent) {
-            context.out.push(newIndent.value);
-            context.position = newIndent.length;
-        }
         context.out.push(doc);
         context.position += doc.width;
     },
@@ -441,12 +414,12 @@ const Formatter: {
     },
 
     indent(ind, mode, doc, context): void {
-        const indent = makeIndent(ind, context.config, doc.immediate);
+        const indent = makeIndent(ind, context.config);
         context.stack.push([indent, mode, doc.contents]);
     },
 
     align(ind, mode, doc, context): void {
-        const indent = makeAlign(ind, doc.prefix, context.config, doc.immediate);
+        const indent = makeAlign(ind, doc.prefix, context.config);
         context.stack.push([indent, mode, doc.contents]);
     },
 
@@ -469,11 +442,7 @@ const Formatter: {
 
             context.shouldRemeasure = false;
             const next: Command = [indent, "flat", doc.contents];
-            // indent may not have been printed yet, check here
-            const remainder =
-                context.config.lineWidth -
-                context.position -
-                (selectIndent(context, indent)?.length ?? 0);
+            const remainder = context.config.lineWidth - context.position;
             const hasLineSuffix = context.lineSuffixes.length > 0;
 
             if (
@@ -609,13 +578,11 @@ const Formatter: {
         }
 
         if (doc.mode === "hard-literal") {
-            if (!indent.immediate && indent.root) {
+            if (indent.root) {
                 context.out.push(context.lineEnd, indent.root.value);
                 context.position = indent.root.length;
             } else {
-                // Output a different line end token (by reference) so that
-                // `text` doesn't output an indent.
-                context.out.push(text(context.config.lineEnd));
+                context.out.push(context.lineEnd);
                 context.position = 0;
             }
             return;
@@ -624,15 +591,14 @@ const Formatter: {
         context.position -= trim(context.out);
         context.out.push(context.lineEnd);
         context.position = 0;
-        // don't print an empty indent immediatelly
-        if (!indent.immediate && indent.length > 0) {
+        if (indent.length > 0) {
             context.out.push(indent.value);
             context.position = indent.length;
         }
     },
 
     label(indent, mode, doc, context): void {
-        context.stack.push([indent, mode, doc]);
+        context.stack.push([indent, mode, doc.contents]);
     },
 
     "break-parent"(): void {
@@ -744,7 +710,7 @@ export function formatDoc(doc: Doc, config: PrinterConfig): Out {
 }
 
 export function printDoc(
-    Docdoc: Doc,
+    doc: Doc,
     config: PrinterConfig & { highlighting: true }
 ): Required<PrintResult>;
 export function printDoc(
@@ -765,4 +731,27 @@ export function printDoc(doc: Doc, config: PrinterConfig = DefaultPrinterConfig)
 export function print(doc: Doc, options?: Partial<Omit<PrinterConfig, "highlighting">>): string {
     const text = printDoc(doc, { ...DefaultPrinterConfig, ...options }).text;
     return text;
+}
+
+export function printIgnored(
+    document: string,
+    segment: Pick<DocumentSegment, "offset" | "end">,
+    comments: Pick<Stream<TextComment>, "forEach">,
+    printed: Set<TextComment>
+): Doc {
+    const { offset, end } = segment;
+
+    comments.forEach((comment) => {
+        if (!comment.segment) return;
+        const { offset: left, end: right } = comment.segment;
+        if (left >= offset && right <= end) printed.add(comment);
+    });
+
+    return join(
+        literalline,
+        document
+            .slice(offset, end)
+            .split(/\r?\n/)
+            .map((line) => text(line))
+    );
 }

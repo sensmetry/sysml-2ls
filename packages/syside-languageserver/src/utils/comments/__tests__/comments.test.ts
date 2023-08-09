@@ -31,7 +31,7 @@ import {
 } from "../comments";
 import { parseKerML, recursiveObjectContaining } from "../../../testing";
 import { CstNode, DeepPartial, Mutable } from "langium";
-import { Comment, ElementReference, Package } from "../../../generated/ast";
+import { Annotation, Comment, OwningMembership, Package } from "../../../generated/ast";
 import { print } from "../../printer/print";
 import {
     brackets,
@@ -108,7 +108,7 @@ describe("visitor", () => {
                         text: "}",
                     },
                     $precedingNode: {
-                        $type: Package,
+                        $type: OwningMembership,
                     },
                     segment: {
                         offset: 13,
@@ -145,9 +145,8 @@ describe("visitor", () => {
                     $previous: {
                         text: "}",
                     },
-                    $precedingNode: <Partial<Package>>{
-                        $type: Package,
-                        declaredName: "P",
+                    $precedingNode: {
+                        $type: OwningMembership,
                     },
                     $next: undefined,
                     segment: {
@@ -237,7 +236,7 @@ describe("visitor", () => {
                 },
                 $precedingNode: undefined,
                 $followingNode: {
-                    $type: ElementReference,
+                    $type: Annotation,
                 },
                 kind: "block",
             })
@@ -296,8 +295,9 @@ describe("KerML note printing", () => {
 
         it("should indent notes where each line starts with '*'", () => {
             note.text = " line 1   \n* line 2  ";
-            expect(print(indent(printKerMLNote(note)))).toMatchInlineSnapshot(`
-"    //* line 1
+            expect(print(indent([hardline, printKerMLNote(note)]))).toMatchInlineSnapshot(`
+"
+    //* line 1
       * line 2
       */
 "
@@ -306,8 +306,9 @@ describe("KerML note printing", () => {
 
         it("should indent notes that ends with a line break where each line starts with '*'", () => {
             note.text = " line 1   \n* line 2 \n";
-            expect(print(indent(printKerMLNote(note)))).toMatchInlineSnapshot(`
-"    //* line 1
+            expect(print(indent([hardline, printKerMLNote(note)]))).toMatchInlineSnapshot(`
+"
+    //* line 1
       * line 2
       */
 "
@@ -451,7 +452,7 @@ describe("printing comments", () => {
                         indent: true,
                     })
                 )
-            ).toEqual("    // a note\n");
+            ).toEqual("// a note\n");
         });
     });
 
