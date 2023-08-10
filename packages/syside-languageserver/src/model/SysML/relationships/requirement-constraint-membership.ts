@@ -36,7 +36,14 @@ export interface RequirementConstraintMembershipOptions
 export class RequirementConstraintMembershipMeta<
     T extends ConstraintUsageMeta = ConstraintUsageMeta,
 > extends FeatureMembershipMeta<T> {
-    kind: RequirementConstraintKind = "requirement";
+    protected _kind: RequirementConstraintKind = "requirement";
+
+    get kind(): RequirementConstraintKind {
+        return this._kind;
+    }
+    set kind(value) {
+        this._kind = value;
+    }
 
     override ast(): RequirementConstraintMembership | undefined {
         return this._ast as RequirementConstraintMembership;

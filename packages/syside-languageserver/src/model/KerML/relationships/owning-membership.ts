@@ -37,6 +37,12 @@ export class OwningMembershipMeta<T extends ElementMeta = ElementMeta> extends M
         }
     }
 
+    // Owning memberships will always be parsed with an owned target element so
+    // it cannot be undefined
+    override element(): T {
+        return this._element as T;
+    }
+
     override ast(): OwningMembership | undefined {
         return this._ast as OwningMembership;
     }

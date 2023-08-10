@@ -39,7 +39,7 @@ entry Model returns Namespace:
 // Dependencies
 
 Dependency returns Dependency:
-    ( prefixes+=PrefixMetadataAnnotation)* 'dependency' Identification? 'from'?
+    ( prefixes+=PrefixMetadataAnnotation)* 'dependency' (Identification? 'from')?
     client+=ElementReference ( ',' client+=ElementReference )* 'to'
     supplier+=ElementReference ( ',' supplier+=ElementReference )*
     RelationshipBody
@@ -176,7 +176,7 @@ ElementFilterMember returns ElementFilterMembership:
 ;
 
 AliasMember returns Membership:
-    Visibility? 'alias' Identification? 'for' targetRef=ElementReference RelationshipBody
+    Visibility? isAlias?='alias' Identification? 'for' targetRef=ElementReference RelationshipBody
 ;
 
 // Imports
@@ -637,7 +637,6 @@ EnumerationUsage returns EnumerationUsage:
 
 fragment OccurrenceDefinitionPrefix:
     BasicDefinitionPrefix?
-    // TODO: empty rule
     ( Individual /* members+=LifeClassMembership */ )?
     DefinitionExtensionKeyword*
 ;
@@ -649,7 +648,6 @@ OccurrenceDefinition returns OccurrenceDefinition:
 IndividualDefinition returns OccurrenceDefinition:
     BasicDefinitionPrefix? Individual
     DefinitionExtensionKeyword* 'def' DefinitionSuffix
-    // TODO: empty rule
     /* members+=LifeClassMembership */
 ;
 
@@ -859,8 +857,8 @@ Message returns FlowConnectionUsage:
 
 fragment MessageDeclaration:
     UsageDeclaration? ValuePart? ( 'of' item=ItemFeatureMember )?
-        ( 'from' ends+=MessageEventMember 'to' ends+=MessageEventMember )?
-    | ends+=MessageEventMember 'to' ends+=MessageEventMember
+        ( 'from' messages+=MessageEventMember 'to' messages+=MessageEventMember )?
+    | messages+=MessageEventMember 'to' messages+=MessageEventMember
 ;
 
 MessageEventMember returns ParameterMembership:

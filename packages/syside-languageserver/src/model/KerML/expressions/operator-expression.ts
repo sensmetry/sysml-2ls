@@ -70,6 +70,7 @@ export const OPERATORS = {
 
 export const IMPLICIT_OPERATORS = {
     DOT: "'.'",
+    COLLECT: "collect",
     ARROW: "'->'",
     SELECT: "'.?'",
     METADATA: "'.metadata'",
@@ -87,7 +88,13 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     /**
      * The escaped operator name used in this expression, i.e. `'+'`
      */
-    operator: Operator = OPERATORS.NONE;
+    protected _operator: Operator = OPERATORS.NONE;
+    public get operator(): AnyOperator {
+        return this._operator;
+    }
+    public set operator(value: Operator) {
+        this._operator = value;
+    }
 
     // this only exists for compatibility with AST since we don't construct the
     // missing intermediate elements to operands
@@ -111,14 +118,14 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     }
 
     override returnType(): string | TypeMeta | undefined {
-        if (this.operator === "'as'" || this.operator === "'meta'") {
+        if (this.operator === OPERATORS.AS || this.operator === OPERATORS.META) {
             // cast operators should be treated as its type arguments
             return typeArgument(this);
         }
-        if (this.operator === "'#'") {
+        if (this.operator === OPERATORS.INDEX) {
             return typeOf(this.args[0]);
         }
-        if (this.operator === "'['") {
+        if (this.operator === OPERATORS.QUANTITY) {
             // this is not used for indexing but setting units
 
             // Cannot use the argument to infer exact type so use base type, the

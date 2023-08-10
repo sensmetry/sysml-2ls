@@ -27,11 +27,19 @@ import { RequirementUsageMeta } from "../requirement-usage";
 import { AstNode, LangiumDocument } from "langium";
 import { RelationshipOptionsBody } from "../../KerML";
 import { RequirementDefinitionMeta } from "../requirement-definition";
+import { RequirementConstraintKind } from "../../enums";
 
 @metamodelOf(RequirementVerificationMembership)
 export class RequirementVerificationMembershipMeta<
     T extends RequirementUsageMeta = RequirementUsageMeta,
 > extends RequirementConstraintMembershipMeta<T> {
+    override get kind(): RequirementConstraintKind {
+        return "requirement";
+    }
+    override set kind(value: RequirementConstraintKind) {
+        // empty;
+    }
+
     override ast(): RequirementVerificationMembership | undefined {
         return this._ast as RequirementVerificationMembership;
     }

@@ -14,9 +14,11 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { LangiumDocument } from "langium";
 import { ReferenceUsage, TransitionUsage } from "../../generated/ast";
 import { enumerable } from "../../utils/common";
-import { metamodelOf } from "../metamodel";
+import { Edge, ParameterMembershipMeta } from "../KerML";
+import { ElementIDProvider, metamodelOf } from "../metamodel";
 import { UsageMeta, UsageOptions } from "./usage";
 
 export type ReferenceUsageOptions = UsageOptions;
@@ -26,10 +28,10 @@ export type ReferenceUsageOptions = UsageOptions;
 @metamodelOf(ReferenceUsage)
 export class ReferenceUsageMeta extends UsageMeta {
     @enumerable
-    override get isReference(): boolean {
-        return true;
+    override get isComposite(): boolean {
+        return false;
     }
-    override set isReference(value) {
+    override set isComposite(value) {
         // empty
     }
 
@@ -50,4 +52,14 @@ declare module "../../generated/ast" {
     interface ReferenceUsage {
         $meta: ReferenceUsageMeta;
     }
+}
+
+export function createEmptyParameterMember(
+    provider: ElementIDProvider,
+    document: LangiumDocument
+): Edge<ParameterMembershipMeta, ReferenceUsageMeta> {
+    return [
+        ParameterMembershipMeta.create(provider, document, { isImplied: true }),
+        ReferenceUsageMeta.create(provider, document),
+    ];
 }

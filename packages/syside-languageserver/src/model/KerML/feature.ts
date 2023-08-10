@@ -174,6 +174,9 @@ export class FeatureMeta extends TypeMeta {
     set isEnd(value) {
         this._isEnd = value;
     }
+    get isEndExplicitly(): boolean {
+        return this._isEnd;
+    }
 
     protected _isOrdered = false;
     protected _impliedIsOrdered = false;
@@ -185,6 +188,9 @@ export class FeatureMeta extends TypeMeta {
     }
     set isOrdered(value) {
         this._isOrdered = value;
+    }
+    get isOrderedExplicitly(): boolean {
+        return this._isOrdered;
     }
 
     @enumerable

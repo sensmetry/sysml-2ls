@@ -220,10 +220,6 @@ test("Requirement verification membership triggers validation if it not owned by
 });
 
 describe("Send action usage validation", () => {
-    test("no sender and receiver trigger a validation", async () => {
-        return expectValidations("action def A { send 1; }", "must have at least either");
-    });
-
     test("port receiver triggers a validation", async () => {
         return expectValidations("action def A { port a; send 1 to a; }", "Sending to a port");
     });

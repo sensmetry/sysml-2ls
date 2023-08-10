@@ -70,7 +70,6 @@ export * from "./relationships/specialization";
 export * from "./relationships/subsetting";
 export * from "./relationships/redefinition";
 export * from "./relationships/reference-subsetting";
-export * from "./relationships/subtype";
 export * from "./relationships/subclassification";
 export * from "./relationships/feature-typing";
 export * from "./relationships/conjugation";

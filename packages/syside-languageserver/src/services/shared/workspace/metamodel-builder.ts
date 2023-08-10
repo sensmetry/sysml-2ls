@@ -72,6 +72,7 @@ import {
     Dependency,
     Inheritance,
     FeatureRelationship,
+    TypeFeaturing,
 } from "../../../generated/ast";
 import {
     BasicMetamodel,
@@ -1344,6 +1345,18 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             isImplied: true,
         });
         node.addHeritage([typing, element]);
+    }
+
+    @builder(TypeFeaturing, 1000)
+    protected addNonDeclarationTypeFeaturing(
+        node: TypeFeaturingMeta,
+        _document: LangiumDocument
+    ): void {
+        if (!node.parent()?.is(OwningMembership)) return;
+
+        const src = node.source();
+        if (!src) return;
+        (src as TypeMeta)["_typeRelationships"].push(node);
     }
 
     // @builder(Feature)

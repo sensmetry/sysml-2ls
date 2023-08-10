@@ -110,3 +110,16 @@ export function getTransitionFeatureKind(
             assertUnreachable(node.kind);
     }
 }
+
+export function getTransitionFeatureKindText(kind: TransitionFeatureKind): string {
+    switch (kind) {
+        case "trigger":
+            return "accept";
+        case "effect":
+            return "do";
+        case "guard":
+            return "if";
+        default:
+            assertUnreachable(kind);
+    }
+}

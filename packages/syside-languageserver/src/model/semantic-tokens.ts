@@ -30,6 +30,7 @@ import { SysMLType } from "../services";
 import { typeIndex } from "./types";
 import { ElementMeta } from "./KerML";
 import { Type, Classifier, Feature } from "../generated/ast";
+import { HighlightCommand } from "../utils";
 
 /**
  * Semantic token types used by the SysML language server
@@ -66,6 +67,13 @@ export const SysMLSemanticTokenTypes = {
     relationship: "relationship",
     metaclass: "metaclass",
 };
+
+/**
+ * Semantic highlights to be used with `text` printer command. Has no modifiers.
+ */
+export const SysMLHighlightType = Object.fromEntries(
+    Object.entries(SysMLSemanticTokenTypes).map(([k, v]) => [k, { type: v }] as const)
+) as Record<keyof typeof SysMLSemanticTokenTypes, HighlightCommand>;
 
 /**
  * Semantic token modifiers used by the SysML language server

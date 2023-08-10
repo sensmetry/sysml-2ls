@@ -36,11 +36,13 @@ test("all AST nodes have a factory function", async () => {
     expect(missing).toMatchInlineSnapshot(`
 [
   "AnnotatingElement",
+  "ConnectorAsUsage",
   "Element",
   "Expose",
   "Featuring",
   "Import",
   "Inheritance",
+  "LoopActionUsage",
   "Relationship",
   "TextualAnnotatingElement",
 ]

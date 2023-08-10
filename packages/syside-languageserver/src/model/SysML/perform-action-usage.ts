@@ -20,6 +20,7 @@ import { FeatureMeta } from "../KerML";
 import { metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { EventOccurrenceUsageMeta, EventOccurrenceUsageOptions } from "./event-occurrence-usage";
+import { enumerable } from "../../utils";
 
 export interface PerformActionUsageOptions
     extends EventOccurrenceUsageOptions,
@@ -29,6 +30,15 @@ export interface PerformActionUsageOptions
     performedAction: "Parts::Part::performedActions",
 })
 export class PerformActionUsageMeta extends Mixin(EventOccurrenceUsageMeta, ActionUsageMeta) {
+    @enumerable
+    // @ts-expect-error issue with mixins
+    override get isComposite(): boolean {
+        return false;
+    }
+    override set isComposite(value) {
+        // empty
+    }
+
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");

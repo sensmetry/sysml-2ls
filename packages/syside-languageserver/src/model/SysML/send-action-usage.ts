@@ -21,6 +21,7 @@ import { Edge, ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMet
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
+import { createEmptyParameterMember } from "./reference-usage";
 
 export interface SendActionUsageOptions extends ActionUsageOptions {
     payload?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
@@ -33,29 +34,33 @@ export interface SendActionUsageOptions extends ActionUsageOptions {
     subaction: "Actions::Action::sendSubactions",
 })
 export class SendActionUsageMeta extends ActionUsageMeta {
+    private _defaultPayload: ParameterMembershipMeta<ReferenceUsageMeta>;
+    private _defaultSender: ParameterMembershipMeta<ReferenceUsageMeta>;
+    private _defaultReceiver: ParameterMembershipMeta<ReferenceUsageMeta>;
+
     private _payload?: ParameterMembershipMeta<ReferenceUsageMeta> | undefined;
     private _sender?: ParameterMembershipMeta<ReferenceUsageMeta> | undefined;
     private _receiver?: ParameterMembershipMeta<ReferenceUsageMeta> | undefined;
 
     @enumerable
-    public get payload(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
-        return this._payload;
+    public get payload(): ParameterMembershipMeta<ReferenceUsageMeta> {
+        return this._payload ?? this._defaultPayload;
     }
     public set payload(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
         this._payload = this.swapEdgeOwnership(this._payload, value);
     }
 
     @enumerable
-    public get sender(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
-        return this._sender;
+    public get sender(): ParameterMembershipMeta<ReferenceUsageMeta> {
+        return this._sender ?? this._defaultSender;
     }
     public set sender(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
         this._sender = this.swapEdgeOwnership(this._sender, value);
     }
 
     @enumerable
-    public get receiver(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
-        return this._receiver;
+    public get receiver(): ParameterMembershipMeta<ReferenceUsageMeta> {
+        return this._receiver ?? this._defaultReceiver;
     }
     public set receiver(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
         this._receiver = this.swapEdgeOwnership(this._receiver, value);
@@ -87,11 +92,25 @@ export class SendActionUsageMeta extends ActionUsageMeta {
 
     protected static applySendOptions(
         model: SendActionUsageMeta,
-        options: SendActionUsageOptions
+        provider: ElementIDProvider,
+        options?: SendActionUsageOptions
     ): void {
-        model.payload = options.payload;
-        model.sender = options.sender;
-        model.receiver = options.receiver;
+        model.payload = options?.payload;
+        model.sender = options?.sender;
+        model.receiver = options?.receiver;
+
+        model._defaultPayload = model.swapEdgeOwnership(
+            model._defaultPayload,
+            createEmptyParameterMember(provider, model.document)
+        );
+        model._defaultSender = model.swapEdgeOwnership(
+            model._defaultSender,
+            createEmptyParameterMember(provider, model.document)
+        );
+        model._defaultReceiver = model.swapEdgeOwnership(
+            model._defaultReceiver,
+            createEmptyParameterMember(provider, model.document)
+        );
     }
 
     static override create<T extends AstNode>(
@@ -101,9 +120,7 @@ export class SendActionUsageMeta extends ActionUsageMeta {
         options?: SendActionUsageOptions
     ): T["$meta"] {
         const model = super.create(provider, document, options) as SendActionUsageMeta;
-        if (options) {
-            SendActionUsageMeta.applySendOptions(model, options);
-        }
+        SendActionUsageMeta.applySendOptions(model, provider, options);
         return model;
     }
 }

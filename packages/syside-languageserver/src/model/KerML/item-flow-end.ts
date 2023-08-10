@@ -29,6 +29,16 @@ export interface ItemFlowEndOptions extends FeatureOptions {
 
 @metamodelOf(ItemFlowEnd, ImplicitItemFlowEnds)
 export class ItemFlowEndMeta extends FeatureMeta {
+    override get isEnd(): boolean {
+        return true;
+    }
+    override set isEnd(value) {
+        // empty
+    }
+    override get isEndExplicitly(): boolean {
+        return false;
+    }
+
     override ast(): ItemFlowEnd | undefined {
         return this._ast as ItemFlowEnd;
     }

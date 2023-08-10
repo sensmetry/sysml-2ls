@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { AstNode, LangiumDocument } from "langium";
-import { ElementFilterMembership } from "../../../generated/ast";
+import { ElementFilterMembership, NamespaceImport, Package } from "../../../generated/ast";
 import { Visibility, enumerable } from "../../../utils";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import {
@@ -31,7 +31,10 @@ export class ElementFilterMembershipMeta<
 > extends OwningMembershipMeta<T> {
     @enumerable
     override get visibility(): Visibility {
-        return Visibility.private;
+        const parent = this.parent();
+        if (parent?.nodeType() === Package && parent.parent()?.is(NamespaceImport))
+            return Visibility.private;
+        return super.visibility;
     }
     override set visibility(value) {
         super.visibility = value;

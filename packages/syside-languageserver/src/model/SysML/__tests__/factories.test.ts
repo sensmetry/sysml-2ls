@@ -31,6 +31,9 @@ import { StateDefinitionMeta } from "../state-definition";
 import { StateUsageMeta } from "../state-usage";
 import { TransitionUsageMeta } from "../transition-usage";
 import { ReferenceUsage } from "../../../generated/ast";
+import { FlowConnectionUsageMeta } from "../flow-connection-usage";
+import { EndFeatureMembershipMeta, ItemFlowEndMeta, ParameterMembershipMeta } from "../../KerML";
+import { EventOccurrenceUsageMeta } from "../event-occurrence-usage";
 
 describe("Element factories", () => {
     const id = basicIdProvider();
@@ -106,7 +109,7 @@ describe("Element factories", () => {
             declaredShortName: "short",
         });
 
-        expect(port.conjugatedDefinition.element()).toMatchObject({
+        expect(port.conjugatedDefinition?.element()).toMatchObject({
             name: "~name",
             shortName: "~short",
         });
@@ -125,5 +128,31 @@ describe("Element factories", () => {
 
         expect(tu["_payload"]?.element()?.nodeType()).toEqual(ReferenceUsage);
         expect(tu["_transitionLinkSource"]?.element()?.nodeType()).toEqual(ReferenceUsage);
+    });
+
+    it("should add ends to flow connection usage", () => {
+        const fc = FlowConnectionUsageMeta.create(id, document, {
+            ends: [
+                [
+                    EndFeatureMembershipMeta.create(id, document),
+                    ItemFlowEndMeta.create(id, document),
+                ],
+            ],
+        });
+
+        expect(fc.ends).toHaveLength(1);
+    });
+
+    it("should add messages to flow connection usage", () => {
+        const fc = FlowConnectionUsageMeta.create(id, document, {
+            messages: [
+                [
+                    ParameterMembershipMeta.create(id, document),
+                    EventOccurrenceUsageMeta.create(id, document),
+                ],
+            ],
+        });
+
+        expect(fc.messages).toHaveLength(1);
     });
 });

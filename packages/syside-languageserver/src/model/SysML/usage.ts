@@ -18,7 +18,6 @@ import { AstNode, LangiumDocument } from "langium";
 import {
     ActionDefinition,
     ActionUsage,
-    FeatureMembership,
     PartDefinition,
     PartUsage,
     PortionKind,
@@ -44,9 +43,7 @@ export class UsageMeta extends FeatureMeta {
     isVariant = false;
     isVariation = false;
     isIndividual = false;
-    protected _isReference = false;
     portionKind?: PortionKind;
-    protected _isImpliedComposite = false;
 
     protected override onParentSet(
         previous: ElementMeta | undefined,
@@ -54,25 +51,31 @@ export class UsageMeta extends FeatureMeta {
     ): void {
         super.onParentSet(previous, current);
         this.isVariant = !!current?.is(VariantMembership);
-        this._isImpliedComposite = Boolean(
-            this.direction === "none" && !this.isEnd && current?.is(FeatureMembership)
-        );
     }
 
     @enumerable
     get isReference(): boolean {
-        return this._isReference;
+        return !this.isComposite;
     }
     set isReference(value) {
-        this._isReference = value;
+        this.isComposite = !value;
+    }
+    get isReferenceExplicitly(): boolean {
+        return !super.isComposite;
     }
 
     @enumerable
     override get isComposite(): boolean {
-        return this._isImpliedComposite || super.isComposite;
+        return (
+            super.isComposite &&
+            Boolean(this.direction === "none" && !this.isEnd && this.owningType)
+        );
     }
     override set isComposite(value) {
         this._isComposite = value;
+    }
+    get isCompositeExplicitly(): boolean {
+        return super.isComposite;
     }
 
     @enumerable
@@ -127,7 +130,7 @@ export class UsageMeta extends FeatureMeta {
     protected static applyUsageOptions(model: UsageMeta, options: UsageOptions): void {
         model.isVariation = Boolean(options.isVariation);
         model.isIndividual = Boolean(options.isIndividual);
-        model._isReference = Boolean(options.isReference);
+        model.isReference = Boolean(options.isReference);
         model.portionKind = options.portionKind;
     }
 

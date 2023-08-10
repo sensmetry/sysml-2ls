@@ -39,7 +39,7 @@ fragment RelationshipOwnedElement:
 
 Dependency returns Dependency:
     ( prefixes+=PrefixMetadataAnnotation )*
-    'dependency' (Identification 'from')?
+    'dependency' (Identification? 'from')?
     client+=ElementReference ( ',' client+=ElementReference )* 'to'
     supplier+=ElementReference ( ',' supplier+=ElementReference )*
     RelationshipBody
@@ -98,7 +98,7 @@ AnnotatingMember returns OwningMembership:
 ;
 
 AliasMember returns Membership:
-    Visibility? 'alias' Identification? 'for' targetRef=ElementReference RelationshipBody
+    Visibility? isAlias?='alias' Identification? 'for' targetRef=ElementReference RelationshipBody
 ;
 
 // Imports

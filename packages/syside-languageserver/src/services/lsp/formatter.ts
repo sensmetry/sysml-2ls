@@ -961,9 +961,10 @@ export class SysMLFormatter extends AbstractFormatter {
     @formatter(ast.ItemFlow) itemFlow(
         node: ast.ItemFlow,
         formatter: NodeFormatter<ast.ItemFlow>,
-        keyword = /flow/
+        keyword = /flow/,
+        ends: AstNode[] = node.ends
     ): void {
-        this.formatBinding(node, formatter, node.ends, "from", "to");
+        this.formatBinding(node, formatter, ends, "from", "to");
 
         const of = formatter.keyword("of");
         if (of.nodes.length === 0) return;
@@ -1295,7 +1296,12 @@ export class SysMLFormatter extends AbstractFormatter {
         node: ast.FlowConnectionUsage,
         formatter: NodeFormatter<ast.FlowConnectionUsage>
     ): void {
-        this.itemFlow(node, formatter, /message|flow/);
+        this.itemFlow(
+            node,
+            formatter,
+            /message|flow/,
+            node.messages.length > 0 ? node.messages : node.ends
+        );
         this.occurrenceUsagePart(node, formatter);
     }
 

@@ -30,10 +30,10 @@ export interface PortDefinitionOptions extends StructureOptions, OccurrenceDefin
     base: "Ports::Port",
 })
 export class PortDefinitionMeta extends Mixin(StructureMeta, OccurrenceDefinitionMeta) {
-    private _conjugatedDefinition: OwningMembershipMeta<ConjugatedPortDefinitionMeta>;
+    private _conjugatedDefinition: OwningMembershipMeta<ConjugatedPortDefinitionMeta> | undefined;
 
     @enumerable
-    get conjugatedDefinition(): OwningMembershipMeta<ConjugatedPortDefinitionMeta> {
+    get conjugatedDefinition(): OwningMembershipMeta<ConjugatedPortDefinitionMeta> | undefined {
         return this._conjugatedDefinition;
     }
 
@@ -86,6 +86,11 @@ export class PortDefinitionMeta extends Mixin(StructureMeta, OccurrenceDefinitio
 
 @metamodelOf(ConjugatedPortDefinition)
 export class ConjugatedPortDefinitionMeta extends PortDefinitionMeta {
+    get originalPortDefinition(): PortDefinitionMeta {
+        // this holds as long as no one edits hidden properties
+        return this._owner as PortDefinitionMeta;
+    }
+
     override ast(): ConjugatedPortDefinition | undefined {
         return this._ast as ConjugatedPortDefinition;
     }

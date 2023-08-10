@@ -35,6 +35,8 @@ import {
     AnnotatingElementMeta,
     RelationshipMeta,
     TargetType,
+    OwningMembershipMeta,
+    NonNullRelationship,
 } from "./_internal";
 import { LazyGetter, enumerable } from "../../utils/common";
 import { removeIfObserved } from "../containers";
@@ -77,6 +79,11 @@ export type Edges<R extends RelationshipMeta> = {
 
 export type RestEdges<T extends RelationshipMeta[]> = { [I in keyof T]: Edge<T[I]> };
 
+type SwappedEdge<T extends RelationshipMeta, V extends ElementMeta> = T &
+    (T extends OwningMembershipMeta
+        ? NonNullRelationship<RelationshipMeta<V>>
+        : RelationshipMeta<V>);
+
 type CleanupCallback = (() => void) & { owner: ElementMeta };
 
 @metamodelOf(Element, "abstract")
@@ -98,6 +105,10 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     // TODO: move to namespace
     protected readonly _memberLookup = new Map<string, NamedChild>();
     protected _metaclass: MetadataFeatureMeta | undefined | LazyMetaclass | "unset" = "unset";
+
+    get isImpliedIncluded(): boolean {
+        return this.setupState === "completed";
+    }
 
     /**
      * Adds annotating element that annotates this element. An implementation
@@ -443,11 +454,11 @@ export abstract class ElementMeta extends BasicMetamodel<Element> {
     protected swapEdgeOwnership<T extends RelationshipMeta, V extends ElementMeta>(
         current: RelationshipMeta | undefined,
         edge: readonly [T, V]
-    ): T & RelationshipMeta<V>;
+    ): SwappedEdge<T, V>;
     protected swapEdgeOwnership<T extends RelationshipMeta, V extends ElementMeta>(
         current: RelationshipMeta | undefined,
         edge: readonly [T, V] | undefined
-    ): (T & RelationshipMeta<V>) | undefined;
+    ): SwappedEdge<T, V> | undefined;
 
     protected swapEdgeOwnership(
         current: RelationshipMeta | undefined,

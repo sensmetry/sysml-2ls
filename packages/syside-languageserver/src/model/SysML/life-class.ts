@@ -25,6 +25,13 @@ export class LifeClassMeta extends ClassMeta {
     override ast(): LifeClass | undefined {
         return this._ast as LifeClass;
     }
+
+    override get isSufficient(): boolean {
+        return true;
+    }
+    override set isSufficient(value) {
+        // empty
+    }
 }
 
 declare module "../../generated/ast" {
