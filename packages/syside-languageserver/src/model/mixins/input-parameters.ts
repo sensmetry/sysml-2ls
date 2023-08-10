@@ -14,18 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import {
-    OwningMembership,
-    ParameterMembership,
-    ReturnParameterMembership,
-} from "../../generated/ast";
+import { OwningMembership } from "../../generated/ast";
 import { FeatureMeta, MembershipMeta, TypeMeta } from "../KerML/_internal";
 import { PositionalFeaturesBase } from "./positional-features";
 
 const Filter: (f: MembershipMeta<FeatureMeta>) => boolean = (f) => {
     if (!f.is(OwningMembership)) return false;
-    if (f.is(ParameterMembership)) return !f.is(ReturnParameterMembership);
-    return Boolean(f.element() && f.element()?.direction !== "out");
+    const dir = f.element()?.direction;
+    return dir === "in" || dir === "inout";
 };
 
 export class InputParametersMixin {

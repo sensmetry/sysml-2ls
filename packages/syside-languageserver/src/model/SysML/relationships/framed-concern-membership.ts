@@ -22,11 +22,19 @@ import { ConcernUsageMeta } from "../concern-usage";
 import { RequirementDefinitionMeta } from "../requirement-definition";
 import { RequirementConstraintMembershipMeta } from "./requirement-constraint-membership";
 import { RequirementUsageMeta } from "../requirement-usage";
+import { RequirementConstraintKind } from "../../enums";
 
 @metamodelOf(FramedConcernMembership)
 export class FramedConcernMembershipMeta<
     T extends ConcernUsageMeta = ConcernUsageMeta,
 > extends RequirementConstraintMembershipMeta<T> {
+    override get kind(): RequirementConstraintKind {
+        return "requirement";
+    }
+    override set kind(value: RequirementConstraintKind) {
+        // empty;
+    }
+
     override ast(): FramedConcernMembership | undefined {
         return this._ast as FramedConcernMembership;
     }

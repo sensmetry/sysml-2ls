@@ -27,8 +27,6 @@ import { AssociationMeta } from "../association";
 import {
     DependencyMeta,
     DocumentationMeta,
-    ElementFilterMembershipMeta,
-    ExpressionMeta,
     InvariantMeta,
     LiteralBooleanMeta,
     LiteralNumberMeta,
@@ -86,15 +84,6 @@ describe("Element factories", () => {
         expect(relationship.parent()).toBe(parent);
         expect(relationship.owner()).toBeUndefined();
         expect(relationship).toMatchObject({ visibility: Visibility.private, isImplied: true });
-    });
-
-    test("element filter membership should be constructed with private visibility", () => {
-        expect(
-            ElementFilterMembershipMeta.create(id, document, {
-                target: ExpressionMeta.create(id, document),
-                visibility: Visibility.public,
-            }).visibility
-        ).toEqual(Visibility.private);
     });
 
     it("should assign client and supplier to dependency", () => {

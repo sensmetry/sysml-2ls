@@ -26,7 +26,9 @@ import { ElementMeta } from "../_internal";
 
 export interface FeatureMembershipMeta<T extends FeatureMeta = FeatureMeta>
     extends OwningMembershipMeta<T>,
-        FeaturingMeta<T> {}
+        FeaturingMeta<T> {
+    element(): T;
+}
 
 @metamodelOf(FeatureMembership)
 @mix(FeaturingMeta, OwningMembershipMeta)

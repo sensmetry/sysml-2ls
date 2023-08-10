@@ -15,9 +15,8 @@
  ********************************************************************************/
 
 import { Classifier, Feature, Multiplicity } from "../../generated/ast";
-import { NonNullable } from "../../utils";
 import { metamodelOf } from "../metamodel";
-import { FeatureMeta, FeatureOptions, TypeMeta } from "./_internal";
+import { FeatureMeta, FeatureOptions, TypeFeaturingMeta } from "./_internal";
 
 export const ImplicitMultiplicities = {
     base: "Base::naturals",
@@ -29,14 +28,11 @@ export type MultiplicityOptions = FeatureOptions;
 
 @metamodelOf(Multiplicity, ImplicitMultiplicities)
 export class MultiplicityMeta extends FeatureMeta {
-    override get featuredBy(): readonly TypeMeta[] {
-        const by = super.typeFeaturings;
-        if (by.length > 0) return by.map((f) => f.element()).filter(NonNullable);
-
-        const owner = this.owner();
-        if (!owner?.is(Feature)) return this._owningType ? [this._owningType] : [];
-
-        return owner.featuredBy;
+    override get typeFeaturings(): readonly TypeFeaturingMeta[] {
+        const explicit = super.typeFeaturings;
+        if (explicit.length > 0) return explicit;
+        if (this.owningType?.is(Feature)) return this.owningType.typeFeaturings;
+        return explicit;
     }
 
     override ast(): Multiplicity | undefined {

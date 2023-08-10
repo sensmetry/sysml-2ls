@@ -106,7 +106,7 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
         document: LangiumDocument,
         options?: ItemFlowOptions
     ): T["$meta"] {
-        const model = super.create(provider, document, options) as ItemFlowMeta;
+        const model = ConnectorMeta.create.call(this, provider, document, options) as ItemFlowMeta;
         if (options) ItemFlowMeta.applyItemFlowOptions(model, options);
         return model;
     }

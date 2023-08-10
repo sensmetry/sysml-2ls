@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { AttributeUsage } from "../../generated/ast";
+import { enumerable } from "../../utils";
 import { metamodelOf } from "../metamodel";
 import { UsageMeta, UsageOptions } from "./usage";
 
@@ -24,6 +25,14 @@ export type AttributeUsageOptions = UsageOptions;
     base: "Base::dataValues",
 })
 export class AttributeUsageMeta extends UsageMeta {
+    @enumerable
+    override get isComposite(): boolean {
+        return false;
+    }
+    override set isComposite(value) {
+        // empty
+    }
+
     override ast(): AttributeUsage | undefined {
         return this._ast as AttributeUsage;
     }

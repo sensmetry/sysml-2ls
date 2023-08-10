@@ -213,7 +213,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "Dependency",
       "returnType": {
-        "$ref": "#/interfaces@54"
+        "$ref": "#/interfaces@53"
       },
       "definition": {
         "$type": "Group",
@@ -243,7 +243,8 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 "rule": {
                   "$ref": "#/rules@220"
                 },
-                "arguments": []
+                "arguments": [],
+                "cardinality": "?"
               },
               {
                 "$type": "Keyword",
@@ -604,7 +605,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "NonFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -642,7 +643,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "NamespaceFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -680,7 +681,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "RelationshipMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -718,7 +719,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "AnnotatingMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -756,7 +757,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "AliasMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Group",
@@ -770,8 +771,13 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "cardinality": "?"
           },
           {
-            "$type": "Keyword",
-            "value": "alias"
+            "$type": "Assignment",
+            "feature": "isAlias",
+            "operator": "?=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "alias"
+            }
           },
           {
             "$type": "RuleCall",
@@ -899,7 +905,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "Import",
       "returnType": {
-        "$ref": "#/interfaces@55"
+        "$ref": "#/interfaces@54"
       },
       "definition": {
         "$type": "Group",
@@ -977,7 +983,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FilterPackageMember",
       "returnType": {
-        "$ref": "#/interfaces@61"
+        "$ref": "#/interfaces@60"
       },
       "definition": {
         "$type": "Group",
@@ -1579,7 +1585,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ElementFilterMember",
       "returnType": {
-        "$ref": "#/interfaces@61"
+        "$ref": "#/interfaces@60"
       },
       "definition": {
         "$type": "Group",
@@ -2264,7 +2270,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Alternatives",
@@ -2296,7 +2302,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "TypeFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -2338,7 +2344,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -2530,7 +2536,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "Conjugation",
       "returnType": {
-        "$ref": "#/interfaces@51"
+        "$ref": "#/interfaces@50"
       },
       "definition": {
         "$type": "Group",
@@ -2642,7 +2648,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedConjugation",
       "returnType": {
-        "$ref": "#/interfaces@51"
+        "$ref": "#/interfaces@50"
       },
       "definition": {
         "$type": "Alternatives",
@@ -3269,7 +3275,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ClassifierConjugation",
       "returnType": {
-        "$ref": "#/interfaces@51"
+        "$ref": "#/interfaces@50"
       },
       "definition": {
         "$type": "Assignment",
@@ -4631,7 +4637,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedReferenceSubsetting",
       "returnType": {
-        "$ref": "#/interfaces@53"
+        "$ref": "#/interfaces@52"
       },
       "definition": {
         "$type": "Alternatives",
@@ -4673,7 +4679,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "Redefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Group",
@@ -4785,7 +4791,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedRedefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Alternatives",
@@ -4861,7 +4867,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureConjugation",
       "returnType": {
-        "$ref": "#/interfaces@51"
+        "$ref": "#/interfaces@50"
       },
       "definition": {
         "$type": "Assignment",
@@ -4925,7 +4931,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureValue",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Group",
@@ -4997,7 +5003,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureValueExpression",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Group",
@@ -5156,7 +5162,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedMultiplicity",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -5236,7 +5242,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "MultiplicityExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -5706,7 +5712,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ConnectorEndMember",
       "returnType": {
-        "$ref": "#/interfaces@64"
+        "$ref": "#/interfaces@63"
       },
       "definition": {
         "$type": "Assignment",
@@ -6431,7 +6437,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ReturnFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@67"
+        "$ref": "#/interfaces@66"
       },
       "definition": {
         "$type": "Group",
@@ -6473,7 +6479,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ResultExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@66"
+        "$ref": "#/interfaces@65"
       },
       "definition": {
         "$type": "Group",
@@ -7003,7 +7009,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ItemFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -7219,7 +7225,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ItemFlowEndMember",
       "returnType": {
-        "$ref": "#/interfaces@64"
+        "$ref": "#/interfaces@63"
       },
       "definition": {
         "$type": "Assignment",
@@ -7287,7 +7293,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ItemFlowEndSubsetting",
       "returnType": {
-        "$ref": "#/interfaces@53"
+        "$ref": "#/interfaces@52"
       },
       "definition": {
         "$type": "Alternatives",
@@ -7338,7 +7344,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ItemFlowFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -7388,7 +7394,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ItemFlowRedefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Assignment",
@@ -7481,7 +7487,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "PrefixMetadataMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -7843,7 +7849,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "MetadataBodyFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -7967,7 +7973,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -8012,7 +8018,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OwnedExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -8037,7 +8043,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ConcreteConditionalExpression",
       "returnType": {
-        "$ref": "#/interfaces@82"
+        "$ref": "#/interfaces@81"
       },
       "definition": {
         "$type": "Group",
@@ -8158,7 +8164,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -8200,7 +8206,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ImpliesExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -8225,7 +8231,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ImpliesExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -8268,7 +8274,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -8310,7 +8316,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OrExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -8335,7 +8341,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "OrExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -8378,7 +8384,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -8456,7 +8462,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "XorExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -8481,7 +8487,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "XorExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -8524,7 +8530,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -8584,7 +8590,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -8662,7 +8668,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "EqualityExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -8687,7 +8693,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "EqualityExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -8730,7 +8736,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -8796,7 +8802,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@82"
+                      "$ref": "#/interfaces@81"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -8872,7 +8878,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -8907,7 +8913,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -8951,7 +8957,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -8983,7 +8989,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -9052,7 +9058,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -9115,7 +9121,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -9175,7 +9181,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -9244,7 +9250,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -9317,7 +9323,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -9379,7 +9385,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -9439,7 +9445,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -9503,7 +9509,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@83"
+                  "$ref": "#/interfaces@82"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -9539,7 +9545,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@82"
+                          "$ref": "#/interfaces@81"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -9581,7 +9587,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@82"
+                          "$ref": "#/interfaces@81"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -9619,7 +9625,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@82"
+                          "$ref": "#/interfaces@81"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -9684,7 +9690,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@84"
+                          "$ref": "#/interfaces@83"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -9713,7 +9719,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@85"
+                          "$ref": "#/interfaces@84"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -9744,7 +9750,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@83"
+                      "$ref": "#/interfaces@82"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -9864,7 +9870,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "BodyExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -9889,7 +9895,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ExpressionBodyMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -9939,7 +9945,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@82"
+                      "$ref": "#/interfaces@81"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -9983,7 +9989,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "InvocationExpression",
       "returnType": {
-        "$ref": "#/interfaces@81"
+        "$ref": "#/interfaces@80"
       },
       "definition": {
         "$type": "Group",
@@ -10112,7 +10118,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ArgumentMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -10211,7 +10217,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "NamedArgumentMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -10282,7 +10288,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ParameterRedefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Assignment",
@@ -10307,7 +10313,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ArgumentValue",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Assignment",
@@ -10562,7 +10568,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "LiteralBoolean",
       "returnType": {
-        "$ref": "#/interfaces@76"
+        "$ref": "#/interfaces@75"
       },
       "definition": {
         "$type": "Alternatives",
@@ -10593,7 +10599,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "LiteralString",
       "returnType": {
-        "$ref": "#/interfaces@77"
+        "$ref": "#/interfaces@76"
       },
       "definition": {
         "$type": "Assignment",
@@ -10618,7 +10624,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "LiteralNumber",
       "returnType": {
-        "$ref": "#/interfaces@78"
+        "$ref": "#/interfaces@77"
       },
       "definition": {
         "$type": "Assignment",
@@ -10643,7 +10649,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "LiteralInfinity",
       "returnType": {
-        "$ref": "#/interfaces@79"
+        "$ref": "#/interfaces@78"
       },
       "definition": {
         "$type": "Group",
@@ -10651,7 +10657,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "Action",
             "type": {
-              "$ref": "#/interfaces@79"
+              "$ref": "#/interfaces@78"
             }
           },
           {
@@ -10671,7 +10677,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "LiteralExpression",
       "returnType": {
-        "$ref": "#/interfaces@75"
+        "$ref": "#/interfaces@74"
       },
       "definition": {
         "$type": "Alternatives",
@@ -10717,7 +10723,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "NullExpression",
       "returnType": {
-        "$ref": "#/interfaces@80"
+        "$ref": "#/interfaces@79"
       },
       "definition": {
         "$type": "Group",
@@ -10725,7 +10731,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "Action",
             "type": {
-              "$ref": "#/interfaces@80"
+              "$ref": "#/interfaces@79"
             }
           },
           {
@@ -11553,7 +11559,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ElementReference",
       "returnType": {
-        "$ref": "#/interfaces@68"
+        "$ref": "#/interfaces@67"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11573,7 +11579,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "NamespaceReference",
       "returnType": {
-        "$ref": "#/interfaces@69"
+        "$ref": "#/interfaces@68"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11593,7 +11599,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "TypeReference",
       "returnType": {
-        "$ref": "#/interfaces@70"
+        "$ref": "#/interfaces@69"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11613,7 +11619,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "ClassifierReference",
       "returnType": {
-        "$ref": "#/interfaces@71"
+        "$ref": "#/interfaces@70"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11633,7 +11639,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureReference",
       "returnType": {
-        "$ref": "#/interfaces@72"
+        "$ref": "#/interfaces@71"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11653,7 +11659,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "MetaclassReference",
       "returnType": {
-        "$ref": "#/interfaces@73"
+        "$ref": "#/interfaces@72"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11673,7 +11679,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "MembershipReference",
       "returnType": {
-        "$ref": "#/interfaces@74"
+        "$ref": "#/interfaces@73"
       },
       "definition": {
         "$type": "RuleCall",
@@ -11901,7 +11907,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "MetadataReference",
       "returnType": {
-        "$ref": "#/interfaces@87"
+        "$ref": "#/interfaces@86"
       },
       "definition": {
         "$type": "Assignment",
@@ -11926,7 +11932,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "TypeReferenceMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -11951,7 +11957,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "TypeResultMember",
       "returnType": {
-        "$ref": "#/interfaces@67"
+        "$ref": "#/interfaces@66"
       },
       "definition": {
         "$type": "Assignment",
@@ -12026,7 +12032,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FunctionReferenceExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -12051,7 +12057,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FunctionReferenceMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -12101,7 +12107,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureChainMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Alternatives",
@@ -12124,7 +12130,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@59"
+                  "$ref": "#/interfaces@58"
                 }
               },
               {
@@ -12304,7 +12310,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureReferenceExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -12329,7 +12335,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "FeatureReferenceMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Assignment",
@@ -12354,7 +12360,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "$type": "ParserRule",
       "name": "MetadataAccessExpression",
       "returnType": {
-        "$ref": "#/interfaces@87"
+        "$ref": "#/interfaces@86"
       },
       "definition": {
         "$type": "Group",
@@ -12523,7 +12529,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@59"
+                "$ref": "#/interfaces@58"
               }
             }
           },
@@ -12540,13 +12546,13 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
                 {
                   "$type": "SimpleType",
                   "typeRef": {
-                    "$ref": "#/interfaces@55"
+                    "$ref": "#/interfaces@54"
                   }
                 },
                 {
                   "$type": "SimpleType",
                   "typeRef": {
-                    "$ref": "#/interfaces@58"
+                    "$ref": "#/interfaces@57"
                   }
                 }
               ]
@@ -12629,7 +12635,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@59"
+              "$ref": "#/interfaces@58"
             }
           }
         }
@@ -12737,7 +12743,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@66"
+              "$ref": "#/interfaces@65"
             }
           }
         }
@@ -12856,7 +12862,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@60"
+              "$ref": "#/interfaces@59"
             }
           }
         },
@@ -12867,7 +12873,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           }
         }
@@ -12912,7 +12918,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@59"
+              "$ref": "#/interfaces@58"
             }
           }
         }
@@ -12955,7 +12961,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@64"
+                "$ref": "#/interfaces@63"
               }
             }
           },
@@ -13012,7 +13018,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@66"
+              "$ref": "#/interfaces@65"
             }
           }
         }
@@ -13034,7 +13040,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@63"
+              "$ref": "#/interfaces@62"
             }
           }
         }
@@ -13191,7 +13197,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@68"
+              "$ref": "#/interfaces@67"
             }
           }
         },
@@ -13224,7 +13230,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@68"
+              "$ref": "#/interfaces@67"
             }
           }
         },
@@ -13332,7 +13338,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "TypeFeaturing",
       "superTypes": [
         {
-          "$ref": "#/interfaces@62"
+          "$ref": "#/interfaces@61"
         }
       ],
       "attributes": []
@@ -13360,16 +13366,6 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
     {
       "$type": "Interface",
       "name": "Subsetting",
-      "superTypes": [
-        {
-          "$ref": "#/interfaces@43"
-        }
-      ],
-      "attributes": []
-    },
-    {
-      "$type": "Interface",
-      "name": "Subtype",
       "superTypes": [
         {
           "$ref": "#/interfaces@43"
@@ -13432,7 +13428,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@68"
+                "$ref": "#/interfaces@67"
               }
             }
           },
@@ -13446,7 +13442,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@68"
+                "$ref": "#/interfaces@67"
               }
             }
           },
@@ -13503,7 +13499,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "MembershipImport",
       "superTypes": [
         {
-          "$ref": "#/interfaces@55"
+          "$ref": "#/interfaces@54"
         }
       ],
       "attributes": []
@@ -13513,27 +13509,37 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "NamespaceImport",
       "superTypes": [
         {
-          "$ref": "#/interfaces@55"
+          "$ref": "#/interfaces@54"
         }
       ],
       "attributes": []
     },
     {
       "$type": "Interface",
+      "attributes": [
+        {
+          "$type": "TypeAttribute",
+          "name": "isAlias",
+          "type": {
+            "$type": "SimpleType",
+            "primitiveType": "boolean"
+          },
+          "isOptional": false
+        }
+      ],
       "name": "Membership",
       "superTypes": [
         {
           "$ref": "#/interfaces@37"
         }
-      ],
-      "attributes": []
+      ]
     },
     {
       "$type": "Interface",
       "name": "OwningMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@58"
+          "$ref": "#/interfaces@57"
         }
       ],
       "attributes": []
@@ -13563,7 +13569,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "FeatureValue",
       "superTypes": [
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ]
     },
@@ -13572,7 +13578,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "ElementFilterMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ],
       "attributes": []
@@ -13592,10 +13598,10 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "FeatureMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@62"
+          "$ref": "#/interfaces@61"
         },
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ],
       "attributes": []
@@ -13605,7 +13611,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "EndFeatureMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -13615,7 +13621,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "ParameterMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -13625,7 +13631,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "ResultExpressionMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -13635,7 +13641,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "ReturnParameterMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@65"
+          "$ref": "#/interfaces@64"
         }
       ],
       "attributes": []
@@ -13669,7 +13675,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "NamespaceReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@68"
+          "$ref": "#/interfaces@67"
         }
       ],
       "attributes": []
@@ -13679,7 +13685,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "TypeReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@69"
+          "$ref": "#/interfaces@68"
         }
       ],
       "attributes": []
@@ -13689,7 +13695,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "ClassifierReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@70"
+          "$ref": "#/interfaces@69"
         }
       ],
       "attributes": []
@@ -13699,7 +13705,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "FeatureReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@70"
+          "$ref": "#/interfaces@69"
         }
       ],
       "attributes": []
@@ -13709,7 +13715,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "MetaclassReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@71"
+          "$ref": "#/interfaces@70"
         }
       ],
       "attributes": []
@@ -13719,7 +13725,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "MembershipReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@68"
+          "$ref": "#/interfaces@67"
         }
       ],
       "attributes": []
@@ -13750,7 +13756,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "LiteralBoolean",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ]
     },
@@ -13770,7 +13776,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "LiteralString",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ]
     },
@@ -13790,7 +13796,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "LiteralNumber",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ]
     },
@@ -13799,7 +13805,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "LiteralInfinity",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ],
       "attributes": []
@@ -13854,7 +13860,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "OperatorExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@81"
+          "$ref": "#/interfaces@80"
         }
       ]
     },
@@ -13863,7 +13869,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "FeatureChainExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@82"
+          "$ref": "#/interfaces@81"
         }
       ],
       "attributes": []
@@ -13873,7 +13879,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "CollectExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@82"
+          "$ref": "#/interfaces@81"
         }
       ],
       "attributes": []
@@ -13883,7 +13889,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
       "name": "SelectExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@82"
+          "$ref": "#/interfaces@81"
         }
       ],
       "attributes": []
@@ -13897,7 +13903,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           },
           "isOptional": false
@@ -13919,7 +13925,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@68"
+              "$ref": "#/interfaces@67"
             }
           },
           "isOptional": false
@@ -14102,25 +14108,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@83"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@81"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@75"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@87"
+              "$ref": "#/interfaces@82"
             }
           },
           {
@@ -14132,7 +14120,31 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@82"
+              "$ref": "#/interfaces@74"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@86"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@79"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@81"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@83"
             }
           },
           {
@@ -14145,12 +14157,6 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
             "$type": "SimpleType",
             "typeRef": {
               "$ref": "#/interfaces@85"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@86"
             }
           }
         ]
@@ -14165,7 +14171,7 @@ export const KerMLGrammar = (): Grammar => loadedKerMLGrammar ?? (loadedKerMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           },
           {
@@ -14419,7 +14425,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "Dependency",
       "returnType": {
-        "$ref": "#/interfaces@54"
+        "$ref": "#/interfaces@53"
       },
       "definition": {
         "$type": "Group",
@@ -14442,16 +14448,21 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "value": "dependency"
           },
           {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@390"
-            },
-            "arguments": [],
-            "cardinality": "?"
-          },
-          {
-            "$type": "Keyword",
-            "value": "from",
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@390"
+                },
+                "arguments": [],
+                "cardinality": "?"
+              },
+              {
+                "$type": "Keyword",
+                "value": "from"
+              }
+            ],
             "cardinality": "?"
           },
           {
@@ -14571,7 +14582,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AnnotatingMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -14704,7 +14715,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetadataDefinition",
       "returnType": {
-        "$ref": "#/interfaces@90"
+        "$ref": "#/interfaces@89"
       },
       "definition": {
         "$type": "Group",
@@ -14770,7 +14781,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PrefixMetadataMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -14818,7 +14829,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PrefixMetadataUsage",
       "returnType": {
-        "$ref": "#/interfaces@91"
+        "$ref": "#/interfaces@90"
       },
       "definition": {
         "$type": "Group",
@@ -14852,7 +14863,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetadataUsage",
       "returnType": {
-        "$ref": "#/interfaces@91"
+        "$ref": "#/interfaces@90"
       },
       "definition": {
         "$type": "Group",
@@ -15116,7 +15127,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetadataBodyUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -15141,7 +15152,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetadataBodyUsage",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Group",
@@ -15482,7 +15493,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "UsageMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -15520,7 +15531,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RelationshipMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -15558,7 +15569,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ElementFilterMember",
       "returnType": {
-        "$ref": "#/interfaces@61"
+        "$ref": "#/interfaces@60"
       },
       "definition": {
         "$type": "Group",
@@ -15604,7 +15615,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AliasMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Group",
@@ -15618,8 +15629,13 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "cardinality": "?"
           },
           {
-            "$type": "Keyword",
-            "value": "alias"
+            "$type": "Assignment",
+            "feature": "isAlias",
+            "operator": "?=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "alias"
+            }
           },
           {
             "$type": "RuleCall",
@@ -15747,7 +15763,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "Import",
       "returnType": {
-        "$ref": "#/interfaces@55"
+        "$ref": "#/interfaces@54"
       },
       "definition": {
         "$type": "Group",
@@ -15825,7 +15841,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FilterPackageMember",
       "returnType": {
-        "$ref": "#/interfaces@61"
+        "$ref": "#/interfaces@60"
       },
       "definition": {
         "$type": "Group",
@@ -16077,7 +16093,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "UsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -16735,7 +16751,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OwnedReferenceSubsetting",
       "returnType": {
-        "$ref": "#/interfaces@53"
+        "$ref": "#/interfaces@52"
       },
       "definition": {
         "$type": "Alternatives",
@@ -16777,7 +16793,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OwnedRedefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Alternatives",
@@ -16819,7 +16835,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OwnedMultiplicity",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -16882,7 +16898,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MultiplicityExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -17229,7 +17245,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "DefinitionMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -17267,7 +17283,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "VisibleAnnotatingMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Group",
@@ -17305,7 +17321,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "VariantUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@165"
+        "$ref": "#/interfaces@164"
       },
       "definition": {
         "$type": "Group",
@@ -17347,7 +17363,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NonOccurrenceUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -17385,7 +17401,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OccurrenceUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -17423,7 +17439,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StructureUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -17461,7 +17477,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "BehaviorUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -17793,7 +17809,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureValue",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Group",
@@ -17865,7 +17881,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureValueExpression",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Group",
@@ -17904,7 +17920,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "DefaultReferenceUsage",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Group",
@@ -17951,7 +17967,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ReferenceUsage",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Group",
@@ -17987,7 +18003,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "VariantReference",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Group",
@@ -18032,7 +18048,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NonOccurrenceUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -18099,7 +18115,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OccurrenceUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -18131,7 +18147,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StructureUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -18254,7 +18270,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "BehaviorUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -18384,7 +18400,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "VariantUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -18549,7 +18565,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ExtendedDefinition",
       "returnType": {
-        "$ref": "#/interfaces@88"
+        "$ref": "#/interfaces@87"
       },
       "definition": {
         "$type": "Group",
@@ -18594,7 +18610,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ExtendedUsage",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Group",
@@ -18634,7 +18650,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AttributeDefinition",
       "returnType": {
-        "$ref": "#/interfaces@95"
+        "$ref": "#/interfaces@94"
       },
       "definition": {
         "$type": "Group",
@@ -18674,7 +18690,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AttributeUsage",
       "returnType": {
-        "$ref": "#/interfaces@96"
+        "$ref": "#/interfaces@95"
       },
       "definition": {
         "$type": "Group",
@@ -18710,7 +18726,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EnumerationDefinition",
       "returnType": {
-        "$ref": "#/interfaces@139"
+        "$ref": "#/interfaces@138"
       },
       "definition": {
         "$type": "Group",
@@ -18829,7 +18845,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EnumerationUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@165"
+        "$ref": "#/interfaces@164"
       },
       "definition": {
         "$type": "Group",
@@ -18867,7 +18883,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EnumeratedValue",
       "returnType": {
-        "$ref": "#/interfaces@140"
+        "$ref": "#/interfaces@139"
       },
       "definition": {
         "$type": "Group",
@@ -18897,7 +18913,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EnumerationUsage",
       "returnType": {
-        "$ref": "#/interfaces@140"
+        "$ref": "#/interfaces@139"
       },
       "definition": {
         "$type": "Group",
@@ -18972,7 +18988,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OccurrenceDefinition",
       "returnType": {
-        "$ref": "#/interfaces@93"
+        "$ref": "#/interfaces@92"
       },
       "definition": {
         "$type": "Group",
@@ -19012,7 +19028,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "IndividualDefinition",
       "returnType": {
-        "$ref": "#/interfaces@93"
+        "$ref": "#/interfaces@92"
       },
       "definition": {
         "$type": "Group",
@@ -19110,7 +19126,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OccurrenceUsage",
       "returnType": {
-        "$ref": "#/interfaces@94"
+        "$ref": "#/interfaces@93"
       },
       "definition": {
         "$type": "Group",
@@ -19146,7 +19162,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "IndividualUsage",
       "returnType": {
-        "$ref": "#/interfaces@94"
+        "$ref": "#/interfaces@93"
       },
       "definition": {
         "$type": "Group",
@@ -19193,7 +19209,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PortionUsage",
       "returnType": {
-        "$ref": "#/interfaces@94"
+        "$ref": "#/interfaces@93"
       },
       "definition": {
         "$type": "Group",
@@ -19248,7 +19264,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EventOccurrenceUsage",
       "returnType": {
-        "$ref": "#/interfaces@152"
+        "$ref": "#/interfaces@151"
       },
       "definition": {
         "$type": "Group",
@@ -19331,7 +19347,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EmptySuccessionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -19356,7 +19372,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EmptySuccession",
       "returnType": {
-        "$ref": "#/interfaces@162"
+        "$ref": "#/interfaces@161"
       },
       "definition": {
         "$type": "Group",
@@ -19391,7 +19407,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MultiplicitySourceEndMember",
       "returnType": {
-        "$ref": "#/interfaces@64"
+        "$ref": "#/interfaces@63"
       },
       "definition": {
         "$type": "Assignment",
@@ -19441,7 +19457,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ItemDefinition",
       "returnType": {
-        "$ref": "#/interfaces@97"
+        "$ref": "#/interfaces@96"
       },
       "definition": {
         "$type": "Group",
@@ -19481,7 +19497,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ItemUsage",
       "returnType": {
-        "$ref": "#/interfaces@98"
+        "$ref": "#/interfaces@97"
       },
       "definition": {
         "$type": "Group",
@@ -19517,7 +19533,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PartDefinition",
       "returnType": {
-        "$ref": "#/interfaces@99"
+        "$ref": "#/interfaces@98"
       },
       "definition": {
         "$type": "Group",
@@ -19557,7 +19573,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PartUsage",
       "returnType": {
-        "$ref": "#/interfaces@100"
+        "$ref": "#/interfaces@99"
       },
       "definition": {
         "$type": "Group",
@@ -19593,7 +19609,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PortDefinition",
       "returnType": {
-        "$ref": "#/interfaces@101"
+        "$ref": "#/interfaces@100"
       },
       "definition": {
         "$type": "Group",
@@ -19633,7 +19649,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConjugatedPortTyping",
       "returnType": {
-        "$ref": "#/interfaces@168"
+        "$ref": "#/interfaces@167"
       },
       "definition": {
         "$type": "Group",
@@ -19667,7 +19683,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConjugatedPortReference",
       "returnType": {
-        "$ref": "#/interfaces@164"
+        "$ref": "#/interfaces@163"
       },
       "definition": {
         "$type": "RuleCall",
@@ -19687,7 +19703,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PortUsage",
       "returnType": {
-        "$ref": "#/interfaces@102"
+        "$ref": "#/interfaces@101"
       },
       "definition": {
         "$type": "Group",
@@ -19723,7 +19739,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConnectorEndMember",
       "returnType": {
-        "$ref": "#/interfaces@64"
+        "$ref": "#/interfaces@63"
       },
       "definition": {
         "$type": "Assignment",
@@ -19811,7 +19827,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "BindingConnector",
       "returnType": {
-        "$ref": "#/interfaces@126"
+        "$ref": "#/interfaces@125"
       },
       "definition": {
         "$type": "Group",
@@ -19893,7 +19909,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "Succession",
       "returnType": {
-        "$ref": "#/interfaces@162"
+        "$ref": "#/interfaces@161"
       },
       "definition": {
         "$type": "Group",
@@ -19975,7 +19991,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConnectionDefinition",
       "returnType": {
-        "$ref": "#/interfaces@127"
+        "$ref": "#/interfaces@126"
       },
       "definition": {
         "$type": "Group",
@@ -20015,7 +20031,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConnectionUsage",
       "returnType": {
-        "$ref": "#/interfaces@128"
+        "$ref": "#/interfaces@127"
       },
       "definition": {
         "$type": "Group",
@@ -20231,7 +20247,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowConnectionDefinition",
       "returnType": {
-        "$ref": "#/interfaces@146"
+        "$ref": "#/interfaces@145"
       },
       "definition": {
         "$type": "Group",
@@ -20271,7 +20287,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "Message",
       "returnType": {
-        "$ref": "#/interfaces@147"
+        "$ref": "#/interfaces@146"
       },
       "definition": {
         "$type": "Group",
@@ -20367,7 +20383,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                   },
                   {
                     "$type": "Assignment",
-                    "feature": "ends",
+                    "feature": "messages",
                     "operator": "+=",
                     "terminal": {
                       "$type": "RuleCall",
@@ -20383,7 +20399,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                   },
                   {
                     "$type": "Assignment",
-                    "feature": "ends",
+                    "feature": "messages",
                     "operator": "+=",
                     "terminal": {
                       "$type": "RuleCall",
@@ -20403,7 +20419,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elements": [
               {
                 "$type": "Assignment",
-                "feature": "ends",
+                "feature": "messages",
                 "operator": "+=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -20419,7 +20435,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               },
               {
                 "$type": "Assignment",
-                "feature": "ends",
+                "feature": "messages",
                 "operator": "+=",
                 "terminal": {
                   "$type": "RuleCall",
@@ -20443,7 +20459,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MessageEventMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -20468,7 +20484,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MessageEvent",
       "returnType": {
-        "$ref": "#/interfaces@152"
+        "$ref": "#/interfaces@151"
       },
       "definition": {
         "$type": "Assignment",
@@ -20493,7 +20509,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowConnectionUsage",
       "returnType": {
-        "$ref": "#/interfaces@147"
+        "$ref": "#/interfaces@146"
       },
       "definition": {
         "$type": "Group",
@@ -20536,7 +20552,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SuccessionFlowConnectionUsage",
       "returnType": {
-        "$ref": "#/interfaces@148"
+        "$ref": "#/interfaces@147"
       },
       "definition": {
         "$type": "Group",
@@ -20712,7 +20728,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ItemFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -20948,7 +20964,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowEndMember",
       "returnType": {
-        "$ref": "#/interfaces@64"
+        "$ref": "#/interfaces@63"
       },
       "definition": {
         "$type": "Assignment",
@@ -21016,7 +21032,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowEndSubsetting",
       "returnType": {
-        "$ref": "#/interfaces@53"
+        "$ref": "#/interfaces@52"
       },
       "definition": {
         "$type": "Alternatives",
@@ -21067,7 +21083,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowFeatureMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -21092,7 +21108,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowFeature",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Assignment",
@@ -21117,7 +21133,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FlowRedefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Assignment",
@@ -21142,7 +21158,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceDefinition",
       "returnType": {
-        "$ref": "#/interfaces@129"
+        "$ref": "#/interfaces@128"
       },
       "definition": {
         "$type": "Group",
@@ -21369,7 +21385,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceNonOccurrenceUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -21407,7 +21423,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceNonOccurrenceUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -21460,7 +21476,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceOccurrenceUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -21498,7 +21514,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceOccurrenceUsageElement",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Alternatives",
@@ -21537,7 +21553,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "DefaultInterfaceEnd",
       "returnType": {
-        "$ref": "#/interfaces@102"
+        "$ref": "#/interfaces@101"
       },
       "definition": {
         "$type": "Group",
@@ -21590,7 +21606,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceUsage",
       "returnType": {
-        "$ref": "#/interfaces@130"
+        "$ref": "#/interfaces@129"
       },
       "definition": {
         "$type": "Group",
@@ -21814,7 +21830,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceEndMember",
       "returnType": {
-        "$ref": "#/interfaces@64"
+        "$ref": "#/interfaces@63"
       },
       "definition": {
         "$type": "Assignment",
@@ -21839,7 +21855,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InterfaceEnd",
       "returnType": {
-        "$ref": "#/interfaces@102"
+        "$ref": "#/interfaces@101"
       },
       "definition": {
         "$type": "Group",
@@ -21902,7 +21918,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AllocationDefinition",
       "returnType": {
-        "$ref": "#/interfaces@141"
+        "$ref": "#/interfaces@140"
       },
       "definition": {
         "$type": "Group",
@@ -21942,7 +21958,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AllocationUsage",
       "returnType": {
-        "$ref": "#/interfaces@142"
+        "$ref": "#/interfaces@141"
       },
       "definition": {
         "$type": "Group",
@@ -22046,7 +22062,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionDefinition",
       "returnType": {
-        "$ref": "#/interfaces@103"
+        "$ref": "#/interfaces@102"
       },
       "definition": {
         "$type": "Group",
@@ -22333,7 +22349,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InitialNodeMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Group",
@@ -22382,7 +22398,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionNodeMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -22420,7 +22436,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TargetSuccessionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -22458,7 +22474,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "GuardedSuccessionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -22483,7 +22499,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionUsage",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Group",
@@ -22526,7 +22542,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PerformActionUsage",
       "returnType": {
-        "$ref": "#/interfaces@151"
+        "$ref": "#/interfaces@150"
       },
       "definition": {
         "$type": "Group",
@@ -22670,7 +22686,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionNode",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Alternatives",
@@ -22794,7 +22810,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AcceptNode",
       "returnType": {
-        "$ref": "#/interfaces@113"
+        "$ref": "#/interfaces@112"
       },
       "definition": {
         "$type": "Group",
@@ -22916,7 +22932,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PayloadParameterMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -22941,7 +22957,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "PayloadParameter",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Alternatives",
@@ -23016,7 +23032,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TriggerFeatureValue",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Assignment",
@@ -23041,7 +23057,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TriggerExpression",
       "returnType": {
-        "$ref": "#/interfaces@150"
+        "$ref": "#/interfaces@149"
       },
       "definition": {
         "$type": "Alternatives",
@@ -23120,7 +23136,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ChangeExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -23170,7 +23186,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ChangeResultExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@66"
+        "$ref": "#/interfaces@65"
       },
       "definition": {
         "$type": "Assignment",
@@ -23195,7 +23211,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SendNode",
       "returnType": {
-        "$ref": "#/interfaces@156"
+        "$ref": "#/interfaces@155"
       },
       "definition": {
         "$type": "Group",
@@ -23317,7 +23333,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NodeParameterMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -23342,7 +23358,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NodeParameter",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Group",
@@ -23350,7 +23366,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "Action",
             "type": {
-              "$ref": "#/interfaces@92"
+              "$ref": "#/interfaces@91"
             }
           },
           {
@@ -23378,7 +23394,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureBinding",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Assignment",
@@ -23403,7 +23419,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AssignmentNode",
       "returnType": {
-        "$ref": "#/interfaces@149"
+        "$ref": "#/interfaces@148"
       },
       "definition": {
         "$type": "Group",
@@ -23497,7 +23513,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ExpressionParameterMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -23522,7 +23538,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "IfNode",
       "returnType": {
-        "$ref": "#/interfaces@105"
+        "$ref": "#/interfaces@104"
       },
       "definition": {
         "$type": "Group",
@@ -23609,7 +23625,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionBodyParameterMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -23634,7 +23650,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionBodyParameter",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Group",
@@ -23685,7 +23701,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "IfNodeParameterMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -23710,7 +23726,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "WhileLoopNode",
       "returnType": {
-        "$ref": "#/interfaces@154"
+        "$ref": "#/interfaces@153"
       },
       "definition": {
         "$type": "Group",
@@ -23803,7 +23819,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ForLoopNode",
       "returnType": {
-        "$ref": "#/interfaces@155"
+        "$ref": "#/interfaces@154"
       },
       "definition": {
         "$type": "Group",
@@ -23872,7 +23888,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ForVariableDeclarationMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -23897,7 +23913,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ForVariableDeclaration",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "RuleCall",
@@ -23917,7 +23933,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ControlNode",
       "returnType": {
-        "$ref": "#/interfaces@157"
+        "$ref": "#/interfaces@156"
       },
       "definition": {
         "$type": "Alternatives",
@@ -24001,7 +24017,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MergeNode",
       "returnType": {
-        "$ref": "#/interfaces@159"
+        "$ref": "#/interfaces@158"
       },
       "definition": {
         "$type": "Group",
@@ -24045,7 +24061,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "DecisionNode",
       "returnType": {
-        "$ref": "#/interfaces@161"
+        "$ref": "#/interfaces@160"
       },
       "definition": {
         "$type": "Group",
@@ -24089,7 +24105,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "JoinNode",
       "returnType": {
-        "$ref": "#/interfaces@160"
+        "$ref": "#/interfaces@159"
       },
       "definition": {
         "$type": "Group",
@@ -24133,7 +24149,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ForkNode",
       "returnType": {
-        "$ref": "#/interfaces@158"
+        "$ref": "#/interfaces@157"
       },
       "definition": {
         "$type": "Group",
@@ -24239,7 +24255,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActionTargetSuccession",
       "returnType": {
-        "$ref": "#/interfaces@89"
+        "$ref": "#/interfaces@88"
       },
       "definition": {
         "$type": "Group",
@@ -24290,7 +24306,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TargetSuccession",
       "returnType": {
-        "$ref": "#/interfaces@162"
+        "$ref": "#/interfaces@161"
       },
       "definition": {
         "$type": "Group",
@@ -24337,7 +24353,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "GuardedTargetSuccession",
       "returnType": {
-        "$ref": "#/interfaces@112"
+        "$ref": "#/interfaces@111"
       },
       "definition": {
         "$type": "Group",
@@ -24383,7 +24399,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "DefaultTargetSuccession",
       "returnType": {
-        "$ref": "#/interfaces@112"
+        "$ref": "#/interfaces@111"
       },
       "definition": {
         "$type": "Group",
@@ -24417,7 +24433,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "GuardedSuccession",
       "returnType": {
-        "$ref": "#/interfaces@112"
+        "$ref": "#/interfaces@111"
       },
       "definition": {
         "$type": "Group",
@@ -24503,7 +24519,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateDefinition",
       "returnType": {
-        "$ref": "#/interfaces@106"
+        "$ref": "#/interfaces@105"
       },
       "definition": {
         "$type": "Group",
@@ -24824,7 +24840,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EntryActionMember",
       "returnType": {
-        "$ref": "#/interfaces@170"
+        "$ref": "#/interfaces@169"
       },
       "definition": {
         "$type": "Group",
@@ -24871,7 +24887,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "DoActionMember",
       "returnType": {
-        "$ref": "#/interfaces@170"
+        "$ref": "#/interfaces@169"
       },
       "definition": {
         "$type": "Group",
@@ -24918,7 +24934,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ExitActionMember",
       "returnType": {
-        "$ref": "#/interfaces@170"
+        "$ref": "#/interfaces@169"
       },
       "definition": {
         "$type": "Group",
@@ -24965,7 +24981,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EntryTransitionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -25033,7 +25049,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateActionUsage_1",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Group",
@@ -25041,7 +25057,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "Action",
             "type": {
-              "$ref": "#/interfaces@104"
+              "$ref": "#/interfaces@103"
             }
           },
           {
@@ -25061,7 +25077,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateActionUsage_2",
       "returnType": {
-        "$ref": "#/interfaces@151"
+        "$ref": "#/interfaces@150"
       },
       "definition": {
         "$type": "Group",
@@ -25093,7 +25109,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateActionUsage_3",
       "returnType": {
-        "$ref": "#/interfaces@113"
+        "$ref": "#/interfaces@112"
       },
       "definition": {
         "$type": "Group",
@@ -25125,7 +25141,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateActionUsage_4",
       "returnType": {
-        "$ref": "#/interfaces@156"
+        "$ref": "#/interfaces@155"
       },
       "definition": {
         "$type": "Group",
@@ -25157,7 +25173,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateActionUsage_5",
       "returnType": {
-        "$ref": "#/interfaces@149"
+        "$ref": "#/interfaces@148"
       },
       "definition": {
         "$type": "Group",
@@ -25189,7 +25205,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateActionUsage",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Alternatives",
@@ -25242,7 +25258,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TransitionUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -25280,7 +25296,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TargetTransitionUsageMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Group",
@@ -25318,7 +25334,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StateUsage",
       "returnType": {
-        "$ref": "#/interfaces@107"
+        "$ref": "#/interfaces@106"
       },
       "definition": {
         "$type": "Group",
@@ -25361,7 +25377,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ExhibitStateUsage",
       "returnType": {
-        "$ref": "#/interfaces@108"
+        "$ref": "#/interfaces@107"
       },
       "definition": {
         "$type": "Group",
@@ -25452,7 +25468,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TransitionUsage",
       "returnType": {
-        "$ref": "#/interfaces@112"
+        "$ref": "#/interfaces@111"
       },
       "definition": {
         "$type": "Group",
@@ -25566,7 +25582,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TargetTransitionUsage",
       "returnType": {
-        "$ref": "#/interfaces@112"
+        "$ref": "#/interfaces@111"
       },
       "definition": {
         "$type": "Group",
@@ -25734,7 +25750,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TransitionSourceMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Alternatives",
@@ -25757,7 +25773,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@59"
+                  "$ref": "#/interfaces@58"
                 }
               },
               {
@@ -25787,7 +25803,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TriggerActionMember",
       "returnType": {
-        "$ref": "#/interfaces@171"
+        "$ref": "#/interfaces@170"
       },
       "definition": {
         "$type": "Group",
@@ -25826,7 +25842,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TriggerAction",
       "returnType": {
-        "$ref": "#/interfaces@113"
+        "$ref": "#/interfaces@112"
       },
       "definition": {
         "$type": "RuleCall",
@@ -25846,7 +25862,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "GuardExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@171"
+        "$ref": "#/interfaces@170"
       },
       "definition": {
         "$type": "Group",
@@ -25885,7 +25901,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorMember",
       "returnType": {
-        "$ref": "#/interfaces@171"
+        "$ref": "#/interfaces@170"
       },
       "definition": {
         "$type": "Group",
@@ -25955,12 +25971,12 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorUsage_1",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Action",
         "type": {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       },
       "definesHiddenTokens": false,
@@ -25974,7 +25990,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorUsage_2",
       "returnType": {
-        "$ref": "#/interfaces@151"
+        "$ref": "#/interfaces@150"
       },
       "definition": {
         "$type": "Group",
@@ -26006,7 +26022,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorUsage_3",
       "returnType": {
-        "$ref": "#/interfaces@113"
+        "$ref": "#/interfaces@112"
       },
       "definition": {
         "$type": "Group",
@@ -26038,7 +26054,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorUsage_4",
       "returnType": {
-        "$ref": "#/interfaces@156"
+        "$ref": "#/interfaces@155"
       },
       "definition": {
         "$type": "Group",
@@ -26070,7 +26086,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorUsage_5",
       "returnType": {
-        "$ref": "#/interfaces@149"
+        "$ref": "#/interfaces@148"
       },
       "definition": {
         "$type": "Group",
@@ -26102,7 +26118,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EffectBehaviorUsage",
       "returnType": {
-        "$ref": "#/interfaces@104"
+        "$ref": "#/interfaces@103"
       },
       "definition": {
         "$type": "Alternatives",
@@ -26155,7 +26171,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TransitionSuccessionMember",
       "returnType": {
-        "$ref": "#/interfaces@59"
+        "$ref": "#/interfaces@58"
       },
       "definition": {
         "$type": "Assignment",
@@ -26180,7 +26196,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TransitionSuccession",
       "returnType": {
-        "$ref": "#/interfaces@162"
+        "$ref": "#/interfaces@161"
       },
       "definition": {
         "$type": "Assignment",
@@ -26205,7 +26221,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "CalculationDefinition",
       "returnType": {
-        "$ref": "#/interfaces@119"
+        "$ref": "#/interfaces@118"
       },
       "definition": {
         "$type": "Group",
@@ -26361,7 +26377,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ReturnParameterMember",
       "returnType": {
-        "$ref": "#/interfaces@67"
+        "$ref": "#/interfaces@66"
       },
       "definition": {
         "$type": "Group",
@@ -26403,7 +26419,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ResultExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@66"
+        "$ref": "#/interfaces@65"
       },
       "definition": {
         "$type": "Group",
@@ -26441,7 +26457,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "CalculationUsage",
       "returnType": {
-        "$ref": "#/interfaces@120"
+        "$ref": "#/interfaces@119"
       },
       "definition": {
         "$type": "Group",
@@ -26515,7 +26531,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConstraintDefinition",
       "returnType": {
-        "$ref": "#/interfaces@109"
+        "$ref": "#/interfaces@108"
       },
       "definition": {
         "$type": "Group",
@@ -26562,7 +26578,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConstraintUsage",
       "returnType": {
-        "$ref": "#/interfaces@110"
+        "$ref": "#/interfaces@109"
       },
       "definition": {
         "$type": "Group",
@@ -26605,7 +26621,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AssertConstraintUsage",
       "returnType": {
-        "$ref": "#/interfaces@111"
+        "$ref": "#/interfaces@110"
       },
       "definition": {
         "$type": "Group",
@@ -26698,7 +26714,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RequirementDefinition",
       "returnType": {
-        "$ref": "#/interfaces@114"
+        "$ref": "#/interfaces@113"
       },
       "definition": {
         "$type": "Group",
@@ -26896,7 +26912,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SubjectMember",
       "returnType": {
-        "$ref": "#/interfaces@172"
+        "$ref": "#/interfaces@171"
       },
       "definition": {
         "$type": "Group",
@@ -26938,7 +26954,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SubjectUsage",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Group",
@@ -26971,7 +26987,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RequirementConstraintMember",
       "returnType": {
-        "$ref": "#/interfaces@175"
+        "$ref": "#/interfaces@174"
       },
       "definition": {
         "$type": "Group",
@@ -27021,7 +27037,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RequirementConstraintUsage",
       "returnType": {
-        "$ref": "#/interfaces@110"
+        "$ref": "#/interfaces@109"
       },
       "definition": {
         "$type": "Alternatives",
@@ -27120,7 +27136,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FramedConcernMember",
       "returnType": {
-        "$ref": "#/interfaces@176"
+        "$ref": "#/interfaces@175"
       },
       "definition": {
         "$type": "Group",
@@ -27162,7 +27178,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FramedConcernUsage",
       "returnType": {
-        "$ref": "#/interfaces@118"
+        "$ref": "#/interfaces@117"
       },
       "definition": {
         "$type": "Alternatives",
@@ -27261,7 +27277,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActorMember",
       "returnType": {
-        "$ref": "#/interfaces@173"
+        "$ref": "#/interfaces@172"
       },
       "definition": {
         "$type": "Group",
@@ -27303,7 +27319,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ActorUsage",
       "returnType": {
-        "$ref": "#/interfaces@100"
+        "$ref": "#/interfaces@99"
       },
       "definition": {
         "$type": "Group",
@@ -27336,7 +27352,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StakeholderMember",
       "returnType": {
-        "$ref": "#/interfaces@174"
+        "$ref": "#/interfaces@173"
       },
       "definition": {
         "$type": "Group",
@@ -27378,7 +27394,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "StakeholderUsage",
       "returnType": {
-        "$ref": "#/interfaces@100"
+        "$ref": "#/interfaces@99"
       },
       "definition": {
         "$type": "Group",
@@ -27411,7 +27427,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RequirementUsage",
       "returnType": {
-        "$ref": "#/interfaces@115"
+        "$ref": "#/interfaces@114"
       },
       "definition": {
         "$type": "Group",
@@ -27454,7 +27470,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SatisfyRequirementUsage",
       "returnType": {
-        "$ref": "#/interfaces@116"
+        "$ref": "#/interfaces@115"
       },
       "definition": {
         "$type": "Group",
@@ -27582,7 +27598,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SatisfactionSubjectMember",
       "returnType": {
-        "$ref": "#/interfaces@172"
+        "$ref": "#/interfaces@171"
       },
       "definition": {
         "$type": "Assignment",
@@ -27607,7 +27623,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SatisfactionParameter",
       "returnType": {
-        "$ref": "#/interfaces@92"
+        "$ref": "#/interfaces@91"
       },
       "definition": {
         "$type": "Assignment",
@@ -27632,7 +27648,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SatisfactionFeatureValue",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Assignment",
@@ -27657,7 +27673,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "SatisfactionReferenceExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -27682,7 +27698,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConcernDefinition",
       "returnType": {
-        "$ref": "#/interfaces@117"
+        "$ref": "#/interfaces@116"
       },
       "definition": {
         "$type": "Group",
@@ -27729,7 +27745,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConcernUsage",
       "returnType": {
-        "$ref": "#/interfaces@118"
+        "$ref": "#/interfaces@117"
       },
       "definition": {
         "$type": "Group",
@@ -27772,7 +27788,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "CaseDefinition",
       "returnType": {
-        "$ref": "#/interfaces@121"
+        "$ref": "#/interfaces@120"
       },
       "definition": {
         "$type": "Group",
@@ -27952,7 +27968,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ObjectiveMember",
       "returnType": {
-        "$ref": "#/interfaces@178"
+        "$ref": "#/interfaces@177"
       },
       "definition": {
         "$type": "Group",
@@ -27994,7 +28010,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ObjectiveRequirementUsage",
       "returnType": {
-        "$ref": "#/interfaces@115"
+        "$ref": "#/interfaces@114"
       },
       "definition": {
         "$type": "Group",
@@ -28034,7 +28050,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "CaseUsage",
       "returnType": {
-        "$ref": "#/interfaces@122"
+        "$ref": "#/interfaces@121"
       },
       "definition": {
         "$type": "Group",
@@ -28077,7 +28093,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AnalysisCaseDefinition",
       "returnType": {
-        "$ref": "#/interfaces@123"
+        "$ref": "#/interfaces@122"
       },
       "definition": {
         "$type": "Group",
@@ -28124,7 +28140,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "AnalysisCaseUsage",
       "returnType": {
-        "$ref": "#/interfaces@124"
+        "$ref": "#/interfaces@123"
       },
       "definition": {
         "$type": "Group",
@@ -28167,7 +28183,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "VerificationCaseDefinition",
       "returnType": {
-        "$ref": "#/interfaces@137"
+        "$ref": "#/interfaces@136"
       },
       "definition": {
         "$type": "Group",
@@ -28214,7 +28230,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "VerificationCaseUsage",
       "returnType": {
-        "$ref": "#/interfaces@138"
+        "$ref": "#/interfaces@137"
       },
       "definition": {
         "$type": "Group",
@@ -28257,7 +28273,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RequirementVerificationMember",
       "returnType": {
-        "$ref": "#/interfaces@177"
+        "$ref": "#/interfaces@176"
       },
       "definition": {
         "$type": "Group",
@@ -28299,7 +28315,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RequirementVerificationUsage",
       "returnType": {
-        "$ref": "#/interfaces@115"
+        "$ref": "#/interfaces@114"
       },
       "definition": {
         "$type": "Alternatives",
@@ -28398,7 +28414,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "UseCaseDefinition",
       "returnType": {
-        "$ref": "#/interfaces@143"
+        "$ref": "#/interfaces@142"
       },
       "definition": {
         "$type": "Group",
@@ -28449,7 +28465,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "UseCaseUsage",
       "returnType": {
-        "$ref": "#/interfaces@144"
+        "$ref": "#/interfaces@143"
       },
       "definition": {
         "$type": "Group",
@@ -28496,7 +28512,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "IncludeUseCaseUsage",
       "returnType": {
-        "$ref": "#/interfaces@145"
+        "$ref": "#/interfaces@144"
       },
       "definition": {
         "$type": "Group",
@@ -28591,7 +28607,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ViewDefinition",
       "returnType": {
-        "$ref": "#/interfaces@131"
+        "$ref": "#/interfaces@130"
       },
       "definition": {
         "$type": "Group",
@@ -28741,7 +28757,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ViewRenderingMember",
       "returnType": {
-        "$ref": "#/interfaces@179"
+        "$ref": "#/interfaces@178"
       },
       "definition": {
         "$type": "Group",
@@ -28783,7 +28799,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ViewRenderingUsage",
       "returnType": {
-        "$ref": "#/interfaces@136"
+        "$ref": "#/interfaces@135"
       },
       "definition": {
         "$type": "Group",
@@ -28828,7 +28844,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ViewUsage",
       "returnType": {
-        "$ref": "#/interfaces@132"
+        "$ref": "#/interfaces@131"
       },
       "definition": {
         "$type": "Group",
@@ -29022,7 +29038,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "Expose",
       "returnType": {
-        "$ref": "#/interfaces@163"
+        "$ref": "#/interfaces@162"
       },
       "definition": {
         "$type": "Group",
@@ -29074,7 +29090,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ViewpointDefinition",
       "returnType": {
-        "$ref": "#/interfaces@133"
+        "$ref": "#/interfaces@132"
       },
       "definition": {
         "$type": "Group",
@@ -29121,7 +29137,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ViewpointUsage",
       "returnType": {
-        "$ref": "#/interfaces@134"
+        "$ref": "#/interfaces@133"
       },
       "definition": {
         "$type": "Group",
@@ -29164,7 +29180,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RenderingDefinition",
       "returnType": {
-        "$ref": "#/interfaces@135"
+        "$ref": "#/interfaces@134"
       },
       "definition": {
         "$type": "Group",
@@ -29204,7 +29220,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "RenderingUsage",
       "returnType": {
-        "$ref": "#/interfaces@136"
+        "$ref": "#/interfaces@135"
       },
       "definition": {
         "$type": "Group",
@@ -29260,7 +29276,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OwnedExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -29305,7 +29321,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OwnedExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -29330,7 +29346,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ConcreteConditionalExpression",
       "returnType": {
-        "$ref": "#/interfaces@82"
+        "$ref": "#/interfaces@81"
       },
       "definition": {
         "$type": "Group",
@@ -29451,7 +29467,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -29493,7 +29509,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ImpliesExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -29518,7 +29534,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ImpliesExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -29561,7 +29577,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -29603,7 +29619,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OrExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -29628,7 +29644,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "OrExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -29671,7 +29687,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -29749,7 +29765,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "XorExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -29774,7 +29790,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "XorExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -29817,7 +29833,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -29877,7 +29893,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -29955,7 +29971,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EqualityExpressionReference",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -29980,7 +29996,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "EqualityExpressionMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -30023,7 +30039,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30089,7 +30105,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@82"
+                      "$ref": "#/interfaces@81"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -30165,7 +30181,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -30200,7 +30216,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -30244,7 +30260,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -30276,7 +30292,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -30345,7 +30361,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30408,7 +30424,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30468,7 +30484,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30537,7 +30553,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30610,7 +30626,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30672,7 +30688,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -30732,7 +30748,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@82"
+                  "$ref": "#/interfaces@81"
                 }
               },
               {
@@ -30796,7 +30812,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@83"
+                  "$ref": "#/interfaces@82"
                 },
                 "feature": "operands",
                 "operator": "+="
@@ -30832,7 +30848,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@82"
+                          "$ref": "#/interfaces@81"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -30874,7 +30890,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@82"
+                          "$ref": "#/interfaces@81"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -30912,7 +30928,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@82"
+                          "$ref": "#/interfaces@81"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -30977,7 +30993,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@84"
+                          "$ref": "#/interfaces@83"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -31006,7 +31022,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                       {
                         "$type": "Action",
                         "type": {
-                          "$ref": "#/interfaces@85"
+                          "$ref": "#/interfaces@84"
                         },
                         "feature": "operands",
                         "operator": "+="
@@ -31037,7 +31053,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@83"
+                      "$ref": "#/interfaces@82"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -31157,7 +31173,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "BodyExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -31182,7 +31198,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ExpressionBodyMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -31232,7 +31248,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                   {
                     "$type": "Action",
                     "type": {
-                      "$ref": "#/interfaces@82"
+                      "$ref": "#/interfaces@81"
                     },
                     "feature": "operands",
                     "operator": "+="
@@ -31276,7 +31292,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "InvocationExpression",
       "returnType": {
-        "$ref": "#/interfaces@81"
+        "$ref": "#/interfaces@80"
       },
       "definition": {
         "$type": "Group",
@@ -31405,7 +31421,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ArgumentMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -31504,7 +31520,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NamedArgumentMember",
       "returnType": {
-        "$ref": "#/interfaces@65"
+        "$ref": "#/interfaces@64"
       },
       "definition": {
         "$type": "Assignment",
@@ -31575,7 +31591,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ParameterRedefinition",
       "returnType": {
-        "$ref": "#/interfaces@52"
+        "$ref": "#/interfaces@51"
       },
       "definition": {
         "$type": "Assignment",
@@ -31600,7 +31616,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ArgumentValue",
       "returnType": {
-        "$ref": "#/interfaces@60"
+        "$ref": "#/interfaces@59"
       },
       "definition": {
         "$type": "Assignment",
@@ -31855,7 +31871,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "LiteralBoolean",
       "returnType": {
-        "$ref": "#/interfaces@76"
+        "$ref": "#/interfaces@75"
       },
       "definition": {
         "$type": "Alternatives",
@@ -31886,7 +31902,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "LiteralString",
       "returnType": {
-        "$ref": "#/interfaces@77"
+        "$ref": "#/interfaces@76"
       },
       "definition": {
         "$type": "Assignment",
@@ -31911,7 +31927,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "LiteralNumber",
       "returnType": {
-        "$ref": "#/interfaces@78"
+        "$ref": "#/interfaces@77"
       },
       "definition": {
         "$type": "Assignment",
@@ -31936,7 +31952,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "LiteralInfinity",
       "returnType": {
-        "$ref": "#/interfaces@79"
+        "$ref": "#/interfaces@78"
       },
       "definition": {
         "$type": "Group",
@@ -31944,7 +31960,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "Action",
             "type": {
-              "$ref": "#/interfaces@79"
+              "$ref": "#/interfaces@78"
             }
           },
           {
@@ -31964,7 +31980,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "LiteralExpression",
       "returnType": {
-        "$ref": "#/interfaces@75"
+        "$ref": "#/interfaces@74"
       },
       "definition": {
         "$type": "Alternatives",
@@ -32010,7 +32026,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NullExpression",
       "returnType": {
-        "$ref": "#/interfaces@80"
+        "$ref": "#/interfaces@79"
       },
       "definition": {
         "$type": "Group",
@@ -32018,7 +32034,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "Action",
             "type": {
-              "$ref": "#/interfaces@80"
+              "$ref": "#/interfaces@79"
             }
           },
           {
@@ -32846,7 +32862,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ElementReference",
       "returnType": {
-        "$ref": "#/interfaces@68"
+        "$ref": "#/interfaces@67"
       },
       "definition": {
         "$type": "RuleCall",
@@ -32866,7 +32882,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "NamespaceReference",
       "returnType": {
-        "$ref": "#/interfaces@69"
+        "$ref": "#/interfaces@68"
       },
       "definition": {
         "$type": "RuleCall",
@@ -32886,7 +32902,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TypeReference",
       "returnType": {
-        "$ref": "#/interfaces@70"
+        "$ref": "#/interfaces@69"
       },
       "definition": {
         "$type": "RuleCall",
@@ -32906,7 +32922,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "ClassifierReference",
       "returnType": {
-        "$ref": "#/interfaces@71"
+        "$ref": "#/interfaces@70"
       },
       "definition": {
         "$type": "RuleCall",
@@ -32926,7 +32942,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureReference",
       "returnType": {
-        "$ref": "#/interfaces@72"
+        "$ref": "#/interfaces@71"
       },
       "definition": {
         "$type": "RuleCall",
@@ -32946,7 +32962,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetaclassReference",
       "returnType": {
-        "$ref": "#/interfaces@73"
+        "$ref": "#/interfaces@72"
       },
       "definition": {
         "$type": "RuleCall",
@@ -32966,7 +32982,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MembershipReference",
       "returnType": {
-        "$ref": "#/interfaces@74"
+        "$ref": "#/interfaces@73"
       },
       "definition": {
         "$type": "RuleCall",
@@ -33194,7 +33210,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetadataReference",
       "returnType": {
-        "$ref": "#/interfaces@87"
+        "$ref": "#/interfaces@86"
       },
       "definition": {
         "$type": "Assignment",
@@ -33219,7 +33235,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TypeReferenceMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -33244,7 +33260,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "TypeResultMember",
       "returnType": {
-        "$ref": "#/interfaces@67"
+        "$ref": "#/interfaces@66"
       },
       "definition": {
         "$type": "Assignment",
@@ -33319,7 +33335,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FunctionReferenceExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -33344,7 +33360,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FunctionReferenceMember",
       "returnType": {
-        "$ref": "#/interfaces@63"
+        "$ref": "#/interfaces@62"
       },
       "definition": {
         "$type": "Assignment",
@@ -33394,7 +33410,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureChainMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Alternatives",
@@ -33417,7 +33433,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
               {
                 "$type": "Action",
                 "type": {
-                  "$ref": "#/interfaces@59"
+                  "$ref": "#/interfaces@58"
                 }
               },
               {
@@ -33597,7 +33613,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureReferenceExpression",
       "returnType": {
-        "$ref": "#/interfaces@86"
+        "$ref": "#/interfaces@85"
       },
       "definition": {
         "$type": "Assignment",
@@ -33622,7 +33638,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "FeatureReferenceMember",
       "returnType": {
-        "$ref": "#/interfaces@58"
+        "$ref": "#/interfaces@57"
       },
       "definition": {
         "$type": "Assignment",
@@ -33647,7 +33663,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "$type": "ParserRule",
       "name": "MetadataAccessExpression",
       "returnType": {
-        "$ref": "#/interfaces@87"
+        "$ref": "#/interfaces@86"
       },
       "definition": {
         "$type": "Group",
@@ -33816,7 +33832,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@59"
+                "$ref": "#/interfaces@58"
               }
             }
           },
@@ -33833,13 +33849,13 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
                 {
                   "$type": "SimpleType",
                   "typeRef": {
-                    "$ref": "#/interfaces@55"
+                    "$ref": "#/interfaces@54"
                   }
                 },
                 {
                   "$type": "SimpleType",
                   "typeRef": {
-                    "$ref": "#/interfaces@58"
+                    "$ref": "#/interfaces@57"
                   }
                 }
               ]
@@ -33922,7 +33938,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@59"
+              "$ref": "#/interfaces@58"
             }
           }
         }
@@ -34030,7 +34046,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@66"
+              "$ref": "#/interfaces@65"
             }
           }
         }
@@ -34149,7 +34165,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@60"
+              "$ref": "#/interfaces@59"
             }
           }
         },
@@ -34160,7 +34176,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           }
         }
@@ -34205,7 +34221,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@59"
+              "$ref": "#/interfaces@58"
             }
           }
         }
@@ -34248,7 +34264,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@64"
+                "$ref": "#/interfaces@63"
               }
             }
           },
@@ -34305,7 +34321,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@66"
+              "$ref": "#/interfaces@65"
             }
           }
         }
@@ -34327,7 +34343,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@63"
+              "$ref": "#/interfaces@62"
             }
           }
         }
@@ -34484,7 +34500,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@68"
+              "$ref": "#/interfaces@67"
             }
           }
         },
@@ -34517,7 +34533,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@68"
+              "$ref": "#/interfaces@67"
             }
           }
         },
@@ -34625,7 +34641,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "TypeFeaturing",
       "superTypes": [
         {
-          "$ref": "#/interfaces@62"
+          "$ref": "#/interfaces@61"
         }
       ],
       "attributes": []
@@ -34653,16 +34669,6 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
     {
       "$type": "Interface",
       "name": "Subsetting",
-      "superTypes": [
-        {
-          "$ref": "#/interfaces@43"
-        }
-      ],
-      "attributes": []
-    },
-    {
-      "$type": "Interface",
-      "name": "Subtype",
       "superTypes": [
         {
           "$ref": "#/interfaces@43"
@@ -34725,7 +34731,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@68"
+                "$ref": "#/interfaces@67"
               }
             }
           },
@@ -34739,7 +34745,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "elementType": {
               "$type": "SimpleType",
               "typeRef": {
-                "$ref": "#/interfaces@68"
+                "$ref": "#/interfaces@67"
               }
             }
           },
@@ -34796,7 +34802,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "MembershipImport",
       "superTypes": [
         {
-          "$ref": "#/interfaces@55"
+          "$ref": "#/interfaces@54"
         }
       ],
       "attributes": []
@@ -34806,27 +34812,37 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "NamespaceImport",
       "superTypes": [
         {
-          "$ref": "#/interfaces@55"
+          "$ref": "#/interfaces@54"
         }
       ],
       "attributes": []
     },
     {
       "$type": "Interface",
+      "attributes": [
+        {
+          "$type": "TypeAttribute",
+          "name": "isAlias",
+          "type": {
+            "$type": "SimpleType",
+            "primitiveType": "boolean"
+          },
+          "isOptional": false
+        }
+      ],
       "name": "Membership",
       "superTypes": [
         {
           "$ref": "#/interfaces@37"
         }
-      ],
-      "attributes": []
+      ]
     },
     {
       "$type": "Interface",
       "name": "OwningMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@58"
+          "$ref": "#/interfaces@57"
         }
       ],
       "attributes": []
@@ -34856,7 +34872,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "FeatureValue",
       "superTypes": [
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ]
     },
@@ -34865,7 +34881,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ElementFilterMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ],
       "attributes": []
@@ -34885,10 +34901,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "FeatureMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@62"
+          "$ref": "#/interfaces@61"
         },
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ],
       "attributes": []
@@ -34898,7 +34914,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "EndFeatureMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -34908,7 +34924,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ParameterMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -34918,7 +34934,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ResultExpressionMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -34928,7 +34944,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ReturnParameterMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@65"
+          "$ref": "#/interfaces@64"
         }
       ],
       "attributes": []
@@ -34962,7 +34978,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "NamespaceReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@68"
+          "$ref": "#/interfaces@67"
         }
       ],
       "attributes": []
@@ -34972,7 +34988,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "TypeReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@69"
+          "$ref": "#/interfaces@68"
         }
       ],
       "attributes": []
@@ -34982,7 +34998,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ClassifierReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@70"
+          "$ref": "#/interfaces@69"
         }
       ],
       "attributes": []
@@ -34992,7 +35008,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "FeatureReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@70"
+          "$ref": "#/interfaces@69"
         }
       ],
       "attributes": []
@@ -35002,7 +35018,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "MetaclassReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@71"
+          "$ref": "#/interfaces@70"
         }
       ],
       "attributes": []
@@ -35012,7 +35028,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "MembershipReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@68"
+          "$ref": "#/interfaces@67"
         }
       ],
       "attributes": []
@@ -35043,7 +35059,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "LiteralBoolean",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ]
     },
@@ -35063,7 +35079,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "LiteralString",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ]
     },
@@ -35083,7 +35099,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "LiteralNumber",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ]
     },
@@ -35092,7 +35108,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "LiteralInfinity",
       "superTypes": [
         {
-          "$ref": "#/interfaces@75"
+          "$ref": "#/interfaces@74"
         }
       ],
       "attributes": []
@@ -35147,7 +35163,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "OperatorExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@81"
+          "$ref": "#/interfaces@80"
         }
       ]
     },
@@ -35156,7 +35172,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "FeatureChainExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@82"
+          "$ref": "#/interfaces@81"
         }
       ],
       "attributes": []
@@ -35166,7 +35182,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "CollectExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@82"
+          "$ref": "#/interfaces@81"
         }
       ],
       "attributes": []
@@ -35176,7 +35192,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "SelectExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@82"
+          "$ref": "#/interfaces@81"
         }
       ],
       "attributes": []
@@ -35190,7 +35206,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           },
           "isOptional": false
@@ -35212,7 +35228,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@68"
+              "$ref": "#/interfaces@67"
             }
           },
           "isOptional": false
@@ -35311,7 +35327,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "$ref": "#/interfaces@16"
         },
         {
-          "$ref": "#/interfaces@97"
+          "$ref": "#/interfaces@96"
         }
       ],
       "attributes": []
@@ -35324,7 +35340,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "$ref": "#/interfaces@21"
         },
         {
-          "$ref": "#/interfaces@98"
+          "$ref": "#/interfaces@97"
         }
       ],
       "attributes": []
@@ -35334,7 +35350,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ReferenceUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@89"
+          "$ref": "#/interfaces@88"
         }
       ],
       "attributes": []
@@ -35344,7 +35360,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "OccurrenceDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@88"
+          "$ref": "#/interfaces@87"
         },
         {
           "$ref": "#/interfaces@11"
@@ -35357,7 +35373,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "OccurrenceUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@89"
+          "$ref": "#/interfaces@88"
         }
       ],
       "attributes": []
@@ -35367,7 +35383,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AttributeDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@88"
+          "$ref": "#/interfaces@87"
         },
         {
           "$ref": "#/interfaces@10"
@@ -35380,7 +35396,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AttributeUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@89"
+          "$ref": "#/interfaces@88"
         }
       ],
       "attributes": []
@@ -35390,7 +35406,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ItemDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@93"
+          "$ref": "#/interfaces@92"
         },
         {
           "$ref": "#/interfaces@12"
@@ -35403,7 +35419,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ItemUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@94"
+          "$ref": "#/interfaces@93"
         }
       ],
       "attributes": []
@@ -35413,7 +35429,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PartDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@97"
+          "$ref": "#/interfaces@96"
         }
       ],
       "attributes": []
@@ -35423,7 +35439,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PartUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@98"
+          "$ref": "#/interfaces@97"
         }
       ],
       "attributes": []
@@ -35433,7 +35449,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PortDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@93"
+          "$ref": "#/interfaces@92"
         },
         {
           "$ref": "#/interfaces@12"
@@ -35446,7 +35462,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PortUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@94"
+          "$ref": "#/interfaces@93"
         }
       ],
       "attributes": []
@@ -35456,7 +35472,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ActionDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@93"
+          "$ref": "#/interfaces@92"
         },
         {
           "$ref": "#/interfaces@13"
@@ -35469,7 +35485,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@94"
+          "$ref": "#/interfaces@93"
         },
         {
           "$ref": "#/interfaces@25"
@@ -35486,7 +35502,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -35497,7 +35513,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -35509,7 +35525,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         }
@@ -35517,7 +35533,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "IfActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ]
     },
@@ -35537,7 +35553,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "StateDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@103"
+          "$ref": "#/interfaces@102"
         }
       ]
     },
@@ -35557,7 +35573,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "StateUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ]
     },
@@ -35566,10 +35582,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ExhibitStateUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@107"
+          "$ref": "#/interfaces@106"
         },
         {
-          "$ref": "#/interfaces@151"
+          "$ref": "#/interfaces@150"
         }
       ],
       "attributes": []
@@ -35579,7 +35595,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConstraintDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@93"
+          "$ref": "#/interfaces@92"
         },
         {
           "$ref": "#/interfaces@18"
@@ -35592,7 +35608,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConstraintUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@94"
+          "$ref": "#/interfaces@93"
         },
         {
           "$ref": "#/interfaces@33"
@@ -35605,7 +35621,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AssertConstraintUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@110"
+          "$ref": "#/interfaces@109"
         },
         {
           "$ref": "#/interfaces@34"
@@ -35623,7 +35639,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           }
         },
@@ -35634,7 +35650,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         },
@@ -35645,7 +35661,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         },
@@ -35656,7 +35672,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@171"
+              "$ref": "#/interfaces@170"
             }
           }
         },
@@ -35667,7 +35683,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@171"
+              "$ref": "#/interfaces@170"
             }
           }
         },
@@ -35678,7 +35694,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@171"
+              "$ref": "#/interfaces@170"
             }
           }
         },
@@ -35689,7 +35705,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@59"
+              "$ref": "#/interfaces@58"
             }
           }
         },
@@ -35700,7 +35716,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@59"
+              "$ref": "#/interfaces@58"
             }
           }
         }
@@ -35708,7 +35724,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "TransitionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ]
     },
@@ -35721,7 +35737,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -35733,7 +35749,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         }
@@ -35741,7 +35757,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AcceptActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ]
     },
@@ -35750,7 +35766,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "RequirementDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@109"
+          "$ref": "#/interfaces@108"
         }
       ],
       "attributes": []
@@ -35760,7 +35776,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "RequirementUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@110"
+          "$ref": "#/interfaces@109"
         }
       ],
       "attributes": []
@@ -35775,7 +35791,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@172"
+              "$ref": "#/interfaces@171"
             }
           }
         }
@@ -35783,10 +35799,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "SatisfyRequirementUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@115"
+          "$ref": "#/interfaces@114"
         },
         {
-          "$ref": "#/interfaces@111"
+          "$ref": "#/interfaces@110"
         }
       ]
     },
@@ -35795,7 +35811,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConcernDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@114"
+          "$ref": "#/interfaces@113"
         }
       ],
       "attributes": []
@@ -35805,7 +35821,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConcernUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@115"
+          "$ref": "#/interfaces@114"
         }
       ],
       "attributes": []
@@ -35815,7 +35831,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "CalculationDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@103"
+          "$ref": "#/interfaces@102"
         },
         {
           "$ref": "#/interfaces@17"
@@ -35828,7 +35844,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "CalculationUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         },
         {
           "$ref": "#/interfaces@30"
@@ -35841,7 +35857,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "CaseDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@119"
+          "$ref": "#/interfaces@118"
         }
       ],
       "attributes": []
@@ -35851,7 +35867,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "CaseUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@120"
+          "$ref": "#/interfaces@119"
         }
       ],
       "attributes": []
@@ -35861,7 +35877,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AnalysisCaseDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@121"
+          "$ref": "#/interfaces@120"
         }
       ],
       "attributes": []
@@ -35871,7 +35887,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AnalysisCaseUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@122"
+          "$ref": "#/interfaces@121"
         }
       ],
       "attributes": []
@@ -35881,7 +35897,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConnectorAsUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@89"
+          "$ref": "#/interfaces@88"
         },
         {
           "$ref": "#/interfaces@26"
@@ -35894,7 +35910,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "BindingConnectorAsUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@125"
+          "$ref": "#/interfaces@124"
         },
         {
           "$ref": "#/interfaces@29"
@@ -35907,7 +35923,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConnectionDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@99"
+          "$ref": "#/interfaces@98"
         },
         {
           "$ref": "#/interfaces@15"
@@ -35920,10 +35936,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConnectionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@100"
+          "$ref": "#/interfaces@99"
         },
         {
-          "$ref": "#/interfaces@125"
+          "$ref": "#/interfaces@124"
         }
       ],
       "attributes": []
@@ -35933,7 +35949,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "InterfaceDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@127"
+          "$ref": "#/interfaces@126"
         }
       ],
       "attributes": []
@@ -35943,7 +35959,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "InterfaceUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@128"
+          "$ref": "#/interfaces@127"
         }
       ],
       "attributes": []
@@ -35953,7 +35969,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ViewDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@99"
+          "$ref": "#/interfaces@98"
         }
       ],
       "attributes": []
@@ -35963,7 +35979,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ViewUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@100"
+          "$ref": "#/interfaces@99"
         }
       ],
       "attributes": []
@@ -35973,7 +35989,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ViewpointDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@114"
+          "$ref": "#/interfaces@113"
         }
       ],
       "attributes": []
@@ -35983,7 +35999,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ViewpointUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@115"
+          "$ref": "#/interfaces@114"
         }
       ],
       "attributes": []
@@ -35993,7 +36009,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "RenderingDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@99"
+          "$ref": "#/interfaces@98"
         }
       ],
       "attributes": []
@@ -36003,7 +36019,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "RenderingUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@100"
+          "$ref": "#/interfaces@99"
         }
       ],
       "attributes": []
@@ -36013,7 +36029,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "VerificationCaseDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@121"
+          "$ref": "#/interfaces@120"
         }
       ],
       "attributes": []
@@ -36023,7 +36039,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "VerificationCaseUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@122"
+          "$ref": "#/interfaces@121"
         }
       ],
       "attributes": []
@@ -36033,7 +36049,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "EnumerationDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@95"
+          "$ref": "#/interfaces@94"
         }
       ],
       "attributes": []
@@ -36043,7 +36059,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "EnumerationUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@96"
+          "$ref": "#/interfaces@95"
         }
       ],
       "attributes": []
@@ -36053,7 +36069,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AllocationDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@127"
+          "$ref": "#/interfaces@126"
         }
       ],
       "attributes": []
@@ -36063,7 +36079,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AllocationUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@128"
+          "$ref": "#/interfaces@127"
         }
       ],
       "attributes": []
@@ -36073,7 +36089,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "UseCaseDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@121"
+          "$ref": "#/interfaces@120"
         }
       ],
       "attributes": []
@@ -36083,7 +36099,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "UseCaseUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@122"
+          "$ref": "#/interfaces@121"
         }
       ],
       "attributes": []
@@ -36093,10 +36109,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "IncludeUseCaseUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@144"
+          "$ref": "#/interfaces@143"
         },
         {
-          "$ref": "#/interfaces@151"
+          "$ref": "#/interfaces@150"
         }
       ],
       "attributes": []
@@ -36106,10 +36122,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "FlowConnectionDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@127"
+          "$ref": "#/interfaces@126"
         },
         {
-          "$ref": "#/interfaces@103"
+          "$ref": "#/interfaces@102"
         },
         {
           "$ref": "#/interfaces@19"
@@ -36119,26 +36135,41 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
     },
     {
       "$type": "Interface",
+      "attributes": [
+        {
+          "$type": "TypeAttribute",
+          "name": "messages",
+          "type": {
+            "$type": "ArrayType",
+            "elementType": {
+              "$type": "SimpleType",
+              "typeRef": {
+                "$ref": "#/interfaces@64"
+              }
+            }
+          },
+          "isOptional": false
+        }
+      ],
       "name": "FlowConnectionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@128"
+          "$ref": "#/interfaces@127"
         },
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         },
         {
           "$ref": "#/interfaces@31"
         }
-      ],
-      "attributes": []
+      ]
     },
     {
       "$type": "Interface",
       "name": "SuccessionFlowConnectionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@147"
+          "$ref": "#/interfaces@146"
         },
         {
           "$ref": "#/interfaces@32"
@@ -36155,7 +36186,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           },
           "isOptional": false
@@ -36166,7 +36197,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -36175,7 +36206,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "AssignmentActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ]
     },
@@ -36208,7 +36239,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "TriggerInvocationExpression",
       "superTypes": [
         {
-          "$ref": "#/interfaces@81"
+          "$ref": "#/interfaces@80"
         }
       ]
     },
@@ -36217,10 +36248,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PerformActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         },
         {
-          "$ref": "#/interfaces@152"
+          "$ref": "#/interfaces@151"
         }
       ],
       "attributes": []
@@ -36230,7 +36261,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "EventOccurrenceUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@94"
+          "$ref": "#/interfaces@93"
         }
       ],
       "attributes": []
@@ -36240,7 +36271,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "LoopActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ],
       "attributes": []
@@ -36255,7 +36286,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         },
@@ -36265,7 +36296,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -36277,7 +36308,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         }
@@ -36285,7 +36316,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "WhileLoopActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@153"
+          "$ref": "#/interfaces@152"
         }
       ]
     },
@@ -36298,7 +36329,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -36309,7 +36340,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -36320,7 +36351,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -36329,7 +36360,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ForLoopActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@153"
+          "$ref": "#/interfaces@152"
         }
       ]
     },
@@ -36342,7 +36373,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           },
           "isOptional": false
@@ -36354,7 +36385,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         },
@@ -36365,7 +36396,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@65"
+              "$ref": "#/interfaces@64"
             }
           }
         }
@@ -36373,7 +36404,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "SendActionUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ]
     },
@@ -36382,7 +36413,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ControlNode",
       "superTypes": [
         {
-          "$ref": "#/interfaces@104"
+          "$ref": "#/interfaces@103"
         }
       ],
       "attributes": []
@@ -36392,7 +36423,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ForkNode",
       "superTypes": [
         {
-          "$ref": "#/interfaces@157"
+          "$ref": "#/interfaces@156"
         }
       ],
       "attributes": []
@@ -36402,7 +36433,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "MergeNode",
       "superTypes": [
         {
-          "$ref": "#/interfaces@157"
+          "$ref": "#/interfaces@156"
         }
       ],
       "attributes": []
@@ -36412,7 +36443,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "JoinNode",
       "superTypes": [
         {
-          "$ref": "#/interfaces@157"
+          "$ref": "#/interfaces@156"
         }
       ],
       "attributes": []
@@ -36422,7 +36453,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "DecisionNode",
       "superTypes": [
         {
-          "$ref": "#/interfaces@157"
+          "$ref": "#/interfaces@156"
         }
       ],
       "attributes": []
@@ -36432,7 +36463,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "SuccessionAsUsage",
       "superTypes": [
         {
-          "$ref": "#/interfaces@125"
+          "$ref": "#/interfaces@124"
         },
         {
           "$ref": "#/interfaces@28"
@@ -36445,7 +36476,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "Expose",
       "superTypes": [
         {
-          "$ref": "#/interfaces@55"
+          "$ref": "#/interfaces@54"
         }
       ],
       "attributes": []
@@ -36455,7 +36486,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConjugatedPortReference",
       "superTypes": [
         {
-          "$ref": "#/interfaces@71"
+          "$ref": "#/interfaces@70"
         }
       ],
       "attributes": []
@@ -36465,7 +36496,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "VariantMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@59"
+          "$ref": "#/interfaces@58"
         }
       ],
       "attributes": []
@@ -36485,7 +36516,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ConjugatedPortDefinition",
       "superTypes": [
         {
-          "$ref": "#/interfaces@101"
+          "$ref": "#/interfaces@100"
         }
       ],
       "attributes": []
@@ -36505,7 +36536,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "PortConjugation",
       "superTypes": [
         {
-          "$ref": "#/interfaces@51"
+          "$ref": "#/interfaces@50"
         }
       ],
       "attributes": []
@@ -36539,7 +36570,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "StateSubactionMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ]
     },
@@ -36572,7 +36603,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "TransitionFeatureMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ]
     },
@@ -36581,7 +36612,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "SubjectMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@65"
+          "$ref": "#/interfaces@64"
         }
       ],
       "attributes": []
@@ -36591,7 +36622,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ActorMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@65"
+          "$ref": "#/interfaces@64"
         }
       ],
       "attributes": []
@@ -36601,7 +36632,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "StakeholderMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@65"
+          "$ref": "#/interfaces@64"
         }
       ],
       "attributes": []
@@ -36624,7 +36655,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "RequirementConstraintMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ]
     },
@@ -36633,7 +36664,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "FramedConcernMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@175"
+          "$ref": "#/interfaces@174"
         }
       ],
       "attributes": []
@@ -36643,7 +36674,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "RequirementVerificationMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@175"
+          "$ref": "#/interfaces@174"
         }
       ],
       "attributes": []
@@ -36653,7 +36684,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ObjectiveMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -36663,7 +36694,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "ViewRenderingMembership",
       "superTypes": [
         {
-          "$ref": "#/interfaces@63"
+          "$ref": "#/interfaces@62"
         }
       ],
       "attributes": []
@@ -36673,10 +36704,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "MembershipExpose",
       "superTypes": [
         {
-          "$ref": "#/interfaces@163"
+          "$ref": "#/interfaces@162"
         },
         {
-          "$ref": "#/interfaces@56"
+          "$ref": "#/interfaces@55"
         }
       ],
       "attributes": []
@@ -36686,10 +36717,10 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
       "name": "NamespaceExpose",
       "superTypes": [
         {
-          "$ref": "#/interfaces@163"
+          "$ref": "#/interfaces@162"
         },
         {
-          "$ref": "#/interfaces@57"
+          "$ref": "#/interfaces@56"
         }
       ],
       "attributes": []
@@ -36864,25 +36895,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@83"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@81"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@75"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@87"
+              "$ref": "#/interfaces@82"
             }
           },
           {
@@ -36894,7 +36907,31 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@82"
+              "$ref": "#/interfaces@74"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@86"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@79"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@81"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/interfaces@83"
             }
           },
           {
@@ -36907,12 +36944,6 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
             "$type": "SimpleType",
             "typeRef": {
               "$ref": "#/interfaces@85"
-            }
-          },
-          {
-            "$type": "SimpleType",
-            "typeRef": {
-              "$ref": "#/interfaces@86"
             }
           }
         ]
@@ -36927,7 +36958,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@58"
+              "$ref": "#/interfaces@57"
             }
           },
           {
@@ -37014,7 +37045,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@153"
+              "$ref": "#/interfaces@152"
             }
           },
           {

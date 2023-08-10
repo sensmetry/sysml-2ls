@@ -20,6 +20,7 @@ import { metamodelOf } from "../metamodel";
 import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
 import { PartUsageMeta, PartUsageOptions } from "./part-usage";
 import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta } from "../KerML";
+import { enumerable } from "../../utils";
 
 export interface ConnectionUsageOptions extends PartUsageOptions, ConnectorAsUsageOptions {}
 
@@ -28,6 +29,15 @@ export interface ConnectionUsageOptions extends PartUsageOptions, ConnectorAsUsa
     binary: "Connections::binaryConnections",
 })
 export class ConnectionUsageMeta extends Mixin(ConnectorAsUsageMeta, PartUsageMeta) {
+    @enumerable
+    // @ts-expect-error issue with mixins
+    override get isComposite(): boolean {
+        return false;
+    }
+    override set isComposite(value) {
+        // empty
+    }
+
     override defaultSupertype(): string {
         return this.isBinary() ? "binary" : "base";
     }

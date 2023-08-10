@@ -48,6 +48,7 @@ import { SysMLConfigurationProvider } from "../shared/workspace/configuration-pr
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLType } from "../sysml-ast-reflection";
 import { ModelValidationAcceptor, validateKerML } from "./validation-registry";
+import { NonNullable } from "../../utils";
 
 /**
  * Implementation of custom validations.
@@ -159,7 +160,7 @@ export class KerMLValidator {
         for (const member of element.ownedElements()) {
             if (!member.is(ast.Membership)) continue;
             // skip non-owning memberships that are not aliases
-            if (!member.is(ast.OwningMembership) && !member.isAlias()) continue;
+            if (!member.is(ast.OwningMembership) && !member.isAlias) continue;
             // skip over automatically named reference usages
             if (member.element()?.is(ast.ReferenceUsage)) continue;
             const name = member.name;
@@ -172,7 +173,7 @@ export class KerMLValidator {
         for (const [name, members] of names.entriesGroupedByKey()) {
             if (members.length < 2) continue;
             for (const [member, property] of members) {
-                const node = member.isAlias() ? member : member.element();
+                const node = member.isAlias ? member : member.element();
                 if (!node) continue;
 
                 accept("error", `Duplicate member name ${name}`, {
@@ -440,7 +441,12 @@ export class KerMLValidator {
         const type = node.invokes() ?? this.index.findType(node.getFunction());
         if (!type) return;
 
-        const expected = new Set(type.inputParameters());
+        const expected = new Set(
+            type
+                .allTypes(undefined, true)
+                .flatMap((t) => t.ownedFeatures())
+                .filter((f) => f.direction !== "out")
+        );
 
         // nothing to check
         if (expected.size === 0) return;
@@ -560,7 +566,7 @@ export class KerMLValidator {
         node: BindingConnectorMeta,
         accept: ModelValidationAcceptor
     ): void {
-        const related = node.relatedFeatures();
+        const related = node.relatedFeatures().filter(NonNullable);
         // skip invalid binding connectors
         if (related.length !== 2) return;
 

@@ -29,25 +29,25 @@ export interface MembershipOptions<
     Target extends ElementMeta = ElementMeta,
     Parent extends NamespaceMeta | undefined = NamespaceMeta,
 > extends RelationshipOptionsBody<Target, Parent>,
-        ElementOptions<Parent> {}
+        ElementOptions<Parent> {
+    isAlias?: boolean;
+}
 
 @metamodelOf(Membership)
 // @ts-expect-error ignoring static inheritance error
 export class MembershipMeta<T extends ElementMeta = ElementMeta> extends RelationshipMeta<T> {
+    isAlias = false;
+
     override ast(): Membership | undefined {
         return this._ast as Membership;
     }
 
     override get name(): string | undefined {
-        return this.isAlias() ? super.name : this.element()?.name;
+        return this.isAlias ? super.name : this.element()?.name;
     }
 
     override get shortName(): string | undefined {
-        return this.isAlias() ? super.shortName : this.element()?.shortName;
-    }
-
-    isAlias(): boolean {
-        return Boolean(super.shortName || super.name);
+        return this.isAlias ? super.shortName : this.element()?.shortName;
     }
 
     /**
@@ -79,7 +79,10 @@ export class MembershipMeta<T extends ElementMeta = ElementMeta> extends Relatio
         options?: MembershipOptions
     ): T["$meta"] {
         const member = super.create(provider, document, options) as MembershipMeta;
-        if (options) ElementMeta.applyElementOptions(member, options);
+        if (options) {
+            member.isAlias = Boolean(options.isAlias);
+            ElementMeta.applyElementOptions(member, options);
+        }
         return member;
     }
 }

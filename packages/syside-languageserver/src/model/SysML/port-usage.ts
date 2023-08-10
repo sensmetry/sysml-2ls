@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { PartDefinition, PortDefinition, PortUsage } from "../../generated/ast";
+import { enumerable } from "../../utils/common";
 import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
 
@@ -26,6 +27,14 @@ export type PortUsageOptions = OccurrenceUsageOptions;
     subport: "Ports::Port::subports",
 })
 export class PortUsageMeta extends OccurrenceUsageMeta {
+    @enumerable
+    override get isComposite(): boolean {
+        return this.owningType?.isAny(PortDefinition, PortUsage) ? super.isComposite : false;
+    }
+    override set isComposite(value) {
+        super.isComposite = value;
+    }
+
     override defaultSupertype(): string {
         if (this.isOwnedPort()) return "ownedPort";
         if (this.isSubport()) return "subport";

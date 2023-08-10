@@ -148,7 +148,7 @@ export interface ModelLevelExpressionEvaluator {
 }
 
 export const BUILTIN_FUNCTIONS: Record<string, BuiltinFunction> = {};
-export const OPERATOR_FUNCTIONS: Partial<Record<meta.Operator, string>> = {};
+export const OPERATOR_FUNCTIONS: Partial<Record<meta.AnyOperator, string>> = {};
 
 // TODO: Allow multiple packages to account for specializations
 export function functionFor(

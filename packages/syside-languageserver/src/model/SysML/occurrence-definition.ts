@@ -17,8 +17,11 @@
 import { Mixin } from "ts-mixer";
 import { OccurrenceDefinition } from "../../generated/ast";
 import { ClassMeta, ClassOptions } from "../KerML/class";
-import { metamodelOf } from "../metamodel";
+import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { DefinitionMeta, DefinitionOptions } from "./definition";
+import { EdgeContainer, OwningMembershipMeta, SubclassificationMeta } from "../KerML";
+import { LifeClassMeta } from "./life-class";
+import { AstNode, LangiumDocument } from "langium";
 
 export interface OccurrenceDefinitionOptions extends ClassOptions, DefinitionOptions {}
 
@@ -26,8 +29,42 @@ export interface OccurrenceDefinitionOptions extends ClassOptions, DefinitionOpt
     base: "Occurrences::Occurrence",
 })
 export class OccurrenceDefinitionMeta extends Mixin(ClassMeta, DefinitionMeta) {
+    protected _lifeClass?: OwningMembershipMeta<LifeClassMeta>;
+
+    get lifeClass(): OwningMembershipMeta<LifeClassMeta> | undefined {
+        return this.isIndividual ? this._lifeClass : undefined;
+    }
+
     override ast(): OccurrenceDefinition | undefined {
         return this._ast as OccurrenceDefinition;
+    }
+
+    protected createLifeClass(id: ElementIDProvider): void {
+        this._lifeClass = this.swapEdgeOwnership(this._lifeClass, [
+            OwningMembershipMeta.create(id, this.document, { isImplied: true }),
+            LifeClassMeta.create(id, this.document, {
+                heritage: EdgeContainer.make([
+                    SubclassificationMeta.create(id, this.document),
+                    this,
+                ]),
+            }),
+        ]);
+    }
+
+    static override create<T extends AstNode>(
+        this: MetatypeProto<T>,
+        provider: ElementIDProvider,
+        document: LangiumDocument,
+        options?: OccurrenceDefinitionOptions
+    ): T["$meta"] {
+        const model = DefinitionMeta.create.call(
+            this,
+            provider,
+            document,
+            options
+        ) as OccurrenceDefinitionMeta;
+        model.createLifeClass(provider);
+        return model;
     }
 }
 

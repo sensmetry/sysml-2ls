@@ -14,9 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { ElementMeta } from "../model";
 import { JSONConvertible } from "./common";
 
-export class Target<T extends object = object> implements JSONConvertible<T | undefined> {
+export class Target<T extends ElementMeta = ElementMeta> implements JSONConvertible {
     protected ref: T | null | undefined;
 
     constructor(value?: T) {
@@ -35,7 +36,8 @@ export class Target<T extends object = object> implements JSONConvertible<T | un
         this.ref = value ?? null;
     }
 
-    toJSON(): T | undefined {
+    toJSON(): object | undefined {
+        if (this.target) return { reference_: this.target.qualifiedName };
         return this.target;
     }
 

@@ -177,17 +177,22 @@ function createMissingEndsInSuccessionAsUsage(
     services: SysMLDefaultServices
 ): void {
     // `ends` may not have been created yet so it may be undefined
-    const ends = node.ends?.length;
-    if (ends !== undefined && ends >= 2) return;
+    node.ends ??= [];
+    const ends = node.ends.length;
+    if (ends >= 2) return;
 
     const reflection = services.shared.AstReflection;
     // NB: adding CST nodes to the owning element for better validation
     // locations
-    if (ends === undefined) node.ends = [];
 
+    let insert = [0, 1];
     // ends === 0 or ends === undefined -> EmptySuccessionMember rule
-    // ends === 1 -> missing MultiplicitySourceEndMember
-    for (const index of [0, 1].slice(0, 2 - (ends ?? 0))) {
+    // ends === 1 -> missing empty MultiplicitySourceEndMember
+    if (ends === 1) {
+        if ((node.ends[0].target as Feature).multiplicity) insert = [1];
+        else insert = [0];
+    }
+    for (const index of insert) {
         const member = reflection.createNode(EndFeatureMembership, {
             $container: node,
             $containerProperty: "ends",
@@ -320,8 +325,10 @@ declare module "langium" {
 // TODO: temporary patch until we can update Langium with https://github.com/langium/langium/pull/898
 LangiumParser.prototype["assignWithoutOverride"] = function (
     target: Record<string, unknown> & { $cstNode: CstNode },
-    source: object & { $cstNode?: CstNode }
+    source: object & { $type?: string; $cstNode?: CstNode }
 ): Record<string, unknown> {
+    const hasType = target.$type !== undefined;
+
     for (const [name, existingValue] of Object.entries(source)) {
         const newValue = target[name];
         if (newValue === undefined) {
@@ -330,6 +337,13 @@ LangiumParser.prototype["assignWithoutOverride"] = function (
             existingValue.push(...newValue);
             target[name] = existingValue;
         }
+    }
+
+    if (!hasType && source.$type) {
+        // there seems to be a parser bug where very rarely the target won't
+        // have mandatory properties assigned after setting $type
+        this["assignMandatoryProperties"](target);
+        collectChildren(target as unknown as AstNode);
     }
 
     if (source.$cstNode) {

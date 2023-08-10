@@ -21,13 +21,27 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
 import { AstNode, LangiumDocument } from "langium";
-import { Edge, EndFeatureMembershipMeta, ItemFlowEndMeta } from "../KerML";
+import {
+    Edge,
+    ElementParts,
+    EndFeatureMembershipMeta,
+    FeatureMeta,
+    ItemFlowEndMeta,
+    ParameterMembershipMeta,
+} from "../KerML";
+import { EventOccurrenceUsageMeta } from "./event-occurrence-usage";
+import { enumerable } from "../../utils";
 
 export interface FlowConnectionUsageOptions
     extends ConnectionUsageOptions,
         ActionUsageOptions,
         ItemFlowOptions {
+    // can't override ends alone to allow only either ends or messages
     ends?: readonly Edge<EndFeatureMembershipMeta, ItemFlowEndMeta>[];
+    /**
+     * Message events for Messages. Will be used instead of `ends` if non-empty.
+     */
+    messages?: readonly Edge<ParameterMembershipMeta, EventOccurrenceUsageMeta>[];
 }
 
 @metamodelOf(FlowConnectionUsage, {
@@ -44,6 +58,40 @@ export class FlowConnectionUsageMeta extends Mixin(
     ItemFlowMeta,
     ConnectionUsageMeta
 ) {
+    // this ideally would be mutually exclusive with `ends`
+    private _messages: ParameterMembershipMeta<EventOccurrenceUsageMeta>[] = [];
+
+    @enumerable
+    public get messages(): readonly ParameterMembershipMeta<EventOccurrenceUsageMeta>[] {
+        return this._messages;
+    }
+
+    get isMessageConnection(): boolean {
+        return this._messages.length > 0;
+    }
+
+    /**
+     * Adds owned message members and returns the new number of message members.
+     * Any messages will be used in place of `ends`.
+     */
+    addMessage(...value: Edge<ParameterMembershipMeta, EventOccurrenceUsageMeta>[]): number {
+        return this.addOwnedEdges(this._messages, value);
+    }
+
+    /**
+     * Removes message sby value and returns the new number of message members.
+     */
+    removeMessage(...value: readonly ParameterMembershipMeta[]): number {
+        return this.removeOwnedElements(this._messages, value);
+    }
+
+    /**
+     * Removes messages by predicate and returns the new number of message members.
+     */
+    removeMessageIf(predicate: (value: ParameterMembershipMeta) => boolean): number {
+        return this.removeOwnedElementsIf(this._messages, predicate);
+    }
+
     override defaultGeneralTypes(): string[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPartOwnedComposite()) supertypes.push("ownedAction");
@@ -57,11 +105,18 @@ export class FlowConnectionUsageMeta extends Mixin(
     }
 
     override defaultSupertype(): string {
-        return !this.featureMembers().some((f) => f.element()?.isEnd) ? "message" : "base";
+        return this.isMessageConnection ? "message" : "base";
     }
 
     override ast(): FlowConnectionUsage | undefined {
         return this._ast as FlowConnectionUsage;
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        FeatureMeta.prototype["collectDeclaration"].call(this, parts);
+
+        if (this.isMessageConnection) parts.push(["messages", this.messages]);
+        else if (this.ends.length > 0) parts.push(["ends", this.ends]);
     }
 
     static override create<T extends AstNode>(
@@ -77,7 +132,9 @@ export class FlowConnectionUsageMeta extends Mixin(
             options
         ) as FlowConnectionUsageMeta;
         if (options) {
+            ConnectionUsageMeta.applyConnectorOptions(model, options);
             ItemFlowMeta.applyItemFlowOptions(model, options);
+            if (options.messages) model.addMessage(...options.messages);
         }
         return model;
     }

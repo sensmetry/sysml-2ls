@@ -21,11 +21,22 @@ import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { UsageMeta, UsageOptions } from "./usage";
 import { AstNode, LangiumDocument } from "langium";
 import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta } from "../KerML";
+import { enumerable } from "../../utils";
 
 export interface ConnectorAsUsageOptions extends UsageOptions, ConnectorOptions {}
 
-@metamodelOf(ConnectorAsUsage)
+// never returned from the textual syntax so make it abstract
+@metamodelOf(ConnectorAsUsage, "abstract")
 export class ConnectorAsUsageMeta extends Mixin(ConnectorMeta, UsageMeta) {
+    @enumerable
+    // @ts-expect-error issue with mixins
+    override get isComposite(): boolean {
+        return false;
+    }
+    override set isComposite(value) {
+        // empty
+    }
+
     override ast(): ConnectorAsUsage | undefined {
         return this._ast as ConnectorAsUsage;
     }

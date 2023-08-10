@@ -29,7 +29,7 @@ test("features can be parsed and aliased", async () => {
     }`,
             { node: Membership, build: true }
         )
-    ).resolves.toMatchObject({ targetRef: qualifiedTarget("person") });
+    ).resolves.toMatchObject({ isAlias: true, targetRef: qualifiedTarget("person") });
 });
 
 test("member features can be parsed", async () => {

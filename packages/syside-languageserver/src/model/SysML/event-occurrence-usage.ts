@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 import { EventOccurrenceUsage, OccurrenceDefinition, OccurrenceUsage } from "../../generated/ast";
+import { enumerable } from "../../utils";
 import { metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
 
@@ -24,6 +25,14 @@ export type EventOccurrenceUsageOptions = OccurrenceUsageOptions;
     suboccurrence: "Occurrences::Occurrence::timeEnclosedOccurrences",
 })
 export class EventOccurrenceUsageMeta extends OccurrenceUsageMeta {
+    @enumerable
+    override get isComposite(): boolean {
+        return false;
+    }
+    override set isComposite(value) {
+        // empty
+    }
+
     override defaultSupertype(): string {
         return this.isSuboccurrence() ? "suboccurrence" : super.defaultSupertype();
     }

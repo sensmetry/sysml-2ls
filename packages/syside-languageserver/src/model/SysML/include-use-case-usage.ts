@@ -25,6 +25,7 @@ import { FeatureMeta } from "../KerML";
 import { metamodelOf } from "../metamodel";
 import { PerformActionUsageMeta, PerformActionUsageOptions } from "./perform-action-usage";
 import { UseCaseUsageMeta, UseCaseUsageOptions } from "./use-case-usage";
+import { enumerable } from "../../utils";
 
 export interface IncludeUseCaseUsageOptions
     extends PerformActionUsageOptions,
@@ -36,6 +37,15 @@ export interface IncludeUseCaseUsageOptions
     performedAction: "Parts::Part::performedActions",
 })
 export class IncludeUseCaseUsageMeta extends Mixin(PerformActionUsageMeta, UseCaseUsageMeta) {
+    @enumerable
+    // @ts-expect-error issue with mixins
+    override get isComposite(): boolean {
+        return false;
+    }
+    override set isComposite(value) {
+        // empty
+    }
+
     override ast(): IncludeUseCaseUsage | undefined {
         return this._ast as IncludeUseCaseUsage;
     }

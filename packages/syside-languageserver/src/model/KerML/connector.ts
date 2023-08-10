@@ -27,6 +27,7 @@ import {
     FeatureOptions,
     InheritanceMeta,
     MembershipMeta,
+    ReferenceSubsettingMeta,
     RelationshipMeta,
     TypeMeta,
 } from "./_internal";
@@ -54,7 +55,7 @@ export class ConnectorMeta extends Mixin(
     private _ends: EndFeatureMembershipMeta[] = [];
 
     @enumerable
-    public get ends(): EndFeatureMembershipMeta[] {
+    public get ends(): readonly EndFeatureMembershipMeta[] {
         return this._ends;
     }
 
@@ -115,7 +116,8 @@ export class ConnectorMeta extends Mixin(
     contextType(): TypeMeta | undefined {
         let commonFeaturingTypes: TypeMeta[] | undefined;
         for (const related of this.relatedFeatures()) {
-            const featurings = related.allFeaturingTypes();
+            const featurings = related?.allFeaturingTypes();
+            if (!featurings) continue;
             if (!commonFeaturingTypes) {
                 commonFeaturingTypes = featurings;
                 continue;
@@ -147,14 +149,19 @@ export class ConnectorMeta extends Mixin(
     /**
      * @returns features related by this connector
      */
-    relatedFeatures(): FeatureMeta[] {
+    relatedFeatures(): (FeatureMeta | undefined)[] {
         // related features are the reference subsettings of the connector ends
         // by the spec, there shouldn't be more than 1 reference subsetting
         return stream(this.allEnds())
-            .map((end) => end.specializations(ReferenceSubsetting).at(0))
-            .map((sub) => sub?.element())
+            .map(
+                (end) =>
+                    end.specializations(ReferenceSubsetting).at(0) as
+                        | ReferenceSubsettingMeta
+                        | undefined
+            )
             .nonNullable()
-            .toArray() as FeatureMeta[];
+            .map((sub) => sub.element())
+            .toArray();
     }
 
     protected override collectDeclaration(parts: ElementParts): void {

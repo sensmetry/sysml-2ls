@@ -179,7 +179,6 @@ interface TypeFeaturing extends Featuring {}
 interface FeatureTyping extends Specialization {}
 interface Subclassification extends Specialization {}
 interface Subsetting extends Specialization {}
-interface Subtype extends Specialization {}
 
 interface Conjugation extends Inheritance {}
 
@@ -201,7 +200,9 @@ interface Import extends Relationship {
 interface MembershipImport extends Import {}
 interface NamespaceImport extends Import {}
 
-interface Membership extends Relationship {}
+interface Membership extends Relationship {
+    isAlias: boolean;
+}
 interface OwningMembership extends Membership {}
 interface FeatureValue extends OwningMembership {
     isDefault: boolean;

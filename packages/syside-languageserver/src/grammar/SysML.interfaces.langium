@@ -111,7 +111,9 @@ interface UseCaseDefinition extends CaseDefinition {}
 interface UseCaseUsage extends CaseUsage {}
 interface IncludeUseCaseUsage extends UseCaseUsage, PerformActionUsage {}
 interface FlowConnectionDefinition extends ConnectionDefinition, ActionDefinition, Interaction {}
-interface FlowConnectionUsage extends ConnectionUsage, ActionUsage, ItemFlow {}
+interface FlowConnectionUsage extends ConnectionUsage, ActionUsage, ItemFlow {
+    messages: ParameterMembership[];
+}
 interface SuccessionFlowConnectionUsage extends FlowConnectionUsage, SuccessionItemFlow {}
 interface AssignmentActionUsage extends ActionUsage {
     targetMember: Membership;

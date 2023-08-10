@@ -24,7 +24,7 @@ import {
     Type,
     TypeRelationship,
 } from "../../generated/ast";
-import { SubtypeKeys, SysMLTypeList } from "../../services/sysml-ast-reflection";
+import { SubtypeKeys, SysMLInterface, SysMLTypeList } from "../../services/sysml-ast-reflection";
 import { enumerable, KeysMatching } from "../../utils/common";
 import { collectRedefinitions } from "../../utils/scope-util";
 import { ElementContainer } from "../containers";
@@ -82,6 +82,7 @@ export function typeRelationships<T extends TypeRelationshipMeta[]>(
 
 export interface TypeOptions extends NamespaceOptions {
     isAbstract?: boolean;
+    isSufficient?: boolean;
     multiplicity?: Edge<OwningMembershipMeta, MultiplicityRangeMeta>;
     heritage?: EdgeContainer<InheritanceMeta>;
     typeRelationships?: EdgeContainer<TypeRelationshipMeta>;
@@ -98,6 +99,13 @@ export class TypeMeta extends Mixin(
     protected _classifier: TypeClassifier = TypeClassifier.None;
 
     protected _multiplicity: OwningMembershipMeta<MultiplicityRangeMeta> | undefined;
+    protected _isSufficient = false;
+    get isSufficient(): boolean {
+        return this._isSufficient;
+    }
+    set isSufficient(value) {
+        this._isSufficient = value;
+    }
 
     /**
      * Whether this type is abstract
@@ -169,6 +177,12 @@ export class TypeMeta extends Mixin(
     @enumerable
     get typeRelationships(): readonly FeatureRelationshipMeta[] {
         return this._typeRelationships.all;
+    }
+
+    typeRelationshipsOf<K extends SubtypeKeys<TypeRelationship>>(
+        kind: K
+    ): readonly SysMLInterface<K>["$meta"][] {
+        return this._typeRelationships.get(kind);
     }
 
     /**
@@ -547,6 +561,7 @@ export class TypeMeta extends Mixin(
         if (options.heritage) model.addHeritage(...options.heritage["values"]);
         if (options.typeRelationships)
             model.addTypeRelationship(...options.typeRelationships["values"]);
+        model.isSufficient = Boolean(options.isSufficient);
     }
 
     static override create<T extends AstNode>(

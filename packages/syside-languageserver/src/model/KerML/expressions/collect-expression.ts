@@ -16,7 +16,12 @@
 
 import { CollectExpression } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { OperatorExpressionMeta, OperatorExpressionOptions } from "../_internal";
+import {
+    AnyOperator,
+    IMPLICIT_OPERATORS,
+    OperatorExpressionMeta,
+    OperatorExpressionOptions,
+} from "../_internal";
 
 export interface CollectExpressionOptions extends OperatorExpressionOptions {
     operator?: never;
@@ -24,6 +29,10 @@ export interface CollectExpressionOptions extends OperatorExpressionOptions {
 
 @metamodelOf(CollectExpression)
 export class CollectExpressionMeta extends OperatorExpressionMeta {
+    override get operator(): AnyOperator {
+        return IMPLICIT_OPERATORS.COLLECT;
+    }
+
     override ast(): CollectExpression | undefined {
         return this._ast as CollectExpression;
     }

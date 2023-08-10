@@ -19,10 +19,14 @@ import { SysMLInterface, SysMLType } from "../services";
 import * as ast from "../generated/ast";
 import {
     ActionUsageMeta,
+    AnnotationMeta,
     BasicMetamodel,
     ElementMeta,
+    EventOccurrenceUsageMeta,
     ExpressionMeta,
+    FeatureMembershipMeta,
     FeatureMeta,
+    ItemFeatureMeta,
     MembershipMeta,
     MetadataFeatureMeta,
     MultiplicityRangeMeta,
@@ -149,6 +153,16 @@ const AstToModel: {
         model["_children"].push(...node.children.map((child) => child.$meta));
     },
 
+    [ast.Dependency](model, node) {
+        model["_prefixes"].length = 0;
+        model["_children"].clear();
+
+        model["_prefixes"].push(
+            ...node.prefixes.map((m) => m.$meta as AnnotationMeta<MetadataFeatureMeta>)
+        );
+        model["_children"].push(...node.elements.map((child) => child.$meta));
+    },
+
     [ast.Relationship](model, node) {
         model["_visibility"] = getVisibility(node.visibility);
 
@@ -157,6 +171,7 @@ const AstToModel: {
 
         if (node.source) model["_source"] = node.source.$meta;
         else if (node.sourceChain) model["_source"] = node.sourceChain.$meta;
+        else if (node.sourceRef) model["_source"] = undefined;
 
         model["_children"].push(...node.elements.map((e) => e.$meta));
     },
@@ -171,7 +186,8 @@ const AstToModel: {
     },
 
     [ast.Type](model, node) {
-        model["_isAbstract"] = !!node.isAbstract;
+        model["_isAbstract"] = Boolean(node.isAbstract);
+        model.isSufficient = node.isSufficient;
         model["_multiplicity"] = node.multiplicity
             ?.$meta as OwningMembershipMeta<MultiplicityRangeMeta>;
 
@@ -275,6 +291,24 @@ const AstToModel: {
         (model["_body"] as RelationshipMeta | undefined) = node.body.$meta;
         (model["_until"] as RelationshipMeta | undefined) = node.until?.$meta;
     },
+
+    [ast.Membership](model, node) {
+        model.isAlias = node.isAlias;
+    },
+
+    [ast.ItemFlow](model, node) {
+        model["_item"] = node.item?.$meta as FeatureMembershipMeta<ItemFeatureMeta>;
+    },
+
+    [ast.TriggerInvocationExpression](model, node) {
+        model.kind = node.kind;
+    },
+
+    [ast.FlowConnectionUsage](model, node) {
+        model["_messages"] = node.messages.map(
+            (m) => m.$meta as ParameterMembershipMeta<EventOccurrenceUsageMeta>
+        );
+    },
 };
 
 type ClearArtifactsFunction<T extends AstNode = AstNode> = (model: NonNullable<T["$meta"]>) => void;
@@ -319,6 +353,11 @@ const ClearArtifacts: { [K in SysMLType]?: ClearArtifactsFunction<SysMLInterface
 
     [ast.Namespace](model) {
         model["_importResolutionState"] = "none";
+    },
+
+    [ast.Dependency](model) {
+        model.client.length = 0;
+        model.supplier.length = 0;
     },
 
     [ast.Relationship](model) {

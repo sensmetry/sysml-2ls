@@ -126,7 +126,7 @@ export function qualifiedReference(name: string): object {
 }
 
 export function qualifiedTypeReference(name: string): object {
-    return { $meta: { to: { qualifiedName: name } } };
+    return { $meta: { to: { reference_: name } } };
 }
 
 export function qualifiedTarget(name: string): object {

@@ -42,6 +42,5 @@ export * from "./return-parameter-membership";
 export * from "./specialization";
 export * from "./subclassification";
 export * from "./subsetting";
-export * from "./subtype";
 export * from "./type-featuring";
 export * from "./unioning";
