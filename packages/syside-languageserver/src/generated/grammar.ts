@@ -36329,7 +36329,7 @@ export const SysMLGrammar = (): Grammar => loadedSysMLGrammar ?? (loadedSysMLGra
           "type": {
             "$type": "SimpleType",
             "typeRef": {
-              "$ref": "#/interfaces@64"
+              "$ref": "#/interfaces@62"
             }
           },
           "isOptional": false
