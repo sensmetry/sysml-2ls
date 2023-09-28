@@ -17,14 +17,21 @@
 import { AstNode, LangiumDocument } from "langium";
 import { ForLoopActionUsage } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
-import { Edge, ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
+import {
+    Edge,
+    ElementParts,
+    FeatureMembershipMeta,
+    FeatureMeta,
+    MembershipMeta,
+    ParameterMembershipMeta,
+} from "../KerML";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta } from "./action-usage";
 import { LoopActionUsageMeta, LoopActionUsageOptions } from "./loop-action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 
 export interface ForLoopActionUsageOptions extends LoopActionUsageOptions {
-    variable?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
+    variable?: Edge<FeatureMembershipMeta, ReferenceUsageMeta>;
     sequence?: Edge<ParameterMembershipMeta, ReferenceUsageMeta>;
     body?: Edge<ParameterMembershipMeta, ActionUsageMeta>;
 }
@@ -35,15 +42,15 @@ export interface ForLoopActionUsageOptions extends LoopActionUsageOptions {
     loopVariable: "Actions::ForLoopAction::var", // TODO:
 })
 export class ForLoopActionUsageMeta extends LoopActionUsageMeta {
-    private _variable?: ParameterMembershipMeta<ReferenceUsageMeta>;
+    private _variable?: FeatureMembershipMeta<ReferenceUsageMeta>;
     private _sequence?: ParameterMembershipMeta<ReferenceUsageMeta>;
     private _body?: ParameterMembershipMeta<ActionUsageMeta>;
 
     @enumerable
-    public get variable(): ParameterMembershipMeta<ReferenceUsageMeta> | undefined {
+    public get variable(): FeatureMembershipMeta<ReferenceUsageMeta> | undefined {
         return this._variable;
     }
-    public set variable(value: Edge<ParameterMembershipMeta, ReferenceUsageMeta> | undefined) {
+    public set variable(value: Edge<FeatureMembershipMeta, ReferenceUsageMeta> | undefined) {
         this._variable = this.swapEdgeOwnership(this._variable, value);
     }
 

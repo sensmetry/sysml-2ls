@@ -134,7 +134,7 @@ interface WhileLoopActionUsage extends LoopActionUsage {
 }
 
 interface ForLoopActionUsage extends LoopActionUsage {
-    variable: ParameterMembership;
+    variable: FeatureMembership;
     sequence: ParameterMembership;
     body: ParameterMembership;
 }

@@ -1791,7 +1791,7 @@ export interface ForLoopActionUsage extends LoopActionUsage {
     readonly $type: 'ForLoopActionUsage';
     body: ParameterMembership
     sequence: ParameterMembership
-    variable: ParameterMembership
+    variable: FeatureMembership
 }
 
 export const ForLoopActionUsage = 'ForLoopActionUsage';
