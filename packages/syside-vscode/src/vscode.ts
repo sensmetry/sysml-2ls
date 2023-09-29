@@ -20,14 +20,8 @@ import { TextEditor } from "syside-protocol";
 import { TextDocumentIdentifier } from "vscode-languageserver";
 import fs from "fs-extra";
 import path from "path";
-import {
-    downloadFile,
-    DownloadInfo,
-    formatBytes,
-    mkTmpdir,
-    unzipFile,
-} from "syside-languageclient";
 import type CONFIG from "../package.json";
+import fetch from "node-fetch";
 
 type Options = keyof typeof CONFIG.contributes.configuration.properties;
 
@@ -128,89 +122,74 @@ export class SysMLVSCodeClientExtender extends SysMLClientExtender {
      * Download the stdlib from web
      */
     protected async downloadStdlibDir(): Promise<string | undefined> {
-        const tempDir = await mkTmpdir();
-        const zipFile = path.join(tempDir, "sysml-v2-release.zip");
-
-        const info = await SysMLVSCodeClientExtender.downloadUrl(
-            this.stdlibRepoZipUrl,
-            zipFile,
-            "Downloading SysML standard library"
-        );
-
-        if (!info) return;
-
-        // store the extracted standard library in cache
         const libPath = this.stdlibDir;
-
-        // delete old directory if it exists to avoid any stale files
-        await fs.remove(libPath);
-
-        await unzipFile(zipFile, path.dirname(libPath), (entry) => {
-            // only unzip the library documents
-            const suffix = /sysml\.library.*\.(?:kerml|sysml)/.exec(entry.fileName);
-            if (!suffix) return;
-            return suffix[0];
-        }).then(async () => await fs.remove(zipFile));
-
-        // and update the configuration
-        await vscode.workspace
-            .getConfiguration()
-            .update(
-                <Options>"sysml.standardLibraryPath",
-                libPath,
-                vscode.ConfigurationTarget.Global
-            );
-        vscode.window.showInformationMessage(
-            `The downloaded standard library can be found in ${libPath}`
+        return SysMLVSCodeClientExtender.downloadFiles(
+            this.stdlibURL,
+            this.stdlibFiles,
+            this.stdlibDir,
+            "Downloading SysML standard library"
+        ).then(
+            async () => {
+                // and update the configuration
+                await vscode.workspace
+                    .getConfiguration()
+                    .update(
+                        <Options>"sysml.standardLibraryPath",
+                        libPath,
+                        vscode.ConfigurationTarget.Global
+                    );
+                vscode.window.showInformationMessage(
+                    `The downloaded standard library can be found in ${libPath}`
+                );
+                return libPath;
+            },
+            async (reason) => {
+                vscode.window.showInformationMessage(
+                    `Failed to download standard library: ${reason}`
+                );
+                return undefined;
+            }
         );
-        return libPath;
     }
 
     /**
-     * Download a file from a given {@link url} with progress shown in VS Code
-     * @see {@link downloadFile}
+     * Download `files` from a given {@link url} with progress shown in VS Code
      * @param url download URL
-     * @param file download destination
+     * @param files files to download from `url`
+     * @param destination download destination
      * @param title Notification title
      * @returns url if the file already exists, {@link DownloadInfo} if the file
      * was successfully downloaded and undefined otherwise
      */
-    protected static async downloadUrl(
+    protected static async downloadFiles(
         url: string,
-        file: string,
+        files: readonly string[],
+        destination: string,
         title: string
-    ): Promise<string | DownloadInfo | undefined> {
-        // only download if the zip file doesn't exist
-        if (await fs.exists(file)) return file;
-
-        let downloadPromise: Promise<DownloadInfo> | undefined;
-        vscode.window.withProgress(
+    ): Promise<void> {
+        return vscode.window.withProgress(
             {
                 title: title,
                 location: vscode.ProgressLocation.Notification,
             },
             async (progress, _) => {
-                let prevBytes = 0;
-                downloadPromise = downloadFile(url, file, {
-                    progress: (bytes, size) => {
-                        if (Number.isNaN(size)) {
-                            progress.report({
-                                message: `Downloaded ${formatBytes(bytes)}`,
-                            });
-                        } else {
-                            // increment is the change to the last call in percent
-                            // so have to convert bytes to percent
-                            const pct = ((bytes - prevBytes) / size) * 100;
-                            prevBytes = bytes;
-                            progress.report({ increment: pct });
-                        }
-                    },
-                });
-                await downloadPromise;
+                let downloaded = 0;
+                await Promise.all(
+                    files.map(async (name) => {
+                        const response = await fetch(path.join(url, name));
+                        const dst = path.join(destination, name);
+                        await fs.mkdirp(path.dirname(dst));
+                        await fs.writeFile(dst, await response.text());
+                        downloaded += 1;
+
+                        progress.report({
+                            message: `Downloaded ${downloaded}/${files.length}`,
+                            increment: (downloaded / files.length) * 100,
+                        });
+                    })
+                );
             }
         );
-
-        return await downloadPromise;
     }
 
     protected async loadConfig(): Promise<ClientConfig | undefined> {

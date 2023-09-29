@@ -36,7 +36,8 @@
         "run-validation": "pnpm --dir packages/syside-languageserver run-validation",
         "grammar": "pnpm --dir packages/syside-languageserver grammar",
         "grammar:generate": "pnpm --dir packages/syside-languageserver grammar:generate",
-        "grammar:watch": "pnpm --dir packages/syside-languageserver grammar:watch"
+        "grammar:watch": "pnpm --dir packages/syside-languageserver grammar:watch",
+        "update-stdlib": "node ./scripts/update-stdlib.mjs"
     },
     "devDependencies": {
         "@jest/expect-utils": "^29.4.3",
@@ -54,6 +55,7 @@
         "esbuild": "^0.17.10",
         "eslint": "^8.34.0",
         "eslint-config-prettier": "^8.8.0",
+        "eslint-plugin-deprecation": "^1.5.0",
         "eslint-plugin-prettier": "^5.0.0",
         "eslint-plugin-unused-imports": "^2.0.0",
         "expect": "^29.4.3",

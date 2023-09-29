@@ -9,6 +9,12 @@
             "path": "packages/syside-protocol/tsconfig.test.json"
         },
         {
+            "path": "packages/syside-base"
+        },
+        {
+            "path": "packages/syside-base/tsconfig.test.json"
+        },
+        {
             "path": "packages/syside-languageclient"
         },
         {

@@ -3,6 +3,7 @@
 module.exports = {
     ...require("./jest.config.base"),
     projects: [
+        "<rootDir>/packages/syside-base",
         "<rootDir>/packages/syside-protocol",
         "<rootDir>/packages/syside-languageclient",
         "<rootDir>/packages/syside-languageserver",

@@ -12,13 +12,5 @@
         "node_modules",
         "**/__test__",
         "**/__tests__"
-    ],
-    "references": [
-        {
-            "path": "../syside-base"
-        },
-        {
-            "path": "../syside-protocol"
-        }
     ]
 }
