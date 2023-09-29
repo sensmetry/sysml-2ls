@@ -6,6 +6,11 @@
 
 ## main
 
+### Improvements
+
+- Only relevant standard library files will be downloaded instead of the full
+  repository, greatly improving download times
+
 ### Chores
 
 - Added methods to add and remove owned child elements

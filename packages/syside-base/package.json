@@ -1,7 +1,7 @@
 {
-    "name": "syside-languageclient",
-    "displayName": "SysIDE Language Client Extensions",
-    "description": "Language client extensions for SysIDE.",
+    "name": "syside-base",
+    "displayName": "SysIDE-base",
+    "description": "Base SysIDE utilities.",
     "publisher": "Sensmetry",
     "author": {
         "name": "Sensmetry",
@@ -13,7 +13,7 @@
     "repository": {
         "url": "https://gitlab.com/sensmetry/public/sysml-2ls",
         "type": "git",
-        "directory": "packages/syside-languageclient"
+        "directory": "packages/syside-base"
     },
     "bugs": {
         "url": "https://gitlab.com/sensmetry/public/sysml-2ls/-/issues"
@@ -33,13 +33,6 @@
         "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
         "index": "node ../../scripts/generate-index.mjs src"
     },
-    "dependencies": {
-        "fs-extra": "^11.1.0",
-        "syside-base": "workspace:*",
-        "syside-protocol": "workspace:*",
-        "vscode-languageserver": "~8.0.2"
-    },
-    "devDependencies": {
-        "@types/fs-extra": "^11.0.1"
-    }
+    "dependencies": {},
+    "devDependencies": {}
 }

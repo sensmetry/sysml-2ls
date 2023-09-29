@@ -18,6 +18,7 @@ import path from "path";
 import { ExecuteCommandRequest, ProtocolConnection } from "vscode-languageserver";
 import { cacheDir } from "./download";
 import { FindStdlibRequest, RegisterTextEditorCommandsRequest } from "syside-protocol";
+import { STDLIB } from "syside-base";
 
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -45,7 +46,7 @@ export abstract class SysMLClientExtender {
      * Client config
      */
     config: ClientConfig = {
-        stdlibUrl: this.stdlibRepoZipUrl,
+        version: STDLIB.version,
     };
 
     /**
@@ -115,24 +116,43 @@ export abstract class SysMLClientExtender {
 
     /**
      * URL to a zip file of a compatible SysML v2 Release repo version
+     * @deprecated use {@link stdlibURL} and {@link stdlibFiles} to download files separately instead
      */
     protected get stdlibRepoZipUrl(): string {
-        //  TODO: download only a folder somehow (~35 times less data used)
-        return "https://github.com/Systems-Modeling/SysML-v2-Release/archive/refs/tags/2023-02.zip";
+        return versionToRepoZip(STDLIB.version);
+    }
+
+    /**
+     * URL of the standard library to which {@link stdlibFiles} can be resolved
+     * to
+     */
+    protected get stdlibURL(): string {
+        return STDLIB.raw;
+    }
+
+    /**
+     * Relative paths of all files in the standard library that need to be downloaded
+     */
+    protected get stdlibFiles(): readonly string[] {
+        return STDLIB.files;
+    }
+
+    protected get cacheDir(): string {
+        return cacheDir();
     }
 
     /**
      * Path to where the standard library may be cached
      */
     protected get stdlibDir(): string {
-        return path.join(cacheDir(), "sysml.library");
+        return path.join(this.cacheDir, "sysml.library");
     }
 
     /**
      * Path to persistent config
      */
     protected get configPath(): string {
-        return path.join(cacheDir(), ".config");
+        return path.join(this.cacheDir, ".config");
     }
 
     /**
@@ -141,9 +161,20 @@ export abstract class SysMLClientExtender {
     private async initializeClient(): Promise<void> {
         let config = await this.loadConfig();
 
-        if (config?.stdlibUrl !== this.stdlibRepoZipUrl) {
+        if (
+            !config ||
+            (config.version
+                ? config.version !== STDLIB.version
+                : // checking for backwards compatibility
+                  // eslint-disable-next-line deprecation/deprecation
+                  config.stdlibUrl !== this.stdlibRepoZipUrl)
+        ) {
             await this.maybeUpdateDownloadedStdlib();
-            if (config) config.stdlibUrl = this.stdlibRepoZipUrl;
+            if (config) {
+                // eslint-disable-next-line deprecation/deprecation
+                if (config.stdlibUrl) config.stdlibUrl = undefined;
+                config.version = STDLIB.version;
+            }
         }
 
         if (!config) config = this.config;
@@ -180,6 +211,16 @@ export abstract class SysMLClientExtender {
 export interface ClientConfig {
     /**
      * Compatible standard library URL used the last time the client was run
+     * @deprecated compare against {@link version} instead
      */
-    stdlibUrl: string;
+    stdlibUrl?: string;
+
+    /**
+     * Compatible standard library tag used the last time the client was run
+     */
+    version: string;
+}
+
+function versionToRepoZip(version: string): string {
+    return `https://github.com/Systems-Modeling/SysML-v2-Release/archive/refs/tags/${version}.zip`;
 }

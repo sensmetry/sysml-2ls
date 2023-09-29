@@ -29,7 +29,7 @@ describe("Validation registry", () => {
     describe("Custom validations", () => {
         let unregister: Disposable;
         beforeEach(() => {
-            unregister = registry.registerValidationRule(Package, () => {
+            unregister = registry.registerModelValidationRule(Package, () => {
                 /* empty */
             });
         });
