@@ -191,6 +191,13 @@ export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
                 DocumentState[targetState]
             } in ${timer.elapsed().toFixed(3)} ms`
         );
+
+        if (targetState === DocumentState.Parsed) {
+            const docs = documents.filter((doc) => doc.state === DocumentState.Parsed);
+            const bytes = docs.reduce((total, doc) => total + doc.textDocument.getText().length, 0);
+            const duration = docs.reduce((total, doc) => total + doc.parseDuration, 0);
+            console.log("   Average parse speed:", (bytes / duration).toFixed(0), "bytes/ms");
+        }
     }
 
     /**
