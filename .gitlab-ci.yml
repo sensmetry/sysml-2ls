@@ -3,7 +3,7 @@ variables:
   EXTENSION_NAME: $PACKAGE_NAME-${CI_COMMIT_SHORT_SHA}
   EXTENSION_PATH: $CI_PROJECT_DIR/$EXTENSION_NAME.vsix
   SERVER_FILENAME: syside-languageserver.js
-  SERVER_RELPATH: packages/syside-vscode/out/language-server/main.js
+  SERVER_RELPATH: packages/syside-vscode/dist/node/language-server/main.js
   SERVER_PATH: $CI_PROJECT_DIR/$SERVER_RELPATH
 
 default:

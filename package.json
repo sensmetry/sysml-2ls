@@ -64,6 +64,7 @@
         "jest-junit": "^15.0.0",
         "jest-matcher-utils": "^29.4.3",
         "jest-snapshot": "^29.5.0",
+        "node-stdlib-browser": "^1.2.0",
         "octokit": "^2.0.14",
         "prettier": "^3.0.0",
         "shx": "^0.3.4",

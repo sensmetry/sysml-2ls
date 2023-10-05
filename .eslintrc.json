@@ -65,6 +65,8 @@
     "ignorePatterns": [
         "**/generated/**",
         "**/lib/**",
-        "**/out/**"
+        "**/out/**",
+        "**/dist/**",
+        "**/scripts/**"
     ]
 }

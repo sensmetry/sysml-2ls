@@ -92,8 +92,29 @@
                 "--extensionDevelopmentPath=${workspaceFolder}/packages/syside-vscode"
             ],
             "outFiles": [
-                "${workspaceFolder}/packages/*/out/*.js",
-                "${workspaceFolder}/packages/*/lib/*.js",
+                "${workspaceFolder}/packages/*/out/**/*.js",
+                "${workspaceFolder}/packages/*/dist/**/*.js",
+                "${workspaceFolder}/packages/*/lib/**/*.js",
+                "!**/node_modules/**"
+            ],
+            "env": {
+                // same socket as attach port
+                "DEBUG_SOCKET": "8008"
+            }
+        },
+        {
+            "name": "Run Web Extension",
+            "type": "extensionHost",
+            "debugWebWorkerHost": true,
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/packages/syside-vscode",
+                "--extensionDevelopmentKind=web"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/packages/*/out/**/*.js",
+                "${workspaceFolder}/packages/*/dist/**/*.js",
+                "${workspaceFolder}/packages/*/lib/**/*.js",
                 "!**/node_modules/**"
             ],
             "env": {
@@ -110,8 +131,9 @@
                 "--extensionDevelopmentPath=${workspaceFolder}/packages/syside-vscode"
             ],
             "outFiles": [
-                "${workspaceFolder}/packages/*/out/*.js",
-                "${workspaceFolder}/packages/*/lib/*.js",
+                "${workspaceFolder}/packages/*/out/**/*.js",
+                "${workspaceFolder}/packages/*/dist/**/*.js",
+                "${workspaceFolder}/packages/*/lib/**/*.js",
                 "!**/node_modules/**"
             ],
             "env": {
@@ -130,7 +152,7 @@
             ],
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceFolder}/packages/*/out/**/*.js",
+                "${workspaceFolder}/packages/*/dist/**/*.js",
                 "${workspaceFolder}/node_modules/langium"
             ]
         },

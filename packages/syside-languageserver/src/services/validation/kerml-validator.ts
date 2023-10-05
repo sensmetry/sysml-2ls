@@ -44,22 +44,22 @@ import {
     TypeMeta,
 } from "../../model";
 import { SysMLSharedServices } from "../services";
-import { SysMLConfigurationProvider } from "../shared/workspace/configuration-provider";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
 import { SysMLType } from "../sysml-ast-reflection";
 import { ModelValidationAcceptor, validateKerML } from "./validation-registry";
 import { NonNullable } from "../../utils";
+import { SysMLFileSystemProvider } from "../shared";
 
 /**
  * Implementation of custom validations.
  */
 export class KerMLValidator {
     protected readonly index: SysMLIndexManager;
-    protected readonly config: SysMLConfigurationProvider;
+    protected readonly fs: SysMLFileSystemProvider;
 
     constructor(services: SysMLSharedServices) {
         this.index = services.workspace.IndexManager;
-        this.config = services.workspace.ConfigurationProvider;
+        this.fs = services.workspace.FileSystemProvider;
     }
 
     @validateKerML(ast.Type, { sysml: false })
@@ -261,13 +261,13 @@ export class KerMLValidator {
             );
         };
 
-        const std = this.config.stdlibUriString;
+        const std = this.fs.standardLibrary;
         if (!std) {
             emit();
             return;
         }
 
-        if (!node.document.uriString.startsWith(std)) {
+        if (!node.document.uriString.startsWith(std.toString())) {
             emit();
         }
     }

@@ -33,6 +33,7 @@
         "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
         "index": "node ../../scripts/generate-index.mjs src"
     },
-    "dependencies": {},
-    "devDependencies": {}
+    "dependencies": {
+        "vscode-uri": "~3.0.7"
+    }
 }

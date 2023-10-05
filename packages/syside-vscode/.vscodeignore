@@ -10,6 +10,7 @@
 .github
 .swcrc
 .pnpm-store
+.vscode-tests-web
 
 # CI artifacts
 release.env

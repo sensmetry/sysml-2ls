@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { InvalidArgumentError, Option } from "commander";
+import { Command, InvalidArgumentError, Option } from "commander";
 import { assertUnreachable } from "langium";
 import { Socket, createConnection } from "net";
 import {
@@ -27,12 +27,9 @@ import {
     SocketMessageReader,
     SocketMessageWriter,
 } from "vscode-languageserver/node";
-import {
-    ArgParser,
-    createArgParser as _createArgParser,
-    DefaultLauncherOptions,
-    LauncherOptions,
-} from "../launch";
+import { ArgParser, DefaultLauncherOptions } from "./arg-parser";
+import { LauncherOptions } from "../launch";
+import { Version } from "../version";
 
 export interface StdioTransport {
     /**
@@ -83,12 +80,16 @@ export const DefaultNodeLauncherOptions: LauncherOptions = {
 export function createArgParser<O extends NodeLauncherOptions = NodeLauncherOptions>(
     options: LauncherOptions = DefaultNodeLauncherOptions
 ): ArgParser<O> {
-    const parser = _createArgParser<O>(options);
+    const command = new Command()
+        .version(Version)
+        .description("SysIDE")
+        .showHelpAfterError(true)
+        .name("Launch SysIDE");
 
     // need to sanitize args for leading `=` since that is what
     // vscode-languageclient passes
     // exposing all implicit vscode-languageserver options here
-    parser.command
+    command
         .addOption(
             new Option("--node-ipc", "Use Node IPC for LSP communication").conflicts([
                 "stdio",
@@ -135,7 +136,13 @@ export function createArgParser<O extends NodeLauncherOptions = NodeLauncherOpti
             sanitizedArgHandler(parsePositiveInt)
         );
 
-    return parser;
+    return {
+        command,
+        parse: (argv, opts): O => {
+            command.parse(argv, opts);
+            return { ...options, ...command.opts<O>() };
+        },
+    };
 }
 
 export function parsePositiveInt(value: string): number {

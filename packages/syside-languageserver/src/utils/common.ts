@@ -18,7 +18,7 @@ import { AstNode, CstNode, DeepPartial, OperationCancelled } from "langium";
 import { isAbstractRule, isRuleCall } from "langium/lib/grammar/generated/ast";
 import { CancellationToken, Range } from "vscode-languageserver";
 import { Element, isElementReference } from "../generated/ast";
-import { performance } from "perf_hooks";
+import now from "performance-now";
 import { isMetamodel } from "../model";
 import path from "path";
 
@@ -263,21 +263,21 @@ export type AssignableKeys<T, V> = { [K in keyof T]-?: V extends T[K] ? K : neve
 export class Timer {
     private start: number;
     constructor() {
-        this.start = performance.now();
+        this.start = now();
     }
 
     /**
      * @returns Time elapsed in ms since construction or last {@link reset}
      */
     elapsed(): number {
-        return performance.now() - this.start;
+        return now() - this.start;
     }
 
     /**
      * Reset timer start point
      */
     reset(): void {
-        this.start = performance.now();
+        this.start = now();
     }
 }
 
@@ -486,14 +486,14 @@ export async function asyncWaitWhile(
 ): Promise<void> {
     let end: number | undefined;
     if (timeout) {
-        const start = performance.now();
+        const start = now();
         end = start + timeout;
     }
 
     return new Promise((resolve, reject) => {
         const check = (): void => {
             if (!condition()) resolve();
-            else if (end && performance.now() > end) reject(OperationCancelled);
+            else if (end && now() > end) reject(OperationCancelled);
             else if (cancelToken.isCancellationRequested) reject(OperationCancelled);
             else setTimeout(check, period);
         };

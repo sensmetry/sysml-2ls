@@ -22,6 +22,11 @@ import * as fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import process from "node:process";
 import path from "node:path";
+import plugin from "node-stdlib-browser/helpers/esbuild/plugin";
+import stdLibBrowser from "node-stdlib-browser";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /** @type {esbuild.Plugin} */
@@ -85,9 +90,67 @@ export const Builds = {
     browser: (entries) => ({
         ...Options,
         platform: "browser",
-        format: "iife",
+        // iife doesn't work in VSCode
+        format: "cjs",
 
         entryPoints: entries,
+        inject: [require.resolve("node-stdlib-browser/helpers/esbuild/shim")],
+        define: {
+            global: "global",
+            process: "process",
+            Buffer: "Buffer",
+        },
+        plugins: [
+            ...Options.plugins,
+            plugin(stdLibBrowser),
+            {
+                name: "fetch-shim",
+                setup(build) {
+                    build.onResolve({ filter: /^node-fetch$/ }, (args) => {
+                        return { path: args.path, namespace: "fetch" };
+                    });
+
+                    build.onLoad({ filter: /./, namespace: "fetch" }, (args) => {
+                        return {
+                            contents: "module.exports = fetch",
+                            loader: "js",
+                        };
+                    });
+                },
+            },
+            {
+                // For some reason ESBuild resolves to UMD by default which may
+                // use `require` which only works with "vscode" literal on the
+                // web. Thankfully, ESM version is also bundled which doesn't
+                // use `require` anywhere.
+                name: "vscode-umd-redirect",
+                setup(build) {
+                    build.onResolve(
+                        {
+                            filter: /vscode-(languageserver-(types|textdocument)|uri)/,
+                            namespace: "file",
+                        },
+                        async (args) => {
+                            const result = await build.resolve(args.path, {
+                                importer: args.importer,
+                                kind: args.kind,
+                                // different namespace to avoid infinite resolve
+                                // loops
+                                namespace: "redirect",
+                                pluginData: args.pluginData,
+                                resolveDir: args.resolveDir,
+                            });
+
+                            if (result.errors.length > 0) {
+                                return { errors: result.errors };
+                            }
+
+                            return { ...result, path: result.path.replace("/umd", "/esm") };
+                        }
+                    );
+                },
+            },
+        ],
     }),
 };
 

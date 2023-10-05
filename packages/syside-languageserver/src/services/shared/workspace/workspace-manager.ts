@@ -26,10 +26,11 @@ import { URI, Utils } from "vscode-uri";
 import { SysMLSharedServices } from "../../services";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { FindStdlibRequest } from "syside-protocol";
-import { performance } from "perf_hooks";
+import now from "performance-now";
 import { SysMLFileSystemProvider } from "./file-system-provider";
 import { ExtensionManager } from "../extension-manager";
 import path from "path";
+import { isUriLike, pathToURI } from "syside-base";
 
 /**
  * Extension of Langium workspace manager that loads the standard library on
@@ -74,6 +75,7 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
             const uri = URI.parse(folder.uri);
             this.extensions.loadScripts(
                 plugins.map((plugin) => {
+                    if (isUriLike(plugin)) return URI.parse(plugin);
                     if (path.isAbsolute(plugin)) return URI.file(plugin);
                     return Utils.joinPath(uri, plugin);
                 })
@@ -90,7 +92,7 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
         const config = this.config.get();
         if (!config.standardLibrary) return;
 
-        let dir = this.config.stdlibUri;
+        let dir = this.fileSystemProvider.standardLibrary;
         if (!dir || !this.fileSystemProvider.existsSync(dir)) {
             if (dir) {
                 // path is set but it doesn't exist, maybe a user error?
@@ -104,12 +106,12 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
             // no path set so request client to find one
             const result = await this.requestClientStdlibDir();
             if (!result) return;
-            dir = URI.file(result);
+            dir = pathToURI(result);
         }
 
         const content = await this.fileSystemProvider.readDirectory(dir);
 
-        const collected: string[] = [];
+        const collected: URI[] = [];
         const fileExtensions = this.serviceRegistry.all.flatMap(
             (e) => e.LanguageMetaData.fileExtensions
         );
@@ -117,15 +119,26 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
             if (!this.includeEntry(folders[0], node, fileExtensions)) continue;
 
             if (node.isFile) {
-                const document = this.langiumDocuments.getOrCreateDocument(node.uri);
-                collector(document);
-                collected.push(node.uri.toString());
+                collected.push(node.uri);
             } else {
                 content.push(...(await this.fileSystemProvider.readDirectory(node.uri)));
             }
         }
 
-        console.log(`Collected standard library:\n${JSON.stringify(collected, undefined, 2)}`);
+        // Preload all documents on the web asynchronously since
+        // `getOrCreatedDocument` would otherwise fail as it uses sync overload.
+        // Async here has great performance benefits as we are actually fetching
+        // documents from another site and browsers can easily parallelize it.
+        await this.fileSystemProvider.preloadFiles(collected);
+        collected.forEach((uri) => collector(this.langiumDocuments.getOrCreateDocument(uri)));
+
+        console.log(
+            `Collected standard library:\n${JSON.stringify(
+                collected.map((uri) => uri.toString()),
+                undefined,
+                2
+            )}`
+        );
 
         return;
     }
@@ -139,12 +152,12 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
         if (!this.connection) return;
 
         // install progress handler to keep delaying timeout on alive clients
-        let end = performance.now() + 5000;
+        let end = now() + 5000;
         const disposable = this.connection?.onProgress(
             FindStdlibRequest.type,
             FindStdlibRequest.ProgressToken,
             () => {
-                end = performance.now() + 5000;
+                end = now() + 5000;
             }
         );
 
@@ -153,7 +166,7 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
         const timeout = new Promise<void>((resolve, reject) => {
             const check = (): void => {
                 if (resolved) resolve();
-                else if (performance.now() > end) reject(OperationCancelled);
+                else if (now() > end) reject(OperationCancelled);
                 else setTimeout(check, 1000);
             };
             check();

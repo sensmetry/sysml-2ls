@@ -20,7 +20,7 @@ import child_process from "child_process";
 
 const exec = util.promisify(child_process.exec);
 
-exec("pnpm run esbuild-base --minify")
+exec("pnpm run esbuild")
     .then(() =>
         Promise.all(
             [
