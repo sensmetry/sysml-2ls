@@ -14,8 +14,18 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * from "./evaluator";
-export * from "./extension-manager";
-export * from "./model-utils";
-export * from "./service-registry";
-export * from "./workspace";
+import { DefaultServiceRegistry } from "langium";
+import { URI } from "vscode-uri";
+import { SysMLDefaultServices } from "../services";
+
+export class SysMLServiceRegistry extends DefaultServiceRegistry {
+    override getServices(uri: URI): SysMLDefaultServices {
+        try {
+            return super.getServices(uri) as SysMLDefaultServices;
+        } catch (_) {
+            const services = this.singleton ?? this.map?.[".sysml"];
+            if (!services) throw new Error("No services registered!");
+            return services as SysMLDefaultServices;
+        }
+    }
+}

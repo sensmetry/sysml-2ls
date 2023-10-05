@@ -25,7 +25,7 @@ import { CancellationToken, Disposable } from "vscode-languageserver";
 import { SysMLSharedServices } from "../../services";
 import { erase, mergeWithPartial, Statistics, Timer } from "../../../utils/common";
 import { URI } from "vscode-uri";
-import { performance } from "perf_hooks";
+import now from "performance-now";
 import { BuildProgress } from "./documents";
 import { SysMLConfigurationProvider } from "./configuration-provider";
 import { SysMLIndexManager } from "./index-manager";
@@ -103,7 +103,7 @@ export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
 
         // tracking of open documents to skip document unnecessary updates
         services.workspace.TextDocuments.onDidOpen((e) => {
-            this.openDocuments.set(e.document.uri, performance.now());
+            this.openDocuments.set(e.document.uri, now());
         });
         services.workspace.TextDocuments.onDidClose((e) => {
             this.openDocuments.delete(e.document.uri);
@@ -224,7 +224,7 @@ export class SysMLDocumentBuilder extends DefaultDocumentBuilder {
             // update if the document is still closed
             if (!openingTime) return true;
             // update if the document has been open for a while
-            if (performance.now() - openingTime > 10) return true;
+            if (now() - openingTime > 10) return true;
             const document = this.langiumDocuments.getOrCreateDocument(uri);
             // update if the document hasn't been fully built yet
             return document.state < DocumentState.Validated;

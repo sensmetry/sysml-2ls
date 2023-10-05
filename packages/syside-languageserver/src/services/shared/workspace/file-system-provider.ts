@@ -23,6 +23,10 @@ import { URI } from "vscode-uri";
  * Extended {@link FileSystemProvider} that provides methods to check if path is valid
  */
 export interface SysMLFileSystemProvider extends FileSystemProvider {
+    get standardLibrary(): URI | undefined;
+    updateStandardLibrary(value: string | undefined): void;
+    get extensionDir(): URI | undefined;
+
     /**
      * Checks if the given path exists asynchronously
      * @return promise that resolves to true if path exists and false otherwise
@@ -34,17 +38,36 @@ export interface SysMLFileSystemProvider extends FileSystemProvider {
      * @return true if path exists and false otherwise
      */
     existsSync(path: URI): boolean;
+
+    loadScript(path: URI): Promise<object | undefined>;
+    preloadFiles(paths: readonly URI[]): Promise<void>;
 }
 
 export class SysMLEmptyFileSystemProvider
     extends EmptyFileSystemProvider
     implements SysMLFileSystemProvider
 {
+    get standardLibrary(): URI | undefined {
+        return;
+    }
+    updateStandardLibrary(value: string | undefined): void {
+        return;
+    }
+    get extensionDir(): URI | undefined {
+        return;
+    }
+
     async exists(path: URI): Promise<boolean> {
         return false;
     }
     existsSync(path: URI): boolean {
         return false;
+    }
+    loadScript(path: URI): Promise<object | undefined> {
+        throw new Error("Method not implemented.");
+    }
+    async preloadFiles(paths: readonly URI[]): Promise<void> {
+        return;
     }
 }
 

@@ -14,7 +14,6 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import fs from "fs-extra";
 import path from "path";
 import os from "os";
 
@@ -42,7 +41,6 @@ export function formatBytes(bytes: number, fractionDigits = 2): string {
 }
 
 /**
- * @see {@link mkTmpdir}
  * @returns temporary directory that can be used for downloads
  */
 export function tmpdir(): string {
@@ -55,24 +53,4 @@ export function tmpdir(): string {
  */
 export function cacheDir(): string {
     return path.join(os.homedir(), ".sysml-2ls");
-}
-
-/**
- * @see {@link tmpdir}
- * @returns a valid temporary directory that can be used for downloads
- */
-export async function mkTmpdir(): Promise<string> {
-    const dir = tmpdir();
-    if (!(await fs.exists(dir))) await fs.mkdir(dir);
-    return dir;
-}
-
-/**
- * @see {@link cacheDir}
- * @returns a valid directory that can be used to for persistent caching
- */
-export async function mkCacheDir(): Promise<string> {
-    const dir = cacheDir();
-    if (!(await fs.exists(dir))) await fs.mkdir(dir);
-    return dir;
 }

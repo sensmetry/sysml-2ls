@@ -15,48 +15,18 @@
  ********************************************************************************/
 
 import * as vscode from "vscode";
-import * as path from "path";
-import {
-    LanguageClient,
-    LanguageClientOptions,
-    ServerOptions,
-    TransportKind,
-} from "vscode-languageclient/node";
-import { SysMLVSCodeClientExtender } from "./vscode";
-import { URI, Utils } from "vscode-uri";
-import { uriToFsPath } from "vscode-uri/lib/umd/uri";
 import { LanguageClientExtension, ServerConfig } from "syside-languageclient";
 import { NonNullable } from "syside-languageserver";
+import { Utils, URI } from "vscode-uri";
+import path from "path";
+import { LanguageClientOptions } from "vscode-languageclient";
+import { isUriLike } from "syside-base";
 
 type ClientExtension = LanguageClientExtension<vscode.ExtensionContext>;
-type Extension = {
+export type Extension = {
     id: string;
     api: ClientExtension;
 };
-
-let data: {
-    client: LanguageClient;
-    extensions: Extension[];
-};
-
-// This function is called when the extension is activated.
-export async function activate(context: vscode.ExtensionContext): Promise<LanguageClient> {
-    data = await startLanguageClient(context);
-    return data.client;
-}
-
-// This function is called when the extension is deactivated.
-export async function deactivate(): Promise<void> {
-    if (data) {
-        await runExtensions(data.extensions, "onDeactivate", data.client);
-        return data.client.stop();
-    }
-    return;
-}
-
-interface ClientConfig {
-    extensions: string[];
-}
 
 async function collectExtensions(ids: string[]): Promise<Extension[]> {
     return Promise.allSettled(
@@ -93,7 +63,7 @@ async function collectExtensions(ids: string[]): Promise<Extension[]> {
     );
 }
 
-async function runExtensions<K extends keyof ClientExtension>(
+export async function runExtensions<K extends keyof ClientExtension>(
     extensions: Extension[],
     method: K,
     ...args: Parameters<ClientExtension[K]>
@@ -117,7 +87,19 @@ async function runExtensions<K extends keyof ClientExtension>(
     );
 }
 
-async function startLanguageClient(context: vscode.ExtensionContext): Promise<typeof data> {
+interface ClientConfig {
+    extensions: string[];
+}
+
+export async function initialize(
+    context: vscode.ExtensionContext,
+    root: string
+): Promise<{
+    config: ServerConfig;
+    extensions: Extension[];
+    serverModule: vscode.Uri;
+    clientOptions: LanguageClientOptions;
+}> {
     const config = vscode.workspace.getConfiguration("sysml");
     const clientConfig: Partial<ClientConfig> = config.client;
     const extensions = await collectExtensions(clientConfig.extensions ?? []);
@@ -136,20 +118,19 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<ty
     };
     await runExtensions(extensions, "onBeforeStart", context, serverConfig);
 
-    let serverModule: string;
+    let serverModule: vscode.Uri;
     if (serverConfig.path) {
         if (path.isAbsolute(serverConfig.path)) {
-            serverModule = serverConfig.path;
+            serverModule = vscode.Uri.file(serverConfig.path);
+        } else if (isUriLike(serverConfig.path)) {
+            serverModule = vscode.Uri.parse(serverConfig.path);
         } else {
             serverModule = vscode.workspace.workspaceFolders?.at(0)
-                ? uriToFsPath(
-                      Utils.resolvePath(
-                          vscode.workspace.workspaceFolders.at(0)?.uri as URI,
-                          serverConfig.path
-                      ),
-                      true
+                ? Utils.resolvePath(
+                      vscode.workspace.workspaceFolders.at(0)?.uri as URI,
+                      serverConfig.path
                   )
-                : path.resolve(serverConfig.path);
+                : vscode.Uri.file(path.resolve(serverConfig.path));
         }
 
         console.info(
@@ -160,64 +141,20 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<ty
             )}`
         );
     } else {
-        serverModule = context.asAbsolutePath(path.join("out", "language-server", "main"));
+        serverModule = vscode.Uri.joinPath(
+            context.extensionUri,
+            `dist/${root}/language-server/main.js`
+        );
     }
-
-    // The debug options for the server --inspect=6009: runs the server in
-    // Node's Inspector mode so VS Code can attach to the server for debugging.
-    // By setting `process.env.DEBUG_BREAK` to a truthy value, the language
-    // server will wait until a debugger is attached.
-    const debugOptions = {
-        execArgv: [
-            "--nolazy",
-            `--inspect${process.env.DEBUG_BREAK ? "-brk" : ""}=${
-                process.env.DEBUG_SOCKET || "6009"
-            }`,
-        ],
-    };
-
-    // If the extension is launched in debug mode then the debug server options
-    // are used Otherwise the run options are used
-    const serverOptions: ServerOptions = {
-        run: {
-            module: serverModule,
-            transport: TransportKind.ipc,
-            args: serverConfig.args.run.map(String),
-        },
-        debug: {
-            module: serverModule,
-            transport: TransportKind.ipc,
-            options: debugOptions,
-            args: serverConfig.args.debug.map(String),
-        },
-    };
-
-    const sysmlWatcher = vscode.workspace.createFileSystemWatcher("**/*.sysml");
-    const kermlWatcher = vscode.workspace.createFileSystemWatcher("**/*.kerml");
-    context.subscriptions.push(kermlWatcher, sysmlWatcher);
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [
-            { scheme: "file", language: "sysml" },
-            { scheme: "file", language: "kerml" },
-        ],
-        synchronize: {
-            // Notify the server about file changes to files contained in the
-            // workspace
-            fileEvents: [sysmlWatcher, kermlWatcher],
-        },
+        // Use sysml by default, no scheme to work on the web and untitled
+        // files. KerML requires pattern to not accidentally parse KerML files
+        // as SysML for untitled files.
+        documentSelector: [{ language: "sysml" }, { language: "kerml", pattern: ".kerml" }],
+        synchronize: {},
     };
 
-    // Create the language client and start the client.
-    const client = new LanguageClient("sysml", "sysml", serverOptions, clientOptions);
-
-    // Start the client. This will also launch the server
-    await new SysMLVSCodeClientExtender(context).extend(client);
-    await client.start();
-    // commands registered in execute command handler seem to be automatically
-    // registered with VSCode
-
-    await runExtensions(extensions, "onStarted", context, client);
-    return { client, extensions };
+    return { config: serverConfig, extensions, serverModule, clientOptions };
 }

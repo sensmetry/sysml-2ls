@@ -8,6 +8,15 @@
 
 ### Improvements
 
+- VSCode extension now works on the web with a few differences:
+  - `sysml.standardLibraryPath` is ignored, standard library is fetched directly
+    from GitHub
+  - `sysml.plugins` is ignored
+
+  Performance on the web may be degraded as the server has to share resources
+  with other extensions. In addition, selecting SysML language will now provide
+  language server support irrespective of the file extension, KerML files have
+  to have `.kerml` extension to get support
 - Only relevant standard library files will be downloaded instead of the full
   repository, greatly improving download times
 

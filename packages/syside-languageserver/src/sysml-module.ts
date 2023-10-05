@@ -71,6 +71,7 @@ import { LanguageEvents, SharedEvents } from "./services/events";
 import { ExtensionManager } from "./services/shared/extension-manager";
 import { ModelUtil } from "./services/shared/model-utils";
 import { SysMLExpressionEvaluator } from "./services/shared/evaluator";
+import { SysMLServiceRegistry } from "./services";
 
 /**
  * Dependency injection module that overrides Langium default services and
@@ -129,6 +130,7 @@ export const SysMLSharedModule: Module<
             workspace: PartialKeys<SysMLAddedSharedServices["workspace"], "FileSystemProvider">;
         }
 > = {
+    ServiceRegistry: () => new SysMLServiceRegistry(),
     AstReflection: () => new SysMLAstReflection(), // handling for chain references
     workspace: {
         DocumentBuilder: (services) => new SysMLDocumentBuilder(services),

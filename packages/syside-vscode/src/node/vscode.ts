@@ -14,42 +14,20 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ClientConfig, SysMLClientExtender } from "syside-languageclient";
+import { ClientConfig } from "syside-languageclient";
 import * as vscode from "vscode";
-import { TextEditor } from "syside-protocol";
-import { TextDocumentIdentifier } from "vscode-languageserver";
 import fs from "fs-extra";
 import path from "path";
-import type CONFIG from "../package.json";
+import type CONFIG from "../../package.json";
 import fetch from "node-fetch";
+import { BaseSysMLVSCodeClientExtender } from "../common/vscode";
 
 type Options = keyof typeof CONFIG.contributes.configuration.properties;
 
 /**
  * SysML language client for VS Code.
  */
-export class SysMLVSCodeClientExtender extends SysMLClientExtender {
-    protected readonly context: vscode.ExtensionContext;
-
-    constructor(context: vscode.ExtensionContext) {
-        super();
-        this.context = context;
-    }
-
-    protected registerTextEditorCommand(
-        command: string,
-        execute: (editor: TextEditor) => Promise<unknown>
-    ): void {
-        const disposable = vscode.commands.registerTextEditorCommand(command, (editor) =>
-            execute({
-                document: TextDocumentIdentifier.create(editor.document.uri.toString()),
-                selection: editor.selection,
-                selections: editor.selections,
-            })
-        );
-        this.context.subscriptions.push(disposable);
-    }
-
+export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
     protected async selectStdlibPath(): Promise<string | undefined> {
         const answer = await vscode.window.showInformationMessage(
             "The SysML v2 standard library was not found, would you like to download or locate it in the filesystem?",

@@ -15,13 +15,12 @@
  ********************************************************************************/
 
 import { DeepPartial, DefaultConfigurationProvider } from "langium";
-import path from "path";
 import { DidChangeConfigurationNotification } from "vscode-languageserver";
-import { URI } from "vscode-uri";
-import { backtrackToDirname, mergeWithPartial } from "../../../utils/common";
+import { mergeWithPartial } from "../../../utils/common";
 import { SysMLConfig } from "../../config";
 import { LanguageConfig, LanguageEvents, SharedEvents } from "../../events";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
+import { SysMLFileSystemProvider } from "./file-system-provider";
 
 export const SETTINGS_KEY = "sysml";
 
@@ -32,11 +31,12 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
         string,
         LanguageEvents["onConfigurationChanged"]
     >;
-    private _stdlibUri?: URI;
-    private _stdlibUriString?: string;
+    private fs: SysMLFileSystemProvider;
 
     constructor(services: SysMLSharedServices) {
         super(services);
+        this.fs = services.workspace.FileSystemProvider;
+
         this.updateStdlibPath(services.config);
 
         this.services = services;
@@ -112,42 +112,6 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
 
     private updateStdlibPath(config: SysMLConfig): void {
         const stdPath = config.standardLibraryPath;
-        this._stdlibUri = stdPath ? URI.file(path.resolve(stdPath)) : undefined;
-        this._stdlibUriString = this._stdlibUri?.toString();
-    }
-
-    private _extensionDir: string | undefined | null;
-
-    /**
-     * Extension root directory
-     */
-    get extensionDir(): string | undefined {
-        if (this._extensionDir !== undefined) return this._extensionDir ?? undefined;
-
-        const extensionDir = backtrackToDirname(__dirname, /out|src/);
-        this._extensionDir = extensionDir ?? null;
-
-        return extensionDir;
-    }
-
-    /**
-     * Standard library directory
-     */
-    get stdlibDir(): string | undefined {
-        return this.get().standardLibraryPath;
-    }
-
-    /**
-     * Standard library directory URI
-     */
-    get stdlibUri(): URI | undefined {
-        return this._stdlibUri;
-    }
-
-    /**
-     * Standard library directory URI as string
-     */
-    get stdlibUriString(): string | undefined {
-        return this._stdlibUriString;
+        this.fs.updateStandardLibrary(stdPath);
     }
 }

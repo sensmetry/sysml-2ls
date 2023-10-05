@@ -162,3 +162,5 @@ lib/
 
 # generated version files
 **/src/version.ts
+
+.vscode-test-web

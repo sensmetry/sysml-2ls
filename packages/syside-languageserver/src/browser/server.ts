@@ -14,25 +14,28 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { startLanguageServer } from "langium";
-import type { Connection } from "vscode-languageserver";
-import { createSysMLServices, SharedModuleContext } from "../sysml-module";
+import {
+    BrowserMessageReader,
+    BrowserMessageWriter,
+    createConnection,
+} from "vscode-languageserver/browser";
+import { createSysMLServices } from "../sysml-module";
+import { VirtualFileSystem } from "./virtual-file-system-provider";
+import { startServer as _startServer } from "../launch";
+
+declare const self: DedicatedWorkerGlobalScope;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface LauncherOptions {
-    // TODO: options for some fields in SysMLConfig
+export interface BrowserLaunchOptions {
+    // empty
 }
 
-export function startServer(
-    connection: Connection,
-    context: Omit<SharedModuleContext, "connection">,
-    options: LauncherOptions
-): ReturnType<typeof createSysMLServices> {
-    // Inject the shared services and language-specific services
-    const services = createSysMLServices({ connection, ...context }, options);
+export function startServer(options: BrowserLaunchOptions): ReturnType<typeof createSysMLServices> {
+    /* browser specific setup code */
+    const input = new BrowserMessageReader(self);
+    const output = new BrowserMessageWriter(self);
 
-    // Start the language server with the shared services
-    startLanguageServer(services.shared);
+    const connection = createConnection(input, output);
 
-    return services;
+    return _startServer(connection, VirtualFileSystem, options);
 }

@@ -15,34 +15,11 @@
  ********************************************************************************/
 
 import { Command, ParseOptions } from "commander";
-import { Version } from "../version";
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface LauncherOptions {
-    // TODO: options for some fields in SysMLConfig
-}
+import { LauncherOptions } from "../launch";
 
 export const DefaultLauncherOptions: Required<LauncherOptions> = {};
 
 export interface ArgParser<O extends LauncherOptions = LauncherOptions> {
     command: Command;
     parse(argv?: readonly string[], options?: ParseOptions): O;
-}
-
-export function createArgParser<O extends LauncherOptions = LauncherOptions>(
-    options: LauncherOptions = DefaultLauncherOptions
-): ArgParser<O> {
-    const command = new Command()
-        .version(Version)
-        .description("SysIDE")
-        .showHelpAfterError(true)
-        .name("Launch SysIDE");
-
-    return {
-        command,
-        parse: (argv, opts): O => {
-            command.parse(argv, opts);
-            return { ...options, ...command.opts<O>() };
-        },
-    };
 }

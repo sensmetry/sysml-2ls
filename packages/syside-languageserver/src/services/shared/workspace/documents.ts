@@ -22,13 +22,13 @@ import {
     MultiMap,
     ParseResult,
 } from "langium";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { streamAst } from "../../../utils";
 import { SysMLSharedServices } from "../../services";
 import { MetamodelBuilder } from "./metamodel-builder";
 import { SysMLConfigurationProvider } from "./configuration-provider";
-import { performance } from "perf_hooks";
+import now from "performance-now";
 import { ElementMeta } from "../../../model";
 import { ModelDiagnostic } from "../../validation";
 
@@ -133,9 +133,9 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
 
     protected override parse<T extends AstNode>(uri: URI, text: string): ParseResult<T> {
         if (!this.config.get().logStatistics) return super.parse<T>(uri, text);
-        const start = performance.now();
+        const start = now();
         const result = super.parse<T>(uri, text);
-        console.info(`Parsed ${uri.toString()} in ${(performance.now() - start).toFixed(2)} ms`);
+        console.info(`Parsed ${uri.toString()} in ${(now() - start).toFixed(2)} ms`);
         return result;
     }
 }

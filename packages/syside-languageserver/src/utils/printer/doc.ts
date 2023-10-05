@@ -16,8 +16,27 @@
  * Based on https://github.com/prettier/prettier
  ********************************************************************************/
 
-import stringWidth from "string-width";
+import _stringWidth from "string-width";
 import { SemanticTokenTypes } from "vscode-languageserver";
+
+const ansiRegex = new RegExp(
+    [
+        "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+        "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))",
+    ].join("|")
+);
+
+function stripAnsi(text: string): string {
+    return text.replace(ansiRegex, "");
+}
+
+function stringWidth(str: string): number {
+    // workaround for vscode.dev
+    if (!Intl.Segmenter) {
+        return stripAnsi(str).length;
+    }
+    return _stringWidth(str);
+}
 
 /**
  * Group ID type.

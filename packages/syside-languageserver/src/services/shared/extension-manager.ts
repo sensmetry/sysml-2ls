@@ -70,11 +70,11 @@ export class ExtensionManager {
      * @param file path to the script
      */
     protected async loadScript(file: URI): Promise<void> {
-        const module = await import(file.fsPath);
+        const module = await this.fileSystem.loadScript(file);
 
         let reason = "no 'activate' function found";
-        if ("activate" in module) {
-            if (module.activate instanceof Function) {
+        if (module && "activate" in module) {
+            if (typeof module.activate === "function") {
                 await module.activate(this.services);
                 console.log(`Plugin '${file.fsPath}' was activated.`);
                 return;
