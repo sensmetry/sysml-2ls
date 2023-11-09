@@ -15,14 +15,11 @@
  ********************************************************************************/
 
 import { LangiumDocument } from "langium";
-import {
-    AbstractKerMLCommentVisitor,
-    CstTextComment,
-    TextComment,
-    visitComments,
-} from "../../utils";
+import { CstTextComment, TextComment, visitComments } from "../../utils";
 import { BasicMetamodel } from "../metamodel";
 import { ElementReference } from "../../generated/ast";
+// import from utils results in a circular import...
+import { AbstractKerMLCommentVisitor } from "../../utils/comments/comments";
 
 export class KerMLCommentAttachVisitor extends AbstractKerMLCommentVisitor {
     override visit(comment: CstTextComment): void {

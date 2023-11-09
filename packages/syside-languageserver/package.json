@@ -34,7 +34,7 @@
     },
     "main": "./lib/index.js",
     "scripts": {
-        "prebuild": "cd src && node -p \"'export const Version = ' + JSON.stringify(require('../package.json').version) + ';'\" > version.ts",
+        "prebuild": "shx cp -R ./syntaxes ../syside-vscode/syntaxes && cd src && node -p \"'export const Version = ' + JSON.stringify(require('../package.json').version) + ';'\" > version.ts",
         "lint": "eslint src --ext ts --max-warnings 0",
         "clean": "shx rm -rf out lib coverage *.tsbuildinfo",
         "build": "pnpm run prebuild && tsc",
@@ -52,7 +52,7 @@
         "esbuild:watch": "pnpm run esbuild-base --sourcemap --watch",
         "prepare-validation": "node ./scripts/clone-sysml-release.mjs",
         "run-validation": "pnpx tsx ./scripts/run-validation.ts",
-        "grammar:generate": "langium generate",
+        "grammar:generate": "langium generate && shx cp -R ./syntaxes ../syside-vscode/syntaxes",
         "grammar:watch": "langium generate --watch"
     },
     "dependencies": {
