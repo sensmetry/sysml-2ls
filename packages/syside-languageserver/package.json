@@ -34,7 +34,7 @@
     },
     "main": "./lib/index.js",
     "scripts": {
-        "prebuild": "node -p \"'export const Version = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
+        "prebuild": "cd src && node -p \"'export const Version = ' + JSON.stringify(require('../package.json').version) + ';'\" > version.ts",
         "lint": "eslint src --ext ts --max-warnings 0",
         "clean": "shx rm -rf out lib coverage *.tsbuildinfo",
         "build": "pnpm run prebuild && tsc",
