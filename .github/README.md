@@ -8,7 +8,7 @@
 
 _SysIDE_ (pronounced "seaside") provides SysML v2 language support in VS Code.
 
-_SysIDE_ includes a language server for SysML v2 and KerML [2023-02 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-02) specifications. Together with VS Code, _SysIDE_ serves as integrated development environment (IDE) for SysML v2.
+_SysIDE_ includes a language server for SysML v2 and KerML [2023-08 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-08) specifications. Together with VS Code, _SysIDE_ serves as integrated development environment (IDE) for SysML v2.
 
 This extension provides:
 
@@ -32,7 +32,7 @@ The initial version has been created as an R&D effort, and contributions are hig
 
 1. Install the latest extension from the marketplace.
 2. Open a SysMLv2 (.sysml) file and the extension will activate.
-3. Upon the first activation a pop-up will be displayed asking you to either locate an existing SysMLv2 standard library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-02/sysml.library) repository) or download it. The pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support.
+3. Upon the first activation a pop-up will be displayed asking you to either locate an existing SysMLv2 standard library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-08/sysml.library) repository) or download it. The pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support.
 
 ## Features
 

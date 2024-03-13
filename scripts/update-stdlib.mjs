@@ -25,7 +25,7 @@ import { fileURLToPath } from "url";
  * in chronological order. Last tag is the one we currently support. Update this
  * by appending a new tag to the array.
  */
-const SUPPORTED_TAGS = ["2022-12", "2023-02"];
+const SUPPORTED_TAGS = ["2022-12", "2023-02", "2023-07.1", "2023-08"];
 
 const CURRENT_TAG = SUPPORTED_TAGS.at(-1);
 const PREVIOUS_TAG = SUPPORTED_TAGS.at(-2);

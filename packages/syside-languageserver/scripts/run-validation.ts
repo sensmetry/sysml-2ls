@@ -146,7 +146,7 @@ function validate(docs: LangiumDocument[], exportDiagnostics = false, ignoreKnow
             2
         );
         const file = path.join(__dirname, "expected-diagnostics.json");
-        fs.writeFileSync(path.join(__dirname, "expected-diagnostics.json"), str);
+        fs.writeFileSync(path.join(__dirname, "expected-diagnostics.json"), str + "\n");
         console.log(`Exported found diagnostics to ${file}`);
         return 0;
     }

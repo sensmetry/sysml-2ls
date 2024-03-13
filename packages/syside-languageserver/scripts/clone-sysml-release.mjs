@@ -28,9 +28,9 @@ const root = path.join(__dirname, "..", "..", "..");
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const checkout = () =>
-    exec("git checkout tags/2023-02", { cwd: path.join(root, "SysML-v2-Release") });
+    exec("git checkout tags/2023-08", { cwd: path.join(root, "SysML-v2-Release") });
 
 exec(
-    "git clone -n --shallow-exclude=2022-12 https://github.com/Systems-Modeling/SysML-v2-Release.git",
+    "git clone -n --shallow-exclude=2023-07.1 https://github.com/Systems-Modeling/SysML-v2-Release.git",
     { cwd: root }
 ).then(checkout, checkout);

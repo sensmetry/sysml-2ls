@@ -110,6 +110,9 @@ export function sanitizeTree(
 
     if (typeof node !== "object") return node;
 
+    const cached = cache.get(node);
+    if (cached) return cached;
+
     const o: SanitizedObject = {};
     cache.set(node, o);
 
