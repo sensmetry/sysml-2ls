@@ -30,7 +30,7 @@ import { makeLinkingScope, makeScope, SysMLScope } from "../utils/scopes";
 import { SysMLConfig } from "../services/config";
 import { Visibility } from "../utils/scope-util";
 import { expect } from "@jest/globals";
-import { BasicMetamodel, RelationshipMeta, attachNotes } from "../model";
+import { BasicMetamodel, PrintRange, RelationshipMeta, attachNotes } from "../model";
 import { SysMLType, SysMLInterface } from "../services";
 
 export const TEST_SERVER_OPTIONS: DeepPartial<SysMLConfig> = {
@@ -277,3 +277,15 @@ export async function parsedNode<K extends SysMLType>(
     expect(node).toBeDefined();
     return node as SysMLInterface<K>;
 }
+
+export const getRange = (text: string): { text: string; range: PrintRange } => {
+    const first = text.indexOf("|");
+    const last = text.lastIndexOf("|");
+    return {
+        text: text.replaceAll("|", ""),
+        range: {
+            offset: first,
+            end: last - 1,
+        },
+    };
+};

@@ -15,7 +15,8 @@
  ********************************************************************************/
 
 import { SemanticTokenModifiers } from "vscode-languageserver";
-import { ElementMeta, FeatureMeta } from "../KerML";
+import type { LangiumDocument } from "langium";
+import { ElementMeta, FeatureMeta, NamespaceMeta } from "../KerML";
 import {
     HighlightCommand,
     Text,
@@ -34,15 +35,27 @@ import {
     line,
     TextComment,
     label,
+    NonNullable,
 } from "../../utils";
 import { tokenType, tokenModifiers } from "../semantic-tokens";
 import { sanitizeName, unsanitizeName } from "../naming";
-import { ElementReference, Membership, MembershipReference } from "../../generated/ast";
+import {
+    ElementReference,
+    InlineExpression,
+    Membership,
+    MembershipReference,
+    Namespace,
+    OwningMembership,
+    Relationship,
+} from "../../generated/ast";
 import { BasicMetamodel } from "../metamodel";
 import {
+    DefaultElementPrinter,
+    ElementPrinter,
     ModelPrinterContext,
     PrintModelElementOptions,
     defaultPrintNotes,
+    printElementIgnored,
     printModelElement,
 } from "./print";
 import { CstNode, DocumentSegment, Grammar, findNodeForKeyword, stream, streamAst } from "langium";
@@ -505,4 +518,233 @@ export function printDescendant<T extends ElementMeta>(
     kind: string
 ): DescendantPrinter<T, T> {
     return new DescendantPrinterImpl(root, context, kind);
+}
+
+export interface PrintRange {
+    offset: number;
+    end: number;
+}
+
+function rangesIntersect(a: PrintRange, b: PrintRange): boolean {
+    return (a.offset > b.offset && a.offset < b.end) || (a.end < b.end && a.end > b.offset);
+}
+
+function rangesIntersectSym(a: PrintRange, b: PrintRange): boolean {
+    return rangesIntersect(a, b) || rangesIntersect(b, a);
+}
+
+function cstRangeIntersector(range: PrintRange): (child: ElementMeta) => boolean {
+    return (child: ElementMeta): boolean => {
+        const cst = child.cst();
+        /* istanbul ignore next */
+        if (!cst) return false;
+        return rangesIntersectSym(cst, range);
+    };
+}
+
+export interface ElementRange {
+    /**
+     * Elements that are affected by the print range.
+     */
+    elements: readonly ElementMeta[];
+
+    /**
+     * Range that printed `elements` are in.
+     */
+    range: PrintRange;
+
+    /**
+     * Indentation level of `elements`.
+     */
+    level: number;
+
+    /**
+     * Options to be used when printing `elements`.
+     */
+    options?: PrintModelElementOptions;
+
+    /**
+     * All siblings not in range prior to `elements`
+     */
+    leading?: readonly ElementMeta[];
+}
+
+const ignoredPrinter: ElementPrinter = (node, context, sibling?) =>
+    printElementIgnored(node, context) ?? DefaultElementPrinter(node, context, sibling);
+
+/**
+ * Collects and returns the elements that should be printed in `range`.
+ */
+export function collectPrintRange(
+    document: LangiumDocument,
+    range: PrintRange
+): ElementRange | undefined {
+    const root = document.parseResult.value.$meta as NamespaceMeta;
+    const cst = root.cst();
+
+    /* istanbul ignore next */
+    if (!cst) return;
+
+    const { offset, end } = range;
+
+    // short-circuit for ranges that fall outside of the root element
+    if (end <= cst.offset || offset >= cst.end) return;
+    let level = 0;
+    let scope = root as ElementMeta;
+    let scopeCst = cst;
+    let children: readonly ElementMeta[] = root.children;
+    let leading: readonly ElementMeta[] | undefined;
+
+    for (;;) {
+        // descend through children to find a common children range
+        const blockOffset = findNodeForKeyword(scope.cst() ?? scopeCst, "{")?.offset ?? -1;
+
+        // greater_equal comparison since a cursor just before the bracket will
+        // have the same offset
+        if ((scope.parent() !== undefined && blockOffset === -1) || blockOffset >= offset) {
+            const parent = scope.parent();
+            if (parent?.is(OwningMembership)) scope = parent;
+            return {
+                elements: [scope],
+                range: getChildrenRange([scope]) as PrintRange,
+                // ascending one level back up
+                level: level - 1,
+                leading,
+                options: {
+                    printer: DefaultElementPrinter,
+                    previousSibling: leading?.at(-1),
+                },
+            };
+        }
+
+        const allChildrenRange = getChildrenRange(children);
+
+        const first = children.findIndex(cstRangeIntersector(range));
+        const last = children.findLastIndex(cstRangeIntersector(range));
+        leading = first > 0 ? children.slice(0, first) : undefined;
+
+        if (first === -1 || last === -1) {
+            // no children intersect the range which is inside the children
+            // block: format the space between the neareast two children
+            switch (children.length) {
+                case 0:
+                    // TODO: format brackets?
+                    return;
+
+                case 1:
+                    /* istanbul ignore next */
+                    if (!allChildrenRange) return;
+                    return {
+                        elements: children,
+                        range: allChildrenRange,
+                        level,
+                        options: {
+                            printer: ignoredPrinter,
+                        },
+                    };
+
+                default: {
+                    const next = children.findIndex((child) => {
+                        const cst = child.cst();
+                        return cst && cst.offset >= end;
+                    });
+                    /* istanbul ignore next */
+                    if (next === -1) return;
+
+                    let prev = next - 1;
+                    while (!children[prev].cst() && prev >= 0) {
+                        --prev;
+                    }
+
+                    const surrounding =
+                        prev >= 0 ? children.slice(prev, next + 1) : [children[next]];
+                    leading = prev > 0 ? children.slice(0, prev) : undefined;
+                    return {
+                        elements: surrounding,
+                        range: getChildrenRange(surrounding) as PrintRange,
+                        level,
+                        leading,
+                        options: {
+                            printer: ignoredPrinter,
+                            previousSibling: leading?.at(-1),
+                        },
+                    };
+                }
+            }
+        }
+
+        if (first === last) {
+            const child = children[first];
+            if (
+                (child.is(Relationship) && !child.element()?.is(InlineExpression)) ||
+                child.is(Namespace)
+            ) {
+                // descend down to check if the whole element or just some
+                // of its children need to be printed
+                const target =
+                    child.is(OwningMembership) && child.element().is(Namespace)
+                        ? (child.element() as NamespaceMeta)
+                        : child;
+                level++;
+                scope = target;
+                scopeCst = (target.cst() ?? child.cst()) as CstNode;
+                children = target.children;
+                continue;
+            }
+        }
+
+        const elements = children.slice(first, last + 1);
+        return {
+            elements,
+            range: getChildrenRange(elements) as PrintRange,
+            level,
+            leading,
+            options: {
+                printer: DefaultElementPrinter,
+                previousSibling: leading?.at(-1),
+            },
+        };
+    }
+}
+
+export function getChildrenRange(children: readonly ElementMeta[]): PrintRange | undefined {
+    const first = children.find((e) => e.cst());
+    const last = children.findLast((e) => e.cst());
+    if (first === undefined || last === undefined) return;
+    const left = [first];
+    if (first.is(Relationship)) {
+        left.push(
+            ...[first.source(), first.element()]
+                .filter(NonNullable)
+                .filter((e) => e.parent() === first)
+        );
+    }
+
+    let right = [last];
+    if (first === last) {
+        right = left;
+    } else if (last.is(Relationship)) {
+        right.push(
+            ...[last.source(), last.element()]
+                .filter(NonNullable)
+                .filter((e) => e.parent() === first)
+        );
+    }
+
+    const start = Math.min(
+        ...left
+            .map(getElementStart)
+            .filter(NonNullable)
+            .map((s) => s.offset)
+    );
+    const end = Math.max(
+        ...right
+            .map(getElementEnd)
+            .filter(NonNullable)
+            .map((s) => s.end)
+    );
+
+    /* istanbul ignore next */
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return;
+    return { offset: start, end };
 }

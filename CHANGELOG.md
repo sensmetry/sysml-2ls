@@ -16,16 +16,33 @@
 ### Improvements
 
 - VSCode extension now works on the web with a few differences:
-  - `sysml.standardLibraryPath` is ignored, standard library is fetched directly
+  - `syside.standardLibraryPath` is ignored, standard library is fetched directly
     from GitHub
-  - `sysml.plugins` is ignored
+  - `syside.plugins` is ignored
 
   Performance on the web may be degraded as the server has to share resources
   with other extensions. In addition, selecting SysML language will now provide
   language server support irrespective of the file extension, KerML files have
   to have `.kerml` extension to get support
 - Only relevant standard library files will be downloaded instead of the full
-  repository, greatly improving download times
+  repository, greatly improving download
+- Formatter now uses pretty-printer to format documents which can take line
+  width into account through
+
+  ```json
+    "[sysml|kerml]": {
+      "syside.formatting.lineWidth": 100
+    },
+    "syside.formatting.lineWidth": 100
+  ```
+
+  in VS Code settings. Additional options are available through
+  `syside.formatting.` section which can also control optional keyword formatting.
+  Formatting can be disabled by leading notes with `syside-format ignore` inside
+  them which will print the element subtree the note is attached to as-is. Let
+  us know about any issues with the new formatter like notes disappearing or
+  feedback how the formatting style can be improved.
+- Added pretty-printer for KerML and SysML models
 
 ### Chores
 
