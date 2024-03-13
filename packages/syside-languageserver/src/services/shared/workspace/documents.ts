@@ -28,9 +28,9 @@ import { streamAst } from "../../../utils";
 import { SysMLSharedServices } from "../../services";
 import { MetamodelBuilder } from "./metamodel-builder";
 import { SysMLConfigurationProvider } from "./configuration-provider";
-import now from "performance-now";
 import { ElementMeta } from "../../../model";
 import { ModelDiagnostic } from "../../validation";
+import now from "performance-now";
 
 export const enum BuildProgress {
     Created = 0,
@@ -84,7 +84,13 @@ declare module "langium" {
          * be attached again.
          */
         commentsAttached: boolean;
+
+        parseDuration: number;
     }
+}
+
+export interface TimedParseResult<T> extends ParseResult<T> {
+    duration: number;
 }
 
 /**
@@ -108,12 +114,13 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
     }
 
     protected override createLangiumDocument<T extends AstNode = AstNode>(
-        parseResult: ParseResult<T>,
+        parseResult: TimedParseResult<T>,
         uri: URI,
         textDocument?: TextDocument,
         text?: string
     ): LangiumDocument<T> {
         const doc = super.createLangiumDocument(parseResult, uri, textDocument, text);
+        doc.parseDuration = parseResult.duration;
         return this.onCreated(doc);
     }
 
@@ -131,12 +138,17 @@ export class SysMLDocumentFactory extends DefaultLangiumDocumentFactory {
         return doc;
     }
 
-    protected override parse<T extends AstNode>(uri: URI, text: string): ParseResult<T> {
-        if (!this.config.get().logStatistics) return super.parse<T>(uri, text);
+    protected override parse<T extends AstNode>(uri: URI, text: string): TimedParseResult<T> {
         const start = now();
         const result = super.parse<T>(uri, text);
-        console.info(`Parsed ${uri.toString()} in ${(now() - start).toFixed(2)} ms`);
-        return result;
+        const duration = now() - start;
+        if (this.config.get().logStatistics)
+            console.info(
+                `Parsed ${uri.toString()} in ${duration.toFixed(2)} ms (${(
+                    text.length / duration
+                ).toFixed(0)} bytes/ms)`
+            );
+        return { ...result, duration };
     }
 }
 
