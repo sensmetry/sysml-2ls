@@ -15,37 +15,7 @@
  ********************************************************************************/
 
 import { Classifier } from "../../../generated/ast";
-import { anything, defaultLinkingErrorTo, parsedNode, qualifiedTarget } from "../../../testing";
-
-describe.each(["specializes", "conjugates"])(
-    "classifiers can only specialize other classifiers with '%s'",
-    (token: string) => {
-        test("specializing non-classifiers issues a diagnostic", async () => {
-            return expect(
-                `namespace A;
-        classifier Child ${token} A;`
-            ).toParseKerML(
-                {},
-                {
-                    diagnostics: [defaultLinkingErrorTo("A"), ...anything(1)],
-                    buildOptions: { validationChecks: "all", standardLibrary: "none" },
-                }
-            );
-        });
-
-        test("specializing classifiers is successful", async () => {
-            return expect(
-                parsedNode(
-                    `classifier A;
-        classifier Child ${token} A;`,
-                    { node: Classifier, index: 1, build: true }
-                )
-            ).resolves.toMatchObject({
-                heritage: [{ targetRef: qualifiedTarget("A") }],
-            });
-        });
-    }
-);
+import { anything, parsedNode } from "../../../testing";
 
 test("specializations can be parsed", async () => {
     return expect(`

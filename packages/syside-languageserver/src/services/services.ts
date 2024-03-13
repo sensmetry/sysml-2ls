@@ -38,6 +38,7 @@ import { ExtensionManager } from "./shared/extension-manager";
 import { ModelUtil } from "./shared/model-utils";
 import { SysMLExpressionEvaluator } from "./shared/evaluator";
 import { BaseValidationRegistry } from "./validation/validation-registry";
+import { SysMLDocumentValidator } from "./validation";
 
 export type SysMLAddedSharedServices = {
     workspace: {
@@ -83,6 +84,7 @@ export type SysMLDefaultAddedServices = {
     };
     validation: {
         ValidationRegistry: BaseValidationRegistry;
+        DocumentValidator: SysMLDocumentValidator;
     };
     shared: SysMLSharedServices;
     Events: LanguageEvents;

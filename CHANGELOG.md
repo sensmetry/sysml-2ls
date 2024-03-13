@@ -6,6 +6,11 @@
 
 ## main
 
+### Changes
+
+- Updated to [2023-08 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-08)
+  - Nearly all changes are to validation
+
 ### Improvements
 
 - Only relevant standard library files will be downloaded instead of the full
