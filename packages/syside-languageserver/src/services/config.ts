@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { DefaultFormatOptions, FormatOptions } from "../model";
 import { DeepReadonly, DeepRequired } from "../utils/common";
 import { SysMLBuildOptions } from "./shared/workspace/document-builder";
 
@@ -83,6 +84,9 @@ export interface SysMLConfig {
      * that will be loaded on server start-up
      */
     plugins: string[];
+
+    /** Formatting options. */
+    formatting: FormatOptions;
 }
 
 export const DefaultDebugConfig: Readonly<DebugConfig> = {
@@ -111,4 +115,5 @@ export const DefaultSysMLConfig: DeepReadonly<SysMLConfig> = {
     logStatistics: true,
     trace: DefaultTraceConfig,
     plugins: [],
+    formatting: DefaultFormatOptions,
 };
