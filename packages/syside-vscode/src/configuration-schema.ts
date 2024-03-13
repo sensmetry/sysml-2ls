@@ -14,16 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-// Using a separate script so that we can pass command line arguments to `vsce`
-// and still be able to run other commands after it
+import type { SysMLConfig } from "syside-languageserver";
+import type { ClientConfig } from "./common/extension";
+import type { ServerConfig } from "syside-languageclient";
 
-import util from "util";
-import child_process from "child_process";
-import fs from "fs-extra";
-import process from "process";
-
-const exec = util.promisify(child_process.exec);
-
-exec("pnpm vsce package " + process.argv.slice(2).join(" "))
-    .then(() => fs.copyFile(".README", "README.md"))
-    .finally(() => fs.unlink(".README"));
+/**
+ * SysIDE configuration.
+ */
+export interface ConfigurationSchema extends SysMLConfig {
+    client: ClientConfig;
+    server: ServerConfig;
+}

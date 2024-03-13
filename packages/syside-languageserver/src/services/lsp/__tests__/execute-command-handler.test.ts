@@ -34,16 +34,22 @@ afterEach(() => {
 
 const SimpleCommands = [
     {
-        command: "sysml.editorCommands",
-        expected: expect.arrayContaining(["sysml.dumpAst", "sysml.dumpAst.console"]),
+        command: "syside.editorCommands",
+        expected: expect.arrayContaining(["syside.dumpAst", "syside.dumpAst.console"]),
     },
     {
-        command: "sysml.simpleCommands",
-        expected: expect.arrayContaining(["sysml.simpleCommands", "sysml.simpleCommands.console"]),
+        command: "syside.simpleCommands",
+        expected: expect.arrayContaining([
+            "syside.simpleCommands",
+            "syside.simpleCommands.console",
+        ]),
     },
     {
-        command: "sysml.allCommands",
-        expected: expect.arrayContaining(["sysml.simpleCommands", "sysml.simpleCommands.console"]),
+        command: "syside.allCommands",
+        expected: expect.arrayContaining([
+            "syside.simpleCommands",
+            "syside.simpleCommands.console",
+        ]),
     },
 ];
 
@@ -74,8 +80,8 @@ describe("document commands can be executed", () => {
     builder.update = mock;
     afterAll(() => (builder.update = update));
 
-    test("sysml.updateDocument triggers document update", async () => {
-        expect(handler?.executeCommand("sysml.updateDocument", [uri?.toJSON()])).resolves;
+    test("syside.updateDocument triggers document update", async () => {
+        expect(handler?.executeCommand("syside.updateDocument", [uri?.toJSON()])).resolves;
         expect(mock).toHaveBeenCalledTimes(1);
         expect(mock).toHaveBeenCalledWith(
             // jest somehow puts an extra `external` property on plain URI...
@@ -93,50 +99,50 @@ part C;
 
 const EditorCommands = [
     {
-        command: "sysml.dumpAst",
+        command: "syside.dumpAst",
         position: { line: 1, character: 3 }, // 'par|t'
         expected: expect.objectContaining({
             $meta: expect.objectContaining({ qualifiedName: "B" }),
         }),
     },
     {
-        command: "sysml.dumpMeta",
+        command: "syside.dumpMeta",
         position: { line: 1, character: 3 },
         expected: expect.objectContaining({ qualifiedName: "B" }),
     },
     {
-        command: "sysml.mro",
+        command: "syside.mro",
         position: { line: 1, character: 3 },
         expected: [expect.stringMatching(/^B/), expect.stringMatching(/^A/)],
     },
     {
-        command: "sysml.children",
+        command: "syside.children",
         position: { line: 1, character: 3 },
         expected: ["x", "y", "z", "v", "a", "b"].map((v) =>
             expect.stringMatching(new RegExp(`^${v}`))
         ),
     },
     {
-        command: "sysml.scope",
+        command: "syside.scope",
         position: { line: 1, character: 3 },
         expected: ["x", "y", "z", "v", "a", "b", "A", "B", "C"].map((v) =>
             expect.stringMatching(new RegExp(`^${v}`))
         ),
     },
     {
-        command: "sysml.evaluate",
+        command: "syside.evaluate",
         position: { line: 1, character: 68 }, // '=|'
         expected: [7],
         name: "feature value",
     },
     {
-        command: "sysml.evaluate",
+        command: "syside.evaluate",
         position: { line: 1, character: 77 }, // '*|'
         expected: [6],
         name: "expression",
     },
     {
-        command: "sysml.evaluate",
+        command: "syside.evaluate",
         position: { line: 1, character: 62 }, // 'attribu|te'
         expected: [7],
         name: "feature",

@@ -81,7 +81,7 @@ class TestClientExtender extends SysMLClientExtender {
         super.extend(client);
         client.onRequest(ConfigurationRequest.type, (params: ConfigurationParams) =>
             params.items.map((item) => {
-                if (item.section === "sysml") return this.configurationRequest();
+                if (item.section === SETTINGS_KEY) return this.configurationRequest();
                 return {};
             })
         );
@@ -232,15 +232,13 @@ describe("package.json exports custom contributions", () => {
                     expect(data.enum).toContain(section);
                 }
 
+                if (typeof section === "undefined") return;
+
                 // can only check that the type field contains one of the type
                 // alternatives since compile time types are discarded at
                 // runtime
-                expect(data.type).toContain(
-                    typeof section === "undefined"
-                        ? "null"
-                        : Array.isArray(section)
-                        ? "array"
-                        : typeof section
+                expect(data.type === "integer" ? "number" : data.type).toContain(
+                    Array.isArray(section) ? "array" : typeof section
                 );
             }
         );
@@ -332,7 +330,7 @@ describe("Language server registration tests", () => {
     test("client asks to download a newer version of standard library if the urls don't match", async () => {
         services.extender.maybeUpdateDownloadedStdlib.mockClear();
         services.extender.maybeUpdateDownloadedStdlib.mockReturnValueOnce(<ClientConfig>{
-            stdlibUrl: services.extender["stdlibRepoZipUrl"] + "...",
+            stdlibUrl: services.extender["stdlibURL"] + "...",
         });
         await services.extender["initializeClient"]();
 

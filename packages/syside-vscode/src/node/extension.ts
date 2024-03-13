@@ -19,14 +19,50 @@ import { LanguageClient, ServerOptions, TransportKind } from "vscode-languagecli
 import { SysMLVSCodeClientExtender } from "./vscode";
 import { Extension, initialize, runExtensions } from "../common/extension";
 import { uriToFsPath } from "vscode-uri/lib/umd/uri";
+import { SETTINGS_KEY } from "syside-languageserver";
 
 let data: {
     client: LanguageClient;
     extensions: Extension[];
 };
 
+function migrateConfig(): void {
+    const oldSection = vscode.workspace.getConfiguration("sysml");
+    const newSection = vscode.workspace.getConfiguration(SETTINGS_KEY);
+    for (const section of [
+        "trace.server",
+        "standardLibrary",
+        "standardLibraryPath",
+        "logStatistics",
+        "defaultBuildOptions.validationChecks",
+        "defaultBuildOptions.ignoreMetamodelErrors",
+        "debug.scopeInLinkingErrors",
+        "debug.stacktraceInLinkingErrors",
+        "debug.linkingTrace",
+        "plugins",
+        "client.extensions",
+        "server.args.run",
+        "server.args.debug",
+        "server.path",
+    ]) {
+        const config = oldSection.inspect(section);
+        if (!config) continue;
+
+        for (const [value, target] of [
+            [config.workspaceFolderValue, vscode.ConfigurationTarget.WorkspaceFolder],
+            [config.workspaceValue, vscode.ConfigurationTarget.Workspace],
+            [config.globalValue, vscode.ConfigurationTarget.Global],
+        ] as const) {
+            if (value === undefined) continue;
+            newSection.update(section, value, target);
+            oldSection.update(section, undefined, target);
+        }
+    }
+}
+
 // This function is called when the extension is activated.
 export async function activate(context: vscode.ExtensionContext): Promise<LanguageClient> {
+    migrateConfig();
     data = await startLanguageClient(context);
     return data.client;
 }
@@ -89,7 +125,7 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<ty
     };
 
     // Create the language client and start the client.
-    const client = new LanguageClient("sysml", "sysml", serverOptions, clientOptions);
+    const client = new LanguageClient("syside", "SysIDE", serverOptions, clientOptions);
 
     // Start the client. This will also launch the server
     await new SysMLVSCodeClientExtender(context).extend(client);

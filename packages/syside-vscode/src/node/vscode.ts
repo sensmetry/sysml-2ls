@@ -66,9 +66,9 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
             ? vscode.ConfigurationTarget.Global
             : vscode.ConfigurationTarget.Workspace;
         const config = vscode.workspace.getConfiguration();
-        await config.update(<Options>"sysml.standardLibrary", false, target);
+        await config.update(<Options>"syside.standardLibrary", false, target);
         await config.update(
-            <Options>"sysml.defaultBuildOptions.ignoreMetamodelErrors",
+            <Options>"syside.defaultBuildOptions.ignoreMetamodelErrors",
             true,
             target
         );
@@ -92,7 +92,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
         if (!(await fs.exists(dir))) return;
         await vscode.workspace
             .getConfiguration()
-            .update(<Options>"sysml.standardLibraryPath", dir, true);
+            .update(<Options>"syside.standardLibraryPath", dir, true);
         return dir;
     }
 
@@ -112,7 +112,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
                 await vscode.workspace
                     .getConfiguration()
                     .update(
-                        <Options>"sysml.standardLibraryPath",
+                        <Options>"syside.standardLibraryPath",
                         libPath,
                         vscode.ConfigurationTarget.Global
                     );
@@ -193,7 +193,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
 
         const usedDir = await vscode.workspace
             .getConfiguration()
-            .get(<Options>"sysml.standardLibraryPath");
+            .get(<Options>"syside.standardLibraryPath");
         if (usedDir !== this.stdlibDir) {
             // not using the downloaded library, skip update
             return;
