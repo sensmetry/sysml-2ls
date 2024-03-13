@@ -28,4 +28,6 @@ module.exports = {
     coveragePathIgnorePatterns: ["node_modules", "__tests__", "__test__", "testing"],
     coverageReporters: ["html", "text", "text-summary", "cobertura"],
     testRegex: "(\\.|/)(test|spec)\\.[jt]sx?$",
+    // v3.0 is broken so disable it
+    prettierPath: null,
 };

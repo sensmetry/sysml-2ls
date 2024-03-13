@@ -14,17 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * from "./KerML";
-export * from "./SysML";
-export * from "./containers";
-export * from "./enums";
+export * from "./actions";
+export * from "./annotating-elements";
+export * from "./connectors";
+export * from "./definition-usages";
+export * from "./edges";
 export * from "./expressions";
-export * from "./implicits";
-export * from "./metamodel";
-export * from "./mixins";
-export * from "./naming";
-export * from "./notes";
-export * from "./printer";
-export * from "./semantic-tokens";
-export * from "./types";
-export * from "./util";
+export * from "./format-options";
+export * from "./namespaces";
+export * from "./print";
+export * from "./successions";
+export * from "./utils";
