@@ -16,21 +16,27 @@
 
 import { DefaultFormatOptions, FormatOptions } from "../model";
 import { DeepReadonly, DeepRequired } from "../utils/common";
+import { LanguageSettings } from "./lsp";
 import { SysMLBuildOptions } from "./shared/workspace/document-builder";
+
+export interface FormatterConfig extends FormatOptions, LanguageSettings {}
 
 export interface DebugConfig {
     /**
      * Append elements in scope to linking errors
+     * @default "none"
      */
     scopeInLinkingErrors?: "none" | "types" | "members";
 
     /**
      * Append stacktrace to thrown errors while resolving references
+     * @default false
      */
     stacktraceInLinkingErrors: boolean;
 
     /**
      * Log linking order
+     * @default false
      */
     linkingTrace: boolean;
 }
@@ -38,6 +44,7 @@ export interface DebugConfig {
 export interface TraceConfig {
     /**
      * Server trace level, implicitly used by the default VS Code LanguageClient
+     * @default "off"
      */
     server: "off" | "messages" | "verbose";
 }
@@ -45,6 +52,7 @@ export interface TraceConfig {
 export interface SysMLConfig {
     /**
      * If true, parse the bundled standard library
+     * @default true
      */
     standardLibrary: boolean;
 
@@ -56,6 +64,7 @@ export interface SysMLConfig {
     /**
      * Skip collecting files matching extensions in the current workspace on
      * startup
+     * @default false
      */
     skipWorkspaceInit: boolean;
 
@@ -71,6 +80,7 @@ export interface SysMLConfig {
 
     /**
      * If true, build times will be reported
+     * @default false
      */
     logStatistics: boolean;
 
@@ -82,11 +92,13 @@ export interface SysMLConfig {
     /**
      * Additional plugin paths (.js scripts or directories with .js scripts)
      * that will be loaded on server start-up
+     * @default []
+     * @items.description Path to a .js script or directory of .js scripts
      */
     plugins: string[];
 
     /** Formatting options. */
-    formatting: FormatOptions;
+    formatting: FormatterConfig;
 }
 
 export const DefaultDebugConfig: Readonly<DebugConfig> = {
@@ -115,5 +127,5 @@ export const DefaultSysMLConfig: DeepReadonly<SysMLConfig> = {
     logStatistics: true,
     trace: DefaultTraceConfig,
     plugins: [],
-    formatting: DefaultFormatOptions,
+    formatting: { ...DefaultFormatOptions, lineWidth: 120 },
 };

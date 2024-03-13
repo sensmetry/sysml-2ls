@@ -94,7 +94,7 @@ export const SysMLDefaultModule: Module<SysMLDefaultServices, PartialSysMLDefaul
         DocumentValidator: (services) => new SysMLDocumentValidator(services),
     },
     lsp: {
-        Formatter: () => new SysMLFormatter(),
+        Formatter: (services) => new SysMLFormatter(services),
         // RenameProvider: (services) => new SysMLRenameProvider(services),
         CompletionProvider: (services) => new SysMLCompletionProvider(services),
         SemanticTokenProvider: (services) => new SysMLSemanticTokenProvider(services),

@@ -342,7 +342,7 @@
                 "syside.debug.stacktraceInLinkingErrors": {
                     "scope": "window",
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Append stacktrace to thrown errors while resolving references"
                 },
                 "syside.debug.linkingTrace": {
@@ -403,7 +403,8 @@
                 "syside.skipWorkspaceInit": {
                     "description": "Skip collecting files matching extensions in the current workspace on\nstartup",
                     "type": "boolean",
-                    "scope": "window"
+                    "scope": "window",
+                    "default": false
                 },
                 "syside.defaultBuildOptions.standalone": {
                     "description": "If true, the document will be built isolated from all the other\ndocuments, i.e. no indexing, no global scope. It's main use is for\ntesting so that each new built file doesn't pollute the global scope and\ninfluence other test results.",
@@ -1977,6 +1978,12 @@
                         "never"
                     ],
                     "type": "string",
+                    "scope": "window"
+                },
+                "syside.formatting.lineWidth": {
+                    "description": "Number of columns the formatter will try to fit source text into.",
+                    "default": 120,
+                    "type": "integer",
                     "scope": "window"
                 }
             }

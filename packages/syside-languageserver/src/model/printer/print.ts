@@ -21,6 +21,7 @@ import {
     PrintCommentContext,
     TextComment,
     hardline,
+    indent,
     inheritLabel,
     join,
     literals,
@@ -39,6 +40,7 @@ import { FormatOptions, DefaultFormatOptions } from "./format-options";
 import * as expr from "./expressions";
 import * as edges from "./edges";
 import {
+    ElementRange,
     KerMLKeywords,
     SysMLKeywords,
     getElementEnd,
@@ -898,4 +900,21 @@ export function printElementIgnored(
         streamModel(node).flatMap((e) => e.notes),
         context.printed
     );
+}
+
+/**
+ * Prints a model range to `Doc`
+ *
+ * @see {@link collectPrintRange}
+ */
+export function printModelRange(range: ElementRange, context: ModelPrinterContext): Doc {
+    const printed = printModelElements(range.elements, context, range.options);
+    let doc: Doc;
+    if (context.mode === "kerml") doc = join(hardline, printed);
+    else {
+        doc = actions.actionBodyJoiner()(range.elements, printed, range.leading);
+    }
+    for (let i = 0; i < range.level; ++i) doc = indent(doc);
+
+    return doc;
 }

@@ -16,9 +16,9 @@
 
 import { LangiumDocument, AstNode, DeepPartial } from "langium";
 import { SubtypeKeys } from "../../../services";
-import { emptyDocument } from "../../../testing";
+import { emptyDocument, getRange, parseKerML, parseSysML } from "../../../testing";
 import { PrinterConfig, mergeWithPartial, DefaultPrinterConfig, print } from "../../../utils";
-import { ElementMeta } from "../../KerML";
+import { ElementMeta, NamespaceMeta } from "../../KerML";
 import { ElementIDProvider, basicIdProvider, MetatypeProto, Metatype } from "../../metamodel";
 import {
     ModelPrinterContext,
@@ -29,6 +29,8 @@ import {
 } from "../print";
 import { Element, OwningMembership } from "../../../generated/ast";
 import { parsedNode } from "../../../testing";
+import { ElementRange, collectPrintRange } from "../utils";
+import { attachNotes } from "../../notes";
 
 let provider: ElementIDProvider;
 let document: LangiumDocument;
@@ -96,4 +98,25 @@ export function expectPrinted(
             (lang === "kerml" ? printKerMLElement : printSysMLElement)(node.$meta, options)
         )
     );
+}
+
+export async function getPrintRange(
+    source: string,
+    options: DeepPartial<PrinterTestContext> & {
+        lang?: "sysml" | "kerml";
+    } = {}
+): Promise<ElementRange | undefined> {
+    const lang = options.lang ?? "kerml";
+    const { text, range } = getRange(source);
+    return (lang === "kerml" ? parseKerML : parseSysML)(text, { build: false }).then((result) => {
+        const root = result.value.$meta as NamespaceMeta;
+        expect(root).toBeDefined();
+        expect(result.lexerErrors).toHaveLength(0);
+        expect(result.parserErrors).toHaveLength(0);
+
+        attachNotes(root.document);
+        const printRange = collectPrintRange(root.document, range);
+
+        return printRange;
+    });
 }
