@@ -37,6 +37,57 @@
     "bugs": {
         "url": "https://gitlab.com/sensmetry/public/sysml-2ls/-/issues"
     },
+    "activationEvents": [
+        "onLanguage:kerml",
+        "onLanguage:sysml"
+    ],
+    "files": [
+        "out",
+        "src"
+    ],
+    "main": "./dist/node/extension.js",
+    "browser": "./dist/browser/extension.js",
+    "scripts": {
+        "lint": "eslint src --ext ts --max-warnings 0",
+        "clean": "shx rm -rf out *.tsbuildinfo",
+        "build": "pnpm run typecheck && pnpm run esbuild",
+        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"pnpm run typecheck -w\" \"pnpm run esbuild:watch\"",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "vscode:prepublish": "pnpm run clean && node ./scripts/prepublish.mjs",
+        "vscode:package": "node ./scripts/package.mjs",
+        "vscode:publish": "node ./scripts/publish.mjs",
+        "ovsx:publish": "ovsx publish",
+        "esbuild": "concurrently -n node,web -c blue,yellow \"pnpm run esbuild-base:node --minify\" \"pnpm run esbuild-base:browser --minify\"",
+        "esbuild:watch": "concurrently -n node,web -c blue,yellow \"pnpm run esbuild:node --watch\" \"pnpm run esbuild:browser --watch\"",
+        "esbuild-base:node": "node ../../scripts/build.mjs node src/node/extension.ts src/node/language-server/main.ts -o ./dist/node",
+        "esbuild:node": "pnpm run esbuild-base:node --sourcemap",
+        "esbuild-base:browser": "node ../../scripts/build.mjs browser src/browser/extension.ts src/browser/language-server/main.ts -o ./dist/browser",
+        "esbuild:browser": "pnpm run esbuild-base:browser --sourcemap inline",
+        "generate:schema": "node ./scripts/generate-schemas.mjs"
+    },
+    "dependencies": {
+        "fs-extra": "^11.1.0",
+        "node-fetch": "^3.3.2",
+        "syside-languageclient": "workspace:*",
+        "syside-languageserver": "workspace:*",
+        "syside-base": "workspace:*",
+        "syside-protocol": "workspace:*",
+        "vscode-languageclient": "~8.0.2",
+        "vscode-languageserver": "~8.0.2",
+        "vscode-uri": "~3.0.7"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.1",
+        "@types/vscode": "^1.56.0",
+        "@vscode/vsce": "^2.20.0",
+        "ovsx": "^0.8.0",
+        "typescript-json-schema": "^0.59.0"
+    },
+    "vsce": {
+        "dependencies": false,
+        "gitlabBranch": "main",
+        "githubBranch": "main"
+    },
     "contributes": {
         "languages": [
             {
@@ -117,90 +168,90 @@
         "semanticTokenModifiers": [],
         "commands": [
             {
-                "command": "sysml.dumpAst.console",
+                "command": "syside.dumpAst.console",
                 "shortTitle": "Dump AST of the current selection",
-                "title": "SysML: Dump AST of the current selection in the active text editor"
+                "title": "SysIDE: Dump AST of the current selection in the active text editor"
             },
             {
-                "command": "sysml.dumpMeta.console",
+                "command": "syside.dumpMeta.console",
                 "shortTitle": "Dump Meta of the current selection",
-                "title": "SysML: Dump Meta of the current selection in the active text editor"
+                "title": "SysIDE: Dump Meta of the current selection in the active text editor"
             },
             {
-                "command": "sysml.updateDocument",
+                "command": "syside.updateDocument",
                 "shortTitle": "Update current document",
-                "title": "SysML: Update current document"
+                "title": "SysIDE: Update current document"
             },
             {
-                "command": "sysml.mro.console",
+                "command": "syside.mro.console",
                 "shortTitle": "Get MRO of the current node",
-                "title": "SysML: Get MRO of the current node"
+                "title": "SysIDE: Get MRO of the current node"
             },
             {
-                "command": "sysml.children.console",
+                "command": "syside.children.console",
                 "shortTitle": "Get children of the current node",
-                "title": "SysML: Get all direct, inherited and imported children of the current node"
+                "title": "SysIDE: Get all direct, inherited and imported children of the current node"
             },
             {
-                "command": "sysml.scope.console",
+                "command": "syside.scope.console",
                 "shortTitle": "Get elements in scope of the current node",
-                "title": "SysML: Get all elements in scope of the current node"
+                "title": "SysIDE: Get all elements in scope of the current node"
             },
             {
-                "command": "sysml.evaluate.console",
+                "command": "syside.evaluate.console",
                 "shortTitle": "Evaluate the selected expression",
-                "title": "SysML: Evaluate the selected expression or feature value"
+                "title": "SysIDE: Evaluate the selected expression or feature value"
             },
             {
-                "command": "sysml.allCommands.console",
+                "command": "syside.allCommands.console",
                 "shortTitle": "Get all available language server commands",
-                "title": "SysML: Get all available language server commands"
+                "title": "SysIDE: Get all available language server commands"
             }
         ],
         "menus": {
             "editor/context": [
                 {
-                    "submenu": "sysml.commands"
+                    "submenu": "syside.commands"
                 }
             ],
-            "sysml.commands": [
+            "syside.commands": [
                 {
-                    "command": "sysml.dumpAst.console",
+                    "command": "syside.dumpAst.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.dumpMeta.console",
+                    "command": "syside.dumpMeta.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.updateDocument",
+                    "command": "syside.updateDocument",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.mro.console",
+                    "command": "syside.mro.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.children.console",
+                    "command": "syside.children.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.scope.console",
+                    "command": "syside.scope.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.evaluate.console",
+                    "command": "syside.evaluate.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "sysml.allCommands.console",
+                    "command": "syside.allCommands.console",
                     "group": "SysML",
                     "when": "editorLangId =~ /(ker|sys)ml/"
                 }
@@ -208,7 +259,7 @@
         },
         "submenus": [
             {
-                "id": "sysml.commands",
+                "id": "syside.commands",
                 "label": "SysML"
             }
         ],
@@ -216,61 +267,58 @@
             "type": "object",
             "title": "SysIDE configuration",
             "properties": {
-                "sysml.trace.server": {
+                "syside.trace.server": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
-                        "off",
                         "messages",
+                        "off",
                         "verbose"
                     ],
                     "default": "off",
-                    "description": "Traces the communication between VS Code and the language server."
+                    "description": "Server trace level, implicitly used by the default VS Code LanguageClient"
                 },
-                "sysml.standardLibrary": {
+                "syside.standardLibrary": {
                     "scope": "window",
                     "type": "boolean",
                     "default": true,
-                    "description": "If false, skip parsing the standard library"
+                    "description": "If true, parse the bundled standard library"
                 },
-                "sysml.standardLibraryPath": {
+                "syside.standardLibraryPath": {
                     "scope": "machine-overridable",
-                    "type": [
-                        "null",
-                        "string"
-                    ],
+                    "type": "string",
                     "default": null,
-                    "description": "Standard library import path, if not set uses the bundled standard library path"
+                    "description": "If set, use this path to import standard library files"
                 },
-                "sysml.logStatistics": {
+                "syside.logStatistics": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
-                    "description": "Log build times"
+                    "description": "If true, build times will be reported"
                 },
-                "sysml.defaultBuildOptions.validationChecks": {
+                "syside.defaultBuildOptions.validationChecks": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
-                        "none",
-                        "all"
+                        "all",
+                        "none"
                     ],
                     "default": "all",
                     "description": "Which validation checks are enabled for files"
                 },
-                "sysml.defaultBuildOptions.ignoreMetamodelErrors": {
+                "syside.defaultBuildOptions.ignoreMetamodelErrors": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
-                    "description": "Ignore errors due to invalid metamodel such as when not using a standard library"
+                    "description": "If set, ignore all metamodel errors"
                 },
-                "sysml.defaultBuildOptions.standardLibrary": {
+                "syside.defaultBuildOptions.standardLibrary": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
+                        "local",
                         "none",
-                        "standard",
-                        "local"
+                        "standard"
                     ],
                     "enumDescriptions": [
                         "skip setting up relationships to the standard library elements",
@@ -278,32 +326,32 @@
                         "use standard library elements from the document locally, useful for testing"
                     ],
                     "default": "standard",
-                    "description": "Source of standard library elements"
+                    "description": "Set type of standard library:\n 'none' - skip setting up relationships to the standard library elements\n 'standard' - use default standard library\n 'local' - use standard library elements from the document locally, useful for testing"
                 },
-                "sysml.debug.scopeInLinkingErrors": {
+                "syside.debug.scopeInLinkingErrors": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
+                        "members",
                         "none",
-                        "types",
-                        "members"
+                        "types"
                     ],
                     "default": "none",
-                    "description": "Display elements in scope in linking errors. Types will display names of scope owning types, members - all members in scope."
+                    "description": "Append elements in scope to linking errors"
                 },
-                "sysml.debug.stacktraceInLinkingErrors": {
+                "syside.debug.stacktraceInLinkingErrors": {
                     "scope": "window",
                     "type": "boolean",
                     "default": true,
-                    "description": "Display stacktrace in linking errors if an error was thrown"
+                    "description": "Append stacktrace to thrown errors while resolving references"
                 },
-                "sysml.debug.linkingTrace": {
+                "syside.debug.linkingTrace": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
-                    "description": "Show trace of linking order"
+                    "description": "Log linking order"
                 },
-                "sysml.plugins": {
+                "syside.plugins": {
                     "scope": "machine-overridable",
                     "type": "array",
                     "default": [],
@@ -311,9 +359,9 @@
                         "type": "string",
                         "description": "Path to a .js script or directory of .js scripts"
                     },
-                    "description": "Additional plugin paths (.js scripts or directories with .js scripts) that will be loaded on server start-up"
+                    "description": "Additional plugin paths (.js scripts or directories with .js scripts)\nthat will be loaded on server start-up"
                 },
-                "sysml.client.extensions": {
+                "syside.client.extensions": {
                     "scope": "window",
                     "type": "array",
                     "default": [],
@@ -323,7 +371,7 @@
                     },
                     "description": "VS Code extensions that extend the language client"
                 },
-                "sysml.server.args.run": {
+                "syside.server.args.run": {
                     "scope": "window",
                     "type": "array",
                     "items": {
@@ -333,14 +381,11 @@
                         ]
                     },
                     "default": [],
-                    "description": "Additional command line arguments to start the server"
+                    "description": "Command line interface arguments in release mode"
                 },
-                "sysml.server.args.debug": {
+                "syside.server.args.debug": {
                     "scope": "window",
-                    "type": [
-                        "array",
-                        "null"
-                    ],
+                    "type": "array",
                     "items": {
                         "type": [
                             "integer",
@@ -348,63 +393,24 @@
                         ]
                     },
                     "default": null,
-                    "description": "Additional command line arguments to start the server when in debug mode"
+                    "description": "Command line interface arguments in debug mode"
                 },
-                "sysml.server.path": {
+                "syside.server.path": {
                     "scope": "machine-overridable",
                     "type": "string",
-                    "description": "Path to the SysIDE launcher. Defaults to the bundled launcher"
+                    "description": "Server entry path, relative paths will be resolved from the first workspace folder"
+                },
+                "syside.skipWorkspaceInit": {
+                    "description": "Skip collecting files matching extensions in the current workspace on\nstartup",
+                    "type": "boolean",
+                    "scope": "window"
+                },
+                "syside.defaultBuildOptions.standalone": {
+                    "description": "If true, the document will be built isolated from all the other\ndocuments, i.e. no indexing, no global scope. It's main use is for\ntesting so that each new built file doesn't pollute the global scope and\ninfluence other test results.",
+                    "type": "boolean",
+                    "scope": "window"
                 }
             }
         }
-    },
-    "activationEvents": [
-        "onLanguage:kerml",
-        "onLanguage:sysml"
-    ],
-    "files": [
-        "dist",
-        "src"
-    ],
-    "main": "./dist/node/extension.js",
-    "browser": "./dist/browser/extension.js",
-    "scripts": {
-        "lint": "eslint src --ext ts --max-warnings 0",
-        "clean": "shx rm -rf out *.tsbuildinfo",
-        "build": "pnpm run typecheck && pnpm run esbuild",
-        "watch": "concurrently -n tsc,esbuild -c blue,yellow \"pnpm run typecheck -w\" \"pnpm run esbuild:watch\"",
-        "typecheck": "tsc -p tsconfig.json --noEmit",
-        "vscode:prepublish": "pnpm run clean && node ./scripts/prepublish.mjs",
-        "vscode:package": "node ./scripts/package.mjs",
-        "vscode:publish": "node ./scripts/publish.mjs",
-        "ovsx:publish": "ovsx publish",
-        "esbuild": "concurrently -n node,web -c blue,yellow \"pnpm run esbuild-base:node --minify\" \"pnpm run esbuild-base:browser --minify\"",
-        "esbuild:watch": "concurrently -n node,web -c blue,yellow \"pnpm run esbuild:node --watch\" \"pnpm run esbuild:browser --watch\"",
-        "esbuild-base:node": "node ../../scripts/build.mjs node src/node/extension.ts src/node/language-server/main.ts -o ./dist/node",
-        "esbuild:node": "pnpm run esbuild-base:node --sourcemap",
-        "esbuild-base:browser": "node ../../scripts/build.mjs browser src/browser/extension.ts src/browser/language-server/main.ts -o ./dist/browser",
-        "esbuild:browser": "pnpm run esbuild-base:browser --sourcemap inline"
-    },
-    "dependencies": {
-        "fs-extra": "^11.1.0",
-        "node-fetch": "^3.3.2",
-        "syside-languageclient": "workspace:*",
-        "syside-languageserver": "workspace:*",
-        "syside-base": "workspace:*",
-        "syside-protocol": "workspace:*",
-        "vscode-languageclient": "~8.0.2",
-        "vscode-languageserver": "~8.0.2",
-        "vscode-uri": "~3.0.7"
-    },
-    "devDependencies": {
-        "@types/fs-extra": "^11.0.1",
-        "@types/vscode": "^1.56.0",
-        "@vscode/vsce": "^2.21.0",
-        "ovsx": "^0.8.0"
-    },
-    "vsce": {
-        "dependencies": false,
-        "gitlabBranch": "main",
-        "githubBranch": "main"
     }
 }

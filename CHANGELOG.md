@@ -10,6 +10,8 @@
 
 - Updated to [2023-08 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2023-08)
   - Nearly all changes are to validation
+- VS Code configuration settings now use `syside` section name instead of
+  `sysml`, existing settings will be automatically migrated
 
 ### Improvements
 

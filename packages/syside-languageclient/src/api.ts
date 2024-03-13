@@ -16,17 +16,21 @@
 
 import { GenericLanguageClient, MaybePromise } from "./sysml-language-client";
 
+export type integer = number;
+
 export interface ServerConfig {
     args: {
         /**
          * Command line interface arguments in release mode
+         * @items {"type": ["integer", "string"]}
          */
-        run: (string | number)[];
+        run: (string | integer)[];
 
         /**
          * Command line interface arguments in debug mode
+         * @items {"type": ["integer", "string"]}
          */
-        debug: (string | number)[];
+        debug: (string | integer)[];
     };
 
     /**

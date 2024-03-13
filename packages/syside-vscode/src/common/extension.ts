@@ -16,11 +16,11 @@
 
 import * as vscode from "vscode";
 import { LanguageClientExtension, ServerConfig } from "syside-languageclient";
-import { NonNullable } from "syside-languageserver";
 import { Utils, URI } from "vscode-uri";
 import path from "path";
 import { LanguageClientOptions } from "vscode-languageclient";
 import { isUriLike } from "syside-base";
+import { NonNullable, SETTINGS_KEY } from "syside-languageserver";
 
 type ClientExtension = LanguageClientExtension<vscode.ExtensionContext>;
 export type Extension = {
@@ -87,7 +87,12 @@ export async function runExtensions<K extends keyof ClientExtension>(
     );
 }
 
-interface ClientConfig {
+export interface ClientConfig {
+    /**
+     * VS Code extensions that extend the language client
+     * @default []
+     * @items.description VS Code extension identifier
+     */
     extensions: string[];
 }
 
@@ -100,7 +105,7 @@ export async function initialize(
     serverModule: vscode.Uri;
     clientOptions: LanguageClientOptions;
 }> {
-    const config = vscode.workspace.getConfiguration("sysml");
+    const config = vscode.workspace.getConfiguration(SETTINGS_KEY);
     const clientConfig: Partial<ClientConfig> = config.client;
     const extensions = await collectExtensions(clientConfig.extensions ?? []);
 

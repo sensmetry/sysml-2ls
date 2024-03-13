@@ -19,6 +19,7 @@ import { Disposable } from "vscode-languageserver";
 import { recursiveObjectContaining, services } from "../../../../testing";
 import { SysMLConfig } from "../../../config";
 import { LanguageConfig } from "../../../events";
+import { SETTINGS_KEY } from "../configuration-provider";
 
 describe("Configuration provider", () => {
     const provider = services.shared.workspace.ConfigurationProvider;
@@ -43,7 +44,7 @@ describe("Configuration provider", () => {
         };
         provider.updateConfiguration({
             settings: {
-                sysml: config,
+                [SETTINGS_KEY]: config,
             },
         });
 
@@ -57,7 +58,7 @@ describe("Configuration provider", () => {
             const cb = jest.fn();
             disposables.push(services[lang].Events.onConfigurationChanged.add(cb));
 
-            const section = lang.toLowerCase();
+            const section = provider["toSectionName"](lang.toLowerCase());
             const old = provider["settings"][section];
             const config: LanguageConfig = {
                 "editor.insertSpaces": true,

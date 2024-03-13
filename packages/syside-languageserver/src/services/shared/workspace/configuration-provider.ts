@@ -22,7 +22,7 @@ import { LanguageConfig, LanguageEvents, SharedEvents } from "../../events";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
 import { SysMLFileSystemProvider } from "./file-system-provider";
 
-export const SETTINGS_KEY = "sysml";
+export const SETTINGS_KEY = "syside";
 
 export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
     protected readonly services: SysMLSharedServices;
@@ -113,5 +113,10 @@ export class SysMLConfigurationProvider extends DefaultConfigurationProvider {
     private updateStdlibPath(config: SysMLConfig): void {
         const stdPath = config.standardLibraryPath;
         this.fs.updateStandardLibrary(stdPath);
+    }
+
+    protected override toSectionName(languageId: string): string {
+        // VS Code uses [langId] for language specific settings
+        return languageId === SETTINGS_KEY ? languageId : `[${languageId}]`;
     }
 }
