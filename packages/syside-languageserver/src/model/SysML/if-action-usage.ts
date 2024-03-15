@@ -23,7 +23,7 @@ import {
     MembershipMeta,
     ParameterMembershipMeta,
 } from "../KerML";
-import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ElementIDProvider, GeneralType, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { NonNullable, enumerable } from "../../utils";
 import { AstNode, LangiumDocument } from "langium";
@@ -72,7 +72,7 @@ export class IfActionUsageMeta extends ActionUsageMeta {
         return this._ast as IfActionUsage;
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isIfThenElse()) supertypes.push("ifThenElse");
         return supertypes;

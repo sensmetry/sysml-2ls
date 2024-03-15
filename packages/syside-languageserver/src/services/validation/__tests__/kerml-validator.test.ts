@@ -143,16 +143,16 @@ describe("Duplicate member names", () => {
     });
 });
 
-test("mixed specializations and conjugations trigger validation", () => {
+test.failing("mixed specializations and conjugations trigger validation", () => {
     return expectValidations(
-        "type A :> B ~ C;",
+        "feature A :> B ~ C;",
         "validateSpecializationSpecificNotConjugated"
     ).resolves.toHaveLength(1);
 });
 
-test("multiple conjugations trigger validation", () => {
+test.failing("multiple conjugations trigger validation", () => {
     return expectValidations(
-        "type A ~ B ~ C;",
+        "feature A ~ B ~ C;",
         "validateTypeAtMostOneConjugator"
     ).resolves.toHaveLength(2);
 });
@@ -331,6 +331,26 @@ describe("Subsettings", () => {
             "validateSubsettingFeaturingTypes"
         ).resolves.toHaveLength(1);
     });
+
+    test.failing(
+        "redefining features with incompatible directions triggers validation ",
+        async () => {
+            return expectValidations(
+                `
+        function A {
+            in feature a;
+            out feature b;
+            inout feature c;
+        }
+        feature a : A {
+            :>> a = 2;
+            :>> b = 2;
+            :>> c = 2;
+        }`,
+                "validateRedefinitionDirectionConformance"
+            ).resolves.toHaveLength(3);
+        }
+    );
 });
 
 describe("DataType", () => {
@@ -472,15 +492,15 @@ describe("parameter memberships", () => {
     });
 
     it.each([
-        ["function", FunctionMeta, "validateFunctionResultParameterMembership"],
-        ["expression", ExpressionMeta, "validateExpressionResultParameterMembership"],
+        ["function", FunctionMeta, "validateFunctionReturnParameterMembership"],
+        ["expression", ExpressionMeta, "validateExpressionReturnParameterMembership"],
     ] as const)("multiple result expressions trigger %s validation", (_, type, code) => {
         const doc = emptyDocument();
         const id = basicIdProvider();
         const ns = (type as typeof FeatureMeta).create(id, doc, {
             children: namespaceChildren(
-                [ResultExpressionMembershipMeta.create(id, doc), ExpressionMeta.create(id, doc)],
-                [ResultExpressionMembershipMeta.create(id, doc), ExpressionMeta.create(id, doc)]
+                [ReturnParameterMembershipMeta.create(id, doc), ExpressionMeta.create(id, doc)],
+                [ReturnParameterMembershipMeta.create(id, doc), ExpressionMeta.create(id, doc)]
             ),
         });
 
@@ -663,6 +683,22 @@ describe("Item flows", () => {
     });
 });
 
+describe("feature values", () => {
+    it("should  trigger validation when redefining feature with a non-default value", async () => {
+        return expectValidations(
+            `
+            class A {
+                feature a = 3;
+            }
+            class B :> A {
+                :>> a = 4;
+            }
+            `,
+            "validateFeatureValueOverriding"
+        ).resolves.toHaveLength(1);
+    });
+});
+
 describe("multiplicity range return type", () => {
     it("should trigger validation for non-integer types", () => {
         return expectValidations(
@@ -671,7 +707,7 @@ describe("multiplicity range return type", () => {
         ).resolves.toHaveLength(1);
     });
 
-    it.each(["-", "+", "*", "/", "**", "^"])(
+    it.each(["-", "+", "*", "**", "^"])(
         "%s should not trigger validation with integer types",
         (op) => {
             return expectValidations(
@@ -698,6 +734,13 @@ describe("multiplicity range return type", () => {
 });
 
 describe("Metadata feature validations", () => {
+    test("missing metaclass typing triggers validation", async () => {
+        return expectValidations(
+            "class M; metadata m : M;",
+            "validateMetadataFeatureMetaclass"
+        ).resolves.toHaveLength(1);
+    });
+
     test("abstract typings trigger validation", async () => {
         return expectValidations(
             "abstract metaclass M; metadata m : M;",

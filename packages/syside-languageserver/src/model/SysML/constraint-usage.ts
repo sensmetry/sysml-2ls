@@ -24,7 +24,7 @@ import {
 import { RequirementConstraintKind } from "../enums";
 import { FeatureMeta } from "../KerML";
 import { BooleanExpressionMeta, BooleanExpressionOptions } from "../KerML/boolean-expression";
-import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ElementIDProvider, GeneralType, MetatypeProto, metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
 import { AstNode, LangiumDocument } from "langium";
 
@@ -40,9 +40,9 @@ export interface ConstraintUsageOptions extends BooleanExpressionOptions, Occurr
     requirement: "Requirements::RequirementCheck::constraints",
 })
 export class ConstraintUsageMeta extends Mixin(BooleanExpressionMeta, OccurrenceUsageMeta) {
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertype = this.requirementConstraintSupertype();
-        const supertypes = supertype ? [supertype] : [];
+        const supertypes: GeneralType[] = supertype ? [supertype] : [];
         supertypes.push(...super.defaultGeneralTypes());
 
         if (this.isCheckedConstraint()) supertypes.push("checkedConstraint");

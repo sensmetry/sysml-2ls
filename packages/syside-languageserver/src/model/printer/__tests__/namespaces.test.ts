@@ -145,13 +145,6 @@ type a
         }).resolves.toEqual(`feature all a ${token} c, e;\n`);
     });
 
-    it("should not merge sequential conjugation", async () => {
-        return expectPrinted("type a conjugates b ~ c {}", {}).resolves.toMatchInlineSnapshot(`
-"type a conjugates b ~ c {}
-"
-`);
-    });
-
     it("should merge sequential feature chaining", async () => {
         return expectPrinted("feature a chains a chains b {}", { node: Feature }).resolves.toEqual(
             "feature a chains a.b {}\n"

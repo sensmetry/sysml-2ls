@@ -358,13 +358,14 @@ export interface FormatPreservedOptions<T extends string, R> {
  */
 export function formatPreserved<T extends string, R>(
     node: ElementMeta,
-    option: Required<PreservableFormatting<T>>,
+    option: PreservableFormatting<T>,
+    fallback: T,
     config: FormatPreservedOptions<T, R>
 ): R {
     const { choose } = config;
     if (option.default !== "preserve") return choose[option.default]();
     const cst = node.cst();
-    if (!cst) return choose[option.fallback]();
+    if (!cst) return choose[option.fallback || fallback]();
 
     const alt = choose.preserve(config.find(cst));
     return choose[alt]();
@@ -392,7 +393,7 @@ export function selectDeclarationKeyword(
     kw: string,
     option: PreservableFormatting<"always" | "as_needed">
 ): string | undefined {
-    const token = formatPreserved(node, option, {
+    const token = formatPreserved(node, option, "always", {
         find: (node) => findNodeForKeyword(node, kw),
         choose: {
             always: () => kw,
@@ -408,7 +409,7 @@ export function shouldIgnoreRef(
     node: UsageMeta,
     option: PreservableFormatting<"always" | "never">
 ): boolean {
-    return formatPreserved(node, option, {
+    return formatPreserved(node, option, "always", {
         find: (node) => findNodeForKeyword(node, "ref"),
         choose: {
             always: () => false,

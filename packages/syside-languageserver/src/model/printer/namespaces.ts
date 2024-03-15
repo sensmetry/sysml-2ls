@@ -63,6 +63,7 @@ import {
     printModelElements,
 } from "./print";
 import { formatPreserved, printIdentifiers, throwError } from "./utils";
+import { printArgument } from "./expressions";
 
 /**
  * Returns an array of printed metadata prefixes. Callee should handle
@@ -283,7 +284,8 @@ function selectDeclaredRelationshipToken(
     if (!info.token) return info.keyword;
 
     const token = info.token;
-    return formatPreserved(current, info.format, {
+    const fallback = info.format.fallback || "token";
+    return formatPreserved(current, info.format, fallback, {
         // have to look at the previous node since type declarations may have
         // multiple keywords/tokens
         find: (node) => getPreviousNode(node, false),
@@ -298,7 +300,7 @@ function selectDeclaredRelationshipToken(
                         return "keyword";
                     default:
                         // most likely a separator
-                        return info.format.fallback;
+                        return fallback;
                 }
             },
         },
@@ -453,7 +455,7 @@ export function printChildrenBlock(
         };
 
         if (options?.forceEmptyBrackets) return asBrackets();
-        return formatPreserved(node, context.format.empty_namespace_brackets, {
+        return formatPreserved(node, context.format.empty_namespace_brackets, "always", {
             find: (node) => findNodeForKeyword(node, "{"),
             choose: {
                 always: asBrackets,
@@ -572,7 +574,7 @@ export function printMultiplicityPart(
         if (node.isNonUnique) props.push(keyword("nonunique"));
 
         if (props.length > 1) {
-            suffix = formatPreserved(node, context.format.ordered_nonunique_priority, {
+            suffix = formatPreserved(node, context.format.ordered_nonunique_priority, "ordered", {
                 find: (cst) => {
                     const ordered = findNodeForKeyword(cst, "ordered");
                     const nonunique = findNodeForKeyword(cst, "nonunique");
@@ -929,6 +931,12 @@ export function printKerMLFeature<T extends FeatureMeta>(
 export function printFeature(node: FeatureMeta, context: ModelPrinterContext): Doc {
     const owner = node.owner();
     if (owner) {
+        if (
+            node.parent()?.nodeType() == ast.ParameterMembership &&
+            owner.is(ast.InvocationExpression)
+        ) {
+            return printArgument(node, context);
+        }
         switch (owner.nodeType()) {
             case ast.FeatureChainExpression:
                 return printChaining(node, context);
@@ -953,7 +961,7 @@ export function printFeature(node: FeatureMeta, context: ModelPrinterContext): D
         }
     }
 
-    const kw = formatPreserved(node, context.format.feature_keyword, {
+    const kw = formatPreserved(node, context.format.feature_keyword, "always", {
         find: (node) => findNodeForKeyword(node, "feature"),
         choose: {
             always: () => "feature",
@@ -982,7 +990,7 @@ export function printFeature(node: FeatureMeta, context: ModelPrinterContext): D
 export function printInvariant(node: InvariantMeta, context: ModelPrinterContext): Doc {
     const kw = node.isNegated
         ? literals.false
-        : formatPreserved(node, context.format.invariant_true_keyword, {
+        : formatPreserved(node, context.format.invariant_true_keyword, "always", {
               find: (node) => findNodeForKeyword(node, "true"),
               choose: {
                   always: () => literals.true,

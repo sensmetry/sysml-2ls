@@ -37,7 +37,13 @@ import {
     TypeFeaturing,
 } from "../../generated/ast";
 import { FeatureDirectionKind, TypeClassifier } from "../enums";
-import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import {
+    BasicMetamodel,
+    ElementIDProvider,
+    GeneralType,
+    MetatypeProto,
+    metamodelOf,
+} from "../metamodel";
 import {
     ConjugationMeta,
     Edge,
@@ -50,6 +56,7 @@ import {
     FeatureValueMeta,
     InheritanceMeta,
     OwningMembershipMeta,
+    RedefinitionMeta,
     RestEdges,
     SubsettingMeta,
     TypeFeaturingMeta,
@@ -58,7 +65,7 @@ import {
     TypeRelationshipMeta,
 } from "./_internal";
 import { SubtypeKeys, SysMLType } from "../../services/sysml-ast-reflection";
-import { AstNode, EMPTY_STREAM, LangiumDocument, stream, Stream } from "langium";
+import { AstNode, EMPTY_STREAM, LangiumDocument, stream, Stream, TreeStreamImpl } from "langium";
 import { NonNullable, enumerable } from "../../utils";
 
 export const ImplicitFeatures = {
@@ -66,6 +73,7 @@ export const ImplicitFeatures = {
     dataValue: "Base::dataValues",
     occurrence: "Occurrences::occurrences",
     suboccurrence: "Occurrences::Occurrence::suboccurrences",
+    portion: "Occurrences::Occurrence::portions",
     object: "Objects::objects",
     subobject: "Objects::Object::subobjects",
     participant: "Links::Link::participant",
@@ -290,7 +298,7 @@ export class FeatureMeta extends TypeMeta {
         return this._owningType;
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isAssociationEnd()) supertypes.push("participant");
 
@@ -299,9 +307,25 @@ export class FeatureMeta extends TypeMeta {
 
     override defaultSupertype(): string {
         if (this.hasStructureType()) return this.isSubobject() ? "subobject" : "object";
-        if (this.hasClassType()) return this.isSuboccurrence() ? "suboccurrence" : "occurrence";
+        if (this.hasClassType())
+            return this.isSuboccurrence()
+                ? "suboccurrence"
+                : this.isPortion
+                ? "portion"
+                : "occurrence";
         if (this.hasDataType()) return "dataValue";
         return "base";
+    }
+
+    protected isPortionImpl(): boolean {
+        const owningType = this.owningType;
+        if (!owningType) {
+            return false;
+        }
+        return (
+            this.isPortion &&
+            (owningType.is(Class) || (owningType.is(Feature) && owningType.hasClassType()))
+        );
     }
 
     override ast(): Feature | undefined {
@@ -397,6 +421,52 @@ export class FeatureMeta extends TypeMeta {
      */
     namingFeature(): FeatureMeta | undefined {
         return this.types(Redefinition).head() as FeatureMeta | undefined;
+    }
+
+    isFeaturedWithin(type: TypeMeta | undefined): boolean {
+        if (type === undefined) {
+            return (
+                this.featuredBy.length == 0 ||
+                (this.featuredBy.length == 1 &&
+                    this.featuredBy[0].qualifiedName == "Base::Anything")
+            );
+        }
+
+        if (this.featuredBy.length == 0) {
+            // implicitly featured by Base::Anything which every type is subtype of
+            // we do not add implicit featuring yet
+            return true;
+        }
+
+        return this.featuredBy.every((f) => type.specializes(f));
+    }
+
+    allRedefinitions(): Stream<RedefinitionMeta> {
+        const visited = new Set<unknown>();
+        const self = RedefinitionMeta.create(() => -1, this.document);
+        self["setElement"](this);
+        return new TreeStreamImpl<RedefinitionMeta>(
+            self,
+            (s) =>
+                s
+                    .element()
+                    ?._heritage.get(Redefinition)
+                    .filter((s) => {
+                        const target = s.element();
+                        if (visited.has(target)) return false;
+                        visited.add(target);
+                        return true;
+                    }) ?? [],
+            {
+                includeRoot: false,
+            }
+        );
+    }
+
+    allRedefinedFeatures(): Stream<FeatureMeta> {
+        return this.allRedefinitions()
+            .map((r) => r.element())
+            .filter(NonNullable);
     }
 
     referencedFeature<K extends SysMLType>(kind?: K): FeatureMeta | undefined {
@@ -559,12 +629,6 @@ export class FeatureMeta extends TypeMeta {
         }
 
         return Array.from(types);
-    }
-
-    isFeaturedBy(type: TypeMeta): boolean {
-        return this.featuredBy.some(
-            (t) => t.conforms(type) || (t.is(Feature) && t.isFeaturedBy(type))
-        );
     }
 
     override ownedParameters(): Stream<FeatureMeta> {

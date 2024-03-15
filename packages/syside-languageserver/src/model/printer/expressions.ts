@@ -19,6 +19,7 @@ import {
     AnyOperator,
     ElementMeta,
     ExpressionMeta,
+    FeatureMembershipMeta,
     FeatureMeta,
     FeatureReferenceExpressionMeta,
     IMPLICIT_OPERATORS,
@@ -149,7 +150,6 @@ export function precedence(node: ElementMeta): number {
             return PREC_LEVELS.ALL;
         case "'#'":
         case "'['":
-        case "'->'":
         case "'.?'":
         case "'.'":
         case "collect":
@@ -181,10 +181,10 @@ export function getOperator(expr: ElementMeta | undefined): AnyOperator {
         case ast.CollectExpression:
             return IMPLICIT_OPERATORS.COLLECT;
         case ast.OperatorExpression: {
-            const op = (expr as OperatorExpressionMeta).operator;
-            if (op === OPERATORS.NONE) return IMPLICIT_OPERATORS.ARROW;
-            return op;
+            return (expr as OperatorExpressionMeta).operator;
         }
+        case ast.FeatureReferenceExpression:
+            return getOperator((expr as FeatureReferenceExpressionMeta).expression?.element());
         case ast.MetadataAccessExpression: {
             const owner = expr.owner();
             if (
@@ -220,10 +220,7 @@ export function shouldFlatten(expr: ElementMeta, lhs: ElementMeta): boolean {
 
     const leftOp = getOperator(expr);
     const lhsOp = getOperator(lhs);
-    if (
-        lhsOp === IMPLICIT_OPERATORS.ARROW ||
-        ((leftOp === OPERATORS.MODULO || leftOp !== lhsOp) && leftPrec === PREC_LEVELS.MULTIPLICITY)
-    )
+    if ((leftOp === OPERATORS.MODULO || leftOp !== lhsOp) && leftPrec === PREC_LEVELS.MULTIPLICITY)
         return false;
 
     return true;
@@ -323,7 +320,6 @@ function printBinaryOpRhs(
         case "'~'":
         case "'not'":
         case "'all'":
-        case "'->'":
         case "'.metadata'":
             /* istanbul ignore next */
             throw new Error(`${operator} is not a binary operator!`);
@@ -356,6 +352,41 @@ const defaultFeaturePrinter: ElementPrinter<FeatureMeta> = (node, context) => {
     return DefaultElementPrinter(node, context);
 };
 
+function shouldParenthesize(expr: ElementMeta, branch: ElementMeta): boolean {
+    const exprPrec = precedence(expr);
+    const branchPrec = precedence(branch);
+
+    // less_equal since we use left-associative parsing which would put
+    // nodes with the same precedence on the lhs by default
+    if (branchPrec <= exprPrec) {
+        return true;
+    }
+    if (branchPrec == PREC_LEVELS.AND) {
+        // avoid human ambiguities and parenthesize and branches
+        return exprPrec == PREC_LEVELS.OR || exprPrec == PREC_LEVELS.XOR;
+    }
+
+    if (branchPrec == PREC_LEVELS.UNARY || branchPrec == PREC_LEVELS.ALL) {
+        // looks weird without parentheses
+        return (
+            exprPrec == PREC_LEVELS.RANGE ||
+            exprPrec == PREC_LEVELS.ADDITION ||
+            exprPrec == PREC_LEVELS.EXPONENTATION ||
+            exprPrec == PREC_LEVELS.MULTIPLICITY
+        );
+    }
+
+    if (exprPrec == PREC_LEVELS.RANGE) {
+        return (
+            branchPrec == PREC_LEVELS.ADDITION ||
+            branchPrec == PREC_LEVELS.EXPONENTATION ||
+            branchPrec == PREC_LEVELS.MULTIPLICITY
+        );
+    }
+
+    return false;
+}
+
 function printBinaryishExpressions(
     expr: OperatorExpressionMeta,
     context: ModelPrinterContext,
@@ -368,11 +399,13 @@ function printBinaryishExpressions(
     // would fail, find one explicitly
     rhs ??= expr.children
         .filter(BasicMetamodel.is(ast.Membership))
+        // catch also ReturnParameterMemberships that are not arguments
+        .find((m) => !m.is(ast.ParameterMembership) || !m.element().value)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .find((m) => !m.element()) as any;
+        ?.element() as any;
 
     let right: Doc;
-    if (rhs.owner() === expr) right = printModelElement(rhs, context, { printer });
+    if (rhs?.owner() === expr) right = printModelElement(rhs, context, { printer });
     else {
         const member = expr.children.find((m) => m.element() === rhs);
         /* istanbul ignore next */
@@ -398,18 +431,11 @@ function printBinaryishExpressions(
         const left = printModelElement(lhs, context);
         hasLhs = left !== literals.emptytext;
         // Not in flattening mode, so wrap lhs in parentheses even if
-        // precendences are equal as `shouldFlatten` returns false where the lhs
+        // precedences are equal as `shouldFlatten` returns false where the lhs
         // node should be wrapped. Sequence expressions don't have to be
         // parenthesized a second time.
         const lhsOp = getOperator(lhs);
-        parts = [
-            paren(
-                left,
-                lhsOp !== OPERATORS.COMMA &&
-                    lhsOp !== IMPLICIT_OPERATORS.ARROW &&
-                    precedence(lhs) <= precedence(expr)
-            ),
-        ];
+        parts = [paren(left, lhsOp !== OPERATORS.COMMA && shouldParenthesize(expr, lhs))];
     }
 
     const operator = getOperator(expr);
@@ -417,7 +443,7 @@ function printBinaryishExpressions(
         ...printBinaryOpRhs(expr, operator, right, context, {
             // less_equal since we use left-associative parsing which would put
             // nodes with the same precedence on the lhs by default
-            parens: precedence(rhs) <= precedence(expr),
+            parens: shouldParenthesize(expr, rhs),
             flatten,
             hasLhs,
         })
@@ -438,10 +464,19 @@ function printBinaryishExpressions(
 }
 
 function printConditionalExpression(
-    expr: OperatorExpressionMeta,
+    expr: OperatorExpressionMeta | FeatureReferenceExpressionMeta,
     context: ModelPrinterContext,
     nested = false
 ): Doc {
+    if (expr.is(ast.FeatureReferenceExpression)) {
+        const target = expr.expression?.element();
+        if (!target || !target.is(ast.OperatorExpression) || target.operator != OPERATORS.IF)
+            throwError(
+                expr,
+                "FeatureReferenceExpression does not refer to a conditional expression!"
+            );
+        expr = target;
+    }
     const [test, then, else_] = expr.arguments();
 
     let hasChain = false;
@@ -502,15 +537,17 @@ function printConditionalExpression(
     return group([condition, indent(branches)]);
 }
 
-function printArrowExpression(expr: OperatorExpressionMeta, context: ModelPrinterContext): Doc {
+function printArrowExpression(expr: InvocationExpressionMeta, context: ModelPrinterContext): Doc {
     const args = expr.arguments();
+    const nonArg = expr.children
+        .find((m): m is FeatureMembershipMeta => m.nodeType() == ast.FeatureMembership)
+        ?.element();
     const isExpr =
-        args.length === 2 &&
-        args[1].nodeType() === ast.Expression &&
-        args[1].specializations().every((s) => s.isImplied);
-    const isList = Boolean(
-        args.length === 1 || (args.length >= 2 && args[1].parent()?.is(ast.ParameterMembership))
-    );
+        args.length === 1 &&
+        nonArg &&
+        nonArg.nodeType() === ast.Expression &&
+        nonArg.specializations().every((s) => s.isImplied);
+    const isList = Boolean(!nonArg || args.length >= 2);
 
     const target = paren(
         printModelElement(args[0], context),
@@ -524,7 +561,13 @@ function printArrowExpression(expr: OperatorExpressionMeta, context: ModelPrinte
     if (isList) {
         const inner = join(
             [literals.comma, line],
-            args.slice(1).map((arg) => printArgument(arg, context))
+            args.slice(1).map((arg) =>
+                printArgument(
+                    // args are owned so owner is not null
+                    arg.owner() as FeatureMeta,
+                    context
+                )
+            )
         );
         return group(
             [
@@ -540,22 +583,25 @@ function printArrowExpression(expr: OperatorExpressionMeta, context: ModelPrinte
     }
 
     if (isExpr) {
-        const inner = printModelElement(args[1], context);
+        const inner = printModelElement(nonArg, context);
         return group([target, func, literals.space, inner]);
     }
 
+    if (!nonArg) throwError(expr, "InvocationExpression is missing a FunctionReferenceMember!");
     return fill([
         target,
         softline,
         func,
         indent(line),
-        indent(printModelElement(args[1], context)),
+        indent(printTarget(nonArg.specializations(ast.FeatureTyping)[0], context)),
     ]);
 }
 
 function printUnaryExpression(expr: OperatorExpressionMeta, context: ModelPrinterContext): Doc {
     const operator = expr.operator;
-    const arg = expr.arguments()[0];
+    const arg = expr.arguments().at(0) ?? expr.children[0].element();
+    if (!arg)
+        throwError(expr, `Unary expression ${expr} is missing an argument or a result member!`);
     return [
         text(operator.slice(1, -1), HighlightOperator),
         operator === OPERATORS.NOT || operator === OPERATORS.ALL
@@ -618,9 +664,6 @@ export function printOperatorExpression(
             return contents;
         }
 
-        case IMPLICIT_OPERATORS.ARROW:
-            return printArrowExpression(expr, context);
-
         case "'+'":
         case "'-'": {
             if (expr.arguments().length === 1) return printUnaryExpression(expr, context);
@@ -633,13 +676,13 @@ export function printOperatorExpression(
     }
 }
 
-function printArgument(arg: FeatureMeta, context: ModelPrinterContext): Doc {
+export function printArgument(arg: FeatureMeta, context: ModelPrinterContext): Doc {
     const value = arg.value?.element();
 
     /* istanbul ignore next */
     if (!value) throwError(arg, "Invalid argument - missing value");
 
-    let rhs = printModelElement(value, context);
+    let rhs = printArgumentValue(value, context);
 
     const name = arg.specializations().find((s) => !s.isImplied && s.is(ast.Redefinition));
     if (!name) return rhs;
@@ -660,6 +703,10 @@ function printArgument(arg: FeatureMeta, context: ModelPrinterContext): Doc {
     });
 }
 
+export function printArgumentValue(value: ExpressionMeta, context: ModelPrinterContext): Doc {
+    return printModelElement(value, context);
+}
+
 /**
  * Default printer for `InvocationExpression`
  */
@@ -667,6 +714,10 @@ export function printInvocationExpr(
     node: InvocationExpressionMeta,
     context: ModelPrinterContext
 ): Doc {
+    if (node.operands.length > 0) {
+        return printArrowExpression(node, context);
+    }
+
     const typing = node.specializations(ast.FeatureTyping).at(0);
 
     /* istanbul ignore next */
@@ -681,7 +732,10 @@ export function printInvocationExpr(
                     softline,
                     join(
                         [literals.comma, line],
-                        node.arguments().map((arg) => printArgument(arg, context))
+                        [
+                            ...node.operands.map((arg) => printArgumentValue(arg, context)),
+                            ...node.argumentMembers().map((arg) => printArgument(arg, context)),
+                        ]
                     ),
                 ]),
                 softline,
@@ -733,7 +787,7 @@ export function printNullExpression(node: NullExpressionMeta, context: ModelPrin
         inner = [literals.space, inner];
     }
 
-    return formatPreserved(node, context.format.null_expression, {
+    return formatPreserved(node, context.format.null_expression, "null", {
         find: (node) => findNodeForKeyword(node, "null"),
         choose: {
             null: (): Doc => group([keyword("null"), inner]),
@@ -743,23 +797,27 @@ export function printNullExpression(node: NullExpressionMeta, context: ModelPrin
     });
 }
 
+export function printExpressionBody(node: ExpressionMeta, context: ModelPrinterContext): Doc {
+    if (node.specializations().some((s) => !s.isImplied))
+        // a function reference
+        return printTarget(node.specializations(ast.FeatureTyping)[0], context);
+
+    return group(
+        printChildrenBlock(node, node.children, context, {
+            result: node.result,
+            insertSpaceBeforeBrackets: false,
+            forceEmptyBrackets: true,
+        })
+    );
+}
+
 export function printExpression(node: ExpressionMeta, context: ModelPrinterContext): Doc {
     if (
         node.parent()?.is(ast.FeatureMembership) &&
-        node.owner()?.isAny(ast.OperatorExpression, ast.FeatureReferenceExpression)
+        node.owner()?.isAny(ast.InvocationExpression, ast.FeatureReferenceExpression)
     ) {
         // this is a body expression
-        if (node.specializations().some((s) => !s.isImplied))
-            // a function reference
-            return printTarget(node.specializations(ast.FeatureTyping)[0], context);
-
-        return group(
-            printChildrenBlock(node, node.children, context, {
-                result: node.result,
-                insertSpaceBeforeBrackets: false,
-                forceEmptyBrackets: true,
-            })
-        );
+        return printExpressionBody(node, context);
     }
 
     if (node.owner()?.is(ast.TriggerInvocationExpression)) {
@@ -820,9 +878,9 @@ export function printTriggerInvocationExpression(
                 return descendant
                     .descend((node) => {
                         /* istanbul ignore next */
-                        if (!node.is(ast.Expression))
-                            throwError(node, "Expected an owned result expression");
-                        return node.result;
+                        if (!node.is(ast.Feature))
+                            throwError(node, "Expected an owned feature value");
+                        return node.value;
                     })
                     .descend((node) => node.element());
             }

@@ -23,12 +23,13 @@ import {
     Inheritance,
     Type,
     TypeRelationship,
+    Conjugation,
 } from "../../generated/ast";
 import { SubtypeKeys, SysMLInterface, SysMLTypeList } from "../../services/sysml-ast-reflection";
 import { enumerable, KeysMatching } from "../../utils/common";
 import { collectRedefinitions } from "../../utils/scope-util";
 import { ElementContainer } from "../containers";
-import { getTypeClassifierString, TypeClassifier } from "../enums";
+import { FeatureDirectionKind, getTypeClassifierString, TypeClassifier } from "../enums";
 import {
     BasicMetamodel,
     ElementID,
@@ -255,6 +256,19 @@ export class TypeMeta extends Mixin(
     }
 
     /**
+     * Stream of direct supertypes types matching {@link kind}
+     * @param kind specialization kind filter
+     */
+    supertypes<K extends SubtypeKeys<Inheritance>>(kind: K): Stream<TypeMeta>;
+    supertypes<K extends SubtypeKeys<Inheritance> | undefined>(kind: K): Stream<TypeMeta>;
+    supertypes(kind?: undefined): Stream<TypeMeta>;
+    supertypes<K extends SubtypeKeys<Inheritance>>(kind?: K): Stream<TypeMeta> {
+        return stream(this.specializations(kind))
+            .map((s) => s.element())
+            .nonNullable();
+    }
+
+    /**
      * Stream of all direct and indirect specializations
      * @param kind specialization kind filter
      */
@@ -290,6 +304,45 @@ export class TypeMeta extends Mixin(
     }
 
     /**
+     * Stream of all direct and indirect supertype specializations
+     * @param kind specialization kind filter
+     */
+    allSupertypeSpecializations<K extends SubtypeKeys<Inheritance>>(
+        kind: K
+    ): Stream<InheritanceMeta>;
+    // prettier-ignore
+    allSupertypeSpecializations<K extends SubtypeKeys<Inheritance> | undefined>(kind: K): Stream<InheritanceMeta>;
+    allSupertypeSpecializations(kind?: undefined): Stream<InheritanceMeta>;
+    allSupertypeSpecializations<K extends SubtypeKeys<Inheritance>>(
+        kind?: K
+    ): Stream<InheritanceMeta> {
+        const visited = new Set<unknown>();
+        const self = SpecializationMeta.create(() => -1, this.document);
+        self["setElement"](this);
+        const tree = new TreeStreamImpl<InheritanceMeta>(
+            self,
+            // avoid circular specializations, there probably should be a
+            // warning
+            (s) =>
+                s
+                    .element()
+                    ?.specializations()
+                    .filter((s) => {
+                        const target = s.element();
+                        if (visited.has(target)) return false;
+                        visited.add(target);
+                        return true;
+                    }) ?? [],
+            {
+                includeRoot: false,
+            }
+        );
+
+        if (!kind) return tree;
+        return tree.filter(BasicMetamodel.is(kind));
+    }
+
+    /**
      * Stream of all direct and indirect specialized types
      * @param kind specialization kind filter
      * @param includeSelf if true, also include itself
@@ -309,14 +362,49 @@ export class TypeMeta extends Mixin(
     }
 
     /**
+     * Stream of all direct and indirect supertypes
+     * @param kind specialization kind filter
+     * @param includeSelf if true, also include itself
+     */
+    // prettier-ignore
+    allSupertypes<K extends SubtypeKeys<Inheritance> | undefined>(kind: K, includeSelf?: boolean): Stream<TypeMeta>;
+    allSupertypes(kind?: undefined, includeSelf?: boolean): Stream<TypeMeta>;
+    allSupertypes<K extends SubtypeKeys<Inheritance> | undefined>(
+        kind?: K,
+        includeSelf = false
+    ): Stream<TypeMeta> {
+        const tree = this.allSupertypeSpecializations(kind)
+            .map((s) => s.element())
+            .nonNullable();
+        if (includeSelf) return stream([this]).concat(tree);
+        return tree;
+    }
+
+    /**
      * @param type qualified name or type AST node to check
-     * @returns true if this type specializes directly or indirectly
+     * @returns true if this type conforms directly or indirectly to
      * {@link type}, false otherwise
      */
     conforms(type: string | TypeMeta): boolean {
         if (typeof type === "string")
             return this.allTypes(undefined, true).some((t) => t?.qualifiedName === type);
         return this.allTypes(undefined, true).some((t) => t === type);
+    }
+
+    /**
+     * @param type qualified name or type AST node to check
+     * @returns true if this type specializes directly or indirectly
+     * {@link type}, false otherwise
+     */
+    specializes(type: string | TypeMeta): boolean {
+        const conjugator = this._heritage.get(Conjugation).at(0);
+        if (conjugator) {
+            return Boolean(conjugator.element()?.specializes(type));
+        }
+
+        if (typeof type === "string")
+            return this.allSupertypes(undefined, true).some((t) => t?.qualifiedName === type);
+        return this.allSupertypes(undefined, true).some((t) => t === type);
     }
 
     /**
@@ -476,6 +564,37 @@ export class TypeMeta extends Mixin(
                 collectRedefinitions(f, visited);
                 return true;
             });
+    }
+
+    directionOf(feature: FeatureMeta, visited: Set<TypeMeta> = new Set()): FeatureDirectionKind {
+        if (feature.owningType == this) {
+            return feature.direction;
+        }
+
+        visited.add(this);
+
+        const conjugator = this._heritage.get(Conjugation).at(0);
+        if (conjugator) {
+            const original = conjugator.element();
+            if (!original || visited.has(original)) {
+                return "none";
+            }
+
+            const direction = original.directionOf(feature, visited);
+            return direction == "in" ? "out" : direction == "out" ? "in" : direction;
+        }
+
+        for (const spec of this.specializations()) {
+            const general = spec.element();
+            if (general && !visited.has(general)) {
+                const direction = general.directionOf(feature, visited);
+                if (direction != "none") {
+                    return direction;
+                }
+            }
+        }
+
+        return "none";
     }
 
     ownedFeatureMemberships(): Stream<FeatureMembershipMeta> {

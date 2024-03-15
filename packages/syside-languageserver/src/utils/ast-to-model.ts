@@ -57,6 +57,10 @@ const AstToModel: {
         model["setParent"](node.$container?.$meta);
     },
 
+    [ast.Comment](model, node) {
+        if (node.locale) model.locale = node.locale.substring(1, node.locale.length - 1);
+    },
+
     [ast.FeatureReferenceExpression](model, node) {
         model["_expression"] = node.expression.$meta as MembershipMeta<FeatureMeta>;
     },
@@ -77,6 +81,9 @@ const AstToModel: {
 
     [ast.OperatorExpression](model, node) {
         if (node.operator) model.operator = `'${node.operator}'` as Operator;
+    },
+
+    [ast.InvocationExpression](model, node) {
         model["_operands"] = node.operands.map((e) => e.$meta);
     },
 

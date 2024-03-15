@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { PerformActionUsage, ReferenceSubsetting } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { EventOccurrenceUsageMeta, EventOccurrenceUsageOptions } from "./event-occurrence-usage";
 import { enumerable } from "../../utils";
@@ -39,7 +39,7 @@ export class PerformActionUsageMeta extends Mixin(EventOccurrenceUsageMeta, Acti
         // empty
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");
 

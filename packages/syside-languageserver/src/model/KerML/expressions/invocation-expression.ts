@@ -16,33 +16,54 @@
 
 import {
     Expression,
-    Feature,
     InvocationExpression,
-    Membership,
+    ParameterMembership,
     SysMLFunction,
 } from "../../../generated/ast";
-import { BasicMetamodel, metamodelOf } from "../../metamodel";
-import { ExpressionMeta, ExpressionOptions, FeatureMeta, TypeMeta } from "../_internal";
+import { NonNullable, enumerable } from "../../../utils/common";
+import { metamodelOf } from "../../metamodel";
+import {
+    ElementParts,
+    ExpressionMeta,
+    ExpressionOptions,
+    FeatureMeta,
+    TypeMeta,
+} from "../_internal";
 
 export type InvocationExpressionOptions = ExpressionOptions;
 
 @metamodelOf(InvocationExpression)
 export class InvocationExpressionMeta extends ExpressionMeta {
-    protected _args: readonly FeatureMeta[] = [];
+    protected _args: readonly ExpressionMeta[] = [];
 
     /**
      * Cached version of {@link arguments} that is populated during model build
      * time
      */
-    get args(): readonly FeatureMeta[] {
+    get args(): readonly ExpressionMeta[] {
         return this._args;
     }
 
-    arguments(): readonly FeatureMeta[] {
-        return this.children
-            .filter(BasicMetamodel.is(Membership))
-            .map((m) => m.element())
-            .filter(BasicMetamodel.is(Feature));
+    // this only exists for compatibility with AST since we don't construct the
+    // missing intermediate elements to operands
+    protected _operands: ExpressionMeta[] = [];
+
+    @enumerable
+    get operands(): readonly ExpressionMeta[] {
+        return this._operands;
+    }
+
+    argumentMembers(): readonly FeatureMeta[] {
+        return this._children.get(ParameterMembership).map((m) => m.element());
+    }
+
+    arguments(): readonly ExpressionMeta[] {
+        return [
+            ...this.operands,
+            ...this.argumentMembers()
+                .map((f) => f.value?.element())
+                .filter(NonNullable),
+        ];
     }
 
     override ast(): InvocationExpression | undefined {
@@ -64,6 +85,11 @@ export class InvocationExpressionMeta extends ExpressionMeta {
         const type = this.invokes();
         if (type?.isAny(Expression, SysMLFunction)) return type.returnType();
         return type;
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        super.collectDeclaration(parts);
+        parts.push(["operands", this.operands]);
     }
 }
 

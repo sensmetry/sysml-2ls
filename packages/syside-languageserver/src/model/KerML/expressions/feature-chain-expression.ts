@@ -14,9 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { FeatureChainExpression } from "../../../generated/ast";
+import { Feature, FeatureChainExpression, Membership } from "../../../generated/ast";
 import { metamodelOf } from "../../metamodel";
-import { OperatorExpressionMeta, OperatorExpressionOptions, TypeMeta } from "../_internal";
+import {
+    FeatureMeta,
+    OperatorExpressionMeta,
+    OperatorExpressionOptions,
+    TypeMeta,
+} from "../_internal";
 
 export const ImplicitFeatureChainExpressions = {
     target: "ControlFunctions::'.'::source::target", // TODO
@@ -28,6 +33,15 @@ export interface FeatureChainExpressionOptions extends OperatorExpressionOptions
 
 @metamodelOf(FeatureChainExpression, ImplicitFeatureChainExpressions)
 export class FeatureChainExpressionMeta extends OperatorExpressionMeta {
+    targetFeature(): FeatureMeta | undefined {
+        const target = this._children
+            .get(Membership)
+            .at(Math.max(0, 1 - this.operands.length))
+            ?.element();
+
+        return target?.is(Feature) ? target : undefined;
+    }
+
     override ast(): FeatureChainExpression | undefined {
         return this._ast as FeatureChainExpression;
     }
@@ -36,7 +50,7 @@ export class FeatureChainExpressionMeta extends OperatorExpressionMeta {
     }
 
     override returnType(): string | TypeMeta | undefined {
-        return this.featureMembers().at(-1)?.finalElement();
+        return this.targetFeature()?.basicFeature();
     }
 }
 

@@ -18,7 +18,7 @@ import { AstNode, LangiumDocument } from "langium";
 import { AcceptActionUsage, TransitionFeatureMembership } from "../../generated/ast";
 import { NonNullable, enumerable } from "../../utils";
 import { Edge, ElementParts, FeatureMeta, MembershipMeta, ParameterMembershipMeta } from "../KerML";
-import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ElementIDProvider, GeneralType, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ReferenceUsageMeta } from "./reference-usage";
 import { createEmptyParameterMember } from "./reference-usage";
@@ -58,7 +58,7 @@ export class AcceptActionUsageMeta extends ActionUsageMeta {
     override ast(): AcceptActionUsage | undefined {
         return this._ast as AcceptActionUsage;
     }
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         if (!this.isTriggerAction()) return super.defaultGeneralTypes();
         return [];
     }

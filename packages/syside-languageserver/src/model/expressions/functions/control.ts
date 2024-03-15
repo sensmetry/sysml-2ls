@@ -17,6 +17,7 @@
 import { Feature, Type } from "../../../generated/ast";
 import {
     ElementMeta,
+    FeatureChainExpressionMeta,
     FeatureMeta,
     IMPLICIT_OPERATORS,
     OPERATORS,
@@ -102,7 +103,7 @@ export class DotFunction extends BuiltinFunction {
         evaluator: ModelLevelExpressionEvaluator
     ): ExpressionResult {
         const values = evaluator.evaluateArgument(expression, 0, target);
-        const targetFeature = expression.args.at(1);
+        const targetFeature = (expression as FeatureChainExpressionMeta).targetFeature();
         if (!targetFeature) throw new Error("Missing target feature");
 
         // nothing to evaluate, everything is a number

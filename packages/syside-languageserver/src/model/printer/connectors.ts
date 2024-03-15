@@ -62,6 +62,7 @@ import {
     printGenericFeature,
     kermlFeatureModifiers,
     TypePrinterOptions,
+    featureValueAppender,
 } from "./namespaces";
 import { BasicMetamodel } from "../metamodel";
 import { occurrenceUsageModifiers, sysmlUsageModifiers } from "./definition-usages";
@@ -115,7 +116,7 @@ export function printConnectorEndMember(node: EndMember, context: ModelPrinterCo
 
         heritage.push(
             line,
-            formatPreserved(target, context.format.declaration_reference_subsetting, {
+            formatPreserved(target, context.format.declaration_reference_subsetting, "token", {
                 find: (node) => findNodeForKeyword(node, "::>"),
                 choose: {
                     keyword: () => keyword("references "),
@@ -233,7 +234,7 @@ export function printBinaryEnds(
     const format = options.source.format;
     const kw = options.source.keyword;
     const sourceKeyword = format
-        ? formatPreserved(node, format, {
+        ? formatPreserved(node, format, "always", {
               find: (node) => findNodeForKeyword(node, kw),
               choose: {
                   always: () => [keyword(kw), literals.space],
@@ -287,7 +288,7 @@ export interface ConnectorPrinterOptions
      * Additional doc to prepend to the end member declaration. Callee should
      * prepend any leading whitespace.
      */
-    suffix?: Doc;
+    suffix?: Doc | ((declaration: Doc[]) => void);
 
     ends?: EndMemberArray;
 }
@@ -303,12 +304,17 @@ export function printGenericConnector(
     options: ConnectorPrinterOptions
 ): Doc {
     const ends = options.ends ?? node.ends;
+    const suffix = options.suffix;
+    const push_suffix = (decl: Doc[]): void => {
+        if (!suffix) {
+            return;
+        }
+        typeof suffix == "function" ? suffix(decl) : decl.push(suffix);
+    };
+
     if (ends.length === 0) {
-        const suffix = options.suffix;
         return printGenericFeature(modifiers, kw, node, context, {
-            appendToDeclaration(decl) {
-                if (suffix) decl.push(suffix);
-            },
+            appendToDeclaration: push_suffix,
         });
     }
 
@@ -319,7 +325,7 @@ export function printGenericConnector(
     const printNary = (): Doc => {
         return printGenericFeature(modifiers, kw, node, context, {
             appendToDeclaration(decl) {
-                if (options.suffix) decl.push(options.suffix);
+                push_suffix(decl);
 
                 const linebreak = indent(group(line, { id: "nary-ends" }));
                 if (decl.length > 0) decl.push(options.naryPrefix ? literals.space : linebreak);
@@ -338,7 +344,7 @@ export function printGenericConnector(
     const printBinary = (): Doc => {
         return printGenericFeature(modifiers, kw, node, context, {
             appendToDeclaration(decl) {
-                if (options.suffix) decl.push(options.suffix);
+                push_suffix(decl);
                 if (decl.length > 0) decl.push(indent(line));
 
                 decl.push(indent(printBinaryEnds(node, ends, context, options)));
@@ -351,7 +357,7 @@ export function printGenericConnector(
     if (options.format === "nary") return printNary();
     if (ends.length > 2) return printNary();
 
-    return formatPreserved(node, options.format, {
+    return formatPreserved(node, options.format, "always", {
         find: (node) => findNodeForKeyword(node, "("),
         choose: {
             always: printBinary,
@@ -599,6 +605,7 @@ export function printConnectionUsage(node: ConnectionUsageMeta, context: ModelPr
                 format: SourceFormatAlways,
             },
             printer: printConnectorEndMember,
+            suffix: node.value ? featureValueAppender(node, context) : undefined,
         }
     );
 }
@@ -612,7 +619,7 @@ export function printConnector(node: ConnectorMeta, context: ModelPrinterContext
             keyword: "from",
             format: context.format.binary_connectors_from_keyword,
         },
-        suffix: undefined,
+        suffix: node.value ? featureValueAppender(node, context) : undefined,
     });
 }
 

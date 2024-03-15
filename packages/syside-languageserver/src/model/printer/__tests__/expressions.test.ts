@@ -226,11 +226,36 @@ describe("operator expressions", () => {
         }
     );
 
-    it.each([" == ", " === ", " != ", " !== ", " % ", "**", "^"])(
+    it.each([" == ", " === ", " != ", " !== ", " % "])(
         "should parenthesize print binary %s expression",
         async (op) => {
             const node = await parseExpr(`lhs ${op} mid ${op} rhs`);
             expect(printKerMLElement(node)).toEqual(`(lhs${op}mid)${op}rhs\n`);
+        }
+    );
+
+    describe.each([
+        ["and", "or"],
+        ["&", "or"],
+        ["and", "xor"],
+        ["&", "xor"],
+    ])("should parenthesize %s expression nested in an %s expression", (op, or_op) => {
+        test("lhs", async () => {
+            const node = await parseExpr(`lhs ${op} mid ${or_op} rhs`);
+            expect(printKerMLElement(node)).toEqual(`(lhs ${op} mid) ${or_op} rhs\n`);
+        });
+
+        test("rhs", async () => {
+            const node = await parseExpr(`lhs ${or_op} mid ${op} rhs`);
+            expect(printKerMLElement(node)).toEqual(`lhs ${or_op} (mid ${op} rhs)\n`);
+        });
+    });
+
+    it.each(["**", "^"])(
+        "should parenthesize print binary exponentiation %s expression",
+        async (op) => {
+            const node = await parseExpr(`lhs ${op} mid ${op} rhs`);
+            expect(printKerMLElement(node)).toEqual(`lhs${op}(mid${op}rhs)\n`);
         }
     );
 

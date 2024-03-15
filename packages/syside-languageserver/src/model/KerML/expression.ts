@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { Expression, FeatureValue, Multiplicity } from "../../generated/ast";
 import { isModelLevelEvaluable } from "../expressions/util";
-import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ElementIDProvider, GeneralType, MetatypeProto, metamodelOf } from "../metamodel";
 import { FunctionMixin } from "../mixins/function";
 import {
     Edge,
@@ -62,7 +62,7 @@ export class ExpressionMeta extends Mixin(StepMeta, FunctionMixin) {
         return this._owningType ? [this._owningType] : [];
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
         if (this.isBehaviorOwnedComposite()) supertypes.push("subperformance");

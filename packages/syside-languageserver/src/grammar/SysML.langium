@@ -75,7 +75,7 @@ fragment RelationshipBodyElements:
 // ===================================================================================================
 
 MetadataDefinition returns MetadataDefinition:
-    Abstract? 'metadata' 'def' DefinitionSuffix
+    Abstract? PrefixMetadata? 'metadata' 'def' DefinitionSuffix
 ;
 
 PrefixMetadataAnnotation returns Annotation:
@@ -95,6 +95,7 @@ PrefixMetadataUsage returns MetadataUsage:
 ;
 
 MetadataUsage returns MetadataUsage:
+    PrefixMetadata?
     ('metadata' | '@') MetadataUsageDeclaration
     ( 'about' about+=Annotation ( ',' about+=Annotation )*)?
     MetadataBody
@@ -459,34 +460,15 @@ fragment UsageBody:
 
 fragment ValuePart:
     value=FeatureValue
-    // TODO: empty rule
-    | value=FeatureValueExpression /* write=EmptyAssignmentActionMember */
 ;
 
 FeatureValue returns FeatureValue:
-    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) target=OwnedExpression
+    ( '='
+    | isInitial?=':='
+    | isDefault?='default' ( '=' | isInitial?=':=' )? 
+    )
+    target=OwnedExpression
 ;
-
-FeatureValueExpression returns FeatureValue:
-    isInitial?=':=' target=OwnedExpression
-;
-
-// EmptyAssignmentActionMember returns OwningMembership:
-//     target=EmptyAssignmentAction
-// ;
-
-// EmptyAssignmentAction returns AssignmentActionUsage:
-//     targetMember=EmptyTargetMember
-//     assignedValue=EmptyParameterMember
-// ;
-
-// EmptyTargetMember returns ParameterMembership:
-//     target=EmptyTargetParameter
-// ;
-
-// EmptyTargetParameter returns ReferenceUsage:
-//     children+=TargetFeatureMember
-// ;
 
 // Reference Usages
 
@@ -509,8 +491,8 @@ NonOccurrenceUsageElement returns Usage:
     | ReferenceUsage
     | AttributeUsage
     | EnumerationUsage
-    | BindingConnector
-    | Succession
+    | BindingConnectorAsUsage
+    | SuccessionAsUsage
     | ExtendedUsage
 ;
 
@@ -559,8 +541,8 @@ VariantUsageElement returns Usage:
     VariantReference
     | ReferenceUsage
     | AttributeUsage
-    | BindingConnector
-    | Succession
+    | BindingConnectorAsUsage
+    | SuccessionAsUsage
     | OccurrenceUsage
     | IndividualUsage
     | PortionUsage
@@ -605,6 +587,7 @@ AttributeUsage returns AttributeUsage:
 // ===================================================================================================
 
 EnumerationDefinition returns EnumerationDefinition:
+    PrefixMetadata?
     'enum' 'def' DefinitionDeclaration EnumerationBody
 ;
 
@@ -623,7 +606,7 @@ EnumerationUsageMember returns VariantMembership:
 ;
 
 EnumeratedValue returns EnumerationUsage:
-    'enum'? UsageSuffix
+    PrefixMetadata? 'enum'? UsageSuffix
 ;
 
 EnumerationUsage returns EnumerationUsage:
@@ -700,7 +683,7 @@ MultiplicitySourceEndMember returns EndFeatureMembership:
     target=MultiplicitySourceEnd
 ;
 
-MultiplicitySourceEnd returns Feature:
+MultiplicitySourceEnd returns ReferenceUsage:
     multiplicity=OwnedMultiplicity
 ;
 
@@ -711,8 +694,8 @@ MultiplicitySourceEnd returns Feature:
 //     target=EmptyTargetEnd
 // ;
 
-// EmptyTargetEnd returns Feature:
-//     {Feature}
+// EmptyTargetEnd returns ReferenceUsage:
+//     {ReferenceUsage}
 // ;
 
 // Items
@@ -784,13 +767,13 @@ ConnectorEndMember returns EndFeatureMembership:
     target=ConnectorEnd
 ;
 
-ConnectorEnd returns Feature:
+ConnectorEnd returns ReferenceUsage:
     ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
 ;
 
 // Binding Connectors
 
-BindingConnector returns BindingConnectorAsUsage:
+BindingConnectorAsUsage returns BindingConnectorAsUsage:
     UsagePrefix ( 'binding' UsageDeclaration? )?
     'bind' ends+=ConnectorEndMember '=' ends+=ConnectorEndMember 
     DefinitionBody
@@ -798,7 +781,7 @@ BindingConnector returns BindingConnectorAsUsage:
 
 // Successions
 
-Succession returns SuccessionAsUsage:
+SuccessionAsUsage returns SuccessionAsUsage:
     UsagePrefix ( 'succession' UsageDeclaration? )? 
     'first' ends+=ConnectorEndMember 'then' ends+=ConnectorEndMember 
     DefinitionBody
@@ -814,7 +797,7 @@ ConnectionDefinition returns ConnectionDefinition:
 
 ConnectionUsage returns ConnectionUsage:
     OccurrenceUsagePrefix 
-    ( 'connection' UsageDeclaration?  ( 'connect' ConnectorPart )? 
+    ( 'connection' UsageDeclaration? ValuePart? ( 'connect' ConnectorPart )? 
     | 'connect' ConnectorPart
     ) UsageBody
 ;
@@ -835,8 +818,8 @@ fragment NaryConnectorPart:
 //     target=EmptySourceEnd
 // ;
 
-// EmptySourceEnd returns Feature:
-//     {Feature}
+// EmptySourceEnd returns ReferenceUsage:
+//     {ReferenceUsage}
 // ;
 
 
@@ -969,8 +952,8 @@ InterfaceNonOccurrenceUsageElement returns Usage:
     ReferenceUsage
     | AttributeUsage
     | EnumerationUsage
-    | BindingConnector
-    | Succession
+    | BindingConnectorAsUsage
+    | SuccessionAsUsage
 ;
 
 InterfaceOccurrenceUsageMember returns FeatureMembership:
@@ -1156,20 +1139,20 @@ TriggerFeatureValue returns FeatureValue:
 ;
 
 TriggerExpression returns TriggerInvocationExpression:
-    kind=('at' | 'after') children+=OwnedExpressionMember
-    | kind='when' children+=ChangeExpressionMember
+    kind=('at' | 'after') children+=ArgumentMember
+    | kind='when' children+=ArgumentExpressionMember
 ;
 
-ChangeExpressionMember returns FeatureMembership:
-    target=ChangeExpression
+ArgumentExpressionMember returns ParameterMembership:
+    target=ArgumentExpression
 ;
 
-ChangeExpression returns Expression:
-    result=ChangeResultExpressionMember
+ArgumentExpression returns Feature:
+    value=ArgumentExpressionValue
 ;
 
-ChangeResultExpressionMember returns ResultExpressionMembership:
-    target=OwnedExpression
+ArgumentExpressionValue returns FeatureValue:
+    target=OwnedExpressionReference
 ;
 
 SendNode returns SendActionUsage:
@@ -1186,8 +1169,8 @@ NodeParameterMember returns ParameterMembership:
     target=NodeParameter
 ;
 
-NodeParameter returns Usage:
-    {ReferenceUsage} value=FeatureBinding
+NodeParameter returns ReferenceUsage:
+    value=FeatureBinding
 ;
 
 FeatureBinding returns FeatureValue:
@@ -1305,7 +1288,7 @@ ControlNode returns ControlNode:
 ;
 
 fragment ControlNodePrefix:
-    RefPrefix Individual? Portion?
+    RefPrefix Individual? Portion? PrefixMetadata?
 ;
 
 MergeNode returns MergeNode:
@@ -1336,7 +1319,7 @@ fragment ActionNodeItems:
 //     target=EmptyUsage
 // ;
 
-// EmptyUsage returns Usage:
+// EmptyUsage returns ReferenceUsage:
 //     {ReferenceUsage}
 // ;
 
@@ -1596,11 +1579,7 @@ ResultExpressionMember returns ResultExpressionMembership:
 // Calculation Usages
 
 CalculationUsage returns CalculationUsage:
-    OccurrenceUsagePrefix 'calc' CalculationUsageDeclaration CalculationBody
-;
-
-fragment CalculationUsageDeclaration:
-    UsageDeclaration? ValuePart?
+    OccurrenceUsagePrefix 'calc' ActionUsageDeclaration CalculationBody
 ;
 
 // Constraints
@@ -1611,14 +1590,18 @@ ConstraintDefinition returns ConstraintDefinition:
 ;
 
 ConstraintUsage returns ConstraintUsage:
-    OccurrenceUsagePrefix 'constraint' CalculationUsageDeclaration CalculationBody
+    OccurrenceUsagePrefix 'constraint' ConstraintUsageDeclaration CalculationBody
 ;
 
 AssertConstraintUsage returns AssertConstraintUsage:
     OccurrenceUsagePrefix 'assert' (isNegated?='not')? (
         heritage+=OwnedReferenceSubsetting FeatureSpecializationPart?
-        | 'constraint' UsageDeclaration?
+        | 'constraint' ConstraintUsageDeclaration
     ) CalculationBody;
+
+fragment ConstraintUsageDeclaration:
+    UsageDeclaration? ValuePart?
+;
 
 // Requirements
 // ===================================================================================================
@@ -1659,8 +1642,8 @@ RequirementConstraintMember returns RequirementConstraintMembership:
 ;
 
 RequirementConstraintUsage returns ConstraintUsage:
-    heritage+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
-    | ( UsageExtensionKeyword* 'constraint' | UsageExtensionKeyword+ ) CalculationUsageDeclaration CalculationBody
+    heritage+=OwnedReferenceSubsetting FeatureSpecialization* CalculationBody
+    | ( UsageExtensionKeyword* 'constraint' | UsageExtensionKeyword+ ) ConstraintUsageDeclaration CalculationBody
 ;
 
 FramedConcernMember returns FramedConcernMembership:
@@ -1669,7 +1652,7 @@ FramedConcernMember returns FramedConcernMembership:
 
 FramedConcernUsage returns ConcernUsage:
     (heritage+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
-    | ( UsageExtensionKeyword* 'concern' | UsageExtensionKeyword+ ) CalculationUsageDeclaration CalculationBody
+    | ( UsageExtensionKeyword* 'concern' | UsageExtensionKeyword+ ) ConstraintUsageDeclaration CalculationBody
     )
 ;
 
@@ -1692,7 +1675,7 @@ StakeholderUsage returns PartUsage:
 // Requirement Usages
 
 RequirementUsage returns RequirementUsage:
-    OccurrenceUsagePrefix 'requirement' CalculationUsageDeclaration RequirementBody
+    OccurrenceUsagePrefix 'requirement' ConstraintUsageDeclaration RequirementBody
 ;
 
 SatisfyRequirementUsage returns SatisfyRequirementUsage:
@@ -1727,7 +1710,7 @@ ConcernDefinition returns ConcernDefinition:
 ;
 
 ConcernUsage returns ConcernUsage:
-    OccurrenceUsagePrefix 'concern' CalculationUsageDeclaration RequirementBody
+    OccurrenceUsagePrefix 'concern' ConstraintUsageDeclaration RequirementBody
 ;
 
 // Cases
@@ -1759,13 +1742,13 @@ ObjectiveMember returns ObjectiveMembership:
 ;
 
 ObjectiveRequirementUsage returns RequirementUsage:
-    UsageExtensionKeyword* CalculationUsageDeclaration RequirementBody
+    UsageExtensionKeyword* ConstraintUsageDeclaration RequirementBody
 ;
 
 // Case Usages
 
 CaseUsage returns CaseUsage:
-    OccurrenceUsagePrefix 'case' CalculationUsageDeclaration CaseBody;
+    OccurrenceUsagePrefix 'case' ActionUsageDeclaration CaseBody;
 
 // Analysis Cases
 // ===================================================================================================
@@ -1775,7 +1758,7 @@ AnalysisCaseDefinition returns AnalysisCaseDefinition:
 ;
 
 AnalysisCaseUsage returns AnalysisCaseUsage:
-    OccurrenceUsagePrefix 'analysis' CalculationUsageDeclaration CaseBody
+    OccurrenceUsagePrefix 'analysis' ActionUsageDeclaration CaseBody
 ;
 
 // Verification Cases
@@ -1786,7 +1769,7 @@ VerificationCaseDefinition returns VerificationCaseDefinition:
 ;
 
 VerificationCaseUsage returns VerificationCaseUsage:
-    OccurrenceUsagePrefix 'verification' CalculationUsageDeclaration CaseBody
+    OccurrenceUsagePrefix 'verification' ActionUsageDeclaration CaseBody
 ;
 
 RequirementVerificationMember returns RequirementVerificationMembership:
@@ -1795,7 +1778,7 @@ RequirementVerificationMember returns RequirementVerificationMembership:
 
 RequirementVerificationUsage returns RequirementUsage:
     heritage+=OwnedReferenceSubsetting FeatureSpecialization* RequirementBody
-    | ( UsageExtensionKeyword* 'requirement' | UsageExtensionKeyword+ ) CalculationUsageDeclaration RequirementBody
+    | ( UsageExtensionKeyword* 'requirement' | UsageExtensionKeyword+ ) ConstraintUsageDeclaration RequirementBody
 ;
 
 // Use Cases
@@ -1806,7 +1789,7 @@ UseCaseDefinition returns UseCaseDefinition:
 ;
 
 UseCaseUsage returns UseCaseUsage:
-    OccurrenceUsagePrefix 'use' 'case' CalculationUsageDeclaration CaseBody
+    OccurrenceUsagePrefix 'use' 'case' ActionUsageDeclaration CaseBody
 ;
 
 IncludeUseCaseUsage returns IncludeUseCaseUsage:
@@ -1843,6 +1826,7 @@ ViewRenderingMember returns ViewRenderingMembership:
 
 ViewRenderingUsage returns RenderingUsage:
     heritage+=OwnedReferenceSubsetting FeatureSpecialization* UsageBody
+    | (PrefixMetadata? 'rendering' | PrefixMetadata ) UsageSuffix
 ;
 
 // View Usages
@@ -1881,7 +1865,7 @@ ViewpointDefinition returns ViewpointDefinition:
 ;
 
 ViewpointUsage returns ViewpointUsage:
-    OccurrenceUsagePrefix 'viewpoint' CalculationUsageDeclaration RequirementBody
+    OccurrenceUsagePrefix 'viewpoint' ConstraintUsageDeclaration RequirementBody
 ;
 
 // Renderings
@@ -2034,7 +2018,7 @@ MultiplicativeExpression returns Expression:
 ;
 
 ExponentiationExpression returns Expression:
-    UnaryExpression ({OperatorExpression.operands+=current} operator=('**' | '^') operands+=UnaryExpression)*
+    UnaryExpression ({OperatorExpression.operands+=current} operator=('**' | '^') operands+=ExponentiationExpression)?
 ;
 
 // Unary Expressions
@@ -2058,7 +2042,7 @@ PrimaryExpression returns Expression:
     ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
     (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
         | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
-        | {OperatorExpression.operands+=current} '->' heritage+=ReferenceTyping 
+        | {InvocationExpression.operands+=current} '->' heritage+=ReferenceTyping 
             ( children+=ExpressionBodyMember
             | children+=FunctionReferenceMember
             | ArgumentList

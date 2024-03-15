@@ -73,7 +73,7 @@ export function successionAsUsageKind(
     previousSibling?: ElementMeta
 ): "target" | "empty" | "regular" | "transition" {
     if (previousSibling?.is(StateSubactionMembership) && previousSibling.kind === "entry") {
-        return "transition";
+        return node.ends.some(isExplicitConnectorEnd) ? "transition" : "empty";
     }
 
     const ends = node.ends;
@@ -415,7 +415,7 @@ function printDefaultTransitionUsage(node: TransitionUsageMeta, context: ModelPr
     const kw =
         node.effect && !node.guard && !node.accepter
             ? "transition"
-            : formatPreserved(node, context.format.transition_usage_keyword, {
+            : formatPreserved(node, context.format.transition_usage_keyword, "always", {
                   find: (node) => findNodeForKeyword(node, "transition"),
                   choose: {
                       always: () => "transition",

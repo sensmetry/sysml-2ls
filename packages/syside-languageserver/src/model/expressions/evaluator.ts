@@ -197,14 +197,6 @@ export class BuiltinFunctionEvaluator implements ModelLevelExpressionEvaluator {
     ): ExpressionResult {
         const arg = expression.args.at(index);
         if (!arg) throw new Error(`Missing argument at position ${index}`);
-        if (arg.value) {
-            const expr = arg.value.element();
-            if (!expr) {
-                this.stack.push(arg, arg.value);
-                throw new Error("Missing value expression");
-            }
-            return this.evaluate(expr, target);
-        }
         return this.evaluate(arg, target);
     }
 

@@ -211,7 +211,7 @@ export function printOccurrenceUsageSubtype(
             .find((s) => !s.isImplied)
             ?.nodeType() === ast.ReferenceSubsetting
     ) {
-        const kw = formatPreserved(node, options.format, {
+        const kw = formatPreserved(node, options.format, "always", {
             find: (node) => findNodeForKeyword(node, optionalKw.split(" ").at(-1) as string),
             choose: {
                 always: () => optionalKw,
@@ -341,14 +341,19 @@ export function printSatisfyRequirement(
         suffix.push(line, keyword("by "), indent(printTarget(subjectValue, context)));
     }
 
-    const assert = formatPreserved(node, context.format.satisfy_requirement_assert_keyword, {
-        find: (node) => findNodeForKeyword(node, "assert"),
-        choose: {
-            always: () => "assert ",
-            never: () => "",
-            preserve: (found) => (found ? "always" : "never"),
-        },
-    });
+    const assert = formatPreserved(
+        node,
+        context.format.satisfy_requirement_assert_keyword,
+        "always",
+        {
+            find: (node) => findNodeForKeyword(node, "assert"),
+            choose: {
+                always: () => "assert ",
+                never: () => "",
+                preserve: (found) => (found ? "always" : "never"),
+            },
+        }
+    );
 
     return printOccurrenceUsageSubtype(
         [assert + (node.isNegated ? "not satisfy" : "satisfy"), "requirement"],
@@ -372,7 +377,7 @@ export function printEnumerationUsage(
             ignoreRef: shouldIgnoreRef(node, context.format.attribute_usage_reference_keyword),
         });
 
-    const kw = formatPreserved(node, context.format.enum_member_keyword, {
+    const kw = formatPreserved(node, context.format.enum_member_keyword, "always", {
         find: (node) => findNodeForKeyword(node, "enum"),
         choose: {
             always: () => keyword("enum"),
@@ -395,7 +400,7 @@ export function printOccurrenceDefinition(
 ): Doc {
     let kw: string;
     if (node.isIndividual)
-        kw = formatPreserved(node, context.format.occurrence_keyword, {
+        kw = formatPreserved(node, context.format.occurrence_keyword, "always", {
             find: (node) => findNodeForKeyword(node, "occurrence"),
             choose: {
                 always: () => "occurrence def",
@@ -410,7 +415,7 @@ export function printOccurrenceDefinition(
 export function printOccurrenceUsage(node: OccurrenceUsageMeta, context: ModelPrinterContext): Doc {
     let kw: string | undefined;
     if (node.isIndividual || node.portionKind)
-        kw = formatPreserved(node, context.format.occurrence_keyword, {
+        kw = formatPreserved(node, context.format.occurrence_keyword, "always", {
             find: (node) => findNodeForKeyword(node, "occurrence"),
             choose: {
                 always: () => "occurrence",
@@ -446,7 +451,7 @@ export function printReferenceUsage(node: ReferenceUsageMeta, context: ModelPrin
     let refKw: "ref" | undefined | "missing";
     const getKw = (): "ref" | undefined => {
         if (refKw === undefined) {
-            refKw = formatPreserved(node, context.format.reference_usage_keyword, {
+            refKw = formatPreserved(node, context.format.reference_usage_keyword, "always", {
                 find: (node) => findNodeForKeyword(node, "ref"),
                 choose: {
                     always: (): "ref" => "ref",

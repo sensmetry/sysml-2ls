@@ -73,6 +73,8 @@ import {
     Inheritance,
     FeatureRelationship,
     TypeFeaturing,
+    ItemFlow,
+    FlowConnectionUsage,
 } from "../../../generated/ast";
 import {
     BasicMetamodel,
@@ -119,12 +121,16 @@ import {
     DependencyMeta,
     MembershipImportMeta,
     RelationshipOptions,
+    GeneralType,
+    ItemFlowMeta,
+    EndFeatureMembershipMeta,
+    FlowConnectionUsageMeta,
 } from "../../../model";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
 import { SysMLIndexManager } from "./index-manager";
 import { TypeMap, typeIndex } from "../../../model/types";
 import { implicitIndex } from "../../../model/implicits";
-import { TransitionFeatureKind } from "../../../model/enums";
+import { FeatureDirectionKind, TransitionFeatureKind } from "../../../model/enums";
 import { NonNullReference, SysMLLinker } from "../../references/linker";
 import { Statistics } from "../../../utils/common";
 import {
@@ -708,9 +714,9 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
             .iterator();
 
         stream(node.ownedEnds()).forEach((end) => {
-            if (end.specializations(Redefinition).length > 0) return; // no implicit end redefinition
             const base = baseEndIterator.next();
             if (base.done) return;
+            if (end.specializations(Redefinition).length > 0) return; // no implicit end redefinition
             const target = base.value.element();
             if (!target) return;
 
@@ -1359,25 +1365,26 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         (src as TypeMeta)["_typeRelationships"].push(node);
     }
 
-    // @builder(Feature)
-    // protected addFeatureWriteMember(node: FeatureMeta, _document: LangiumDocument): void {
-    //     if (!node.value || !node.value.isInitial || node.value.isDefault || node.featureWrite)
-    //         return;
+    @builder([ItemFlow, FlowConnectionUsage], 1000)
+    protected setFlowEndDirections(
+        node: ItemFlowMeta | FlowConnectionUsageMeta,
+        _document: LangiumDocument
+    ): void {
+        const ends = node.ends;
 
-    //     const lang = getLanguageId(_document.uri);
-    //     if (lang === ".sysml") {
-    //         const action = AssignmentActionUsageMeta.create(this.util.idProvider);
-    //         action["_targetMember"] = ParameterMembershipMeta.create(this.util.idProvider, {
-    //             parent: action,
-    //             target: ReferenceUsageMeta.create(this.util.idProvider),
-    //         });
-    //         const member = OwningMembershipMeta.create(this.util.idProvider, {
-    //             parent: node,
-    //             target: action,
-    //         });
-    //     }
-    //     // TODO: create feature write member, SysML/KerML differs what is created
-    // }
+        const setDirection = (
+            end: EndFeatureMembershipMeta | undefined,
+            direction: FeatureDirectionKind
+        ): void => {
+            const mem = end?.element().children[0];
+            if (mem?.is(FeatureMembership)) {
+                mem.element().direction = direction;
+            }
+        };
+
+        setDirection(ends[0], "out");
+        setDirection(ends[1], "in");
+    }
 
     /**
      * Construct the node fully by linking all its children and optionally specialized types
@@ -1461,23 +1468,31 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      * @param document document that owns {@link node}
      * @returns qualified names of implicit base types
      */
-    protected getImplicitSpecializations(node: ElementMeta, document: LangiumDocument): string[] {
-        const names: string[] = [];
+    protected getImplicitSpecializations(
+        node: ElementMeta,
+        document: LangiumDocument
+    ): GeneralType[] {
+        const names: GeneralType[] = [];
 
-        for (const kind of node.defaultGeneralTypes()) {
-            const implicitName = implicitIndex.get(node.nodeType(), kind);
+        for (const general of node.defaultGeneralTypes()) {
+            const name = typeof general == "string" ? general : general.type;
+            const implicitName = implicitIndex.get(node.nodeType(), name);
 
             if (!implicitName) {
                 document.modelDiagnostics.add(node, {
                     element: node,
-                    message: `Could not find implicit specialization for ${node.nodeType()} (${kind})`,
+                    message: `Could not find implicit specialization for ${node.nodeType()} (${name})`,
                     severity: "error",
                     info: {},
                 });
                 continue;
             }
 
-            names.push(implicitName);
+            names.push(
+                typeof general == "string"
+                    ? implicitName
+                    : { type: implicitName, specialization: general.specialization }
+            );
         }
 
         return names;
@@ -1497,10 +1512,8 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
         if (document.buildOptions?.standardLibrary === "none") return;
 
         const kind = node.specializationKind();
-        for (const name of this.getImplicitSpecializations(node, document)) {
-            if (!name) {
-                continue;
-            }
+        for (const general of this.getImplicitSpecializations(node, document)) {
+            const name = typeof general == "string" ? general : general.type;
             const implicit = this.findLibraryElement(
                 node,
                 name,
@@ -1508,8 +1521,12 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
                 type,
                 `Could not find implicit specialization for ${kind}`
             );
+
             if (implicit && implicit !== node) {
-                const specialization = this.constructMetamodel(kind, document) as InheritanceMeta;
+                const specialization = this.constructMetamodel(
+                    typeof general == "string" ? kind : general.specialization,
+                    document
+                ) as InheritanceMeta;
                 specialization["_isImplied"] = true;
                 node.addHeritage([specialization, implicit]);
             }

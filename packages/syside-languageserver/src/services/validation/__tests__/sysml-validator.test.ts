@@ -467,6 +467,15 @@ describe("Transition usage", () => {
     });
 });
 
+describe("AssertConstraintUsage", () => {
+    test("referencing non-constraint usage triggers validation", () => {
+        return expectValidations(
+            "attribute a; assert a;",
+            "validateAssertConstraintUsageReference"
+        ).resolves.toHaveLength(1);
+    });
+});
+
 describe.each([
     ["Actor", ActorMembershipMeta, "validateActorMembershipOwningType"],
     ["Subject", SubjectMembershipMeta, "validateSubjectMembershipOwningType"],
@@ -653,6 +662,62 @@ describe.each([
     });
 });
 
+describe("TriggerInvocationExpression validation", () => {
+    it("at should trigger validation for non time values", async () => {
+        return expectValidations(
+            `action A {
+                accept at 0;
+            }
+            `,
+            "validateTriggerInvocationActionAtArgument"
+        ).resolves.toHaveLength(1);
+    });
+
+    it("when should trigger validation for non boolean values", async () => {
+        return expectValidations(
+            `action A {
+                accept when 0;
+            }
+            `,
+            "validateTriggerInvocationActionWhenArgument"
+        ).resolves.toHaveLength(1);
+    });
+
+    it("when should not trigger validation for boolean values", async () => {
+        return expectValidations(
+            `action A {
+                accept when true;
+            }
+            `,
+            "validateTriggerInvocationActionWhenArgument"
+        ).resolves.toHaveLength(0);
+    });
+
+    it("after should trigger validation for non time values", async () => {
+        return expectValidations(
+            `action A {
+                accept after 0;
+            }
+            `,
+            "validateTriggerInvocationActionAfterArgument"
+        ).resolves.toHaveLength(1);
+    });
+
+    it("after should not trigger validation for duration literals", async () => {
+        return expectValidations(
+            `package ISQBase {
+                item def DurationUnit;
+            }
+            item ms : ISQBase::DurationUnit;
+            action A {
+                accept after 1 [ms];
+            }
+            `,
+            "validateTriggerInvocationActionAfterArgument"
+        ).resolves.toHaveLength(0);
+    });
+});
+
 describe("PartUsage validation", () => {
     test("usages not typed by part defs trigger validation", async () => {
         return expectValidations(
@@ -697,6 +762,15 @@ describe.each([
         return expectValidations(
             `${kw} def C; ${kw} def D; ${kw} p : C, D;`,
             code
+        ).resolves.toHaveLength(1);
+    });
+});
+
+describe("SatisfyRequirementUsage", () => {
+    test("referencing non-requirement usage triggers validation", () => {
+        return expectValidations(
+            "attribute a; satisfy a;",
+            "validateSatisfyRequirementUsageReference"
         ).resolves.toHaveLength(1);
     });
 });

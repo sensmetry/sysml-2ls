@@ -16,14 +16,13 @@
 
 import {
     ReferenceSubsetting,
+    Redefinition,
     RenderingDefinition,
     RenderingUsage,
-    ViewDefinition,
     ViewRenderingMembership,
-    ViewUsage,
 } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { PartUsageMeta, PartUsageOptions } from "./part-usage";
 
 export type RenderingUsageOptions = PartUsageOptions;
@@ -31,10 +30,19 @@ export type RenderingUsageOptions = PartUsageOptions;
 @metamodelOf(RenderingUsage, {
     base: "Views::renderings",
     subrendering: "Views::Rendering::subrenderings",
+    viewRendering: "Views::Rendering::viewRendering",
 })
 export class RenderingUsageMeta extends PartUsageMeta {
     override defaultSupertype(): string {
         return this.isSubrendering() ? "subrendering" : "base";
+    }
+
+    override defaultGeneralTypes(): GeneralType[] {
+        const supertypes = super.defaultGeneralTypes();
+        if (this.isViewRendering()) {
+            supertypes.push({ type: "viewRendering", specialization: Redefinition });
+        }
+        return supertypes;
     }
 
     isSubrendering(): boolean {
@@ -42,9 +50,9 @@ export class RenderingUsageMeta extends PartUsageMeta {
         return Boolean(parent?.isAny(RenderingUsage, RenderingDefinition));
     }
 
-    isRender(): boolean {
-        const parent = this.owner();
-        return Boolean(parent?.isAny(ViewDefinition, ViewUsage));
+    isViewRendering(): boolean {
+        const parent = this.parent();
+        return Boolean(parent?.is(ViewRenderingMembership));
     }
 
     override ast(): RenderingUsage | undefined {
