@@ -251,7 +251,8 @@ Type returns Type:
 
 fragment TypeDeclaration:
     Sufficient? Identification? (multiplicity=OwnedMultiplicity)?
-    (SpecializationPart | ConjugationPart)+ TypeRelationshipPart*
+    (SpecializationPart | ConjugationPart) 
+    TypeRelationshipPart*
 ;
 
 fragment SpecializationPart:
@@ -578,52 +579,14 @@ FeatureConjugation returns Conjugation:
 
 fragment ValuePart:
     value=FeatureValue
-    | value=FeatureValueExpression
-    // not reliable in Langium
-    //   write=EmptyFeatureWriteMember
 ;
 
 FeatureValue returns FeatureValue:
-    ( '=' | isDefault?='default' ( '=' | isInitial?=':=' )? ) target=OwnedExpression
+    ( '='
+    | isInitial?=':='
+    | isDefault?='default' ( '=' | isInitial?=':=' )?
+    ) target=OwnedExpression
 ;
-
-FeatureValueExpression returns FeatureValue:
-    isInitial?=':=' target=OwnedExpression
-;
-
-// EmptyFeatureWriteMember returns OwningMembership:
-//     target=EmptyFeatureWrite
-// ;
-
-// EmptyFeatureWrite returns Step:
-//     children+=EmptyTargetMember
-//     children+=EmptyParameterMember
-// ;
-
-// EmptyTargetMember returns ParameterMembership:
-//     target=EmptyTargetParameter
-// ;
-
-// SysML type in KerML? Really?
-// EmptyTargetParameter returns Feature:
-//     children+=TargetFeatureMember
-// ;
-
-// TargetFeatureMember returns FeatureMembership:
-//     target=TargetFeature
-// ;
-
-// TargetFeature returns Feature:
-//     children+=EmptyFeatureMember
-// ;
-
-// EmptyFeatureMember returns FeatureMembership:
-//     target=EmptyFeature
-// ;
-
-// EmptyParameterMember returns ParameterMembership:
-//     target=EmptyFeature
-// ;
 
 /* MULTIPLICITIES */
 
@@ -691,7 +654,11 @@ AssociationStructure returns AssociationStructure:
 /* Connectors */
 
 Connector returns Connector:
-    FeaturePrefix 'connector' ConnectorDeclaration TypeBody
+    FeaturePrefix 'connector' 
+    ( FeatureDeclaration? ValuePart? 
+    | ConnectorDeclaration
+    )
+    TypeBody
 ;
 
 fragment ConnectorDeclaration:
@@ -706,7 +673,7 @@ fragment BinaryConnectorDeclaration:
 
 fragment NaryConnectorDeclaration:
     FeatureDeclaration?
-    ( '(' ends+=ConnectorEndMember ( ',' ends+=ConnectorEndMember )+ ')' )?
+    '(' ends+=ConnectorEndMember ( ',' ends+=ConnectorEndMember )+ ')'
 ;
 
 ConnectorEndMember returns EndFeatureMembership:
@@ -904,6 +871,7 @@ PrefixMetadataFeature returns MetadataFeature:
 ;
 
 MetadataFeature returns MetadataFeature:
+    PrefixMetadata?
     ( '@' | 'metadata' ) MetadataFeatureDeclaration 
     ( 'about' about+=Annotation ( ',' about+=Annotation )* )?
     MetadataBody
@@ -1078,7 +1046,7 @@ MultiplicativeExpression returns Expression:
 ;
 
 ExponentiationExpression returns Expression:
-    UnaryExpression ({OperatorExpression.operands+=current} operator=('**' | '^') operands+=UnaryExpression)*
+    UnaryExpression ({OperatorExpression.operands+=current} operator=('**' | '^') operands+=ExponentiationExpression)?
 ;
 
 // Unary Expressions
@@ -1102,7 +1070,7 @@ PrimaryExpression returns Expression:
     ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
     (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
         | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
-        | {OperatorExpression.operands+=current} '->' heritage+=ReferenceTyping 
+        | {InvocationExpression.operands+=current} '->' heritage+=ReferenceTyping 
             ( children+=ExpressionBodyMember
             | children+=FunctionReferenceMember
             | ArgumentList

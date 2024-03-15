@@ -15,7 +15,12 @@
  ********************************************************************************/
 
 import { DeepPartial } from "langium";
-import { Namespace, SuccessionAsUsage, TransitionUsage } from "../../../generated/ast";
+import {
+    Namespace,
+    StateDefinition,
+    SuccessionAsUsage,
+    TransitionUsage,
+} from "../../../generated/ast";
 import { printDoc } from "../../../utils";
 import { StateUsageMeta } from "../../SysML";
 import { defaultSysMLPrinterContext, printModelElement } from "../print";
@@ -35,6 +40,25 @@ describe("successions", () => {
             lang: "sysml",
             node: SuccessionAsUsage,
         }).resolves.toEqual("then\n");
+    });
+
+    it("should print empty successions following an entry", async () => {
+        return expectPrinted(
+            `state def Counting {
+            entry assign counter.count := 0;
+            
+            then state wait;
+        }`,
+            {
+                lang: "sysml",
+                node: StateDefinition,
+            }
+        ).resolves.toEqual(`state def Counting {
+    entry assign counter.count := 0;
+
+    then state wait;
+}
+`);
     });
 
     it("should print empty successions with multiplicity source", async () => {

@@ -243,7 +243,7 @@ export function printWithVisibility(
     switch (edge.visibility) {
         case Visibility.public:
             return [
-                formatPreserved(edge, format, {
+                formatPreserved(edge, format, "always", {
                     find: (node) => findNodeForKeyword(node, "public"),
                     choose: {
                         always: () => keyword("public "),
@@ -340,7 +340,7 @@ export function printSourceTargetRelationship(
 
     const declaration: Doc[] = [];
     const prefix = options.format
-        ? formatPreserved(node, options.format, {
+        ? formatPreserved(node, options.format, "always", {
               find: (node) => findNodeForKeyword(node, kw),
               choose: {
                   always: () => keyword(kw),
@@ -386,7 +386,7 @@ export function selectToken(
     node: RelationshipMeta,
     option: DeclaredRelationshipFormat
 ): Text {
-    return formatPreserved(node, option, {
+    return formatPreserved(node, option, "token", {
         find: (node) => findNodeForKeyword(node, token.contents),
         choose: {
             keyword: () => kw,
@@ -420,7 +420,7 @@ export function printDependency(node: DependencyMeta, context: ModelPrinterConte
         declaration.push(indent(identifiers));
         from.push(keyword("from"), line);
     } else {
-        const kw = formatPreserved(node, context.format.dependency_from_keyword, {
+        const kw = formatPreserved(node, context.format.dependency_from_keyword, "always", {
             find: (node) => findNodeForKeyword(node, "from"),
             choose: {
                 always: () => keyword("from"),
@@ -657,7 +657,7 @@ export function printFeatureValue(node: FeatureValueMeta, context: ModelPrinterC
         if (node.isInitial) {
             prefix.push(text(":="));
         } else {
-            const equals = formatPreserved(node, context.format.feature_value_equals, {
+            const equals = formatPreserved(node, context.format.feature_value_equals, "always", {
                 find: (node) => findNodeForKeyword(node, "="),
                 choose: {
                     as_needed: () => undefined,
@@ -742,7 +742,7 @@ export function printSubsetting(node: SubsettingMeta, context: ModelPrinterConte
 export function printTypeFeaturing(node: TypeFeaturingMeta, context: ModelPrinterContext): Doc {
     assertKerML(context, node.nodeType());
     return printSourceTargetRelationship("featuring", node, context, {
-        sourceKw: formatPreserved(node, context.format.featuring_of_keyword, {
+        sourceKw: formatPreserved(node, context.format.featuring_of_keyword, "always", {
             find: (node) => findNodeForKeyword(node, "of"),
             choose: {
                 always: () => keyword("of"),
@@ -843,7 +843,7 @@ function printSpecialRequirementMember(
         printer(node, context) {
             const allowShorthand = canPrintShorthandUsage(node, ast.ReferenceSubsetting);
 
-            const kw = formatPreserved(node, context.format.framed_concern_keyword, {
+            const kw = formatPreserved(node, context.format.framed_concern_keyword, "always", {
                 find: (node) => findNodeForKeyword(node, options.targetKeyword),
                 choose: {
                     always: () => options.targetKeyword,
@@ -922,8 +922,9 @@ export function printViewRenderingMembership(
     previousSibling?: ElementMeta
 ): Doc {
     assertSysML(context, node.nodeType());
-    return printGenericMembership("render", node, context, {
+    return printSpecialRequirementMember(node, context, {
         previousSibling,
-        printer: printShorthandUsage,
+        memberKeyword: "render",
+        targetKeyword: "rendering",
     });
 }

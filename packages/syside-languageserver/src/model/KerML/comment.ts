@@ -19,10 +19,14 @@ import { Comment } from "../../generated/ast";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { TextualAnnotatingElementOptions, TextualAnnotatingMeta } from "./_internal";
 
-export type CommentOptions = TextualAnnotatingElementOptions;
+export interface CommentOptions extends TextualAnnotatingElementOptions {
+    locale?: string;
+}
 
 @metamodelOf(Comment)
 export class CommentMeta extends TextualAnnotatingMeta {
+    locale?: string;
+
     override ast(): Comment | undefined {
         return this._ast as Comment;
     }
@@ -31,9 +35,11 @@ export class CommentMeta extends TextualAnnotatingMeta {
         this: MetatypeProto<T>,
         provider: ElementIDProvider,
         document: LangiumDocument,
-        options?: TextualAnnotatingElementOptions | undefined
+        options?: CommentOptions | undefined
     ): T["$meta"] {
-        return super.create(provider, document, options);
+        const model = super.create(provider, document, options) as CommentMeta;
+        if (options) model.locale = options.locale;
+        return model;
     }
 }
 

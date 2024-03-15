@@ -136,6 +136,13 @@ export function metamodelOf<K extends SysMLType>(
     };
 }
 
+export type GeneralType =
+    | string
+    | {
+          type: string;
+          specialization: SubtypeKeys<Inheritance>;
+      };
+
 export interface Metamodel<T extends AstNode = AstNode> {
     /**
      * Assigned element ID
@@ -196,7 +203,7 @@ export interface Metamodel<T extends AstNode = AstNode> {
      * Array of strings of default general type kinds that are later resolved to
      * library elements together with the element type
      */
-    defaultGeneralTypes(): string[];
+    defaultGeneralTypes(): GeneralType[];
 
     /**
      * Default general type kind that should be directly or indirectly
@@ -344,7 +351,7 @@ export class BasicMetamodel<T extends AstNode = AstNode> implements Metamodel<T>
         return {};
     }
 
-    defaultGeneralTypes(): string[] {
+    defaultGeneralTypes(): GeneralType[] {
         return [this.defaultSupertype()];
     }
 

@@ -16,7 +16,13 @@
 
 import { Mixin } from "ts-mixer";
 import { ItemFlow, ItemFlowEnd } from "../../generated/ast";
-import { BasicMetamodel, ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import {
+    BasicMetamodel,
+    ElementIDProvider,
+    GeneralType,
+    MetatypeProto,
+    metamodelOf,
+} from "../metamodel";
 import {
     ConnectorMeta,
     ConnectorOptions,
@@ -61,7 +67,7 @@ export class ItemFlowMeta extends Mixin(StepMeta, ConnectorMeta) {
     override ast(): ItemFlow | undefined {
         return this._ast as ItemFlow;
     }
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");
         if (this.isBehaviorOwnedComposite()) supertypes.push("subperformance");

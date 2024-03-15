@@ -22,6 +22,8 @@ import {
     ActorMembershipMeta,
     AllocationUsageMeta,
     AnalysisCaseUsageMeta,
+    AssertConstraintUsageMeta,
+    AssignmentActionUsageMeta,
     AssociationStructMeta,
     AttributeUsageMeta,
     BasicMetamodel,
@@ -66,6 +68,7 @@ import {
     RequirementDefinitionMeta,
     RequirementUsageMeta,
     RequirementVerificationMembershipMeta,
+    SatisfyRequirementUsageMeta,
     SendActionUsageMeta,
     StakeholderMembershipMeta,
     StateDefinitionMeta,
@@ -75,6 +78,7 @@ import {
     SuccessionAsUsageMeta,
     TransitionFeatureMembershipMeta,
     TransitionUsageMeta,
+    TriggerInvocationExpressionMeta,
     TypeMeta,
     UsageMeta,
     UseCaseUsageMeta,
@@ -148,22 +152,6 @@ export class SysMLValidator extends KerMLValidator {
 
     // validateReferenceUsageIsReference - implicitly ensured by the model
     // validateUsageNonVariationMembership - duplicate with validateVariantMembershipOwningNamespace
-
-    /* // too restrictive such that pilot skips this for now
-    @validateSysML(ast.Usage)
-    validateUsageOwningType(node: UsageMeta, accept: ModelValidationAcceptor): void {
-        if (node.owningType && !node.owningType.isAny(ast.Usage, ast.Definition)) {
-            accept(
-                "error",
-                "Usage must either have no owning type, or it must be a Definition or a Usage.",
-                {
-                    element: node,
-                    code: "validateUsageOwningType",
-                }
-            );
-        }
-    }
-    */
 
     @validateSysML(ast.VariantMembership)
     validateVariantMembershipOwningNamespace(
@@ -519,6 +507,94 @@ export class SysMLValidator extends KerMLValidator {
         );
     }
 
+    @validateSysML(ast.AssignmentActionUsage)
+    validateAssignmentActionUsageReferent(
+        node: AssignmentActionUsageMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        if (!node.targetMember) {
+            accept("error", `An assignment must have a Feature referent.`, {
+                element: node,
+                code: "validateAssignmentActionUsageReferent",
+            });
+        }
+    }
+
+    @validateSysML(ast.TriggerInvocationExpression)
+    validateTriggerInvocationExpression(
+        node: TriggerInvocationExpressionMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        const arg = node.args.at(0);
+
+        switch (node.kind) {
+            case "at":
+                if (!arg || !this.isTime(arg)) {
+                    accept("error", "An at expression must be a TimeInstantValue.", {
+                        element: node,
+                        code: "validateTriggerInvocationActionAtArgument",
+                    });
+                }
+                break;
+            case "when":
+                if (!arg || !this.isBooleanExpression(arg)) {
+                    accept("error", "A when expression must be Boolean.", {
+                        element: node,
+                        code: "validateTriggerInvocationActionWhenArgument",
+                    });
+                }
+                break;
+            case "after":
+                if (!arg || !this.isDuration(arg)) {
+                    accept("error", "An after expression must be a DurationValue.", {
+                        element: node,
+                        code: "validateTriggerInvocationActionAfterArgument",
+                    });
+                }
+                break;
+        }
+    }
+
+    protected isTime(expr: ExpressionMeta): boolean {
+        const result = this.expressionResult(expr);
+
+        if (result && this.index.conforms(result, "Time::TimeInstantValue")) return true;
+        return (
+            expr.is(ast.OperatorExpression) &&
+            SysMLValidator.IntegerOperators.includes(expr.operator) &&
+            expr.args.every((arg) => this.isTime(arg) || this.isDuration(arg))
+        );
+    }
+
+    protected isDuration(expr: ExpressionMeta): boolean {
+        if (this.isDurationExpression(expr)) {
+            return true;
+        }
+
+        const result = this.expressionResult(expr);
+
+        if (result && this.index.conforms(result, "ISQBase::DurationValue")) return true;
+        return (
+            expr.is(ast.OperatorExpression) &&
+            SysMLValidator.IntegerOperators.includes(expr.operator) &&
+            expr.args.every((arg) => this.isTime(arg) || this.isDuration(arg))
+        );
+    }
+
+    protected isDurationExpression(expr: ExpressionMeta): boolean {
+        if (!expr.is(ast.OperatorExpression) || expr.operator != OPERATORS.QUANTITY) {
+            return false;
+        }
+
+        const arg = expr.args.at(1);
+        if (!arg) {
+            return false;
+        }
+
+        const result = this.expressionResult(arg);
+        return Boolean(result && this.index.conforms(result, "ISQBase::DurationUnit"));
+    }
+
     // TODO: validateControlNodeIncomingSuccessions (not in pilot)
     // TODO: validateControlNodeOutgoingSuccessions (not in pilot)
 
@@ -576,6 +652,14 @@ export class SysMLValidator extends KerMLValidator {
         }
     }
 
+    // we use explicit members for each of the features/parameters so checking
+    // would only be needed for incomplete elements, e.g. programmatic creation:
+
+    // validateForLoopActionUsageLoopVariable;
+    // validateForLoopActionUsageParameters;
+    // validateIfActionUsageParameters;
+    // validateWhileLoopActionUsageParameters;
+
     @validateSysML(ast.ExhibitStateUsage)
     validateExhibitStateUsageReference(
         node: ExhibitStateUsageMeta,
@@ -601,8 +685,6 @@ export class SysMLValidator extends KerMLValidator {
             );
         }
     }
-
-    // TODO: validateStateDefinitionIsParallelGeneralization (not in pilot)
 
     @validateSysML(ast.SuccessionAsUsage)
     @validateSysML(ast.TransitionUsage)
@@ -778,6 +860,18 @@ export class SysMLValidator extends KerMLValidator {
         );
     }
 
+    @validateSysML(ast.AssertConstraintUsage)
+    validateAssertConstraintUsageReference(
+        node: AssertConstraintUsageMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        this.checkReferencing(node, accept, {
+            type: ast.AssertConstraintUsage,
+            reference: ast.ConstraintUsage,
+            info: { code: "validateAssertConstraintUsageReference" },
+        });
+    }
+
     @validateSysML(ast.ConstraintUsage, [ast.RequirementUsage])
     validateConstraintUsageTyping(
         node: ConstraintUsageMeta,
@@ -805,9 +899,7 @@ export class SysMLValidator extends KerMLValidator {
                     ast.RequirementDefinition,
                     ast.CaseDefinition,
                     ast.CaseUsage
-                ) &&
-            // pilot allows for some reason
-            !node.parent()?.parent()?.is(ast.RequirementConstraintMembership)
+                )
         )
             accept(
                 "error",
@@ -916,6 +1008,18 @@ export class SysMLValidator extends KerMLValidator {
             "RequirementUsages must be typed by exactly one RequirementDefinition.",
             { code: "validateRequirementUsageTyping" }
         );
+    }
+
+    @validateSysML(ast.SatisfyRequirementUsage)
+    validateSatisfyRequirementUsageReference(
+        node: SatisfyRequirementUsageMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        this.checkReferencing(node, accept, {
+            type: ast.SatisfyRequirementUsage,
+            reference: ast.RequirementUsage,
+            info: { code: "validateSatisfyRequirementUsageReference" },
+        });
     }
 
     @validateSysML(ast.CaseDefinition)
@@ -1281,22 +1385,6 @@ export class SysMLValidator extends KerMLValidator {
         info?: Omit<ModelDiagnosticInfo<T>, "element">
     ): boolean {
         if (!node.allTypings().find((t) => t.is(bound))) {
-            accept("error", message, { ...info, element: node });
-            return false;
-        }
-
-        return true;
-    }
-
-    protected validateExactlyOneTyping<T extends FeatureMeta>(
-        node: T,
-        bound: SysMLType,
-        accept: ModelValidationAcceptor,
-        message: string,
-        info?: Omit<ModelDiagnosticInfo<T>, "element">
-    ): boolean {
-        const typings = node.allTypings();
-        if (typings.length !== 1 || !typings.find((t) => t.is(bound))) {
             accept("error", message, { ...info, element: node });
             return false;
         }

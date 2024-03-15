@@ -32,6 +32,7 @@ import {
     FeatureChainingMeta,
     FeatureMeta,
     FeatureReferenceExpressionMeta,
+    FeatureValueMeta,
     FunctionMeta,
     InteractionMeta,
     InvocationExpressionMeta,
@@ -52,11 +53,12 @@ import {
     ReturnParameterMembershipMeta,
     SpecializationMeta,
     SubsettingMeta,
+    typeArgument,
     TypeMeta,
 } from "../../model";
 import { SysMLSharedServices } from "../services";
 import { SysMLIndexManager } from "../shared/workspace/index-manager";
-import { SubtypeKeys, SysMLInterface } from "../sysml-ast-reflection";
+import { SubtypeKeys, SysMLInterface, SysMLType } from "../sysml-ast-reflection";
 import {
     ModelDiagnosticInfo,
     ModelValidationAcceptor,
@@ -227,7 +229,7 @@ export class KerMLValidator {
         },
         [ast.Unioning]: {
             code: "validateTypeOwnedUnioningNotOne",
-            message: "A Type cannot have exactly one ownedUnionin.",
+            message: "A Type cannot have exactly one ownedUnioning.",
         },
         [ast.FeatureChaining]: {
             code: "validateFeatureChainingFeatureNotOne",
@@ -344,6 +346,33 @@ export class KerMLValidator {
         }
     }
 
+    // this is broken until linking can be done to our custom model structures w/o langium AstNode
+    // @validateKerML(ast.Redefinition)
+    // validateRedefinitionDirectionConformance(
+    //     node: RedefinitionMeta,
+    //     accept: ModelValidationAcceptor
+    // ): void {
+    //     const redefining = node.source() as FeatureMeta | undefined;
+    //     const redefined = node.element();
+
+    //     if (!redefining || !redefined || redefined.parent() === node) return;
+
+    //     const dstFeaturings = redefined.featuredBy;
+    //     const direction = redefining.direction;
+    //     for (const featuring of dstFeaturings) {
+    //         const redefinedDir = featuring.directionOf(redefined);
+    //         if (
+    //             ((redefinedDir == "in" || redefinedDir == "out") && direction != redefinedDir) ||
+    //             (redefinedDir == "inout" && direction == "none")
+    //         ) {
+    //             accept("error", "Redefining feature must have a compatible direction", {
+    //                 element: node,
+    //                 code: "validateRedefinitionDirectionConformance",
+    //             });
+    //         }
+    //     }
+    // }
+
     @validateKerML(ast.FeatureChaining)
     validateFeatureChainingFeatureConformance(
         node: FeatureChainingMeta,
@@ -381,10 +410,10 @@ export class KerMLValidator {
         const dstFeaturings = redefined.featuredBy;
         if (srcFeaturings.every((t) => dstFeaturings.includes(t))) {
             accept(
-                "warning",
+                "error",
                 srcFeaturings.length === 0
-                    ? "A package level Feature must not redefine other Features."
-                    : "Owner of redefining feature should not be the same as owner of the redefined feature.",
+                    ? "A package level Feature cannot redefine other Features."
+                    : "Owner of redefining feature cannot be the same as owner of the redefined feature.",
                 {
                     element: node,
                     code: "validateRedefinitionFeaturingTypes",
@@ -457,10 +486,10 @@ export class KerMLValidator {
     ): void {
         if (!subsetted.isNonUnique && subsetting.isNonUnique) {
             accept(
-                "warning",
+                "error",
                 node.nodeType() === ast.Redefinition
-                    ? "Redefining feature should not be nonunique if redefined feature is unique"
-                    : "Subsetting feature should not be nonunique if subsetted feature is unique",
+                    ? "Redefining feature cannot be nonunique if redefined feature is unique"
+                    : "Subsetting feature cannot be nonunique if subsetted feature is unique",
                 {
                     element: node,
                     property: "sourceRef",
@@ -476,15 +505,10 @@ export class KerMLValidator {
         subsetted: FeatureMeta,
         accept: ModelValidationAcceptor
     ): void {
-        const subsettingTypes = subsetting.featuredBy;
         const subsettedTypes = subsetted.featuredBy;
         if (
             subsettedTypes.length > 0 &&
-            !subsettedTypes.every((t) =>
-                subsettingTypes.some(
-                    (f) => f.conforms(t) || (f.is(ast.Feature) && f.isFeaturedBy(t))
-                )
-            )
+            !subsettedTypes.every((t) => this.isAccessibleFrom(subsetting, t))
         ) {
             accept(
                 subsetting.owner()?.is(ast.ItemFlowEnd) ? "error" : "warning",
@@ -492,6 +516,19 @@ export class KerMLValidator {
                 { element: node, code: "validateSubsettingFeaturingTypes" }
             );
         }
+    }
+
+    protected isAccessibleFrom(feature: FeatureMeta, type: TypeMeta): boolean {
+        const featurings = feature.featuredBy;
+        return (
+            (featurings.length == 0 && type.qualifiedName == "Base::Anything") ||
+            featurings.some((featuring) => {
+                return (
+                    featuring.conforms(type) ||
+                    (featuring.is(ast.Feature) && this.isAccessibleFrom(featuring, type))
+                );
+            })
+        );
     }
 
     @validateKerML(ast.Subsetting)
@@ -633,7 +670,22 @@ export class KerMLValidator {
         // skip invalid binding connectors
         if (related.length !== 2) return;
 
-        if (!this.conformsSymmetrical(related[0].allTypings(), related[1].allTypings())) {
+        const notConformsBoolean = (i: number): boolean | undefined => {
+            const owningType = related[i].owningType;
+            return (
+                owningType &&
+                this.isBooleanExpression(owningType) &&
+                !related[i]
+                    .allTypings()
+                    .some((t) => this.index.conforms(t, "Performances::BooleanEvaluation"))
+            );
+        };
+
+        if (
+            !this.conformsSymmetrical(related[0].allTypings(), related[1].allTypings()) ||
+            notConformsBoolean(0) ||
+            notConformsBoolean(1)
+        ) {
             accept("warning", "Bound features should have conforming types", {
                 element: node,
                 code: "validateBindingConnectorTypeConformance",
@@ -655,9 +707,14 @@ export class KerMLValidator {
                 | FeatureMeta
                 | undefined;
 
-            if (!related || related.typeFeaturings.length === 0) return;
-            if (featuringTypes.some((type) => related.featuredBy.some((f) => type.conforms(f))))
+            if (
+                !related ||
+                (featuringTypes.length == 0
+                    ? related.isFeaturedWithin(undefined)
+                    : featuringTypes.every((t) => related?.isFeaturedWithin(t)))
+            ) {
                 return;
+            }
 
             accept(
                 "warning",
@@ -688,24 +745,24 @@ export class KerMLValidator {
     // implicitly ensured by the grammar but not the type system
     @validateKerML(ast.SysMLFunction)
     @validateKerML(ast.Expression)
-    validateResultParameterMembershipCount(
+    validateReturnParameterMembershipCount(
         node: ExpressionMeta | FunctionMeta,
         accept: ModelValidationAcceptor
     ): void {
         const isFn = node.is(ast.SysMLFunction);
-        const results = node.children.filter(BasicMetamodel.is(ast.ResultExpressionMembership));
-        if (results.length > (node.result ? 0 : 1))
+        const results = node.children.filter(BasicMetamodel.is(ast.ReturnParameterMembership));
+        if (results.length > 1)
             this.apply(
                 "error",
                 results,
                 `${
                     isFn ? "A Function" : "An Expression"
-                } must own at most one ResultParameterMembership.`,
+                } must own at most one ReturnParameterMembership.`,
                 accept,
                 {
                     code: isFn
-                        ? "validateFunctionResultParameterMembership"
-                        : "validateExpressionResultParameterMembership",
+                        ? "validateFunctionReturnParameterMembership"
+                        : "validateExpressionReturnParameterMembership",
                 }
             );
     }
@@ -743,7 +800,7 @@ export class KerMLValidator {
         node: FeatureChainExpressionMeta,
         accept: ModelValidationAcceptor
     ): void {
-        const target = node.args.at(1);
+        const target = node.targetFeature();
         const left = node.args.at(0);
 
         /* istanbul ignore next */
@@ -825,7 +882,8 @@ export class KerMLValidator {
     ): void {
         if (node.operator !== OPERATORS.AS) return;
 
-        const [left, type] = node.args;
+        const left = node.args.at(0);
+        const type = typeArgument(node);
         /* istanbul ignore next */
         if (!type || !left?.isAny(ast.Expression, ast.SysMLFunction)) return;
 
@@ -833,7 +891,7 @@ export class KerMLValidator {
         /* istanbul ignore next */
         if (!arg) return;
         const argTypes = arg.is(ast.Feature) ? arg.allTypings() : [arg];
-        const types = type.allTypings();
+        const types = type.is(ast.Feature) ? type.allTypings() : [type];
         if (!this.conformsSymmetrical(argTypes, types)) {
             accept("error", `Cast argument should have conforming types.`, {
                 element: node,
@@ -915,48 +973,55 @@ export class KerMLValidator {
         }
     }
 
-    private readonly ArithmeticOperators: AnyOperator[] = [
-        OPERATORS.MINUS,
-        OPERATORS.PLUS,
-        OPERATORS.MULTIPLY,
-        OPERATORS.DIVIDE,
-        OPERATORS.EXPONENT_1,
-        OPERATORS.EXPONENT_2,
-        OPERATORS.RANGE,
-    ];
+    @validateKerML(ast.FeatureValue)
+    validateFeatureValueOverriding(node: FeatureValueMeta, accept: ModelValidationAcceptor): void {
+        const feature = node.owner();
+        if (!feature?.is(ast.Feature)) {
+            return;
+        }
+
+        if (
+            feature
+                .allRedefinedFeatures()
+                .map((f) => f.value)
+                .some((fv) => fv && fv != node && !fv.isDefault)
+        ) {
+            accept("error", "Cannot override a non-default feature value.", {
+                element: node,
+                code: "validateFeatureValueOverriding",
+            });
+        }
+    }
 
     @validateKerML(ast.MultiplicityRange)
     validateMultiplicityRangeBoundResultTypes(
         node: MultiplicityRangeMeta,
         accept: ModelValidationAcceptor
     ): void {
-        const isNatural = (expr: FeatureMeta): boolean => {
-            if (expr.is(ast.FeatureReferenceExpression)) {
-                const target = expr.expression?.element();
-                // failure-to-link should not result in validation failure as
-                // well
-                return !target || isNatural(target);
-            }
-
-            return Boolean(
-                expr.conforms("ScalarValues::Integer") ||
-                    (expr.is(ast.LiteralNumber) && expr.isInteger && expr.literal >= 0) ||
-                    expr.is(ast.LiteralInfinity) ||
-                    (expr.is(ast.Expression) &&
-                        expr.result?.element().conforms("ScalarValues::Integer")) ||
-                    (expr.is(ast.OperatorExpression) &&
-                        this.ArithmeticOperators.includes(expr.operator) &&
-                        expr.args.every(isNatural))
-            );
-        };
-
-        if (node.range && !isNatural(node.range.element())) {
+        if (
+            node.range &&
+            !this.isInteger(node.range.element(), KerMLValidator.IntegerRangeOperators)
+        ) {
             accept(
                 "error",
-                "The results of the bound Expression(s) of a MultiplicityRange must be typed by ScalarValues::Natural.",
+                "The results of the bound Expression(s) of a MultiplicityRange must be Naturals.",
                 { element: node.range, code: "validateMultiplicityRangeBoundResultTypes" }
             );
         }
+    }
+
+    @validateKerML(ast.MetadataFeature, { bounds: [ast.MetadataUsage] })
+    validateMetadataFeatureMetaclass(
+        node: MetadataFeatureMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        this.validateExactlyOneTyping(
+            node,
+            ast.Metaclass,
+            accept,
+            "MetadataFeature must be typed by exactly one Metaclass.",
+            { code: "validateMetadataFeatureMetaclass" }
+        );
     }
 
     @validateKerML(ast.MetadataFeature)
@@ -1034,15 +1099,6 @@ export class KerMLValidator {
             this.validateMetadataFeatureBody(feature, accept);
         });
     }
-
-    protected readonly BooleanOperators: AnyOperator[] = [
-        OPERATORS.NOT,
-        OPERATORS.XOR,
-        OPERATORS.AND,
-        OPERATORS.BITWISE_AND,
-        OPERATORS.OR,
-        OPERATORS.BITWISE_OR,
-    ];
 
     @validateKerML(ast.ElementFilterMembership)
     validateElementFilterMembership(
@@ -1141,7 +1197,7 @@ export class KerMLValidator {
         );
     }
 
-    protected isBoolean(expr: ExpressionMeta): boolean {
+    protected expressionResult(expr: ExpressionMeta): string | TypeMeta | undefined {
         let result = expr.returnType();
         const func = expr.getFunction();
         if (!result && func) {
@@ -1154,11 +1210,122 @@ export class KerMLValidator {
             }
         }
 
+        return result;
+    }
+
+    protected readonly BooleanOperators: AnyOperator[] = [
+        OPERATORS.NOT,
+        OPERATORS.XOR,
+        OPERATORS.AND,
+        OPERATORS.BITWISE_AND,
+        OPERATORS.OR,
+        OPERATORS.BITWISE_OR,
+    ];
+
+    protected isBoolean(expr: ExpressionMeta): boolean {
+        if (expr.is(ast.LiteralBoolean)) {
+            return true;
+        }
+
+        const result = this.expressionResult(expr);
+
         if (result && this.index.conforms(result, "ScalarValues::Boolean")) return true;
         return (
             expr.is(ast.OperatorExpression) &&
             this.BooleanOperators.includes(expr.operator) &&
             expr.args.every((arg) => !arg || (arg.is(ast.Expression) && this.isBoolean(arg)))
         );
+    }
+
+    protected readonly ComparisonOperators: AnyOperator[] = [
+        OPERATORS.EQUALS,
+        OPERATORS.SAME,
+        OPERATORS.NOT_EQUALS,
+        OPERATORS.NOT_SAME,
+        OPERATORS.IS_TYPE,
+        OPERATORS.HAS_TYPE,
+        OPERATORS.LESS,
+        OPERATORS.LESS_EQUAL,
+        OPERATORS.GREATER,
+        OPERATORS.GREATER_EQUAL,
+    ];
+
+    protected isBooleanExpression(expr: TypeMeta): boolean {
+        if (!expr.is(ast.Expression)) {
+            return false;
+        }
+        if (expr.isAny(ast.LiteralBoolean, ast.Predicate)) {
+            // short-circuit for known always-true cases
+            return true;
+        }
+
+        if (expr.is(ast.OperatorExpression) && this.ComparisonOperators.includes(expr.operator)) {
+            return true;
+        }
+
+        const result = this.expressionResult(expr);
+
+        if (result && this.index.conforms(result, "Performances::BooleanEvaluation")) return true;
+        if (expr.is(ast.FeatureReferenceExpression)) {
+            const referent = expr.expression?.element();
+            if (!referent?.is(ast.Expression)) return false;
+            if (this.isBoolean(referent)) return true;
+
+            const refResult = this.index.findType(this.expressionResult(referent));
+            return Boolean(refResult?.is(ast.Expression) && this.isBoolean(refResult));
+        }
+
+        return false;
+    }
+
+    protected static readonly IntegerOperators: AnyOperator[] = [
+        OPERATORS.MINUS,
+        OPERATORS.PLUS,
+        OPERATORS.MULTIPLY,
+        OPERATORS.MODULO,
+        OPERATORS.EXPONENT_1,
+        OPERATORS.EXPONENT_2,
+    ];
+
+    protected static readonly IntegerRangeOperators: AnyOperator[] = [
+        ...this.IntegerOperators,
+        OPERATORS.RANGE,
+    ];
+
+    protected isInteger(
+        expr: ExpressionMeta,
+        operators = KerMLValidator.IntegerOperators
+    ): boolean {
+        if (expr.is(ast.LiteralInfinity)) {
+            return true;
+        }
+        if (expr.is(ast.LiteralNumber)) {
+            return expr.isInteger;
+        }
+
+        const result = this.expressionResult(expr);
+
+        if (result && this.index.conforms(result, "ScalarValues::Integer")) return true;
+        return (
+            expr.is(ast.OperatorExpression) &&
+            operators.includes(expr.operator) &&
+            expr.args.every((arg) => this.isInteger(arg))
+        );
+    }
+
+    protected validateExactlyOneTyping<T extends FeatureMeta>(
+        node: T,
+        bound: SysMLType,
+        accept: ModelValidationAcceptor,
+        message: string,
+        info?: Omit<ModelDiagnosticInfo<T>, "element">
+    ): boolean {
+        const typings = node.allTypings();
+        if (typings.length !== 1 || !typings.find((t) => t.is(bound))) {
+            accept("error", message, { ...info, element: node });
+            return false;
+        }
+
+        return true;
     }
 }

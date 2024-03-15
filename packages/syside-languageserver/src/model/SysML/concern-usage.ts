@@ -15,23 +15,37 @@
  ********************************************************************************/
 
 import { ConcernUsage, FramedConcernMembership } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { RequirementUsageMeta, RequirementUsageOptions } from "./requirement-usage";
 
 export type ConcernUsageOptions = RequirementUsageOptions;
 
 @metamodelOf(ConcernUsage, {
     base: "Requirements::concernChecks",
-    subrequirement: "Requirements::RequirementCheck::concerns",
+    concern: "Requirements::RequirementCheck::concerns",
 })
 export class ConcernUsageMeta extends RequirementUsageMeta {
     override ast(): ConcernUsage | undefined {
         return this._ast as ConcernUsage;
     }
 
+    override defaultSupertype(): string {
+        return "base";
+    }
+
+    override defaultGeneralTypes(): GeneralType[] {
+        const supertypes = super.defaultGeneralTypes();
+
+        if (this.isSubrequirement()) {
+            supertypes.push("subrequirement");
+        }
+
+        return supertypes;
+    }
+
     override requirementConstraintSupertype(): string | undefined {
         return this.parent()?.is(FramedConcernMembership)
-            ? "subrequirement"
+            ? "concern"
             : super.requirementConstraintKind();
     }
 }

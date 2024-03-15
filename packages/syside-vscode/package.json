@@ -492,7 +492,7 @@
                 },
                 "syside.formatting.comment_about_break": {
                     "description": "Controls line break preceding `about` in `Comment`:\n* `always`: about list is always on a new line\n* `as_needed`: printer tries to fit about list on the previous line",
-                    "default": "always",
+                    "default": "as_needed",
                     "enum": [
                         "always",
                         "as_needed"
@@ -753,7 +753,7 @@
                     "scope": "window"
                 },
                 "syside.formatting.feature_value_equals.default": {
-                    "description": "Controls feature value equals token formatting whenever it can be\nommitted:\n* `as_needed`: `=` will only be printed if it is required by the grammar\n* `always`: `=` will be always printed when it is acceptable by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
+                    "description": "Controls feature value equals token formatting whenever it can be\nomitted:\n* `as_needed`: `=` will only be printed if it is required by the grammar\n* `always`: `=` will be always printed when it is acceptable by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
                         "always",
@@ -764,7 +764,7 @@
                     "scope": "window"
                 },
                 "syside.formatting.feature_value_equals.fallback": {
-                    "description": "Controls feature value equals token formatting whenever it can be\nommitted:\n* `as_needed`: `=` will only be printed if it is required by the grammar\n* `always`: `=` will be always printed when it is acceptable by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
+                    "description": "Controls feature value equals token formatting whenever it can be\nomitted:\n* `as_needed`: `=` will only be printed if it is required by the grammar\n* `always`: `=` will be always printed when it is acceptable by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
                         "as_needed"
@@ -1084,7 +1084,7 @@
                     "scope": "window"
                 },
                 "syside.formatting.metadata_body_feature_redefines.default": {
-                    "description": "Controls first feature redefinition formatting inside MetadataFeature\nbodies:\n* `keyword`: `redefinines` is printed\n* `token`: `:>>` is printed\n* `none`: nothing is printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
+                    "description": "Controls first feature redefinition formatting inside MetadataFeature\nbodies:\n* `keyword`: `redefines` is printed\n* `token`: `:>>` is printed\n* `none`: nothing is printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
                         "keyword",
@@ -1096,7 +1096,7 @@
                     "scope": "window"
                 },
                 "syside.formatting.metadata_body_feature_redefines.fallback": {
-                    "description": "Controls first feature redefinition formatting inside MetadataFeature\nbodies:\n* `keyword`: `redefinines` is printed\n* `token`: `:>>` is printed\n* `none`: nothing is printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
+                    "description": "Controls first feature redefinition formatting inside MetadataFeature\nbodies:\n* `keyword`: `redefines` is printed\n* `token`: `:>>` is printed\n* `none`: nothing is printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
                         "none",
@@ -1730,7 +1730,7 @@
                     "scope": "window"
                 },
                 "syside.formatting.element_filter_parenthesize": {
-                    "description": "Controls `filter (...)` condition expression in element filter memberhips\nformatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
+                    "description": "Controls `filter (...)` condition expression in element filter memberships\nformatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
                     "default": "on_break",
                     "enum": [
                         "always",

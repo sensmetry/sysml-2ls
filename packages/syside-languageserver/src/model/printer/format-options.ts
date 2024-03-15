@@ -34,7 +34,7 @@ export type PreservableFormatting<Alts extends string> = {
      * Controls `preserve` formatting for cases when there is no associated
      * source text.
      */
-    fallback: Alts;
+    fallback?: Alts;
 };
 
 /**
@@ -101,7 +101,7 @@ export interface FormatOptions {
      * Controls line break preceding `about` in `Comment`:
      * * `always`: about list is always on a new line
      * * `as_needed`: printer tries to fit about list on the previous line
-     * @default "always"
+     * @default "as_needed"
      */
     comment_about_break: "always" | "as_needed";
 
@@ -218,7 +218,7 @@ export interface FormatOptions {
 
     /**
      * Controls feature value equals token formatting whenever it can be
-     * ommitted:
+     * omitted:
      * * `as_needed`: `=` will only be printed if it is required by the grammar
      * * `always`: `=` will be always printed when it is acceptable by the
      *   grammar
@@ -352,7 +352,7 @@ export interface FormatOptions {
     /**
      * Controls first feature redefinition formatting inside MetadataFeature
      * bodies:
-     * * `keyword`: `redefinines` is printed
+     * * `keyword`: `redefines` is printed
      * * `token`: `:>>` is printed
      * * `none`: nothing is printed
      */
@@ -595,7 +595,7 @@ export interface FormatOptions {
     transition_usage_parenthesize_guard: "always" | "never" | "on_break";
 
     /**
-     * Controls `filter (...)` condition expression in element filter memberhips
+     * Controls `filter (...)` condition expression in element filter memberships
      * formatting:
      * * `always`: expression is printed with parentheses
      * * `never`: expression is printed without parentheses

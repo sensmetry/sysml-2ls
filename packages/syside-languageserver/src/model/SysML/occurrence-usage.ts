@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import { OccurrenceUsage } from "../../generated/ast";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { UsageMeta, UsageOptions } from "./usage";
 
 export type OccurrenceUsageOptions = UsageOptions;
@@ -26,7 +26,7 @@ export type OccurrenceUsageOptions = UsageOptions;
     snapshot: "Occurrences::Occurrence::snapshots",
 })
 export class OccurrenceUsageMeta extends UsageMeta {
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isSuboccurrence()) supertypes.push("suboccurrence");
         if (this.portionKind) supertypes.push(this.portionKind);

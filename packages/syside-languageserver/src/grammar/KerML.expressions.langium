@@ -138,11 +138,14 @@ Comment returns Comment:
     ('comment' Identification?
         ('about' about+=Annotation ( ',' about+=Annotation )*)?
     )?
+    ( 'locale' locale=STRING_VALUE )?
     TextualAnnotatingElementBody
 ;
 
 Documentation returns Documentation:
-    'doc' Identification? TextualAnnotatingElementBody
+    'doc' Identification? 
+    ( 'locale' locale=STRING_VALUE )?
+    TextualAnnotatingElementBody
 ;
 
 // Textual representation

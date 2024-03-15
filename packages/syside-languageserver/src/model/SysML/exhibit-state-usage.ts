@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { ExhibitStateUsage, ReferenceSubsetting } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { PerformActionUsageMeta, PerformActionUsageOptions } from "./perform-action-usage";
 import { StateUsageMeta, StateUsageOptions } from "./state-usage";
 import { enumerable } from "../../utils";
@@ -37,7 +37,7 @@ export class ExhibitStateUsageMeta extends Mixin(PerformActionUsageMeta, StateUs
         // empty
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");
         return supertypes;

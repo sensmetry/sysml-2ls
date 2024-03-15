@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { FlowConnectionUsage } from "../../generated/ast";
 import { ItemFlowMeta, ItemFlowOptions } from "../KerML/item-flow";
-import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
+import { ElementIDProvider, GeneralType, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
 import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
 import { AstNode, LangiumDocument } from "langium";
@@ -92,7 +92,7 @@ export class FlowConnectionUsageMeta extends Mixin(
         return this.removeOwnedElementsIf(this._messages, predicate);
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPartOwnedComposite()) supertypes.push("ownedAction");
         else if (this.isStructureOwnedComposite()) supertypes.push("ownedPerformance");

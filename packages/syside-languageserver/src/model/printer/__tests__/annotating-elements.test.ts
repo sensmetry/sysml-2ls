@@ -80,13 +80,23 @@ describe("comments", () => {
 `);
     });
 
-    it("should print comment with explicit aboutt with a line break", async () => {
+    it("should print comment with locale", async () => {
+        (await expectPrinted(`comment about A locale "en_US" /* a comment */`))
+            .toEqual(`comment about A locale "en_US"
+/*
+ * a comment
+ */
+`);
+    });
+
+    it("should print comment with explicit about with a line break", async () => {
         (
-            await expectPrinted("comment about A /* a comment */", {
+            await expectPrinted(`comment about A locale "en_US" /* a comment */`, {
                 format: { comment_about_break: "always" },
             })
         ).toEqual(`comment
     about A
+    locale "en_US"
 /*
  * a comment
  */
@@ -174,15 +184,29 @@ describe("documentation", () => {
         );
     });
 
+    it("should print docs with locale", async () => {
+        (await expectPrinted(`doc <short> long locale "en_US" /* doc */`)).toEqual(
+            `doc <short> long locale "en_US"
+/*
+ * doc
+ */
+`
+        );
+    });
+
     it("should break on long identifiers", async () => {
         (
-            await expectPrinted("doc <'long short name.....'> 'long regular name.....' /* doc */", {
-                options: { lineWidth: 20 },
-            })
+            await expectPrinted(
+                `doc <'long short name.....'> 'long regular name.....' locale "en_US" /* doc */`,
+                {
+                    options: { lineWidth: 20 },
+                }
+            )
         ).toMatchInlineSnapshot(`
 "doc <
         'long short name.....'
     > 'long regular name.....'
+    locale "en_US"
 /*
  * doc
  */
@@ -410,6 +434,19 @@ describe("metadata features", () => {
             `@Meta {
     value = 3;
 }\n`
+        );
+    });
+
+    it("should print metadata prefixes", async () => {
+        (
+            await expectPrinted(`#Security #Classified metadata Classified {
+	        classificationLevel = secret;
+	    }`)
+        ).toEqual(
+            `#Security #Classified metadata Classified {
+    classificationLevel = secret;
+}
+`
         );
     });
 });

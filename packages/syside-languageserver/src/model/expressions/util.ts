@@ -199,7 +199,10 @@ export function isModelLevelEvaluable(fn: meta.FunctionMeta | string): boolean {
  * @returns type if a type parameter was found, undefined otherwise
  */
 export function typeArgument(expr: meta.OperatorExpressionMeta): meta.TypeMeta | undefined {
-    const arg = expr.args.at(1);
+    const arg = expr
+        .ownedFeatures()
+        .tail(Math.max(0, 1 - expr.operands.length))
+        .head();
     if (arg?.is(Type)) {
         return arg.types().head();
     }

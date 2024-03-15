@@ -17,7 +17,7 @@
 import { Mixin } from "ts-mixer";
 import { ActionUsage, PartDefinition, PartUsage } from "../../generated/ast";
 import { StepMeta, StepOptions } from "../KerML/step";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { OccurrenceUsageMeta, OccurrenceUsageOptions } from "./occurrence-usage";
 
 export interface ActionUsageOptions extends StepOptions, OccurrenceUsageOptions {}
@@ -43,7 +43,7 @@ export class ActionUsageMeta extends Mixin(StepMeta, OccurrenceUsageMeta) {
         return "base";
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         const subactionType = this.getSubactionType();
         if (subactionType) supertypes.push(subactionType);

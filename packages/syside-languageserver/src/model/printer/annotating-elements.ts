@@ -30,6 +30,7 @@ import {
     markAsRoot,
     keyword,
     getPreviousNode,
+    fill,
 } from "../../utils";
 import {
     AnnotationMeta,
@@ -41,7 +42,7 @@ import {
 } from "../KerML";
 import { SysMLSemanticTokenTypes } from "../semantic-tokens";
 import { printTarget } from "./edges";
-import { printChildrenBlock, printDeclaredRelationships } from "./namespaces";
+import { printChildrenBlock, printDeclaredRelationships, printPrefixes } from "./namespaces";
 import {
     ElementPrinter,
     ModelPrinterContext,
@@ -102,6 +103,18 @@ function printAbout(
     ];
 }
 
+function printLocale(locale: string | undefined): Doc | undefined {
+    if (!locale) return;
+
+    return group(
+        indent([
+            keyword("locale"),
+            literals.space,
+            text(JSON.stringify(locale), { type: SysMLSemanticTokenTypes.string }),
+        ])
+    );
+}
+
 /**
  * Default printer for comment elements.
  */
@@ -132,6 +145,14 @@ export function printCommentElement(node: CommentMeta, context: ModelPrinterCont
 
     parts.push(...printAbout(about, context, mustBreak));
 
+    const locale = printLocale(node.locale);
+    if (locale) {
+        if (parts.length > 0) {
+            parts.push(indent(mustBreak ? hardline : line));
+        }
+        parts.push(locale);
+    }
+
     return [
         group(parts),
         parts.length > 0 ? hardline : literals.emptytext,
@@ -152,6 +173,10 @@ export function printDocumentation(node: DocumentationMeta, context: ModelPrinte
         parts.push(line, inner);
     }
 
+    const locale = printLocale(node.locale);
+    if (locale) {
+        parts.push(indent(line), locale);
+    }
     return [group(parts), hardline, printBody(node.body, context.format.markdown_comments)];
 }
 
@@ -211,8 +236,10 @@ export function printTextualRepresentation(
  * Default printer for metadata features.
  */
 export function printMetadataFeature(node: MetadataFeatureMeta, context: ModelPrinterContext): Doc {
+    const prefixes = join(line, printPrefixes(node.prefixes, context));
+
     const prefix: Doc[] = [
-        formatPreserved(node, context.format.metadata_feature_keyword, {
+        formatPreserved(node, context.format.metadata_feature_keyword, "@", {
             find: (node) => findNodeForKeyword(node, "metadata"),
             choose: {
                 "@": () => text("@"),
@@ -227,7 +254,7 @@ export function printMetadataFeature(node: MetadataFeatureMeta, context: ModelPr
     if (identifier.length > 0) {
         prefix.push(...identifier);
         heritage.push(
-            formatPreserved(node, context.format.declaration_feature_typing, {
+            formatPreserved(node, context.format.declaration_feature_typing, "token", {
                 find: (node) => findNodeForKeyword(node, ":"),
                 choose: {
                     keyword: () => keyword(context.mode === "kerml" ? "typed by " : "defined by "),
@@ -244,9 +271,15 @@ export function printMetadataFeature(node: MetadataFeatureMeta, context: ModelPr
     if (!typing) throwError(node, "Invalid MetadataFeature - missing FeatureTyping");
     heritage.push(printTarget(typing, context));
 
+    const groups: Doc[] = [];
+    if (prefixes.length > 0) {
+        groups.push(indent(fill(prefixes)), line);
+    }
+    groups.push(group(prefix), indent(group(heritage)));
+
     return [
         group([
-            group([group(prefix), indent(group(heritage))]),
+            group(groups),
             ...printAbout(
                 node.annotations().filter((a) => !a.isImplied),
                 context
@@ -280,7 +313,7 @@ const MetadataBodyElementPrinter: ElementPrinter = (node, context) => {
 
     const relationships: Doc[] = [
         [
-            formatPreserved(redef, context.format.metadata_body_feature_redefines, {
+            formatPreserved(redef, context.format.metadata_body_feature_redefines, "token", {
                 find: (node) => getPreviousNode(node, false),
                 choose: {
                     keyword: () => keyword("redefines "),
@@ -302,7 +335,7 @@ const MetadataBodyElementPrinter: ElementPrinter = (node, context) => {
 
     return [
         group([
-            formatPreserved(target, context.format.metadata_body_feature_keyword, {
+            formatPreserved(target, context.format.metadata_body_feature_keyword, "always", {
                 find: (node) => findNodeForKeyword(node, kw),
                 choose: {
                     always: (): Doc => [keyword(kw), literals.space],

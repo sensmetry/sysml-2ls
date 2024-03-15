@@ -18,7 +18,7 @@ import { LangiumDocument } from "langium";
 import { ReferenceUsage, TransitionUsage } from "../../generated/ast";
 import { enumerable } from "../../utils/common";
 import { Edge, ParameterMembershipMeta } from "../KerML";
-import { ElementIDProvider, metamodelOf } from "../metamodel";
+import { ElementIDProvider, GeneralType, metamodelOf } from "../metamodel";
 import { UsageMeta, UsageOptions } from "./usage";
 
 export type ReferenceUsageOptions = UsageOptions;
@@ -35,7 +35,7 @@ export class ReferenceUsageMeta extends UsageMeta {
         // empty
     }
 
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const owner = this.owner();
         if (owner?.is(TransitionUsage) && this === owner.payloadParameter()) return [];
         const supertypes = super.defaultGeneralTypes();

@@ -16,17 +16,9 @@
 
 import { AstNode, LangiumDocument } from "langium";
 import { OperatorExpression } from "../../../generated/ast";
-import { enumerable } from "../../../utils";
 import { OPERATOR_FUNCTIONS, typeArgument, typeOf } from "../../expressions/util";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
-import {
-    ElementParts,
-    ExpressionMeta,
-    FeatureMeta,
-    InvocationExpressionMeta,
-    InvocationExpressionOptions,
-    TypeMeta,
-} from "../_internal";
+import { InvocationExpressionMeta, InvocationExpressionOptions, TypeMeta } from "../_internal";
 
 export const OPERATORS = {
     IF: "'if'",
@@ -71,7 +63,6 @@ export const OPERATORS = {
 export const IMPLICIT_OPERATORS = {
     DOT: "'.'",
     COLLECT: "collect",
-    ARROW: "'->'",
     SELECT: "'.?'",
     METADATA: "'.metadata'",
 } as const;
@@ -94,19 +85,6 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
     }
     public set operator(value: Operator) {
         this._operator = value;
-    }
-
-    // this only exists for compatibility with AST since we don't construct the
-    // missing intermediate elements to operands
-    protected _operands: ExpressionMeta[] = [];
-
-    @enumerable
-    get operands(): readonly ExpressionMeta[] {
-        return this._operands;
-    }
-
-    override arguments(): readonly FeatureMeta[] {
-        return [...this.operands, ...super.arguments()];
     }
 
     override ast(): OperatorExpression | undefined {
@@ -142,11 +120,6 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
         if (returns) return returns.element();
 
         return super.returnType();
-    }
-
-    protected override collectDeclaration(parts: ElementParts): void {
-        super.collectDeclaration(parts);
-        parts.push(["operands", this.operands]);
     }
 
     static override create<T extends AstNode>(

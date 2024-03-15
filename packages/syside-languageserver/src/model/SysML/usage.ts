@@ -22,7 +22,6 @@ import {
     PartUsage,
     PortionKind,
     StateSubactionMembership,
-    SubjectMembership,
     Usage,
     VariantMembership,
 } from "../../generated/ast";
@@ -84,10 +83,6 @@ export class UsageMeta extends FeatureMeta {
     }
     override set isAbstract(value) {
         this._isAbstract = value;
-    }
-
-    override isIgnoredParameter(): boolean {
-        return super.isIgnoredParameter() || !!this.parent()?.is(SubjectMembership);
     }
 
     override ast(): Usage | undefined {

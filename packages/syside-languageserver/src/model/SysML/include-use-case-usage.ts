@@ -22,7 +22,7 @@ import {
     ReferenceSubsetting,
 } from "../../generated/ast";
 import { FeatureMeta } from "../KerML";
-import { metamodelOf } from "../metamodel";
+import { GeneralType, metamodelOf } from "../metamodel";
 import { PerformActionUsageMeta, PerformActionUsageOptions } from "./perform-action-usage";
 import { UseCaseUsageMeta, UseCaseUsageOptions } from "./use-case-usage";
 import { enumerable } from "../../utils";
@@ -49,7 +49,7 @@ export class IncludeUseCaseUsageMeta extends Mixin(PerformActionUsageMeta, UseCa
     override ast(): IncludeUseCaseUsage | undefined {
         return this._ast as IncludeUseCaseUsage;
     }
-    override defaultGeneralTypes(): string[] {
+    override defaultGeneralTypes(): GeneralType[] {
         const supertypes = super.defaultGeneralTypes();
         if (this.isPerformedAction()) supertypes.push("performedAction");
         return supertypes;
