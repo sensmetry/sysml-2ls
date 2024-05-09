@@ -18,6 +18,7 @@ import util from "util";
 import child_process from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
+import { existsSync } from "fs";
 
 const exec = util.promisify(child_process.exec);
 
@@ -25,12 +26,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const root = path.join(__dirname, "..", "..", "..");
+const dir = path.join(root, "SysML-v2-Release");
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const checkout = () =>
-    exec("git checkout tags/2024-02", { cwd: path.join(root, "SysML-v2-Release") });
+const tag = "2024-03";
 
-exec(
-    "git clone --depth 1 https://github.com/Systems-Modeling/SysML-v2-Release.git",
-    { cwd: root }
-).then(checkout, checkout);
+if (existsSync(dir)) {
+    exec(`git config remote.origin.fetch "+refs/tags/${tag}:refs/tags/${tag}"`, { cwd: dir })
+        .then(() => exec(`git fetch --depth=1`, { cwd: dir }))
+        .then(() => exec(`git checkout tags/${tag}`, { cwd: dir }));
+} else {
+    exec(
+        `git clone --depth 1 --branch ${tag} https://github.com/Systems-Modeling/SysML-v2-Release.git`,
+        { cwd: root }
+    );
+}

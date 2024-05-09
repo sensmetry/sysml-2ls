@@ -3,6 +3,8 @@
 [![pipeline status](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/pipeline.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/commits/main)
 [![coverage report](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/coverage.svg)](https://sensmetry.gitlab.io/public/sysml-2ls)
 [![Latest Release](https://gitlab.com/sensmetry/public/sysml-2ls/-/badges/release.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/releases)
+[![VSCode Marketplace](https://img.shields.io/badge/Download-VS%20Code%20Marketplace-brightgreen?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=sensmetry.sysml-2ls)
+[![OpenVSX](https://img.shields.io/badge/Download-Open--VSX-brightgreen?logo=vscodium)](https://open-vsx.org/extension/sensmetry/sysml-2ls)
 
 _SysIDE_ (pronounced "seaside") provides SysML v2 language support in VS Code.
 
