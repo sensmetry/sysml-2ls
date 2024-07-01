@@ -6,6 +6,10 @@
 
 ## main
 
+### Changes
+
+- Updated icon
+
 ## 0.6.1
 
 ### Fixed
