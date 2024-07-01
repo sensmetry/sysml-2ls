@@ -94,7 +94,7 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
             LiteralNumber: [this.literalNumber],
             LiteralString: [this.literalString],
             Comment: [this.comment],
-            TextualRepresentation: [this.comment, this.textualRep],
+            TextualRepresentation: [this.textualRep],
             OperatorExpression: [this.operatorExpression],
         } as HighlightMap as TypeMap<SysMLTypeList, HighlightFunction[]>);
 
@@ -271,21 +271,32 @@ export class SysMLSemanticTokenProvider extends AbstractSemanticTokenProvider {
     /**
      * Highlight comment bodies
      */
-    protected comment(
-        node: Comment | TextualRepresentation,
-        acceptor: SemanticTokenAcceptor
-    ): void {
+    protected comment(node: Comment, acceptor: SemanticTokenAcceptor): void {
         acceptor({
             node: node,
             property: "body",
             type: SysMLSemanticTokenTypes.annotationBody,
         });
+
+        if (node.locale) {
+            acceptor({
+                node,
+                property: "locale",
+                type: SysMLSemanticTokenTypes.string,
+            });
+        }
     }
 
     /**
      * Highlight textual representation language
      */
     protected textualRep(node: TextualRepresentation, acceptor: SemanticTokenAcceptor): void {
+        acceptor({
+            node: node,
+            property: "body",
+            type: SysMLSemanticTokenTypes.annotationBody,
+        });
+
         acceptor({
             node,
             property: "language",

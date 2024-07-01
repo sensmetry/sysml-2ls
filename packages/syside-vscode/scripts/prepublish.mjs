@@ -20,6 +20,74 @@ import child_process from "child_process";
 
 const exec = util.promisify(child_process.exec);
 
+const Repository = (lang) => ({
+    strings: {
+        patterns: [
+            {
+                name: `string.quoted.other.${lang}`,
+                begin: "/\\*",
+                beginCapture: {
+                    0: {
+                        name: `punctuation.definition.string.begin.${lang}`,
+                    },
+                },
+                end: "\\*/",
+                endCapture: {
+                    0: {
+                        name: `punctuation.definition.string.end.${lang}`,
+                    },
+                },
+            },
+            {
+                name: `string.quoted.double.${lang}`,
+                begin: '"',
+                beginCapture: {
+                    0: {
+                        name: `punctuation.definition.string.begin.${lang}`,
+                    },
+                },
+                end: '"',
+                endCapture: {
+                    0: {
+                        name: `punctuation.definition.string.end.${lang}`,
+                    },
+                },
+            },
+        ],
+    },
+});
+const Patterns = (lang) => [
+    {
+        include: "#strings",
+    },
+    {
+        match: "\\b([1-9]+[0-9]*|0)",
+        name: `constant.numeric.integer.decimal.${lang}`,
+    },
+    {
+        match: "\\b(?i:(\\d+\\.\\d*(e[\\-\\+]?\\d+)?))(?=[^a-zA-Z_])",
+        name: `constant.numeric.float.${lang}`,
+    },
+    {
+        match: "(?<=[^0-9a-zA-Z_])(?i:(\\.\\d+(e[\\-\\+]?\\d+)?))",
+        name: `constant.numeric.float.${lang}`,
+    },
+];
+
+/**
+ *
+ * @param {string} filename
+ * @param {string} lang
+ */
+async function updateTextMateGrammar(filename, lang) {
+    let grammar = JSON.parse(await fs.readFile(filename, { encoding: "utf-8" }));
+
+    grammar.patterns.push(...Patterns(lang));
+    Object.assign(grammar.repository, Repository(lang));
+
+    await fs.writeFile(filename, JSON.stringify(grammar, null, 2));
+}
+
 exec("pnpm run esbuild")
     .then(() =>
         Promise.all(
@@ -31,4 +99,10 @@ exec("pnpm run esbuild")
         )
     )
     .then(() => fs.copyFile("../../README.md", "README.md"))
-    .then(() => fs.copy("../syside-languageserver/syntaxes", "syntaxes"));
+    .then(() => fs.copy("../syside-languageserver/syntaxes", "syntaxes"))
+    .then(() =>
+        Promise.all([
+            updateTextMateGrammar("syntaxes/kerml.tmLanguage.json", "kerml"),
+            updateTextMateGrammar("syntaxes/sysml.tmLanguage.json", "sysml"),
+        ])
+    );
