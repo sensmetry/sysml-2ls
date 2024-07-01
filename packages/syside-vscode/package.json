@@ -1,6 +1,6 @@
 {
     "name": "sysml-2ls",
-    "displayName": "SysIDE",
+    "displayName": "SysIDE CE",
     "description": "SysML v2 language support in VS Code.",
     "publisher": "Sensmetry",
     "author": {
