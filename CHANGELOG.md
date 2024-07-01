@@ -6,6 +6,11 @@
 
 ## main
 
+### Fixed
+
+- Fixed `locale` semantic highlighting and TextMate grammar now correctly
+  highlights `REGULAR_COMMENT`s, strings and numbers.
+
 ## 0.6.0
 
 ### Changes
