@@ -40,6 +40,12 @@ class GitHooks {
                 "\n\n**NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls)."
             );
         });
+        contents = contents.replace(/(src="\.)/m, (sub) => {
+            return (
+                sub +
+                "."
+            );
+        });
 
         await fs.writeFile(".github/README.md", contents);
     }
