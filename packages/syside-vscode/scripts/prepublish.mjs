@@ -98,8 +98,15 @@ exec("pnpm run esbuild")
             ].map(([src, dst]) => fs.copyFile(src, dst))
         )
     )
-    .then(() => fs.copyFile("../../README.md", "README.md"))
-    .then(() => fs.copy("../syside-languageserver/syntaxes", "syntaxes"))
+    .then(() =>
+        Promise.all([
+            fs.copyFile("../../README.md", "README.md"),
+            fs
+                .mkdirp("icons")
+                .then(() => fs.copyFile("../../docs/images/logo.png", "icons/logo.png")),
+            fs.copy("../syside-languageserver/syntaxes", "syntaxes"),
+        ])
+    )
     .then(() =>
         Promise.all([
             updateTextMateGrammar("syntaxes/kerml.tmLanguage.json", "kerml"),

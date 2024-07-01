@@ -3,7 +3,7 @@
 **NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
 
 <!-- markdownlint-capture -->
-<!-- markdownlint-disable-file no-inline-html -->
+<!-- markdownlint-disable-file no-inline-html heading-increment -->
 
 <table align="center"><tr><td align="center" width="9999">
 <img src="../docs/images/logo-full.png" align="center" width="400" alt="SysIDE icon">
@@ -24,7 +24,7 @@ _SysIDE_ (pronounced "seaside") is a transformational SysML v2 systems-as-code m
 
 ---
 
-_SysIDE Community Edition (SysIDE CE)_ is a free and open source SysML v2 textual editing and analysis system, bringing rich SysML v2 language support to Visual Studio Code. _SysIDE CE_ can also be integrated into other aplications and automated workflows which need to interact with SysML v2 textual representations.
+_SysIDE Community Edition (SysIDE CE)_ is a free and open source SysML v2 textual editing and analysis system, bringing rich SysML v2 language support to Visual Studio Code. _SysIDE CE_ can also be integrated into other applications and automated workflows which need to interact with SysML v2 textual representations.
 
 The main enabling components of _SysIDE CE_ are a parser and a language server for SysML v2 and KerML [2024-05 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-05) specifications.
 
@@ -48,6 +48,7 @@ _SysIDE CE_ is an open source project with contributions from user and developer
 ## Editions
 
 There are two editions of _SysIDE_:
+
 - _SysIDE CE_ - free and open source version of _SysIDE_, enabling modern 'as code' modeling for everyone
 - _SysIDE Pro_ - a licenced version of _SysIDE_, providing advanced features & performance for power-users
 
