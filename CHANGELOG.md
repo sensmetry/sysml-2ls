@@ -6,6 +6,8 @@
 
 ## main
 
+## 0.6.1
+
 ### Fixed
 
 - Fixed `locale` semantic highlighting and TextMate grammar now correctly
