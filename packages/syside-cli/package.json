@@ -41,10 +41,10 @@
         "chalk": "^5.2.0",
         "commander": "^10.0.1",
         "syside-languageserver": "workspace:*",
-        "vscode-uri": "~3.0.7"
+        "vscode-uri": "3.0.7"
     },
     "devDependencies": {
-        "langium": "^1.2.0",
+        "langium": "~1.2.0",
         "vscode-languageserver": "~8.0.2"
     }
 }

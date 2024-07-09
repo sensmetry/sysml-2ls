@@ -620,8 +620,8 @@ const Formatter: {
                     ? indent(doc.contents)
                     : doc.contents
                 : doc.negate
-                ? doc.contents
-                : indent(doc.contents),
+                  ? doc.contents
+                  : indent(doc.contents),
         ]);
     },
 

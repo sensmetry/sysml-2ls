@@ -311,8 +311,8 @@ export class FeatureMeta extends TypeMeta {
             return this.isSuboccurrence()
                 ? "suboccurrence"
                 : this.isPortion
-                ? "portion"
-                : "occurrence";
+                  ? "portion"
+                  : "occurrence";
         if (this.hasDataType()) return "dataValue";
         return "base";
     }

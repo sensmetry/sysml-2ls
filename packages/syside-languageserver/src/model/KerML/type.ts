@@ -467,8 +467,8 @@ export class TypeMeta extends Mixin(
     ): Stream<NonNullRelationship<InheritanceMeta>> {
         return (
             Array.isArray(is)
-                ? stream(this.allSpecializations(kind)).filter(
-                      (s) => s.finalElement()?.isAny(...is)
+                ? stream(this.allSpecializations(kind)).filter((s) =>
+                      s.finalElement()?.isAny(...is)
                   )
                 : stream(this.allSpecializations(kind)).filter((s) => s.finalElement()?.is(is))
         ) as Stream<NonNullRelationship<InheritanceMeta>>;

@@ -9,7 +9,8 @@ variables:
 default:
   image: node:19.2
   before_script:
-    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
+    - corepack enable
+    - corepack prepare pnpm@latest-9 --activate
     - pnpm config set store-dir .pnpm-store
     - pnpm install --ignore-scripts
   cache:

@@ -56,8 +56,8 @@ export class ActionUsageMeta extends Mixin(StepMeta, OccurrenceUsageMeta) {
         return this.isActionOwnedComposite()
             ? "subaction"
             : this.isPartOwnedComposite()
-            ? "ownedAction"
-            : undefined;
+              ? "ownedAction"
+              : undefined;
     }
 
     protected override isSuboccurrence(): boolean {
