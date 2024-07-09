@@ -167,8 +167,8 @@ export class KerMLValidator {
                 property: parsed?.sourceRef
                     ? "sourceRef"
                     : parsed?.sourceChain
-                    ? "sourceChain"
-                    : "source",
+                      ? "sourceChain"
+                      : "source",
             });
         }
     }

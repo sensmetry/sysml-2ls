@@ -468,8 +468,8 @@ export function printChildrenBlock(
     const linebreak = options?.forceBreak
         ? hardline
         : context.format.bracket_spacing
-        ? line
-        : softline;
+          ? line
+          : softline;
 
     const printed = printModelElements(children, context, options);
     let joined = options?.join ? options.join(children, printed) : join(linebreak, printed);

@@ -34,6 +34,6 @@
         "index": "node ../../scripts/generate-index.mjs src"
     },
     "dependencies": {
-        "vscode-uri": "~3.0.7"
+        "vscode-uri": "3.0.7"
     }
 }

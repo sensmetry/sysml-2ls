@@ -58,8 +58,8 @@ class TypesIndex<S = SysMLTypeList> {
                     (NON_TYPES.has(subtype)
                         ? unions
                         : this.base.isSubtype(subtype, ast.Namespace)
-                        ? types
-                        : relationships
+                          ? types
+                          : relationships
                     ).push(subtype);
                 }
             }
