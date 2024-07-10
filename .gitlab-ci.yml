@@ -135,6 +135,11 @@ package:release:
         echo "$VERSION tag already exists, bailing out"
         exit 1
       fi
+    # add GH and GL remotes and check that we can access them
+    - git remote add github_origin https://github-ci-token:${GH_ACCESS_TOKEN}@github.com/sensmetry/sysml-2ls.git
+    - git ls-remote -q github_origin
+    - git remote add gitlab_origin https://gitlab-ci-token:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git ls-remote -q gitlab_origin
     - echo "Preparing for $VERSION release"
     # update version fields
     - pnpm run --silent prepare-release $VERSION -o release.description
@@ -150,13 +155,11 @@ package:release:
     - cp $SERVER_PATH $SERVER_FILENAME
     - echo PACKAGE_JOB_ID=$CI_JOB_ID >> release.env
     # push to github mirror first before gitlab can push automatically and this fails
-    - git remote add github_origin https://github-ci-token:${GH_ACCESS_TOKEN}@github.com/sensmetry/sysml-2ls.git
+    # prevent triggering pipeline again with -o ci.skip
     - git push github_origin HEAD:main -o ci.skip
-    - git push github_origin HEAD:main --tags -o ci.skip
-    # push changes as the last command, prevent triggering pipeline again with
-    # -o ci.skip
-    - git remote add gitlab_origin https://gitlab-ci-token:${ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - git push gitlab_origin HEAD:main -o ci.skip
+    # push tags as the last command
+    - git push github_origin HEAD:main --tags -o ci.skip
     - git push gitlab_origin HEAD:main --tags -o ci.skip
   artifacts:
     paths:
