@@ -6,6 +6,10 @@
 
 ## main
 
+### Changes
+
+- Added License Bundler on esbuild
+
 ## 0.6.2
 
 ### Changes

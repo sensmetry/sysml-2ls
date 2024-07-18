@@ -25,6 +25,8 @@ import path from "node:path";
 import plugin from "node-stdlib-browser/helpers/esbuild/plugin";
 import stdLibBrowser from "node-stdlib-browser";
 import { createRequire } from "node:module";
+import rollupPluginLicense from "rollup-plugin-license";
+import { getLicenseText } from "./licencemarkup.mjs";
 
 const require = createRequire(import.meta.url);
 
@@ -39,6 +41,42 @@ export const BuildWatcher = {
         build.onEnd((result) => {
             console.log(
                 `Build ended with ${result.warnings.length} warnings and ${result.errors.length} errors`
+            );
+        });
+    },
+};
+
+/**
+ * @typedef {import("rollup-plugin-license").Dependency} Dependency
+ */
+
+/** @type {esbuild.Plugin} */
+export const LicenseBundler = {
+    name: "License bundler",
+    setup(build) {
+        build.onEnd(async (result) => {
+            const chunk = {
+                modules: Object.fromEntries(
+                    Object.keys(result.metafile.inputs).map((file) => [file, { renderedLength: 1 }])
+                ),
+            };
+
+            /** @type { Dependency[]} */
+            let dependencies;
+            const plugin = rollupPluginLicense({
+                thirdParty: {
+                    includePrivate: true,
+                    output(_dependencies) {
+                        dependencies = _dependencies;
+                    },
+                },
+            });
+            plugin.renderChunk("", chunk);
+            plugin.generateBundle();
+            let txt = await getLicenseText(dependencies);
+            fs.writeFileSync(
+                path.join(path.dirname(Object.keys(result.metafile.outputs)[0]), "LICENSE"),
+                txt
             );
         });
     },
@@ -74,7 +112,8 @@ export const Options = {
     external: ["vscode"],
     write: true,
     outdir: "./out",
-    plugins: [BuildWatcher, LLStarAmbiguityReport],
+    metafile: true,
+    plugins: [BuildWatcher, LLStarAmbiguityReport, LicenseBundler],
 };
 
 /** @type {Record<string, (entries: string[]) => esbuild.BuildOptions>} */
