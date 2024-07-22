@@ -3,8 +3,10 @@ variables:
   EXTENSION_NAME: $PACKAGE_NAME-${CI_COMMIT_SHORT_SHA}
   EXTENSION_PATH: $CI_PROJECT_DIR/$EXTENSION_NAME.vsix
   SERVER_FILENAME: syside-languageserver.js
-  SERVER_RELPATH: packages/syside-vscode/dist/node/language-server/main.js
-  SERVER_PATH: $CI_PROJECT_DIR/$SERVER_RELPATH
+  SERVER_ZIPNAME: syside-languageserver.zip
+  SERVER_DIST_PATH: packages/syside-vscode/dist/node
+  SERVER_PATH: $CI_PROJECT_DIR/$SERVER_DIST_PATH/language-server/main.js
+  SERVER_LICENSE: $CI_PROJECT_DIR/$SERVER_DIST_PATH/LICENSE
 
 default:
   image: node:19.2
@@ -64,14 +66,23 @@ validate:
     - pnpm run prepare-validation
     - pnpm run run-validation
 
+.apt_install_package: &apt_install_package |
+  apt-get update -qq
+  apt-get install -y --no-install-recommends zip
+
+.package_artefacts: &package_artefacts |
+  pnpm run vscode:package -o $EXTENSION_PATH
+  cp $SERVER_PATH $SERVER_FILENAME
+  zip $SERVER_ZIPNAME -j $SERVER_FILENAME $SERVER_LICENSE
+
 .package-template:
   stage: deploy
   script:
-    - pnpm run vscode:package -o $EXTENSION_PATH
-    - cp $SERVER_PATH $SERVER_FILENAME
+    - *apt_install_package 
+    - *package_artefacts
   artifacts:
     paths:
-      - $SERVER_FILENAME
+      - $SERVER_ZIPNAME
       - $EXTENSION_PATH
     name: $EXTENSION_NAME
     expire_in: 1 mos
@@ -135,6 +146,7 @@ package:release:
         echo "$VERSION tag already exists, bailing out"
         exit 1
       fi
+    - *apt_install_package 
     # add GH and GL remotes and check that we can access them
     - git remote add github_origin https://github-ci-token:${GH_ACCESS_TOKEN}@github.com/sensmetry/sysml-2ls.git
     - git ls-remote -q github_origin
@@ -151,8 +163,7 @@ package:release:
     - git commit -m "Release $VERSION"
     - git tag ${VERSION}
     # package the extension
-    - pnpm run vscode:package -o $EXTENSION_PATH
-    - cp $SERVER_PATH $SERVER_FILENAME
+    - *package_artefacts
     - echo PACKAGE_JOB_ID=$CI_JOB_ID >> release.env
     # push to github mirror first before gitlab can push automatically and this fails
     # prevent triggering pipeline again with -o ci.skip
@@ -163,7 +174,7 @@ package:release:
     - git push gitlab_origin HEAD:main --tags -o ci.skip
   artifacts:
     paths:
-      - $SERVER_FILENAME
+      - $SERVER_ZIPNAME
       - $EXTENSION_PATH
       - release.description
     name: $EXTENSION_NAME
