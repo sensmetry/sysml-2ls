@@ -8,6 +8,8 @@
 
 ### Changes
 
+- Added license to the published `syside-languageserver.js` which is now zipped
+  together with license
 - Added License Bundler on esbuild
 
 ## 0.6.2
