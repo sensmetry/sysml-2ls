@@ -44,6 +44,22 @@ build:
       - packages/**/node_modules/**/*
       - .pnpm-store/**/*
 
+code_navigation:
+  allow_failure: true # recommended
+  script:
+    - npm install -g @sourcegraph/scip-typescript
+    - scip-typescript index --pnpm-workspaces
+    - env
+      TAG="v0.4.0"
+      OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+      ARCH="$(uname -m | sed -e 's/x86_64/amd64/')"
+      bash -c 'curl -L "https://github.com/sourcegraph/scip/releases/download/$TAG/scip-$OS-$ARCH.tar.gz"' | tar xzf - scip
+    - ./scip convert
+  artifacts:
+    reports:
+      lsif: dump.lsif
+
+
 test:
   stage: test
   coverage: /Lines\s*:\s*(\d+.?\d*)%/

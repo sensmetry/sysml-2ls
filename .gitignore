@@ -164,3 +164,6 @@ lib/
 **/src/version.ts
 
 .vscode-test-web
+dump.lsif
+index.scip
+scip
