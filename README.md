@@ -65,19 +65,31 @@ The extension provides basic features to support SysML v2 document editing:
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable-file no-inline-html -->
 
-- Autocompletion  
-  ![Autocompletion](/docs/images/completion.gif)
+- **Semantic and syntax checking** identifies errors as they occur allowing to instantly correct mistakes and speed up workflow.  
+  ![Semantic and syntax checking](/docs/images/validation_dark.gif)
   <br> <br>
 
-- Code navigation  
-  ![Navigation](/docs/images/navigation.gif)
-  <br> <br>
 
-- Semantic highlighting  
+- **Semantic highlighting** increases readability and allows to distinguish different parts of the code quickly.  
   ![Semantic highlighting](/docs/images/semantic-highlighting.png)
   <br> <br>
 
-- Auto-formatting:
+- **Autocompletion** speeds up the workflow by reducing typing errors and minimizing manual input.  
+  ![Autocompletion](/docs/images/completion.gif)
+  <br> <br>
+
+- **Hovers** instantly display documentation allowing to quickly understand an element.  
+  ![Hovers](/docs/images/hover.gif)
+  <br> <br>
+
+- **Code navigation** speeds up development by enabling quick access to element definitions.  
+  ![Navigation](/docs/images/navigation.gif)
+  <br> <br>
+
+- **Folding** improves readability and eases navigation by organizing code into collapsible sections.  
+  ![Folding](/docs/images/folding.gif)
+
+- **Auto-formatting** enhances code readability and maintainability by ensuring consistent structure for:  
 
   - Comment bodies  
   ![Comment bodies](/docs/images/comment-formatting.gif)
@@ -87,24 +99,18 @@ The extension provides basic features to support SysML v2 document editing:
   ![Elements](/docs/images/formatting.gif)
   <br> <br>
 
-- Renaming  
+- **Renaming** saves time and reduces errors by renaming all elements with the same name with one click.  
   ![Renaming](/docs/images/renaming.gif)
   <br> <br>
 
-- Hovers  
-  ![Hovers](/docs/images/hover.gif)
-  <br> <br>
-
-- References  
+- **References** enable efficient navigation and code updating by identifying all instances of an element.  
   ![References](/docs/images/references.gif)
   <br> <br>
 
-- Document symbols  
+- **Document symbols** provide rapid model overviews, enabling efficient comprehension and navigation.  
   ![Symbols](/docs/images/symbols.gif)
   <br> <br>
 
-- Folding  
-  ![Folding](/docs/images/folding.gif)
 
 <!-- markdownlint-restore -->
 
