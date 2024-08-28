@@ -75,11 +75,11 @@ This is a good way to get a taste for how _SysIDE CE_ works. But if you plan on 
 4. Link with the SysML v2 standard library:
 
     - Upon the first activation a pop-up will be displayed on the bottom righ tof your screen asking you to either locate an existing SysML v2 standard library or download it.  
-    <img src="docs/images/library-prompt.png" alt="Prompt" width="600"/>
+    <img src="../docs/images/library-prompt.png" alt="Prompt" width="600"/>
     <br> <br>
 
     - If you don't see the pop-up, download the library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-02/sysml.library) repository) and copy its path to extension settings:  
-    <img src="docs/images/library-settings.png" alt="Settings" width="600"/>
+    <img src="../docs/images/library-settings.png" alt="Settings" width="600"/>
     <br> <br>
 
     - Alternatively, the pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support (<mark>may result in faulty sysml validation</mark>).
