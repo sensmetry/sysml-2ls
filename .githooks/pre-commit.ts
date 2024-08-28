@@ -40,7 +40,7 @@ class GitHooks {
                 "\n\n**NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls)."
             );
         });
-        contents = contents.replace(/(src="\.)/m, (sub) => {
+        contents = contents.replace(/(src="\.)/g, (sub) => {
             return (
                 sub +
                 "."
