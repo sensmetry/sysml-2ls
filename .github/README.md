@@ -56,9 +56,33 @@ If you want to get in touch regarding any edition of _SysIDE_, reach out to Sens
 
 ## Quick start
 
-1. Install the latest extension from the marketplace.
-2. Open a SysML v2 (.sysml) file and the extension will activate.
-3. Upon the first activation a pop-up will be displayed asking you to either locate an existing SysML v2 standard library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-02/sysml.library) repository) or download it. The pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support.
+### In a browser (without local VSCode)
+
+You can try out _SysIDE_ without needing to instal it locally. To do so:
+1. Go to [Visual Studio Code for the Web](https://vscode.dev)
+2. Open the `Extensions` tab on the right of the screen
+3. Search for and install _SysIDE CE_
+4. Open a folder or a `.sysml` file
+
+This is a good way to get a taste for how _SysIDE CE_ works. But if you plan on using it for a longer term or for larger models, we suggest installing it locally.
+
+### Running locally
+
+0. Install [Visual Studio Code](https://code.visualstudio.com) or [VSCodium](https://vscodium.com)
+1. Open the `Extensions` tab on the right of the screen
+2. Search for and install _SysIDE CE_
+3. Open a SysML v2 (.sysml) file and the extension will activate.
+4. Link with the SysML v2 standard library:
+
+    - Upon the first activation a pop-up will be displayed on the bottom righ tof your screen asking you to either locate an existing SysML v2 standard library or download it.  
+    <img src="docs/images/library-prompt.png" alt="Prompt" width="600"/>
+    <br> <br>
+
+    - If you don't see the pop-up, download the library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-02/sysml.library) repository) and copy its path to extension settings:  
+    <img src="docs/images/library-settings.png" alt="Settings" width="600"/>
+    <br> <br>
+
+    - Alternatively, the pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support (<mark>may result in faulty sysml validation</mark>).
 
 ## Features
 
@@ -67,19 +91,31 @@ The extension provides basic features to support SysML v2 document editing:
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable-file no-inline-html -->
 
-- Autocompletion  
-  ![Autocompletion](/docs/images/completion.gif)
+- **Semantic and syntax checking** identifies errors as they occur allowing to instantly correct mistakes and speed up workflow.  
+  ![Semantic and syntax checking](/docs/images/validation_dark.gif)
   <br> <br>
 
-- Code navigation  
-  ![Navigation](/docs/images/navigation.gif)
-  <br> <br>
 
-- Semantic highlighting  
+- **Semantic highlighting** increases readability and allows to distinguish different parts of the code quickly.  
   ![Semantic highlighting](/docs/images/semantic-highlighting.png)
   <br> <br>
 
-- Auto-formatting:
+- **Autocompletion** speeds up the workflow by reducing typing errors and minimizing manual input.  
+  ![Autocompletion](/docs/images/completion.gif)
+  <br> <br>
+
+- **Hovers** instantly display documentation allowing to quickly understand an element.  
+  ![Hovers](/docs/images/hover.gif)
+  <br> <br>
+
+- **Code navigation** speeds up development by enabling quick access to element definitions.  
+  ![Navigation](/docs/images/navigation.gif)
+  <br> <br>
+
+- **Folding** improves readability and eases navigation by organizing code into collapsible sections.  
+  ![Folding](/docs/images/folding.gif)
+
+- **Auto-formatting** enhances code readability and maintainability by ensuring consistent structure for:  
 
   - Comment bodies  
   ![Comment bodies](/docs/images/comment-formatting.gif)
@@ -89,24 +125,18 @@ The extension provides basic features to support SysML v2 document editing:
   ![Elements](/docs/images/formatting.gif)
   <br> <br>
 
-- Renaming  
+- **Renaming** saves time and reduces errors by renaming all elements with the same name with one click.  
   ![Renaming](/docs/images/renaming.gif)
   <br> <br>
 
-- Hovers  
-  ![Hovers](/docs/images/hover.gif)
-  <br> <br>
-
-- References  
+- **References** enable efficient navigation and code updating by identifying all instances of an element.  
   ![References](/docs/images/references.gif)
   <br> <br>
 
-- Document symbols  
+- **Document symbols** provide rapid model overviews, enabling efficient comprehension and navigation.  
   ![Symbols](/docs/images/symbols.gif)
   <br> <br>
 
-- Folding  
-  ![Folding](/docs/images/folding.gif)
 
 <!-- markdownlint-restore -->
 
