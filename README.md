@@ -54,9 +54,33 @@ If you want to get in touch regarding any edition of _SysIDE_, reach out to Sens
 
 ## Quick start
 
-1. Install the latest extension from the marketplace.
-2. Open a SysML v2 (.sysml) file and the extension will activate.
-3. Upon the first activation a pop-up will be displayed asking you to either locate an existing SysML v2 standard library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-02/sysml.library) repository) or download it. The pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support.
+### In a browser (without local VSCode)
+
+You can try out _SysIDE_ without needing to instal it locally. To do so:
+1. Go to [Visual Studio Code for the Web](https://vscode.dev)
+2. Open the `Extensions` tab on the right of the screen
+3. Search for and install _SysIDE CE_
+4. Open a folder or a `.sysml` file
+
+This is a good way to get a taste for how _SysIDE CE_ works. But if you plan on using it for a longer term or for larger models, we suggest installing it locally.
+
+### Running locally
+
+0. Install [Visual Studio Code](https://code.visualstudio.com) or [VSCodium](https://vscodium.com)
+1. Open the `Extensions` tab on the right of the screen
+2. Search for and install _SysIDE CE_
+3. Open a SysML v2 (.sysml) file and the extension will activate.
+4. Link with the SysML v2 standard library:
+
+    - Upon the first activation a pop-up will be displayed on the bottom righ tof your screen asking you to either locate an existing SysML v2 standard library or download it.  
+    <img src="docs/images/library-prompt.png" alt="Prompt" width="600"/>
+    <br> <br>
+
+    - If you don't see the pop-up, download the library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-02/sysml.library) repository) and copy its path to extension settings:  
+    <img src="docs/images/library-settings.png" alt="Settings" width="600"/>
+    <br> <br>
+
+    - Alternatively, the pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support (<mark>may result in faulty sysml validation</mark>).
 
 ## Features
 
