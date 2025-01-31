@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -16,11 +16,11 @@
 
 import { Stream, stream, EMPTY_STREAM, LangiumDocument } from "langium";
 import { URI, Utils } from "vscode-uri";
-import { NamespaceScope, SysMLScope, ExportedMember } from "./scopes";
+import { SysMLScope, ExportedMember } from "./scopes";
 import { Namespace } from "../generated/ast";
 import { MembershipMeta, NamespaceMeta, ElementMeta, namedMembership } from "../model";
 import { erase } from "./common";
-import { Visibility, DEFAULT_ALIAS_RESOLVER } from "./scope-util";
+import { Visibility } from "./scope-util";
 
 /**
  * Get a language ID from a URI
@@ -36,28 +36,6 @@ type ScopeEntry = {
 
 type DynamicExportMap = Map<string, NamespaceMeta>;
 type ExportIndex = Record<string, DynamicExportMap>;
-
-function getExports(exports: ExportIndex, langId?: string): Stream<NamespaceScope> {
-    let namespaces: Stream<NamespaceMeta>;
-    if (!langId) namespaces = stream(Object.values(exports)).flatMap((map) => map.values());
-    else
-        namespaces = stream(exports[langId]?.values() ?? []).concat(
-            stream(Object.keys(exports))
-                .filter((k) => k !== langId)
-                .flatMap((k) => exports[k].values())
-        );
-
-    return namespaces.map(
-        (ns) =>
-            new NamespaceScope(ns, {
-                imported: { visibility: Visibility.public, depth: 0 },
-                inherited: { visibility: Visibility.public, depth: 0 },
-                visited: new Set(),
-                specializations: new Set(),
-                aliasResolver: DEFAULT_ALIAS_RESOLVER,
-            })
-    );
-}
 
 function getFromEntries(entries: ScopeEntry[], langId?: string): MembershipMeta | undefined {
     if (langId) {
@@ -79,12 +57,6 @@ export class GlobalScope extends SysMLScope {
      * exports from `staticExports` on document invalidation
      */
     protected readonly documentStaticExports: Map<string, [string, ScopeEntry][]> = new Map();
-
-    /**
-     * fallback for full scope resolution in case name was not found in static
-     * exports
-     */
-    protected readonly dynamicExports: ExportIndex = {};
 
     /**
      * all root namespaces for use in completion generation
@@ -115,15 +87,6 @@ export class GlobalScope extends SysMLScope {
         return;
     }
 
-    protected getDynamicExportedElement(name: string, langId?: string): MembershipMeta | undefined {
-        for (const ns of this.getDynamicExports(langId)) {
-            const candidate = ns.getExportedElement(name);
-            if (candidate) return candidate;
-        }
-
-        return;
-    }
-
     override getAllExportedElements(langId?: string): Stream<ExportedMember> {
         return this.getAllLocalElements(new Set(), langId);
     }
@@ -135,22 +98,14 @@ export class GlobalScope extends SysMLScope {
         name: string,
         langId?: string
     ): MembershipMeta<ElementMeta> | "prune" | undefined {
-        return (
-            this.getStaticExportedElement(name, langId) ??
-            this.getDynamicExportedElement(name, langId)
-        );
+        return this.getStaticExportedElement(name, langId);
     }
 
     protected getAllLocalElements(ignored: Set<string>, langId?: string): Stream<ExportedMember> {
         return stream(this.staticExports)
             .map(([name, entries]) => [name, getFromEntries(entries, langId)] as const)
             .filter((t): t is ExportedMember => Boolean(t[1]))
-            .concat(this.getDynamicExports(langId).flatMap((ns) => ns.getAllExportedElements()))
             .distinct(([name]) => name);
-    }
-
-    protected getDynamicExports(langId?: string): Stream<NamespaceScope> {
-        return getExports(this.dynamicExports, langId);
     }
 
     invalidateDocuments(uris: URI[]): void {
@@ -160,7 +115,6 @@ export class GlobalScope extends SysMLScope {
             const id = getLanguageId(uri);
             const uriStr = uri.toString();
 
-            this.dynamicExports[id]?.delete(uriStr);
             this.allExports[id]?.delete(uriStr);
 
             this.documentStaticExports.get(uriStr)?.forEach(([name, entry]) => {
@@ -199,25 +153,6 @@ export class GlobalScope extends SysMLScope {
         };
 
         addExports(this.allExports);
-
-        // DO NOT ADD NAMESPACES WITH ONLY STATICALLY KNOWN EXPORTS. We do not
-        // need to check a namespace for dynamically exported symbols if it has
-        // no public dynamic exports WHICH ALL SANE DOCUMENTS SHOULD DO. If all
-        // documents follow this, then the dynamic exports will remain empty and
-        // not deteriorate performance when a name is not found in static
-        // exports map.
-        if (
-            root.imports.some((imp) => imp.visibility === Visibility.public) ||
-            root.featureMembers().some((m) => {
-                if (m.visibility !== Visibility.public) return false;
-                const target = m.element();
-                if (!target) return false;
-                // unnamed features may get implicit name after reference
-                // resolution, treating them as dynamic exports
-                return !target.name && !target.shortName;
-            })
-        )
-            addExports(this.dynamicExports);
     }
 
     wrapForLang(langId?: string): SysMLScope {

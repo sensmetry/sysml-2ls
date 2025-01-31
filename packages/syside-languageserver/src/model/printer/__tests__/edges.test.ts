@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -62,20 +62,20 @@ const expectPrinted: typeof expectPrintedAs = (text, context?) => {
 describe("imports", () => {
     describe("membership imports", () => {
         it("should print non-recursive imports without children", async () => {
-            const node = await parsedNode("import M;", { node: MembershipImport });
-            expect(printKerMLElement(node.$meta)).toEqual("import M;\n");
+            const node = await parsedNode("private import M;", { node: MembershipImport });
+            expect(printKerMLElement(node.$meta)).toEqual("private import M;\n");
         });
 
         it("should print recursive imports without children", async () => {
-            const node = await parsedNode("import M ::**;", { node: MembershipImport });
-            expect(printKerMLElement(node.$meta)).toEqual("import M::**;\n");
+            const node = await parsedNode("private import M ::**;", { node: MembershipImport });
+            expect(printKerMLElement(node.$meta)).toEqual("private import M::**;\n");
         });
 
         it("should print imports with children", async () => {
-            const node = await parsedNode("import all M { /* comment */ }", {
+            const node = await parsedNode("private import all M { /* comment */ }", {
                 node: MembershipImport,
             });
-            expect(printKerMLElement(node.$meta)).toEqual(`import all M {
+            expect(printKerMLElement(node.$meta)).toEqual(`private import all M {
     /*
      * comment
      */
@@ -85,25 +85,27 @@ describe("imports", () => {
 
     describe("namespace imports", () => {
         it("should print non-recursive imports without children", async () => {
-            const node = await parsedNode("import M::*;", { node: NamespaceImport });
-            expect(printKerMLElement(node.$meta)).toEqual("import M::*;\n");
+            const node = await parsedNode("private import M::*;", { node: NamespaceImport });
+            expect(printKerMLElement(node.$meta)).toEqual("private import M::*;\n");
         });
 
         it("should print recursive imports without children", async () => {
-            const node = await parsedNode("import M ::* ::**;", { node: NamespaceImport });
-            expect(printKerMLElement(node.$meta)).toEqual("import M::*::**;\n");
+            const node = await parsedNode("private import M ::* ::**;", { node: NamespaceImport });
+            expect(printKerMLElement(node.$meta)).toEqual("private import M::*::**;\n");
         });
 
         it("should print recursive membership imports with filters", async () => {
-            const node = await parsedNode("import M ::**[true];", { node: NamespaceImport });
-            expect(printKerMLElement(node.$meta)).toEqual("import M::**[true];\n");
+            const node = await parsedNode("private import M ::**[true];", {
+                node: NamespaceImport,
+            });
+            expect(printKerMLElement(node.$meta)).toEqual("private import M::**[true];\n");
         });
 
         it("should print imports with children", async () => {
-            const node = await parsedNode("import all M::* { /* comment */ }", {
+            const node = await parsedNode("private import all M::* { /* comment */ }", {
                 node: NamespaceImport,
             });
-            expect(printKerMLElement(node.$meta)).toEqual(`import all M::* {
+            expect(printKerMLElement(node.$meta)).toEqual(`private import all M::* {
     /*
      * comment
      */
@@ -111,20 +113,20 @@ describe("imports", () => {
         });
 
         it("should print filtered imports", async () => {
-            const node = await parsedNode("import M ::* ::** [@Safety][hastype T];", {
+            const node = await parsedNode("private import M ::* ::** [@Safety][hastype T];", {
                 node: NamespaceImport,
             });
             expect(printKerMLElement(node.$meta)).toEqual(
-                "import M::*::**[@ Safety][hastype T];\n"
+                "private import M::*::**[@ Safety][hastype T];\n"
             );
         });
 
         it("should break filtered imports", async () => {
-            const node = await parsedNode("import M ::* ::** [@Safety][hastype T];", {
+            const node = await parsedNode("private import M ::* ::** [@Safety][hastype T];", {
                 node: NamespaceImport,
             });
             expect(printKerMLElement(node.$meta, { options: { lineWidth: 20 } })).toEqual(
-                `import M::*::**[
+                `private import M::*::**[
         @ Safety
     ][hastype T];\n`
             );
@@ -355,14 +357,25 @@ describe("dependencies", () => {
 });
 
 describe.each([
-    ["import", Import, "kerml", (text: string): string => text],
-    ["expose", Expose, "sysml", (text: string): string => `view { ${text} }`],
-] as const)("%s", (kw, type, lang, transform) => {
-    it("should print non-recursive membership imports", async () => {
-        return expectPrinted(transform(`${kw} M { /* comment */ }`), {
+    ["", "private ", "import", Import, "kerml", (text: string): string => text],
+    ["protected ", "", "expose", Expose, "sysml", (text: string): string => `view { ${text} }`],
+] as const)("%s", (bad, vis, kw, type, lang, transform) => {
+    it("should print appropriate visibility indicators", async () => {
+        return expectPrinted(transform(`${bad}${kw} M { /* comment */ }`), {
             lang,
             node: ("Membership" + type) as SubtypeKeys<Element>,
-        }).resolves.toEqual(`${kw} M {
+        }).resolves.toEqual(`${vis}${kw} M {
+    /*
+     * comment
+     */
+}\n`);
+    });
+
+    it("should print non-recursive membership imports", async () => {
+        return expectPrinted(transform(`${vis}${kw} M { /* comment */ }`), {
+            lang,
+            node: ("Membership" + type) as SubtypeKeys<Element>,
+        }).resolves.toEqual(`${vis}${kw} M {
     /*
      * comment
      */
@@ -370,10 +383,10 @@ describe.each([
     });
 
     it("should print recursive membership imports", async () => {
-        return expectPrinted(transform(`${kw} M::** { /* comment */ }`), {
+        return expectPrinted(transform(`${vis}${kw} M::** { /* comment */ }`), {
             lang,
             node: ("Membership" + type) as SubtypeKeys<Element>,
-        }).resolves.toEqual(`${kw} M::** {
+        }).resolves.toEqual(`${vis}${kw} M::** {
     /*
      * comment
      */
@@ -381,10 +394,10 @@ describe.each([
     });
 
     it("should print non-recursive namespace imports", async () => {
-        return expectPrinted(transform(`${kw} M::* { /* comment */ }`), {
+        return expectPrinted(transform(`${vis}${kw} M::* { /* comment */ }`), {
             lang,
             node: ("Namespace" + type) as SubtypeKeys<Element>,
-        }).resolves.toEqual(`${kw} M::* {
+        }).resolves.toEqual(`${vis}${kw} M::* {
     /*
      * comment
      */
@@ -392,10 +405,10 @@ describe.each([
     });
 
     it("should print recursive namespace imports", async () => {
-        return expectPrinted(transform(`${kw} M::*::** { /* comment */ }`), {
+        return expectPrinted(transform(`${vis}${kw} M::*::** { /* comment */ }`), {
             lang,
             node: ("Namespace" + type) as SubtypeKeys<Element>,
-        }).resolves.toEqual(`${kw} M::*::** {
+        }).resolves.toEqual(`${vis}${kw} M::*::** {
     /*
      * comment
      */
@@ -403,11 +416,11 @@ describe.each([
     });
 
     it("should print namespace imports with filters", async () => {
-        return expectPrinted(transform(`${kw} M::* [@Safety][hastype T]{ /* comment */ }`), {
+        return expectPrinted(transform(`${vis}${kw} M::* [@Safety][hastype T]{ /* comment */ }`), {
             lang,
             node: ("Namespace" + type) as SubtypeKeys<Element>,
             options: { lineWidth: 20 },
-        }).resolves.toEqual(`${kw} M::*[
+        }).resolves.toEqual(`${vis}${kw} M::*[
         @ Safety
     ][hastype T] {
     /*

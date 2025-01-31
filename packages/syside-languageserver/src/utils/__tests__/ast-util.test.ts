@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -35,28 +35,28 @@ namespace N1 {
 
 const N4 = `
 namespace N4 {
-    import N1::N2::B;
+    public import N1::N2::B;
 
     namespace C;
 }
 `;
 
 const N5 = `namespace N5 {
-    import N1::N2::*;
+    public import N1::N2::*;
 
     namespace C;
 }
 `;
 
 const N6 = `namespace N6 {
-    import N1::**;
+    public import N1::**;
 
     namespace C;
 }
 `;
 
 const N7 = `namespace N7 {
-    import N1::*::**;
+    public import N1::*::**;
 
     namespace C;
 }
@@ -212,11 +212,11 @@ test("circular imports are resolved without infinite loops", async () => {
     const result = await parseKerML(`
     package Circular {
         package P1 {
-            import P2::*;
+            public import P2::*;
             class A;
         }
         package P2 {
-            import P1::*;
+            public import P1::*;
             class B;
         }       
     }

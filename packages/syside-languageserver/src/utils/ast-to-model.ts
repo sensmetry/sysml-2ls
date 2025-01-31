@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * model program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -43,6 +43,7 @@ import {
     typeIndex,
 } from "../model";
 import { streamModel } from "./ast-util";
+import { Visibility } from "./scope-util";
 
 type AstToModelFunction<T extends AstNode = AstNode> = (
     model: NonNullable<T["$meta"]>,
@@ -100,6 +101,9 @@ const AstToModel: {
     [ast.Import](model, node) {
         model.isRecursive = !!node.isRecursive;
         model["_importsAll"] = node.importsAll;
+        if (model.parent()?.is(ast.Package) && model.parent()?.parent()?.is(ast.Import)) {
+            model.visibility = Visibility.public;
+        }
     },
 
     [ast.AnnotatingElement](model, node) {

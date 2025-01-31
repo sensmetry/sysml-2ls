@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -564,6 +564,13 @@ describe("Include use case usage", () => {
 });
 
 describe("Expose", () => {
+    test("explicit visibility indicator triggers validation", () => {
+        return expectValidations(
+            "view V { protected expose a; }",
+            "validateExposeNoExplicitVisibility"
+        ).resolves.toHaveLength(1);
+    });
+
     test("invalid owning namespace triggers validation", () => {
         return expectOwningType(
             MembershipExposeMeta,

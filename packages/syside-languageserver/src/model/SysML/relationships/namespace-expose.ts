@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -25,7 +25,7 @@ import { ViewUsageMeta } from "../view-usage";
 
 export interface NamespaceExposeMeta<T extends NamespaceMeta = NamespaceMeta>
     extends ExposeMeta<T>,
-        NamespaceImportMeta<T> {
+        Omit<NamespaceImportMeta<T>, "visibility" | "clearVisibility" | "setMetaclass"> {
     get importsAll(): boolean;
 }
 
