@@ -8,7 +8,7 @@
         "url": "https://sensmetry.com/",
         "email": "opensource@sensmetry.com"
     },
-    "version": "0.6.2",
+    "version": "0.7.0",
     "icon": "icons/logo.png",
     "engines": {
         "vscode": "^1.56.0"

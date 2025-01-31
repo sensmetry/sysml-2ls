@@ -6,6 +6,8 @@
 
 ## main
 
+## 0.7.0
+
 ### Changes
 
 - Added license to the published `syside-languageserver.js` which is now zipped
