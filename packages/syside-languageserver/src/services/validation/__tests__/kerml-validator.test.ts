@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -90,6 +90,22 @@ test("non-constructed elements with implied relationships trigger validation", (
         accept
     );
     expect(accept).toHaveBeenCalledTimes(1);
+});
+
+describe("Import", () => {
+    test("public top level import trigger validation", async () => {
+        return expectValidations(
+            "public import A;",
+            "validateImportTopLevelVisibility"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("import without visibility indicator trigger validation", async () => {
+        return expectValidations(
+            "import A;",
+            "validateImportExplicitVisibility"
+        ).resolves.toHaveLength(1);
+    });
 });
 
 describe("Duplicate member names", () => {

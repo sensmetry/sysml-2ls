@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -287,7 +287,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     /**
      * @returns the AST under active cursor as JSON string
      */
-    @editorCommand("syside.dumpAst")
+    @editorCommand("syside.editor.dumpAst")
     protected dumpAst(
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
@@ -300,7 +300,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     /**
      * @returns the metamodel under active cursor as JSON string
      */
-    @editorCommand("syside.dumpMeta")
+    @editorCommand("syside.editor.dumpMeta")
     protected dumpMeta(
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
@@ -314,7 +314,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @return array of `"{qualified name} ({specialization kind}, implicit: {is
      * implicit})"` strings of types used in name resolution in the same order
      */
-    @editorCommand("syside.mro")
+    @editorCommand("syside.editor.mro")
     protected mro(
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
@@ -339,7 +339,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @returns array of qualified children names visible to the linker in the
      * scope of the AST node under active cursor
      */
-    @editorCommand("syside.children")
+    @editorCommand("syside.editor.children")
     protected children(
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
@@ -357,7 +357,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @returns array of all qualified names visible to linker in the scope of
      * the AST node under active cursor
      */
-    @editorCommand("syside.scope")
+    @editorCommand("syside.editor.scope")
     protected scope(
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
@@ -376,7 +376,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * active cursor
      * @returns result of the evaluated inline expression
      */
-    @editorCommand("syside.evaluate")
+    @editorCommand("syside.editor.evaluate")
     protected evaluate(
         editor: RegisterTextEditorCommandsRequest.Parameters,
         _ = CancellationToken.None
@@ -408,7 +408,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @see {@link editorCommand}
      * @returns array of available editor commands
      */
-    @simpleCommand("syside.editorCommands")
+    @simpleCommand("syside.editor.editorCommands")
     protected getEditorCommands(_ = CancellationToken.None): string[] {
         return Array.from(TEXT_EDITOR_FUNCTIONS.keys());
     }
@@ -417,7 +417,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @see {@link simpleCommand}
      * @returns array of available simple commands
      */
-    @simpleCommand("syside.simpleCommands")
+    @simpleCommand("syside.editor.simpleCommands")
     protected getSimpleCommands(_ = CancellationToken.None): string[] {
         return Array.from(SIMPLE_COMMANDS.keys());
     }
@@ -428,7 +428,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @see {@link documentCommand}
      * @returns array of all available commands
      */
-    @simpleCommand("syside.allCommands")
+    @simpleCommand("syside.editor.allCommands")
     protected getAllCommands(_ = CancellationToken.None): string[] {
         return this.commands;
     }
@@ -438,7 +438,7 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
      * @param uriComp URI components of the document to update
      * @param token cancellation token
      */
-    @documentCommand("syside.updateDocument")
+    @documentCommand("syside.editor.updateDocument")
     protected async updateDocument(
         uriComp: UriComponents,
         token = CancellationToken.None

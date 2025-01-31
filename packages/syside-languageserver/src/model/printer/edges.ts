@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -239,20 +239,13 @@ export function printWithVisibility(
     context: ModelPrinterContext
 ): Doc {
     const format = context.format.public_keyword;
+    if (edge.is(ast.Expose) || (!edge.is(ast.Import) && !edge.hasExplicitVisibility)) {
+        return doc;
+    }
 
     switch (edge.visibility) {
         case Visibility.public:
-            return [
-                formatPreserved(edge, format, "always", {
-                    find: (node) => findNodeForKeyword(node, "public"),
-                    choose: {
-                        always: () => keyword("public "),
-                        never: () => literals.emptytext,
-                        preserve: (found) => (found ? "always" : "never"),
-                    },
-                }),
-                doc,
-            ];
+            return [keyword("public "), doc];
         case Visibility.protected:
             return [keyword("protected "), doc];
         case Visibility.private:

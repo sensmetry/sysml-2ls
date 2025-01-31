@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -217,13 +217,13 @@ describe("package.json exports custom contributions", () => {
             (property, data) => {
                 const parts = property.split(".");
                 expect(parts.length).toBeGreaterThanOrEqual(1);
-                expect(parts[0]).toEqual(SETTINGS_KEY);
+                expect(parts[0].concat(".", parts[1])).toEqual(SETTINGS_KEY);
 
                 // custom client/server config
-                if (parts.at(1) === "client" || parts.at(1) === "server") return;
+                if (parts.at(2) === "client" || parts.at(2) === "server") return;
 
                 let section: Record<string, unknown> = DefaultSysMLConfig;
-                for (const part of parts.slice(1)) {
+                for (const part of parts.slice(2)) {
                     expect(Object.keys(section)).toContain(part);
                     section = section[part] as Record<string, unknown>;
                 }

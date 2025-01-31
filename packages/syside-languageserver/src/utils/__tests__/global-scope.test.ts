@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -14,15 +14,13 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { Stream } from "langium";
 import { parseKerML, parseSysML, TEST_BUILD_OPTIONS } from "../../testing";
 import { GlobalScope } from "../global-scope";
-import { NamespaceScope } from "../scopes";
 
 const SaneKerML = "package <k1> K1; private package K2;";
 const SaneSysML = "package S1; package K1;";
-const BadKerML_import = "package A { package B; } import A::*;";
-const BadSysML_import = "package A { package B; } import C::*;";
+const BadKerML_import = "package A { package B; } public import A::*;";
+const BadSysML_import = "package A { package B; } public import C::*;";
 const BadKerML_feature = "package A { feature a; } feature :>> A::a;";
 
 const BUILD_OPTIONS = {
@@ -30,11 +28,7 @@ const BUILD_OPTIONS = {
     document: true,
 } as const;
 
-class TestScope extends GlobalScope {
-    override getDynamicExports(langId?: string | undefined): Stream<NamespaceScope> {
-        return super.getDynamicExports(langId);
-    }
-}
+class TestScope extends GlobalScope {}
 
 describe("Global scope", () => {
     let scope: TestScope;
@@ -59,13 +53,13 @@ describe("Global scope", () => {
         expect(scope.getExportedElement("S1", ".kerml")).toBeDefined();
     });
 
-    it("should find dynamically imported global symbols by name", async () => {
+    it("should not find dynamically imported global symbols by name", async () => {
         const kerml = await parseKerML(BadKerML_import, BUILD_OPTIONS);
 
         scope.collectDocument(kerml);
 
         expect(scope.getExportedElement("A")).toBeDefined();
-        expect(scope.getExportedElement("B")).toBeDefined();
+        expect(scope.getExportedElement("B")).toBeUndefined();
         expect(scope.getExportedElement("AB")).toBeUndefined();
     });
 
@@ -85,7 +79,6 @@ describe("Global scope", () => {
             BUILD_OPTIONS
         );
         scope.collectDocument(kerml);
-        expect(scope.getDynamicExports().count()).toEqual(0);
         expect(scope.getExportedElement("B")).toBeUndefined();
     });
 
@@ -95,7 +88,6 @@ describe("Global scope", () => {
             BUILD_OPTIONS
         );
         scope.collectDocument(kerml);
-        expect(scope.getDynamicExports().count()).toEqual(0);
         expect(scope.getExportedElement("a")).toBeUndefined();
     });
 
@@ -115,8 +107,6 @@ describe("Global scope", () => {
             ["A", "A"],
             ["K1", "K1"],
             ["k1", "K1"],
-            // dynamic imports are returned last
-            ["B", "A::B"],
         ]);
     });
 
@@ -132,10 +122,7 @@ describe("Global scope", () => {
                 .getAllExportedElements(".sysml")
                 .map((e) => [e[0], e[1].document.uriString])
                 .toArray()
-        ).toEqual([
-            ["A", sysml.uriString],
-            ["B", kerml.uriString],
-        ]);
+        ).toEqual([["A", sysml.uriString]]);
     });
 
     it("should remove invalidated document exports from the scope", async () => {

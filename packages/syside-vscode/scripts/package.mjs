@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -21,8 +21,31 @@ import util from "util";
 import child_process from "child_process";
 import fs from "fs-extra";
 import process from "process";
+import path from "path";
+import { SYSMLRELEASE } from "../../syside-languageserver/scripts/clone-sysml-release.mjs";
 
 const exec = util.promisify(child_process.exec);
+
+fs.removeSync("sysml.library")
+fs.mkdirp("sysml.library");
+
+fs.copy(
+    path.join(SYSMLRELEASE, "LICENSE"),
+    path.join("sysml.library", "LICENSE.LGPLv3"),
+);
+
+fs.copy(
+    path.join(SYSMLRELEASE, "LICENSE-GPL"),
+    path.join("sysml.library", "LICENSE.GPLv3"),
+);
+
+fs.copy(
+    path.join(SYSMLRELEASE, "sysml.library"),
+    "sysml.library",
+    {filter: (src, _) => {
+        return !src.split("/").pop().startsWith(".");
+    }}
+);
 
 exec("pnpm vsce package " + process.argv.slice(2).join(" "))
     .then(() => fs.copyFile(".README", "README.md"))

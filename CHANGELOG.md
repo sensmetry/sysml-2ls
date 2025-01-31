@@ -11,6 +11,21 @@
 - Added license to the published `syside-languageserver.js` which is now zipped
   together with license
 - Added License Bundler on esbuild
+- Updated to [2024-09 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-09)
+  - Updated default visibilities of `Imports`
+  - Imports need to have explicit visibility now
+
+### Improvements
+
+- Users no longer need to manually download the standard library or click the
+  "Download standard library" button in the notification on first run of SysIDE
+  Editor. The extension now bundles the latest standard library.
+
+### Chores
+
+- Rebranded from "SysIDE CE" to "SysIDE Editor".
+  - Settings and command prefixes changed from `syside` to `syside.editor`.
+  - Existing settings will be automatically migrated.
 
 ## 0.6.2
 

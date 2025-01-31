@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -28,15 +28,17 @@ const __dirname = path.dirname(__filename);
 const root = path.join(__dirname, "..", "..", "..");
 const dir = path.join(root, "SysML-v2-Release");
 
-const tag = "2024-03";
+const tag = "2024-09";
 
 if (existsSync(dir)) {
-    exec(`git config remote.origin.fetch "+refs/tags/${tag}:refs/tags/${tag}"`, { cwd: dir })
+    await exec(`git config remote.origin.fetch "+refs/tags/${tag}:refs/tags/${tag}"`, { cwd: dir })
         .then(() => exec(`git fetch --depth=1`, { cwd: dir }))
         .then(() => exec(`git checkout tags/${tag}`, { cwd: dir }));
 } else {
-    exec(
+    await exec(
         `git clone --depth 1 --branch ${tag} https://github.com/Systems-Modeling/SysML-v2-Release.git`,
         { cwd: root }
     );
 }
+
+export const SYSMLRELEASE = dir

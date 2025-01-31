@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -29,9 +29,15 @@ type Options = keyof typeof CONFIG.contributes.configuration.properties;
  */
 export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
     protected async selectStdlibPath(): Promise<string | undefined> {
+        // Try to find the bundled library first
+        const extPath = vscode.extensions.getExtension("Sensmetry.sysml-2ls")?.extensionPath;
+        if (extPath !== undefined) {
+            return path.join(extPath, "sysml.library");
+        }
+
+        // Otherwise ask the user what to do
         const answer = await vscode.window.showInformationMessage(
-            "The SysML v2 standard library was not found, would you like to download or locate it in the filesystem?",
-            "Download",
+            "The SysML v2 standard library was not found, would you like to disable or locate it in the filesystem?",
             "Locate",
             "Disable in workspace",
             "Disable"
@@ -50,11 +56,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
             return;
         }
 
-        if (answer === "Locate") {
-            return this.findStdlibDir();
-        }
-
-        return this.downloadStdlibDir();
+        return this.findStdlibDir();
     }
 
     /**
@@ -66,9 +68,9 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
             ? vscode.ConfigurationTarget.Global
             : vscode.ConfigurationTarget.Workspace;
         const config = vscode.workspace.getConfiguration();
-        await config.update(<Options>"syside.standardLibrary", false, target);
+        await config.update(<Options>"syside.editor.standardLibrary", false, target);
         await config.update(
-            <Options>"syside.defaultBuildOptions.ignoreMetamodelErrors",
+            <Options>"syside.editor.defaultBuildOptions.ignoreMetamodelErrors",
             true,
             target
         );
@@ -92,7 +94,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
         if (!(await fs.exists(dir))) return;
         await vscode.workspace
             .getConfiguration()
-            .update(<Options>"syside.standardLibraryPath", dir, true);
+            .update(<Options>"syside.editor.standardLibraryPath", dir, true);
         return dir;
     }
 
@@ -112,7 +114,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
                 await vscode.workspace
                     .getConfiguration()
                     .update(
-                        <Options>"syside.standardLibraryPath",
+                        <Options>"syside.editor.standardLibraryPath",
                         libPath,
                         vscode.ConfigurationTarget.Global
                     );
@@ -193,7 +195,7 @@ export class SysMLVSCodeClientExtender extends BaseSysMLVSCodeClientExtender {
 
         const usedDir = await vscode.workspace
             .getConfiguration()
-            .get(<Options>"syside.standardLibraryPath");
+            .get(<Options>"syside.editor.standardLibraryPath");
         if (usedDir !== this.stdlibDir) {
             // not using the downloaded library, skip update
             return;

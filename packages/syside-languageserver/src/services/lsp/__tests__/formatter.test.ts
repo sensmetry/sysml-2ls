@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -22,7 +22,7 @@ import { getRange, parseKerML, parseSysML, services } from "../../../testing";
 import { PrintRange } from "../../../model";
 
 const unformattedSysMLExample = `
-part def Camera {import PictureTaking::*;perform action takePicture[*] :> PictureTaking::takePicture;
+part def Camera {private import PictureTaking::*;perform action takePicture[*] :> PictureTaking::takePicture;
 part focusingSubsystem {perform takePicture.focus;}
 part imagingSubsystem {perform takePicture.shoot;}
 }
@@ -154,7 +154,7 @@ describe("SysMLFormatter", () => {
         it("should format whole document correctly with 4 tabsize, with spaces", () => {
             return expectFormatted(unformattedSysMLExample).resolves.toEqual(
                 `part def Camera {
-    import PictureTaking::*;
+    private import PictureTaking::*;
     perform action takePicture :> PictureTaking::takePicture [*];
     part focusingSubsystem {
         perform takePicture.focus;
@@ -173,7 +173,7 @@ describe("SysMLFormatter", () => {
                 insertSpaces: true,
             }).resolves.toEqual(
                 `part def Camera {
-  import PictureTaking::*;
+  private import PictureTaking::*;
   perform action takePicture :> PictureTaking::takePicture [*];
   part focusingSubsystem {
     perform takePicture.focus;
@@ -192,7 +192,7 @@ describe("SysMLFormatter", () => {
                 insertSpaces: false,
             }).resolves.toEqual(
                 `part def Camera {
-	import PictureTaking::*;
+	private import PictureTaking::*;
 	perform action takePicture :> PictureTaking::takePicture [*];
 	part focusingSubsystem {
 		perform takePicture.focus;

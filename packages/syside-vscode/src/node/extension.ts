@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -27,7 +27,8 @@ let data: {
 };
 
 function migrateConfig(): void {
-    const oldSection = vscode.workspace.getConfiguration("sysml");
+    const sysmlSection = vscode.workspace.getConfiguration("sysml");
+    const sysideSection = vscode.workspace.getConfiguration("syside");
     const newSection = vscode.workspace.getConfiguration(SETTINGS_KEY);
     for (const section of [
         "trace.server",
@@ -45,17 +46,19 @@ function migrateConfig(): void {
         "server.args.debug",
         "server.path",
     ]) {
-        const config = oldSection.inspect(section);
-        if (!config) continue;
+        for (const oldSection of [sysmlSection, sysideSection]) {
+            const config = oldSection.inspect(section);
+            if (!config) continue;
 
-        for (const [value, target] of [
-            [config.workspaceFolderValue, vscode.ConfigurationTarget.WorkspaceFolder],
-            [config.workspaceValue, vscode.ConfigurationTarget.Workspace],
-            [config.globalValue, vscode.ConfigurationTarget.Global],
-        ] as const) {
-            if (value === undefined) continue;
-            newSection.update(section, value, target);
-            oldSection.update(section, undefined, target);
+            for (const [value, target] of [
+                [config.workspaceFolderValue, vscode.ConfigurationTarget.WorkspaceFolder],
+                [config.workspaceValue, vscode.ConfigurationTarget.Workspace],
+                [config.globalValue, vscode.ConfigurationTarget.Global],
+            ] as const) {
+                if (value === undefined) continue;
+                newSection.update(section, value, target);
+                oldSection.update(section, undefined, target);
+            }
         }
     }
 }

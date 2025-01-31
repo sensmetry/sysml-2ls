@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -34,21 +34,24 @@ afterEach(() => {
 
 const SimpleCommands = [
     {
-        command: "syside.editorCommands",
-        expected: expect.arrayContaining(["syside.dumpAst", "syside.dumpAst.console"]),
-    },
-    {
-        command: "syside.simpleCommands",
+        command: "syside.editor.editorCommands",
         expected: expect.arrayContaining([
-            "syside.simpleCommands",
-            "syside.simpleCommands.console",
+            "syside.editor.dumpAst",
+            "syside.editor.dumpAst.console",
         ]),
     },
     {
-        command: "syside.allCommands",
+        command: "syside.editor.simpleCommands",
         expected: expect.arrayContaining([
-            "syside.simpleCommands",
-            "syside.simpleCommands.console",
+            "syside.editor.simpleCommands",
+            "syside.editor.simpleCommands.console",
+        ]),
+    },
+    {
+        command: "syside.editor.allCommands",
+        expected: expect.arrayContaining([
+            "syside.editor.simpleCommands",
+            "syside.editor.simpleCommands.console",
         ]),
     },
 ];
@@ -80,8 +83,8 @@ describe("document commands can be executed", () => {
     builder.update = mock;
     afterAll(() => (builder.update = update));
 
-    test("syside.updateDocument triggers document update", async () => {
-        expect(handler?.executeCommand("syside.updateDocument", [uri?.toJSON()])).resolves;
+    test("syside.editor.updateDocument triggers document update", async () => {
+        expect(handler?.executeCommand("syside.editor.updateDocument", [uri?.toJSON()])).resolves;
         expect(mock).toHaveBeenCalledTimes(1);
         expect(mock).toHaveBeenCalledWith(
             // jest somehow puts an extra `external` property on plain URI...
@@ -99,50 +102,50 @@ part C;
 
 const EditorCommands = [
     {
-        command: "syside.dumpAst",
+        command: "syside.editor.dumpAst",
         position: { line: 1, character: 3 }, // 'par|t'
         expected: expect.objectContaining({
             $meta: expect.objectContaining({ qualifiedName: "B" }),
         }),
     },
     {
-        command: "syside.dumpMeta",
+        command: "syside.editor.dumpMeta",
         position: { line: 1, character: 3 },
         expected: expect.objectContaining({ qualifiedName: "B" }),
     },
     {
-        command: "syside.mro",
+        command: "syside.editor.mro",
         position: { line: 1, character: 3 },
         expected: [expect.stringMatching(/^B/), expect.stringMatching(/^A/)],
     },
     {
-        command: "syside.children",
+        command: "syside.editor.children",
         position: { line: 1, character: 3 },
         expected: ["x", "y", "z", "v", "a", "b"].map((v) =>
             expect.stringMatching(new RegExp(`^${v}`))
         ),
     },
     {
-        command: "syside.scope",
+        command: "syside.editor.scope",
         position: { line: 1, character: 3 },
         expected: ["x", "y", "z", "v", "a", "b", "A", "B", "C"].map((v) =>
             expect.stringMatching(new RegExp(`^${v}`))
         ),
     },
     {
-        command: "syside.evaluate",
+        command: "syside.editor.evaluate",
         position: { line: 1, character: 68 }, // '=|'
         expected: [7],
         name: "feature value",
     },
     {
-        command: "syside.evaluate",
+        command: "syside.editor.evaluate",
         position: { line: 1, character: 77 }, // '*|'
         expected: [6],
         name: "expression",
     },
     {
-        command: "syside.evaluate",
+        command: "syside.editor.evaluate",
         position: { line: 1, character: 62 }, // 'attribu|te'
         expected: [7],
         name: "feature",

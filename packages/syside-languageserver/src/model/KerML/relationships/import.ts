@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -17,6 +17,7 @@
 import { AstNode, LangiumDocument } from "langium";
 import { Import } from "../../../generated/ast";
 import { enumerable } from "../../../utils";
+import { Visibility } from "../../../utils/scope-util";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../../metamodel";
 import {
     ElementMeta,
@@ -45,6 +46,19 @@ export abstract class ImportMeta<T extends Importable = Importable> extends Rela
      * Whether visibility is ignored
      */
     protected _importsAll = false;
+
+    /**
+     * Visibility of the element at the end of this import
+     * @see {@link element}
+     */
+    @enumerable
+    override get visibility(): Visibility {
+        return this._visibility ?? Visibility.private;
+    }
+
+    override set visibility(value: Visibility) {
+        this._visibility = value;
+    }
 
     @enumerable
     get importsAll(): boolean {

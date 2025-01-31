@@ -1,4 +1,4 @@
-# SysIDE Community Edition
+# SysIDE Editor
 
 **NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
 
@@ -24,11 +24,11 @@ _SysIDE_ (pronounced "seaside") is a transformational SysML v2 systems-as-code m
 
 ---
 
-_SysIDE Community Edition (SysIDE CE)_ is a free and open source SysML v2 textual editing and analysis system, bringing rich SysML v2 language support to Visual Studio Code. _SysIDE CE_ can also be integrated into other applications and automated workflows which need to interact with SysML v2 textual representations.
+_SysIDE Editor_ is a free and open source SysML v2 textual editing and analysis system, bringing rich SysML v2 language support to Visual Studio Code. _SysIDE Editor_ can also be integrated into other applications and automated workflows which need to interact with SysML v2 textual representations.
 
-The main enabling components of _SysIDE CE_ are a parser and a language server for SysML v2 and KerML [2024-05 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-05) specifications.
+The main enabling components of _SysIDE Editor_ are a parser and a language server for SysML v2 and KerML [2024-05 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-05) specifications.
 
-_SysIDE CE_ provides features such as:
+_SysIDE Editor_ provides features such as:
 
 - Semantic highlighting
 - Autocompletion
@@ -41,18 +41,21 @@ _SysIDE CE_ provides features such as:
 - Renaming
 - Documentation on hover
 
-_SysIDE CE_ is built and maintained by [**Sensmetry**](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission- & safety-critical automated systems.
+_SysIDE Editor_ is built and maintained by [**Sensmetry**](https://sensmetry.com/), a company focused on ensuring the safety and reliability of mission- & safety-critical automated systems.
 
-_SysIDE CE_ is an open source project with contributions from user and developer community highly encouraged and welcome. For further information about the open source license, see [LICENSE](/LICENSE). To contribute, please see the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
+_SysIDE Editor_ is an open source project with contributions from user and developer community highly encouraged and welcome. For further information about the open source license, see [LICENSE](/LICENSE). To contribute, please see the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
-## Editions
+## SysIDE tool family
 
-There are two editions of _SysIDE_:
+_SysIDE_ tool family is quickly growing. At the moment, it includes:
 
-- _SysIDE CE_ - free and open source version of _SysIDE_, enabling modern 'as code' modeling for everyone
-- _SysIDE Pro_ - a licenced version of _SysIDE_, providing advanced features & performance for power-users
+- _SysIDE Editor_ - free and open source VS Code extension, enabling modern 'as code' modeling for everyone.
+- _SysIDE Modeler_ - a premium SysML v2 modeling environment. Soon to be released for Early Adopter Program members.
+- _SysIDE Automator_ - analyse, optimise, and automate your modeling workflows by using Python. Available to Early Adopter Program members.
 
 If you want to get in touch regarding any edition of _SysIDE_, reach out to Sensmetry at `syside(at)sensmetry(dot)com`
+
+To get more information about the _SysIDE_ tool family or to join the Early Adopter Program, please visit [syside.sensmetry.com](https://syside.sensmetry.com).
 
 ## Quick start
 
@@ -61,28 +64,26 @@ If you want to get in touch regarding any edition of _SysIDE_, reach out to Sens
 You can try out _SysIDE_ without needing to instal it locally. To do so:
 1. Go to [Visual Studio Code for the Web](https://vscode.dev)
 2. Open the `Extensions` tab on the right of the screen
-3. Search for and install _SysIDE CE_
+3. Search for and install _SysIDE Editor_
 4. Open a folder or a `.sysml` file
 
-This is a good way to get a taste for how _SysIDE CE_ works. But if you plan on using it for a longer term or for larger models, we suggest installing it locally.
+This is a good way to get a taste for how _SysIDE Editor_ works. But if you plan on using it for a longer term or for larger models, we suggest installing it locally.
 
 ### Running locally
 
 0. Install [Visual Studio Code](https://code.visualstudio.com) or [VSCodium](https://vscodium.com)
 1. Open the `Extensions` tab on the right of the screen
-2. Search for and install _SysIDE CE_
+2. Search for and install _SysIDE Editor_
 3. Open a SysML v2 (.sysml) file and the extension will activate.
 4. Link with the SysML v2 standard library:
 
-    - Upon the first activation a pop-up will be displayed on the bottom righ tof your screen asking you to either locate an existing SysML v2 standard library or download it.  
-    <img src="../docs/images/library-prompt.png" alt="Prompt" width="600"/>
-    <br> <br>
+## Standard library
 
-    - If you don't see the pop-up, download the library (`sysml.library` directory from [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-02/sysml.library) repository) and copy its path to extension settings:  
-    <img src="../docs/images/library-settings.png" alt="Settings" width="600"/>
-    <br> <br>
+_SysIDE Editor_ includes the standard library from the [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-09/sysml.library) repository. The library is licenced under the LGPL v3.0, see [LICENSE](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-09/LICENSE).
 
-    - Alternatively, the pop-up may also be disabled globally or in the workspace and the extension will continue without standard library support (<mark>may result in faulty sysml validation</mark>).
+If you wish to use a different version of the standard library you can go to the _SysIDE Editor_ settings and enter the path to the directory with your preferred library.
+
+![Settings](./docs/images/library-settings.png)
 
 ## Features
 
@@ -182,6 +183,6 @@ See [CONTRIBUTING.md](/CONTRIBUTING.md).
 
 ## Disclaimer
 
-_SysIDE CE_ is developed for the language that carries the name of SysML which is a trademark of OMG. _SysIDE CE_ has been started and continues to be maintained by [Sensmetry](https://sensmetry.com/).
+_SysIDE Editor_ is developed for the language that carries the name of SysML which is a trademark of OMG. _SysIDE Editor_ has been started and continues to be maintained by [Sensmetry](https://sensmetry.com/).
 
 The project is open source. For further information, see [LICENSE](/LICENSE).

@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 export const STDLIB = {
-    version: "2024-02",
-    tree: "https://github.com/Systems-Modeling/SysML-v2-Release/blob/2024-02/sysml.library/",
-    raw: "https://raw.githubusercontent.com/Systems-Modeling/SysML-v2-Release/2024-02/sysml.library/",
+    version: "2024-09",
+    tree: "https://github.com/Systems-Modeling/SysML-v2-Release/blob/2024-09/sysml.library/",
+    raw: "https://raw.githubusercontent.com/Systems-Modeling/SysML-v2-Release/2024-09/sysml.library/",
     files: [
         "Systems Library/Actions.sysml",
         "Systems Library/Allocations.sysml",

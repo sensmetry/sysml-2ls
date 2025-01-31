@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -1184,6 +1184,16 @@ export class SysMLValidator extends KerMLValidator {
     }
 
     // validateExposeIsImportAll - implicitly ensured by the model
+
+    @validateSysML(ast.Expose)
+    validateExposeNoExplicitVisibility(node: ExposeMeta, accept: ModelValidationAcceptor): void {
+        if (node.hasExplicitVisibility) {
+            accept("error", "An Expose cannot have an explicit visibility.", {
+                element: node,
+                code: "validateExposeNoExplicitVisibility",
+            });
+        }
+    }
 
     @validateSysML(ast.Expose)
     validateExposeOwningNamespace(node: ExposeMeta, accept: ModelValidationAcceptor): void {

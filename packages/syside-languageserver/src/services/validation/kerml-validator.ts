@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -34,6 +34,7 @@ import {
     FeatureReferenceExpressionMeta,
     FeatureValueMeta,
     FunctionMeta,
+    ImportMeta,
     InteractionMeta,
     InvocationExpressionMeta,
     ItemFlowEndMeta,
@@ -65,7 +66,7 @@ import {
     Severity,
     validateKerML,
 } from "./validation-registry";
-import { NonNullable } from "../../utils";
+import { NonNullable, Visibility } from "../../utils";
 import { SysMLFileSystemProvider } from "../shared";
 
 /**
@@ -92,6 +93,30 @@ export class KerMLValidator {
             accept("error", "Element cannot have implied relationships included.", {
                 element: node,
                 code: "validateElementIsImpliedIncluded",
+            });
+        }
+    }
+
+    @validateKerML(ast.Import)
+    validateImportTopLevelVisibility(node: ImportMeta, accept: ModelValidationAcceptor): void {
+        if (node.parent()?.is(ast.Namespace) && !node.parent()?.parent()) {
+            if (node.visibility === Visibility.private) return;
+            else {
+                accept("error", "Top Level Import must be private", {
+                    element: node,
+                    property: "visibility",
+                    code: "validateImportTopLevelVisibility",
+                });
+            }
+        }
+    }
+
+    @validateKerML(ast.Import)
+    validateImportExplicitVisibility(node: ImportMeta, accept: ModelValidationAcceptor): void {
+        if (!node.is(ast.Expose) && !node.hasExplicitVisibility) {
+            accept("error", "An Import must have explicit visibility.", {
+                element: node,
+                code: "validateImportExplicitVisibility",
             });
         }
     }

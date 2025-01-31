@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -25,7 +25,7 @@ import { fileURLToPath } from "url";
  * in chronological order. Last tag is the one we currently support. Update this
  * by appending a new tag to the array.
  */
-const SUPPORTED_TAGS = ["2022-12", "2023-02", "2023-07.1", "2023-08", "2024-02"];
+const SUPPORTED_TAGS = ["2022-12", "2023-02", "2023-07.1", "2023-08", "2024-02", "2024-07", "2024-09"];
 
 const CURRENT_TAG = SUPPORTED_TAGS.at(-1);
 const PREVIOUS_TAG = SUPPORTED_TAGS.at(-2);
@@ -81,7 +81,7 @@ async function collectStblibUrls() {
 async function generateStdlibUrls() {
     const urls = await collectStblibUrls();
     const contents = `/********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at

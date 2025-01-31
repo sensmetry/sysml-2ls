@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -168,7 +168,7 @@ export class SysMLFormatter implements Formatter {
         const lineWidth: number | undefined =
             (await this.config.getConfiguration(
                 Utils.extname(document.uri).replace(".", ""),
-                "syside.formatter.lineWidth"
+                "syside.editor.formatter.lineWidth"
             )) ?? this.config.get().formatting.lineWidth;
 
         const text = document.textDocument.getText();

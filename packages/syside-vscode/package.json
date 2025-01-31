@@ -1,6 +1,6 @@
 {
     "name": "sysml-2ls",
-    "displayName": "SysIDE CE",
+    "displayName": "SysIDE Editor",
     "description": "SysML v2 language support in VS Code.",
     "publisher": "Sensmetry",
     "author": {
@@ -168,42 +168,42 @@
         "semanticTokenModifiers": [],
         "commands": [
             {
-                "command": "syside.dumpAst.console",
+                "command": "syside.editor.dumpAst.console",
                 "shortTitle": "Dump AST of the current selection",
                 "title": "SysIDE: Dump AST of the current selection in the active text editor"
             },
             {
-                "command": "syside.dumpMeta.console",
+                "command": "syside.editor.dumpMeta.console",
                 "shortTitle": "Dump Meta of the current selection",
                 "title": "SysIDE: Dump Meta of the current selection in the active text editor"
             },
             {
-                "command": "syside.updateDocument",
+                "command": "syside.editor.updateDocument",
                 "shortTitle": "Update current document",
                 "title": "SysIDE: Update current document"
             },
             {
-                "command": "syside.mro.console",
+                "command": "syside.editor.mro.console",
                 "shortTitle": "Get MRO of the current node",
                 "title": "SysIDE: Get MRO of the current node"
             },
             {
-                "command": "syside.children.console",
+                "command": "syside.editor.children.console",
                 "shortTitle": "Get children of the current node",
                 "title": "SysIDE: Get all direct, inherited and imported children of the current node"
             },
             {
-                "command": "syside.scope.console",
+                "command": "syside.editor.scope.console",
                 "shortTitle": "Get elements in scope of the current node",
                 "title": "SysIDE: Get all elements in scope of the current node"
             },
             {
-                "command": "syside.evaluate.console",
+                "command": "syside.editor.evaluate.console",
                 "shortTitle": "Evaluate the selected expression",
                 "title": "SysIDE: Evaluate the selected expression or feature value"
             },
             {
-                "command": "syside.allCommands.console",
+                "command": "syside.editor.allCommands.console",
                 "shortTitle": "Get all available language server commands",
                 "title": "SysIDE: Get all available language server commands"
             }
@@ -211,47 +211,47 @@
         "menus": {
             "editor/context": [
                 {
-                    "submenu": "syside.commands"
+                    "submenu": "syside.editor.commands"
                 }
             ],
-            "syside.commands": [
+            "syside.editor.commands": [
                 {
-                    "command": "syside.dumpAst.console",
+                    "command": "syside.editor.dumpAst.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.dumpMeta.console",
+                    "command": "syside.editor.dumpMeta.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.updateDocument",
+                    "command": "syside.editor.updateDocument",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.mro.console",
+                    "command": "syside.editor.mro.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.children.console",
+                    "command": "syside.editor.children.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.scope.console",
+                    "command": "syside.editor.scope.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.evaluate.console",
+                    "command": "syside.editor.evaluate.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },
                 {
-                    "command": "syside.allCommands.console",
+                    "command": "syside.editor.allCommands.console",
                     "group": "SysML",
                     "when": "editorLangId =~ /(ker|sys)ml/"
                 }
@@ -259,7 +259,7 @@
         },
         "submenus": [
             {
-                "id": "syside.commands",
+                "id": "syside.editor.commands",
                 "label": "SysML"
             }
         ],
@@ -267,7 +267,7 @@
             "type": "object",
             "title": "SysIDE configuration",
             "properties": {
-                "syside.trace.server": {
+                "syside.editor.trace.server": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
@@ -278,25 +278,25 @@
                     "default": "off",
                     "description": "Server trace level, implicitly used by the default VS Code LanguageClient"
                 },
-                "syside.standardLibrary": {
+                "syside.editor.standardLibrary": {
                     "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "If true, parse the bundled standard library"
                 },
-                "syside.standardLibraryPath": {
+                "syside.editor.standardLibraryPath": {
                     "scope": "machine-overridable",
                     "type": "string",
                     "default": null,
                     "description": "If set, use this path to import standard library files"
                 },
-                "syside.logStatistics": {
+                "syside.editor.logStatistics": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
                     "description": "If true, build times will be reported"
                 },
-                "syside.defaultBuildOptions.validationChecks": {
+                "syside.editor.defaultBuildOptions.validationChecks": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
@@ -306,13 +306,13 @@
                     "default": "all",
                     "description": "Which validation checks are enabled for files"
                 },
-                "syside.defaultBuildOptions.ignoreMetamodelErrors": {
+                "syside.editor.defaultBuildOptions.ignoreMetamodelErrors": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
                     "description": "If set, ignore all metamodel errors"
                 },
-                "syside.defaultBuildOptions.standardLibrary": {
+                "syside.editor.defaultBuildOptions.standardLibrary": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
@@ -328,7 +328,7 @@
                     "default": "standard",
                     "description": "Set type of standard library:\n 'none' - skip setting up relationships to the standard library elements\n 'standard' - use default standard library\n 'local' - use standard library elements from the document locally, useful for testing"
                 },
-                "syside.debug.scopeInLinkingErrors": {
+                "syside.editor.debug.scopeInLinkingErrors": {
                     "scope": "window",
                     "type": "string",
                     "enum": [
@@ -339,19 +339,19 @@
                     "default": "none",
                     "description": "Append elements in scope to linking errors"
                 },
-                "syside.debug.stacktraceInLinkingErrors": {
+                "syside.editor.debug.stacktraceInLinkingErrors": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
                     "description": "Append stacktrace to thrown errors while resolving references"
                 },
-                "syside.debug.linkingTrace": {
+                "syside.editor.debug.linkingTrace": {
                     "scope": "window",
                     "type": "boolean",
                     "default": false,
                     "description": "Log linking order"
                 },
-                "syside.plugins": {
+                "syside.editor.plugins": {
                     "scope": "machine-overridable",
                     "type": "array",
                     "default": [],
@@ -361,7 +361,7 @@
                     },
                     "description": "Additional plugin paths (.js scripts or directories with .js scripts)\nthat will be loaded on server start-up"
                 },
-                "syside.client.extensions": {
+                "syside.editor.client.extensions": {
                     "scope": "window",
                     "type": "array",
                     "default": [],
@@ -371,7 +371,7 @@
                     },
                     "description": "VS Code extensions that extend the language client"
                 },
-                "syside.server.args.run": {
+                "syside.editor.server.args.run": {
                     "scope": "window",
                     "type": "array",
                     "items": {
@@ -383,7 +383,7 @@
                     "default": [],
                     "description": "Command line interface arguments in release mode"
                 },
-                "syside.server.args.debug": {
+                "syside.editor.server.args.debug": {
                     "scope": "window",
                     "type": "array",
                     "items": {
@@ -395,23 +395,23 @@
                     "default": null,
                     "description": "Command line interface arguments in debug mode"
                 },
-                "syside.server.path": {
+                "syside.editor.server.path": {
                     "scope": "machine-overridable",
                     "type": "string",
                     "description": "Server entry path, relative paths will be resolved from the first workspace folder"
                 },
-                "syside.skipWorkspaceInit": {
+                "syside.editor.skipWorkspaceInit": {
                     "description": "Skip collecting files matching extensions in the current workspace on\nstartup",
                     "type": "boolean",
                     "scope": "window",
                     "default": false
                 },
-                "syside.defaultBuildOptions.standalone": {
+                "syside.editor.defaultBuildOptions.standalone": {
                     "description": "If true, the document will be built isolated from all the other\ndocuments, i.e. no indexing, no global scope. It's main use is for\ntesting so that each new built file doesn't pollute the global scope and\ninfluence other test results.",
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.null_expression.default": {
+                "syside.editor.formatting.null_expression.default": {
                     "description": "Controls `NullExpression` formatting:\n* `null`: always formatted as `null`\n* `brackets`: always formatted as `()`\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -422,7 +422,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.null_expression.fallback": {
+                "syside.editor.formatting.null_expression.fallback": {
                     "description": "Controls `NullExpression` formatting:\n* `null`: always formatted as `null`\n* `brackets`: always formatted as `()`\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "brackets",
@@ -431,7 +431,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.literal_real": {
+                "syside.editor.formatting.literal_real": {
                     "description": "Controls `LiteralReal` formatting. Only applies to those numbers that are\nnot in the source text.",
                     "default": "none",
                     "enum": [
@@ -442,19 +442,19 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.strip_unnecessary_quotes": {
+                "syside.editor.formatting.strip_unnecessary_quotes": {
                     "description": "Controls identifier formatting. If true, strips quotes from identifiers\nif the name doesn't have restricted characters",
                     "default": true,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.sequence_expression_trailing_comma": {
+                "syside.editor.formatting.sequence_expression_trailing_comma": {
                     "description": "Controls `SequenceExpression` formatting. If true, sequence expressions\nwill be printed with a trailing comma if broken.",
                     "default": true,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.operator_break": {
+                "syside.editor.formatting.operator_break": {
                     "description": "Controls binary operator placement on line breaks.\n* `after`: operators are placed on the same line as the LHS expression\n* `before`: operators are placed on the same line as the RHS expression",
                     "default": "after",
                     "enum": [
@@ -464,13 +464,13 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.bracket_spacing": {
+                "syside.editor.formatting.bracket_spacing": {
                     "description": "If true, adds a space around brackets on a single line",
                     "default": true,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.comment_keyword.default": {
+                "syside.editor.formatting.comment_keyword.default": {
                     "description": "Controls `comment` keyword formatting:\n* `always`: `comment` will always be printed\n* `as_needed`: `comment` will only be printed as needed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -481,7 +481,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.comment_keyword.fallback": {
+                "syside.editor.formatting.comment_keyword.fallback": {
                     "description": "Controls `comment` keyword formatting:\n* `always`: `comment` will always be printed\n* `as_needed`: `comment` will only be printed as needed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -490,7 +490,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.comment_about_break": {
+                "syside.editor.formatting.comment_about_break": {
                     "description": "Controls line break preceding `about` in `Comment`:\n* `always`: about list is always on a new line\n* `as_needed`: printer tries to fit about list on the previous line",
                     "default": "as_needed",
                     "enum": [
@@ -500,13 +500,13 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.markdown_comments": {
+                "syside.editor.formatting.markdown_comments": {
                     "description": "Controls `Comment` and `Documentation` body formatting. If true, trailing\nwhitespace is preserved on each line but last.",
                     "default": true,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.textual_representation_keyword.default": {
+                "syside.editor.formatting.textual_representation_keyword.default": {
                     "description": "Controls `rep` keyword formatting:\n* `always`: `rep` will always be printed\n* `as_needed`: `rep` will only be printed as needed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -517,7 +517,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.textual_representation_keyword.fallback": {
+                "syside.editor.formatting.textual_representation_keyword.fallback": {
                     "description": "Controls `rep` keyword formatting:\n* `always`: `rep` will always be printed\n* `as_needed`: `rep` will only be printed as needed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -526,7 +526,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.textual_representation_language_break": {
+                "syside.editor.formatting.textual_representation_language_break": {
                     "description": "Controls line break preceding `language` in `TextualRepresentation`:\n* `always`: language is always on a new line\n* `as_needed`: printer tries to fit language on the previous line",
                     "default": "always",
                     "enum": [
@@ -536,7 +536,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.empty_namespace_brackets.default": {
+                "syside.editor.formatting.empty_namespace_brackets.default": {
                     "description": "Controls formatting of empty children blocks:\n* `always`: empty blocks are always formatted as `{}`\n* `never`: empty blocks are always formatted as `;`\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -547,7 +547,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.empty_namespace_brackets.fallback": {
+                "syside.editor.formatting.empty_namespace_brackets.fallback": {
                     "description": "Controls formatting of empty children blocks:\n* `always`: empty blocks are always formatted as `{}`\n* `never`: empty blocks are always formatted as `;`\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -556,43 +556,43 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.merge_declaration_disjoining": {
+                "syside.editor.formatting.merge_declaration_disjoining": {
                     "description": "Controls disjoining formatting in type declarations. If true, all\ndisjoinings are merged into a single group. Requires KerML.",
                     "default": false,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.merge_unioning": {
+                "syside.editor.formatting.merge_unioning": {
                     "description": "Controls unioning formatting in type declarations. If true, all unionings\nare merged into a single group. Requires KerML.",
                     "default": false,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.merge_intersecting": {
+                "syside.editor.formatting.merge_intersecting": {
                     "description": "Controls intersecting formatting in type declarations. If true, all\nintersectings are merged into a single group. Requires KerML.",
                     "default": false,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.merge_differencing": {
+                "syside.editor.formatting.merge_differencing": {
                     "description": "Controls differencing formatting in type declarations. If true, all\ndifferencings are merged into a single group. Requires KerML.",
                     "default": false,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.merge_feature_chaining": {
+                "syside.editor.formatting.merge_feature_chaining": {
                     "description": "Controls feature chaining formatting in feature declarations. If true,\nall feature chainings are merged into a single group. Requires KerML.",
                     "default": false,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.merge_declaration_type_featuring": {
+                "syside.editor.formatting.merge_declaration_type_featuring": {
                     "description": "Controls type featuring formatting in feature declarations. If true, all\ntype featurings are merged into a single group. Requires KerML.",
                     "default": false,
                     "type": "boolean",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_specialization.default": {
+                "syside.editor.formatting.declaration_specialization.default": {
                     "description": "Controls specialization formatting.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -603,7 +603,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_specialization.fallback": {
+                "syside.editor.formatting.declaration_specialization.fallback": {
                     "description": "Controls specialization formatting.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -612,7 +612,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_conjugation.default": {
+                "syside.editor.formatting.declaration_conjugation.default": {
                     "description": "Controls conjugation formatting. Requires KerML.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -623,7 +623,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_conjugation.fallback": {
+                "syside.editor.formatting.declaration_conjugation.fallback": {
                     "description": "Controls conjugation formatting. Requires KerML.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -632,7 +632,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_subsetting.default": {
+                "syside.editor.formatting.declaration_subsetting.default": {
                     "description": "Controls subsetting formatting.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -643,7 +643,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_subsetting.fallback": {
+                "syside.editor.formatting.declaration_subsetting.fallback": {
                     "description": "Controls subsetting formatting.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -652,7 +652,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_subclassification.default": {
+                "syside.editor.formatting.declaration_subclassification.default": {
                     "description": "Controls subclassification formatting.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -663,7 +663,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_subclassification.fallback": {
+                "syside.editor.formatting.declaration_subclassification.fallback": {
                     "description": "Controls subclassification formatting.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -672,7 +672,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_redefinition.default": {
+                "syside.editor.formatting.declaration_redefinition.default": {
                     "description": "Controls redefinition formatting.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -683,7 +683,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_redefinition.fallback": {
+                "syside.editor.formatting.declaration_redefinition.fallback": {
                     "description": "Controls redefinition formatting.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -692,7 +692,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_reference_subsetting.default": {
+                "syside.editor.formatting.declaration_reference_subsetting.default": {
                     "description": "Controls reference subsetting formatting in feature declarations.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -703,7 +703,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_reference_subsetting.fallback": {
+                "syside.editor.formatting.declaration_reference_subsetting.fallback": {
                     "description": "Controls reference subsetting formatting in feature declarations.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -712,7 +712,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_feature_typing.default": {
+                "syside.editor.formatting.declaration_feature_typing.default": {
                     "description": "Controls feature typing formatting.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -723,7 +723,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_feature_typing.fallback": {
+                "syside.editor.formatting.declaration_feature_typing.fallback": {
                     "description": "Controls feature typing formatting.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -732,7 +732,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_conjugated_port_typing.default": {
+                "syside.editor.formatting.declaration_conjugated_port_typing.default": {
                     "description": "Controls conjugated port typing formatting in port declarations.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -743,7 +743,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.declaration_conjugated_port_typing.fallback": {
+                "syside.editor.formatting.declaration_conjugated_port_typing.fallback": {
                     "description": "Controls conjugated port typing formatting in port declarations.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -752,7 +752,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.feature_value_equals.default": {
+                "syside.editor.formatting.feature_value_equals.default": {
                     "description": "Controls feature value equals token formatting whenever it can be\nomitted:\n* `as_needed`: `=` will only be printed if it is required by the grammar\n* `always`: `=` will be always printed when it is acceptable by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -763,7 +763,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.feature_value_equals.fallback": {
+                "syside.editor.formatting.feature_value_equals.fallback": {
                     "description": "Controls feature value equals token formatting whenever it can be\nomitted:\n* `as_needed`: `=` will only be printed if it is required by the grammar\n* `always`: `=` will be always printed when it is acceptable by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -772,7 +772,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.feature_keyword.default": {
+                "syside.editor.formatting.feature_keyword.default": {
                     "description": "Controls `feature` keyword formatting in KerML:\n* `always`: `feature` keyword is always printed\n* `as_needed`: `feature` keyword is printed only when required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -783,7 +783,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.feature_keyword.fallback": {
+                "syside.editor.formatting.feature_keyword.fallback": {
                     "description": "Controls `feature` keyword formatting in KerML:\n* `always`: `feature` keyword is always printed\n* `as_needed`: `feature` keyword is printed only when required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -792,7 +792,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.public_keyword.default": {
+                "syside.editor.formatting.public_keyword.default": {
                     "description": "Controls `public` keyword formatting:\n* `always`: `public` will always be printed\n* `never`: `public` will never be printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -803,7 +803,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.public_keyword.fallback": {
+                "syside.editor.formatting.public_keyword.fallback": {
                     "description": "Controls `public` keyword formatting:\n* `always`: `public` will always be printed\n* `never`: `public` will never be printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -812,7 +812,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_specialization.default": {
+                "syside.editor.formatting.specialization_keyword_specialization.default": {
                     "description": "Controls `specialization` keyword formatting in specialization members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -823,7 +823,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_specialization.fallback": {
+                "syside.editor.formatting.specialization_keyword_specialization.fallback": {
                     "description": "Controls `specialization` keyword formatting in specialization members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -832,7 +832,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_subclassification.default": {
+                "syside.editor.formatting.specialization_keyword_subclassification.default": {
                     "description": "Controls `specialization` keyword formatting in subclassification\nmembers:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -843,7 +843,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_subclassification.fallback": {
+                "syside.editor.formatting.specialization_keyword_subclassification.fallback": {
                     "description": "Controls `specialization` keyword formatting in subclassification\nmembers:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -852,7 +852,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_feature_typing.default": {
+                "syside.editor.formatting.specialization_keyword_feature_typing.default": {
                     "description": "Controls `specialization` keyword formatting in feature typing members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -863,7 +863,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_feature_typing.fallback": {
+                "syside.editor.formatting.specialization_keyword_feature_typing.fallback": {
                     "description": "Controls `specialization` keyword formatting in feature typing members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -872,7 +872,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_subsetting.default": {
+                "syside.editor.formatting.specialization_keyword_subsetting.default": {
                     "description": "Controls `specialization` keyword formatting in subsetting members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -883,7 +883,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_subsetting.fallback": {
+                "syside.editor.formatting.specialization_keyword_subsetting.fallback": {
                     "description": "Controls `specialization` keyword formatting in subsetting members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -892,7 +892,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_redefinition.default": {
+                "syside.editor.formatting.specialization_keyword_redefinition.default": {
                     "description": "Controls `specialization` keyword formatting in redefinition members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -903,7 +903,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.specialization_keyword_redefinition.fallback": {
+                "syside.editor.formatting.specialization_keyword_redefinition.fallback": {
                     "description": "Controls `specialization` keyword formatting in redefinition members:\n* `always`: `specialization` will always be printed.\n* `as_needed`: `specialization` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -912,7 +912,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.conjugation_keyword.default": {
+                "syside.editor.formatting.conjugation_keyword.default": {
                     "description": "Controls `conjugation` keyword formatting in conjugation members:\n* `always`: `conjugation` will always be printed.\n* `as_needed`: `conjugation` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -923,7 +923,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.conjugation_keyword.fallback": {
+                "syside.editor.formatting.conjugation_keyword.fallback": {
                     "description": "Controls `conjugation` keyword formatting in conjugation members:\n* `always`: `conjugation` will always be printed.\n* `as_needed`: `conjugation` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -932,7 +932,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.disjoining_keyword.default": {
+                "syside.editor.formatting.disjoining_keyword.default": {
                     "description": "Controls `disjoining` keyword formatting in disjoining members:\n* `always`: `disjoining` will always be printed.\n* `as_needed`: `disjoining` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -943,7 +943,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.disjoining_keyword.fallback": {
+                "syside.editor.formatting.disjoining_keyword.fallback": {
                     "description": "Controls `disjoining` keyword formatting in disjoining members:\n* `always`: `disjoining` will always be printed.\n* `as_needed`: `disjoining` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -952,7 +952,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.inverting_keyword.default": {
+                "syside.editor.formatting.inverting_keyword.default": {
                     "description": "Controls `inverting` keyword formatting in inverting members:\n* `always`: `inverting` will always be printed.\n* `as_needed`: `inverting` will be printed only if required by the\n  grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -963,7 +963,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.inverting_keyword.fallback": {
+                "syside.editor.formatting.inverting_keyword.fallback": {
                     "description": "Controls `inverting` keyword formatting in inverting members:\n* `always`: `inverting` will always be printed.\n* `as_needed`: `inverting` will be printed only if required by the\n  grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -972,7 +972,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.featuring_of_keyword.default": {
+                "syside.editor.formatting.featuring_of_keyword.default": {
                     "description": "Controls `of` keyword formatting in type featuring members:\n* `always`: `of` will always be printed.\n* `as_needed`: `of` will be printed only if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -983,7 +983,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.featuring_of_keyword.fallback": {
+                "syside.editor.formatting.featuring_of_keyword.fallback": {
                     "description": "Controls `of` keyword formatting in type featuring members:\n* `always`: `of` will always be printed.\n* `as_needed`: `of` will be printed only if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -992,7 +992,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.dependency_from_keyword.default": {
+                "syside.editor.formatting.dependency_from_keyword.default": {
                     "description": "Controls `from` keyword formatting in dependencies:\n* `always`: `from` will always be printed.\n* `as_needed`: `from` will be printed only if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1003,7 +1003,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.dependency_from_keyword.fallback": {
+                "syside.editor.formatting.dependency_from_keyword.fallback": {
                     "description": "Controls `from` keyword formatting in dependencies:\n* `always`: `from` will always be printed.\n* `as_needed`: `from` will be printed only if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1012,7 +1012,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.invariant_true_keyword.default": {
+                "syside.editor.formatting.invariant_true_keyword.default": {
                     "description": "Controls `true` keyword formatting in invariants:\n* `never`: `true` is never printed\n* `always`: `true` is always printed if invariant is not negated\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1023,7 +1023,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.invariant_true_keyword.fallback": {
+                "syside.editor.formatting.invariant_true_keyword.fallback": {
                     "description": "Controls `true` keyword formatting in invariants:\n* `never`: `true` is never printed\n* `always`: `true` is always printed if invariant is not negated\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1032,7 +1032,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.multiplicity_placement": {
+                "syside.editor.formatting.multiplicity_placement": {
                     "description": "Controls multiplicity placement in type declarations:\n* `first`: multiplicity is printed before any specializations\n* `first-specialization`: multiplicity is printed after the first\n  specialization\n* `last`: multiplicity is printed after all specializations",
                     "default": "first-specialization",
                     "enum": [
@@ -1043,7 +1043,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.metadata_feature_keyword.default": {
+                "syside.editor.formatting.metadata_feature_keyword.default": {
                     "description": "Controls metadata feature keyword used.\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1054,7 +1054,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.metadata_feature_keyword.fallback": {
+                "syside.editor.formatting.metadata_feature_keyword.fallback": {
                     "description": "Controls metadata feature keyword used.\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "@",
@@ -1063,7 +1063,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.metadata_body_feature_keyword.default": {
+                "syside.editor.formatting.metadata_body_feature_keyword.default": {
                     "description": "Controls `feature` (KerML) and `ref` (SysML) keyword formatting in\nmetadata features:\n* `always`: keywords are always printed\n* `never`: keywords are never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1074,7 +1074,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.metadata_body_feature_keyword.fallback": {
+                "syside.editor.formatting.metadata_body_feature_keyword.fallback": {
                     "description": "Controls `feature` (KerML) and `ref` (SysML) keyword formatting in\nmetadata features:\n* `always`: keywords are always printed\n* `never`: keywords are never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1083,7 +1083,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.metadata_body_feature_redefines.default": {
+                "syside.editor.formatting.metadata_body_feature_redefines.default": {
                     "description": "Controls first feature redefinition formatting inside MetadataFeature\nbodies:\n* `keyword`: `redefines` is printed\n* `token`: `:>>` is printed\n* `none`: nothing is printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1095,7 +1095,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.metadata_body_feature_redefines.fallback": {
+                "syside.editor.formatting.metadata_body_feature_redefines.fallback": {
                     "description": "Controls first feature redefinition formatting inside MetadataFeature\nbodies:\n* `keyword`: `redefines` is printed\n* `token`: `:>>` is printed\n* `none`: nothing is printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "keyword",
@@ -1105,7 +1105,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_allocation_usages.default": {
+                "syside.editor.formatting.binary_allocation_usages.default": {
                     "description": "Controls allocation usage ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1116,7 +1116,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_allocation_usages.fallback": {
+                "syside.editor.formatting.binary_allocation_usages.fallback": {
                     "description": "Controls allocation usage ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1125,7 +1125,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_connectors.default": {
+                "syside.editor.formatting.binary_connectors.default": {
                     "description": "Controls connector ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1136,7 +1136,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_connectors.fallback": {
+                "syside.editor.formatting.binary_connectors.fallback": {
                     "description": "Controls connector ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1145,7 +1145,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_connectors_from_keyword.default": {
+                "syside.editor.formatting.binary_connectors_from_keyword.default": {
                     "description": "Controls `from` keyword formatting in binary connectors:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1156,7 +1156,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_connectors_from_keyword.fallback": {
+                "syside.editor.formatting.binary_connectors_from_keyword.fallback": {
                     "description": "Controls `from` keyword formatting in binary connectors:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1165,7 +1165,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_binding_connectors.default": {
+                "syside.editor.formatting.binary_binding_connectors.default": {
                     "description": "Controls binding connector ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1176,7 +1176,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_binding_connectors.fallback": {
+                "syside.editor.formatting.binary_binding_connectors.fallback": {
                     "description": "Controls binding connector ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1185,7 +1185,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_binding_connector_of_keyword.default": {
+                "syside.editor.formatting.binary_binding_connector_of_keyword.default": {
                     "description": "Controls `of` keyword formatting in binary binding connectors:\n* `always`: `of` is always printed\n* `as_needed`: `of` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1196,7 +1196,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_binding_connector_of_keyword.fallback": {
+                "syside.editor.formatting.binary_binding_connector_of_keyword.fallback": {
                     "description": "Controls `of` keyword formatting in binary binding connectors:\n* `always`: `of` is always printed\n* `as_needed`: `of` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1205,7 +1205,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_successions.default": {
+                "syside.editor.formatting.binary_successions.default": {
                     "description": "Controls succession ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1216,7 +1216,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_successions.fallback": {
+                "syside.editor.formatting.binary_successions.fallback": {
                     "description": "Controls succession ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1225,7 +1225,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_succession_first_keyword.default": {
+                "syside.editor.formatting.binary_succession_first_keyword.default": {
                     "description": "Controls `first` keyword formatting in binary successions:\n* `always`: `first` is always printed\n* `as_needed`: `first` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1236,7 +1236,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_succession_first_keyword.fallback": {
+                "syside.editor.formatting.binary_succession_first_keyword.fallback": {
                     "description": "Controls `first` keyword formatting in binary successions:\n* `always`: `first` is always printed\n* `as_needed`: `first` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1245,7 +1245,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.item_flow_from_keyword.default": {
+                "syside.editor.formatting.item_flow_from_keyword.default": {
                     "description": "Controls `from` keyword formatting in item flows:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1256,7 +1256,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.item_flow_from_keyword.fallback": {
+                "syside.editor.formatting.item_flow_from_keyword.fallback": {
                     "description": "Controls `from` keyword formatting in item flows:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1265,7 +1265,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.succession_item_flow_from_keyword.default": {
+                "syside.editor.formatting.succession_item_flow_from_keyword.default": {
                     "description": "Controls `from` keyword formatting in succession item flows:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1276,7 +1276,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.succession_item_flow_from_keyword.fallback": {
+                "syside.editor.formatting.succession_item_flow_from_keyword.fallback": {
                     "description": "Controls `from` keyword formatting in succession item flows:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1285,7 +1285,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.flow_connection_usage_from_keyword.default": {
+                "syside.editor.formatting.flow_connection_usage_from_keyword.default": {
                     "description": "Controls `from` keyword formatting in flow connection usages:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1296,7 +1296,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.flow_connection_usage_from_keyword.fallback": {
+                "syside.editor.formatting.flow_connection_usage_from_keyword.fallback": {
                     "description": "Controls `from` keyword formatting in flow connection usages:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1305,7 +1305,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.succession_flow_connection_usage_from_keyword.default": {
+                "syside.editor.formatting.succession_flow_connection_usage_from_keyword.default": {
                     "description": "Controls `from` keyword formatting in succession flow connection usages:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1316,7 +1316,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.succession_flow_connection_usage_from_keyword.fallback": {
+                "syside.editor.formatting.succession_flow_connection_usage_from_keyword.fallback": {
                     "description": "Controls `from` keyword formatting in succession flow connection usages:\n* `always`: `from` is always printed\n* `as_needed`: `from` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1325,7 +1325,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.ordered_nonunique_priority.default": {
+                "syside.editor.formatting.ordered_nonunique_priority.default": {
                     "description": "Controls `ordered` and `nonunique` print order:\n* `ordered`: `ordered` is printed first\n* `nonunique`: `nonunique` is printed first\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1336,7 +1336,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.ordered_nonunique_priority.fallback": {
+                "syside.editor.formatting.ordered_nonunique_priority.fallback": {
                     "description": "Controls `ordered` and `nonunique` print order:\n* `ordered`: `ordered` is printed first\n* `nonunique`: `nonunique` is printed first\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "nonunique",
@@ -1345,7 +1345,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.enum_member_keyword.default": {
+                "syside.editor.formatting.enum_member_keyword.default": {
                     "description": "Controls `enum` keyword formatting inside enum definitions:\n* `always`: `enum` is always printed\n* `never`: `enum` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1356,7 +1356,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.enum_member_keyword.fallback": {
+                "syside.editor.formatting.enum_member_keyword.fallback": {
                     "description": "Controls `enum` keyword formatting inside enum definitions:\n* `always`: `enum` is always printed\n* `never`: `enum` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1365,7 +1365,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.occurrence_keyword.default": {
+                "syside.editor.formatting.occurrence_keyword.default": {
                     "description": "Controls `occurrence` keyword formatting in  occurrence usages and\ndefinitions:\n* `always`: `occurrence` is always printed\n* `as_needed`: `occurrence` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1376,7 +1376,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.occurrence_keyword.fallback": {
+                "syside.editor.formatting.occurrence_keyword.fallback": {
                     "description": "Controls `occurrence` keyword formatting in  occurrence usages and\ndefinitions:\n* `always`: `occurrence` is always printed\n* `as_needed`: `occurrence` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1385,7 +1385,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binding_connector_as_usage_keyword.default": {
+                "syside.editor.formatting.binding_connector_as_usage_keyword.default": {
                     "description": "Controls `binding` formatting in binding connectors as usages:\n* `always`: `binding` is always printed\n* `as_needed`: `binding` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1396,7 +1396,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binding_connector_as_usage_keyword.fallback": {
+                "syside.editor.formatting.binding_connector_as_usage_keyword.fallback": {
                     "description": "Controls `binding` formatting in binding connectors as usages:\n* `always`: `binding` is always printed\n* `as_needed`: `binding` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1405,7 +1405,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.succession_as_usage_keyword.default": {
+                "syside.editor.formatting.succession_as_usage_keyword.default": {
                     "description": "Controls `succession` formatting in successions as usages:\n* `always`: `succession` is always printed\n* `as_needed`: `succession` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1416,7 +1416,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.succession_as_usage_keyword.fallback": {
+                "syside.editor.formatting.succession_as_usage_keyword.fallback": {
                     "description": "Controls `succession` formatting in successions as usages:\n* `always`: `succession` is always printed\n* `as_needed`: `succession` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1425,7 +1425,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.assert_constraint_usage_keyword.default": {
+                "syside.editor.formatting.assert_constraint_usage_keyword.default": {
                     "description": "Controls `constraint` formatting in assert constraint usages:\n* `always`: `constraint` is always printed\n* `as_needed`: `constraint` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1436,7 +1436,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.assert_constraint_usage_keyword.fallback": {
+                "syside.editor.formatting.assert_constraint_usage_keyword.fallback": {
                     "description": "Controls `constraint` formatting in assert constraint usages:\n* `always`: `constraint` is always printed\n* `as_needed`: `constraint` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1445,7 +1445,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.event_occurrence_keyword.default": {
+                "syside.editor.formatting.event_occurrence_keyword.default": {
                     "description": "Controls `occurrence` keyword formatting in event occurrence usages:\n* `always`: `occurrence` is always printed\n* `as_needed`: `occurrence` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1456,7 +1456,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.event_occurrence_keyword.fallback": {
+                "syside.editor.formatting.event_occurrence_keyword.fallback": {
                     "description": "Controls `occurrence` keyword formatting in event occurrence usages:\n* `always`: `occurrence` is always printed\n* `as_needed`: `occurrence` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1465,7 +1465,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.exhibit_state_usage_keyword.default": {
+                "syside.editor.formatting.exhibit_state_usage_keyword.default": {
                     "description": "Controls `state` formatting in exhibit state usages:\n* `always`: `state` is always printed\n* `as_needed`: `state` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1476,7 +1476,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.exhibit_state_usage_keyword.fallback": {
+                "syside.editor.formatting.exhibit_state_usage_keyword.fallback": {
                     "description": "Controls `state` formatting in exhibit state usages:\n* `always`: `state` is always printed\n* `as_needed`: `state` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1485,7 +1485,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.include_use_case_usage_keyword.default": {
+                "syside.editor.formatting.include_use_case_usage_keyword.default": {
                     "description": "Controls `use case` formatting in include use case usages:\n* `always`: `use case` is always printed\n* `as_needed`: `use case` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1496,7 +1496,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.include_use_case_usage_keyword.fallback": {
+                "syside.editor.formatting.include_use_case_usage_keyword.fallback": {
                     "description": "Controls `use case` formatting in include use case usages:\n* `always`: `use case` is always printed\n* `as_needed`: `use case` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1505,7 +1505,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.perform_action_usage_keyword.default": {
+                "syside.editor.formatting.perform_action_usage_keyword.default": {
                     "description": "Controls `action` formatting in perform action usages:\n* `always`: `action` is always printed\n* `as_needed`: `action` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1516,7 +1516,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.perform_action_usage_keyword.fallback": {
+                "syside.editor.formatting.perform_action_usage_keyword.fallback": {
                     "description": "Controls `action` formatting in perform action usages:\n* `always`: `action` is always printed\n* `as_needed`: `action` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1525,7 +1525,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.satisfy_requirement_keyword.default": {
+                "syside.editor.formatting.satisfy_requirement_keyword.default": {
                     "description": "Controls `requirement` formatting in satisfy requirement usages:\n* `always`: `requirement` is always printed\n* `as_needed`: `requirement` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1536,7 +1536,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.satisfy_requirement_keyword.fallback": {
+                "syside.editor.formatting.satisfy_requirement_keyword.fallback": {
                     "description": "Controls `requirement` formatting in satisfy requirement usages:\n* `always`: `requirement` is always printed\n* `as_needed`: `requirement` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1545,7 +1545,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.satisfy_requirement_assert_keyword.default": {
+                "syside.editor.formatting.satisfy_requirement_assert_keyword.default": {
                     "description": "Controls `assert` formatting in satisfy requirement usages:\n* `always`: `assert` is always printed\n* `never`: `assert` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1556,7 +1556,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.satisfy_requirement_assert_keyword.fallback": {
+                "syside.editor.formatting.satisfy_requirement_assert_keyword.fallback": {
                     "description": "Controls `assert` formatting in satisfy requirement usages:\n* `always`: `assert` is always printed\n* `never`: `assert` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1565,7 +1565,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.allocation_usage_keyword.default": {
+                "syside.editor.formatting.allocation_usage_keyword.default": {
                     "description": "Controls `allocation` formatting in allocation usages:\n* `always`: `allocation` is always printed\n* `as_needed`: `allocation` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1576,7 +1576,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.allocation_usage_keyword.fallback": {
+                "syside.editor.formatting.allocation_usage_keyword.fallback": {
                     "description": "Controls `allocation` formatting in allocation usages:\n* `always`: `allocation` is always printed\n* `as_needed`: `allocation` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1585,7 +1585,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.connection_usage_keyword.default": {
+                "syside.editor.formatting.connection_usage_keyword.default": {
                     "description": "Controls `connection` formatting in connection usages:\n* `always`: `connection` is always printed\n* `as_needed`: `connection` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1596,7 +1596,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.connection_usage_keyword.fallback": {
+                "syside.editor.formatting.connection_usage_keyword.fallback": {
                     "description": "Controls `connection` formatting in connection usages:\n* `always`: `connection` is always printed\n* `as_needed`: `connection` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1605,7 +1605,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_connection_usages.default": {
+                "syside.editor.formatting.binary_connection_usages.default": {
                     "description": "Controls connection usage ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1616,7 +1616,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_connection_usages.fallback": {
+                "syside.editor.formatting.binary_connection_usages.fallback": {
                     "description": "Controls connection usage ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1625,7 +1625,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_interface_usages.default": {
+                "syside.editor.formatting.binary_interface_usages.default": {
                     "description": "Controls interface usage ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1636,7 +1636,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.binary_interface_usages.fallback": {
+                "syside.editor.formatting.binary_interface_usages.fallback": {
                     "description": "Controls interface usage ends formatting:\n* `always`: binary ends are printed as binary declaration\n* `never: binary ends are printed as nary declaration\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1645,7 +1645,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.interface_usage_connect_keyword.default": {
+                "syside.editor.formatting.interface_usage_connect_keyword.default": {
                     "description": "Controls `connect` formatting in interface usages:\n* `always`: `connect` is always printed\n* `as_needed`: `connect` is only printed when required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1656,7 +1656,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.interface_usage_connect_keyword.fallback": {
+                "syside.editor.formatting.interface_usage_connect_keyword.fallback": {
                     "description": "Controls `connect` formatting in interface usages:\n* `always`: `connect` is always printed\n* `as_needed`: `connect` is only printed when required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1665,7 +1665,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.action_node_keyword.default": {
+                "syside.editor.formatting.action_node_keyword.default": {
                     "description": "Controls `action` formatting in action nodes:\n* `always`: `action` is always printed\n* `as_needed`: `action` is printed only if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1676,7 +1676,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.action_node_keyword.fallback": {
+                "syside.editor.formatting.action_node_keyword.fallback": {
                     "description": "Controls `action` formatting in action nodes:\n* `always`: `action` is always printed\n* `as_needed`: `action` is printed only if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1685,7 +1685,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.while_loop_parenthesize_condition": {
+                "syside.editor.formatting.while_loop_parenthesize_condition": {
                     "description": "Controls `while (...)` while loop action condition expression formatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
                     "default": "on_break",
                     "enum": [
@@ -1696,7 +1696,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.while_loop_parenthesize_until": {
+                "syside.editor.formatting.while_loop_parenthesize_until": {
                     "description": "Controls `until (...)` while loop action condition expression formatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
                     "default": "on_break",
                     "enum": [
@@ -1707,7 +1707,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.if_parenthesize_condition": {
+                "syside.editor.formatting.if_parenthesize_condition": {
                     "description": "Controls `if (...)` condition expression formatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
                     "default": "on_break",
                     "enum": [
@@ -1718,7 +1718,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.transition_usage_parenthesize_guard": {
+                "syside.editor.formatting.transition_usage_parenthesize_guard": {
                     "description": "Controls `if (...)` condition expression in transition usages formatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
                     "default": "on_break",
                     "enum": [
@@ -1729,7 +1729,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.element_filter_parenthesize": {
+                "syside.editor.formatting.element_filter_parenthesize": {
                     "description": "Controls `filter (...)` condition expression in element filter memberships\nformatting:\n* `always`: expression is printed with parentheses\n* `never`: expression is printed without parentheses",
                     "default": "on_break",
                     "enum": [
@@ -1740,7 +1740,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.transition_usage_keyword.default": {
+                "syside.editor.formatting.transition_usage_keyword.default": {
                     "description": "Controls `transition` formatting in transition usages:\n* `always`: `transition` is always printed if permitted by the grammar\n* `as_needed`: `transition` is only printed if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1751,7 +1751,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.transition_usage_keyword.fallback": {
+                "syside.editor.formatting.transition_usage_keyword.fallback": {
                     "description": "Controls `transition` formatting in transition usages:\n* `always`: `transition` is always printed if permitted by the grammar\n* `as_needed`: `transition` is only printed if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1760,7 +1760,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.transition_usage_first_keyword.default": {
+                "syside.editor.formatting.transition_usage_first_keyword.default": {
                     "description": "Controls `first` formatting in transition usages:\n* `always`: `first` is always printed if permitted by the grammar\n* `as_needed`: `first` is only printed if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1771,7 +1771,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.transition_usage_first_keyword.fallback": {
+                "syside.editor.formatting.transition_usage_first_keyword.fallback": {
                     "description": "Controls `first` formatting in transition usages:\n* `always`: `first` is always printed if permitted by the grammar\n* `as_needed`: `first` is only printed if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1780,7 +1780,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.framed_concern_keyword.default": {
+                "syside.editor.formatting.framed_concern_keyword.default": {
                     "description": "Controls `concern` formatting in framed concern usages:\n* `always`: `concern` is always printed\n* `as_needed`: `concern` is only printed if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1791,7 +1791,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.framed_concern_keyword.fallback": {
+                "syside.editor.formatting.framed_concern_keyword.fallback": {
                     "description": "Controls `concern` formatting in framed concern usages:\n* `always`: `concern` is always printed\n* `as_needed`: `concern` is only printed if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1800,7 +1800,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.reference_usage_keyword.default": {
+                "syside.editor.formatting.reference_usage_keyword.default": {
                     "description": "Controls `ref` formatting in reference usages:\n* `always`: `ref` is always printed\n* `as_needed`: `ref` is only printed if required by the grammar\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1811,7 +1811,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.reference_usage_keyword.fallback": {
+                "syside.editor.formatting.reference_usage_keyword.fallback": {
                     "description": "Controls `ref` formatting in reference usages:\n* `always`: `ref` is always printed\n* `as_needed`: `ref` is only printed if required by the grammar\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1820,7 +1820,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.attribute_usage_reference_keyword.default": {
+                "syside.editor.formatting.attribute_usage_reference_keyword.default": {
                     "description": "Controls `ref` formatting in attribute usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1831,7 +1831,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.attribute_usage_reference_keyword.fallback": {
+                "syside.editor.formatting.attribute_usage_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in attribute usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1840,7 +1840,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.event_occurrence_reference_keyword.default": {
+                "syside.editor.formatting.event_occurrence_reference_keyword.default": {
                     "description": "Controls `ref` formatting in event occurrence usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1851,7 +1851,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.event_occurrence_reference_keyword.fallback": {
+                "syside.editor.formatting.event_occurrence_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in event occurrence usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1860,7 +1860,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.port_usage_reference_keyword.default": {
+                "syside.editor.formatting.port_usage_reference_keyword.default": {
                     "description": "Controls `ref` formatting in attribute usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1871,7 +1871,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.port_usage_reference_keyword.fallback": {
+                "syside.editor.formatting.port_usage_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in attribute usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1880,7 +1880,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.connection_usage_reference_keyword.default": {
+                "syside.editor.formatting.connection_usage_reference_keyword.default": {
                     "description": "Controls `ref` formatting in connection usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1891,7 +1891,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.connection_usage_reference_keyword.fallback": {
+                "syside.editor.formatting.connection_usage_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in connection usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1900,7 +1900,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.connector_as_usage_reference_keyword.default": {
+                "syside.editor.formatting.connector_as_usage_reference_keyword.default": {
                     "description": "Controls `ref` formatting in connector as usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1911,7 +1911,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.connector_as_usage_reference_keyword.fallback": {
+                "syside.editor.formatting.connector_as_usage_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in connector as usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1920,7 +1920,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.exhibit_state_reference_keyword.default": {
+                "syside.editor.formatting.exhibit_state_reference_keyword.default": {
                     "description": "Controls `ref` formatting in exhibit state usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1931,7 +1931,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.exhibit_state_reference_keyword.fallback": {
+                "syside.editor.formatting.exhibit_state_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in exhibit state usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1940,7 +1940,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.include_use_case_reference_keyword.default": {
+                "syside.editor.formatting.include_use_case_reference_keyword.default": {
                     "description": "Controls `ref` formatting in include use case usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1951,7 +1951,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.include_use_case_reference_keyword.fallback": {
+                "syside.editor.formatting.include_use_case_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in include use case usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1960,7 +1960,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.perform_action_reference_keyword.default": {
+                "syside.editor.formatting.perform_action_reference_keyword.default": {
                     "description": "Controls `ref` formatting in perform action usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls formatting in majority of cases.\n* `preserve`: element preserves source text formatting",
                     "default": "preserve",
                     "enum": [
@@ -1971,7 +1971,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.perform_action_reference_keyword.fallback": {
+                "syside.editor.formatting.perform_action_reference_keyword.fallback": {
                     "description": "Controls `ref` formatting in perform action usages:\n* `always`: `ref` is always printed\n* `never`: `ref` is never printed\n\nControls `preserve` formatting for cases when there is no associated\nsource text.",
                     "enum": [
                         "always",
@@ -1980,7 +1980,7 @@
                     "type": "string",
                     "scope": "window"
                 },
-                "syside.formatting.lineWidth": {
+                "syside.editor.formatting.lineWidth": {
                     "description": "Number of columns the formatter will try to fit source text into.",
                     "default": 120,
                     "type": "integer",

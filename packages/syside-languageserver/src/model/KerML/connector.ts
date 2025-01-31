@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2022-2023 Sensmetry UAB and others
+ * Copyright (c) 2022-2025 Sensmetry UAB and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -115,6 +115,11 @@ export class ConnectorMeta extends Mixin(
 
     contextType(): TypeMeta | undefined {
         let commonFeaturingTypes: TypeMeta[] | undefined;
+        const relatedFeatures = this.relatedFeatures();
+        const relatedFeatureContext = relatedFeatures.find((f1) =>
+            relatedFeatures.some((f2) => f2 !== f1 && f2?.featuredBy.includes(f1 as TypeMeta))
+        );
+        if (relatedFeatureContext) return relatedFeatureContext;
         for (const related of this.relatedFeatures()) {
             const featurings = related?.allFeaturingTypes();
             if (!featurings) continue;
