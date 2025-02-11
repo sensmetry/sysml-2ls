@@ -25,7 +25,7 @@ export interface BindingConnectorAsUsageOptions
         ConnectorAsUsageOptions {}
 
 @metamodelOf(BindingConnectorAsUsage, {
-    base: "Links::links",
+    base: "Links::selfLinks",
     binary: "Links::selfLinks",
 })
 export class BindingConnectorAsUsageMeta extends Mixin(BindingConnectorMeta, ConnectorAsUsageMeta) {

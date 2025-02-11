@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 export const STDLIB = {
-    version: "2024-09",
-    tree: "https://github.com/Systems-Modeling/SysML-v2-Release/blob/2024-09/sysml.library/",
-    raw: "https://raw.githubusercontent.com/Systems-Modeling/SysML-v2-Release/2024-09/sysml.library/",
+    version: "2024-11",
+    tree: "https://github.com/Systems-Modeling/SysML-v2-Release/blob/2024-11/sysml.library/",
+    raw: "https://raw.githubusercontent.com/Systems-Modeling/SysML-v2-Release/2024-11/sysml.library/",
     files: [
         "Systems Library/Actions.sysml",
         "Systems Library/Allocations.sysml",

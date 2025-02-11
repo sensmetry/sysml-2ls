@@ -1162,13 +1162,7 @@ export class KerMLValidator {
             });
         };
 
-        const std = this.fs.standardLibrary;
-        if (!std) {
-            emit();
-            return;
-        }
-
-        if (!node.document.uriString.startsWith(std.toString())) {
+        if (!node.document.isStandard) {
             emit();
         }
     }

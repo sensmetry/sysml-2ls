@@ -1091,6 +1091,7 @@ ActionNode returns ActionUsage:
     SendNode
     | AcceptNode
     | AssignmentNode
+    | TerminateNode
     | IfNode
     | WhileLoopNode
     | ForLoopNode
@@ -1232,6 +1233,12 @@ TargetExpression returns Expression:
     )*
 ;
 */
+
+TerminateNode returns TerminateActionUsage:
+    ActionNodePrefix 'terminate'
+    ( terminatedOccurrence=NodeParameterMember )?
+    ActionBody
+;
 
 ExpressionParameterMember returns ParameterMembership:
     target=OwnedExpression

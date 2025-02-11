@@ -1,7 +1,7 @@
 import 'KerML.interfaces'
 
 // Langium only generated `is...` function if the type is a union and not an alias
-type TransparentElement = 
+type TransparentElement =
     LoopActionUsage |
     NonOwnerType
 ;
@@ -177,3 +177,6 @@ interface ObjectiveMembership extends FeatureMembership {}
 interface ViewRenderingMembership extends FeatureMembership {}
 interface MembershipExpose extends Expose, MembershipImport {}
 interface NamespaceExpose extends Expose, NamespaceImport {}
+interface TerminateActionUsage extends ActionUsage {
+    terminatedOccurrence?: ParameterMembership;
+}

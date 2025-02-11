@@ -96,7 +96,11 @@ async function collectDocuments(
         if (fileExtensions.includes(Utils.extname(node.uri))) uris.push(node.uri);
     }
 
-    return uris.map((uri) => services.workspace.LangiumDocuments.getOrCreateDocument(uri));
+    return uris.map((uri) => {
+        const doc = services.workspace.LangiumDocuments.getOrCreateDocument(uri);
+        doc.isStandard = doc.uriString.includes("sysml.library");
+        return doc;
+    });
 }
 
 // Build collected documents

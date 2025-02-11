@@ -67,6 +67,7 @@ import {
     StateSubactionMembershipMeta,
     StateUsageMeta,
     SuccessionAsUsageMeta,
+    TerminateActionUsageMeta,
     TransitionUsageMeta,
     WhileLoopActionUsageMeta,
 } from "../SysML";
@@ -145,7 +146,7 @@ function printActionSubtype(
     node: ActionUsageMeta,
     context: ModelPrinterContext,
     options: {
-        suffix: Doc;
+        suffix: Doc | undefined;
         keyword: string;
         declarationOnly?: boolean;
     }
@@ -157,11 +158,9 @@ function printActionSubtype(
         context,
         {
             appendToDeclaration(declaration) {
-                const suffix = group([
-                    keyword(options.keyword),
-                    literals.space,
-                    group(options.suffix),
-                ]);
+                const suffix = options.suffix
+                    ? group([keyword(options.keyword), literals.space, group(options.suffix)])
+                    : keyword(options.keyword);
                 if (declaration.length > 0)
                     declaration.push(
                         group(
@@ -583,6 +582,22 @@ export function printStateUsage(node: StateUsageMeta, context: ModelPrinterConte
             if (node.isParallel) declaration.push([line, keyword("parallel")]);
         },
         forceBrackets: node.isParallel,
+    });
+}
+
+export function printTerminateAction(
+    node: TerminateActionUsageMeta,
+    context: ModelPrinterContext,
+    declarationOnly?: boolean
+): Doc {
+    const suffix: Doc | undefined = node.terminatedOccurrence
+        ? printNodeParameter(node, "terminatedOccurrence", context)
+        : undefined;
+
+    return printActionSubtype(node, context, {
+        keyword: "terminate",
+        suffix: suffix,
+        declarationOnly,
     });
 }
 

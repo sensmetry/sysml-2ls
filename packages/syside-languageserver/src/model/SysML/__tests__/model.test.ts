@@ -22,6 +22,7 @@ import {
     IfActionUsage,
     SatisfyRequirementUsage,
     SendActionUsage,
+    TerminateActionUsage,
     TransitionUsage,
 } from "../../../generated/ast";
 import { emptyDocument } from "../../../testing";
@@ -44,6 +45,7 @@ import { SubjectMembershipMeta, TransitionFeatureMembershipMeta } from "../relat
 import { SatisfyRequirementUsageMeta } from "../satisfy-requirement-usage";
 import { SendActionUsageMeta } from "../send-action-usage";
 import { SuccessionAsUsageMeta } from "../succession-as-usage";
+import { TerminateActionUsageMeta } from "../terminate-action-usage";
 import { TransitionUsageMeta, TransitionUsageOptions } from "../transition-usage";
 
 describe("Model elements", () => {
@@ -117,6 +119,17 @@ describe("Model elements", () => {
                 edgeProto: ParameterMembershipMeta,
                 targetProto: ReferenceUsageMeta,
                 property: prop,
+            });
+        });
+    });
+
+    describe(`${TerminateActionUsage} elements`, () => {
+        describe("terminatedOccurrence item", () => {
+            testChildProperty<TerminateActionUsageMeta>({
+                proto: TerminateActionUsageMeta,
+                edgeProto: ParameterMembershipMeta,
+                targetProto: ReferenceUsageMeta,
+                property: "terminatedOccurrence",
             });
         });
     });

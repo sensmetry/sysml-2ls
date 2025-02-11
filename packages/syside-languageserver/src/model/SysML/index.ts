@@ -81,6 +81,7 @@ export * from "./state-definition";
 export * from "./state-usage";
 export * from "./succession-as-usage";
 export * from "./succession-flow-connection-usage";
+export * from "./terminate-action-usage";
 export * from "./transition-usage";
 export * from "./usage";
 export * from "./use-case-definition";

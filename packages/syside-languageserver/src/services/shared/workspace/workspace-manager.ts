@@ -130,7 +130,11 @@ export class SysMLWorkspaceManager extends DefaultWorkspaceManager {
         // Async here has great performance benefits as we are actually fetching
         // documents from another site and browsers can easily parallelize it.
         await this.fileSystemProvider.preloadFiles(collected);
-        collected.forEach((uri) => collector(this.langiumDocuments.getOrCreateDocument(uri)));
+        for (const uri of collected) {
+            const doc = this.langiumDocuments.getOrCreateDocument(uri);
+            doc.isStandard = true;
+            collector(doc);
+        }
 
         console.log(
             `Collected standard library:\n${JSON.stringify(

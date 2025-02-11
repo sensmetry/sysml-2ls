@@ -6,6 +6,21 @@
 
 ## main
 
+### Fixed
+
+- Fixed erroneous `validateLibraryPackageNotStandard` validation errors when
+  using the bundled standard library
+
+### Changes
+
+- Updated to [2024-11 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-11)
+  - New keyword `terminate`
+  - New type `TerminateActionUsage`
+
+### Chores
+
+- Renamed command titles from 'SysIDE' to 'SysIDE Editor'
+
 ## 0.7.0
 
 ### Changes
