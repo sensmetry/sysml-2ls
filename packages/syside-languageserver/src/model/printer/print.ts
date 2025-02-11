@@ -613,6 +613,9 @@ const ModelPrinter: Omit<
     [ast.StateUsage](node, context) {
         return actions.printStateUsage(node, context);
     },
+    [ast.TerminateActionUsage](node, context) {
+        return actions.printTerminateAction(node, context);
+    },
     [ast.Usage](node, context) {
         // assuming extended usage with at least one prefix
         return sysml.printGenericUsage("auto", undefined, node, context);

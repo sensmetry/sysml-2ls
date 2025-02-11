@@ -1,20 +1,20 @@
-# SysIDE Editor
-
-**NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
-
 <!-- markdownlint-capture -->
-<!-- markdownlint-disable-file no-inline-html heading-increment -->
+<!-- markdownlint-disable-file no-inline-html heading-increment first-line-heading -->
 
 <table align="center"><tr><td align="center" width="9999">
 <img src="../docs/images/logo-full.png" align="center" width="400" alt="SysIDE icon">
 
-### SysML v2 'as code' modeling and analysis system
+### System Engineering at the Speed of Code
 
-_SysIDE_ (pronounced "seaside") is a transformational SysML v2 systems-as-code modeling tool
+_SysIDE_ (pronounced "seaside") is a comprehensive tool suite for all of your SysML v2 needs
 
 </td></tr></table>
 
 <!-- markdownlint-restore -->
+
+# SysIDE Editor
+
+**NOTE: this is a mirror repository.** The main repository is hosted [here on Gitlab](https://gitlab.com/sensmetry/public/sysml-2ls).
 
 [![pipeline status](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/pipeline.svg)](https://gitlab.com/sensmetry/public/sysml-2ls/-/commits/main)
 [![coverage report](https://gitlab.com/sensmetry/public/sysml-2ls/badges/main/coverage.svg)](https://sensmetry.gitlab.io/public/sysml-2ls)
@@ -24,9 +24,9 @@ _SysIDE_ (pronounced "seaside") is a transformational SysML v2 systems-as-code m
 
 ---
 
-_SysIDE Editor_ is a free and open source SysML v2 textual editing and analysis system, bringing rich SysML v2 language support to Visual Studio Code. _SysIDE Editor_ can also be integrated into other applications and automated workflows which need to interact with SysML v2 textual representations.
+_SysIDE Editor_ is a free and open source SysML v2 textual editing and analysis tool, bringing rich SysML v2 language support to Visual Studio Code. _SysIDE Editor_ can also be integrated into other applications and automated workflows which need to interact with SysML v2 textual representations.
 
-The main enabling components of _SysIDE Editor_ are a parser and a language server for SysML v2 and KerML [2024-05 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-05) specifications.
+The main enabling components of _SysIDE Editor_ are a parser and a language server for SysML v2 and KerML [2024-11 release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-11) specifications.
 
 _SysIDE Editor_ provides features such as:
 
@@ -45,23 +45,26 @@ _SysIDE Editor_ is built and maintained by [**Sensmetry**](https://sensmetry.com
 
 _SysIDE Editor_ is an open source project with contributions from user and developer community highly encouraged and welcome. For further information about the open source license, see [LICENSE](/LICENSE). To contribute, please see the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
-## SysIDE tool family
+## SysIDE tool suite
 
-_SysIDE_ tool family is quickly growing. At the moment, it includes:
+_SysIDE_ tool suite is quickly growing. It includes:
 
-- _SysIDE Editor_ - free and open source VS Code extension, enabling modern 'as code' modeling for everyone.
-- _SysIDE Modeler_ - a premium SysML v2 modeling environment. Soon to be released for Early Adopter Program members.
-- _SysIDE Automator_ - analyse, optimise, and automate your modeling workflows by using Python. Available to Early Adopter Program members.
+- _**SysIDE Editor**_ - free and open source VS Code extension, enabling modern 'as code' modeling for everyone. Available to everyone.
+- _**SysIDE Librarian**_ - open-source SysML v2 package manager. Coming soon.
+- _**SysIDE Modeler**_ - a premium SysML v2 modeling environment. Available to Early Adopter Program members.
+- _**SysIDE Automator**_ - analyse, optimise, and automate your modeling workflows by using Python. Available to Early Adopter Program members.
+- _**SysIDE Server**_ - model server to ensure interoperability with other SysML v2 tools, even those that do not support textual notation. Coming soon.
 
-If you want to get in touch regarding any edition of _SysIDE_, reach out to Sensmetry at `syside(at)sensmetry(dot)com`
+If you want to get in touch regarding any edition of _SysIDE_, reach out to Sensmetry at [syside@sensmetry.com](mailto:syside@sensmetry.com)
 
-To get more information about the _SysIDE_ tool family or to join the Early Adopter Program, please visit [syside.sensmetry.com](https://syside.sensmetry.com).
+To get more information about the _SysIDE_ tool suite or to join the Early Adopter Program, please visit [syside.sensmetry.com](https://syside.sensmetry.com).
 
 ## Quick start
 
 ### In a browser (without local VSCode)
 
-You can try out _SysIDE_ without needing to instal it locally. To do so:
+You can try out _SysIDE Editor_ without needing to instal it locally. To do so:
+
 1. Go to [Visual Studio Code for the Web](https://vscode.dev)
 2. Open the `Extensions` tab on the right of the screen
 3. Search for and install _SysIDE Editor_
@@ -71,7 +74,7 @@ This is a good way to get a taste for how _SysIDE Editor_ works. But if you plan
 
 ### Running locally
 
-0. Install [Visual Studio Code](https://code.visualstudio.com) or [VSCodium](https://vscodium.com)
+0. Install [Visual Studio Code](https://code.visualstudio.com), [VSCodium](https://vscodium.com), or [Cursor AI](https://www.cursor.com)
 1. Open the `Extensions` tab on the right of the screen
 2. Search for and install _SysIDE Editor_
 3. Open a SysML v2 (.sysml) file and the extension will activate.
@@ -79,7 +82,7 @@ This is a good way to get a taste for how _SysIDE Editor_ works. But if you plan
 
 ## Standard library
 
-_SysIDE Editor_ includes the standard library from the [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-09/sysml.library) repository. The library is licenced under the LGPL v3.0, see [LICENSE](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-09/LICENSE).
+_SysIDE Editor_ includes the standard library from the [SysML-v2-Release](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-11/sysml.library) repository. The library is licenced under the LGPL v3.0, see [LICENSE](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-11/LICENSE).
 
 If you wish to use a different version of the standard library you can go to the _SysIDE Editor_ settings and enter the path to the directory with your preferred library.
 
@@ -95,7 +98,6 @@ The extension provides basic features to support SysML v2 document editing:
 - **Semantic and syntax checking** identifies errors as they occur allowing to instantly correct mistakes and speed up workflow.  
   ![Semantic and syntax checking](/docs/images/validation_dark.gif)
   <br> <br>
-
 
 - **Semantic highlighting** increases readability and allows to distinguish different parts of the code quickly.  
   ![Semantic highlighting](/docs/images/semantic-highlighting.png)
@@ -137,7 +139,6 @@ The extension provides basic features to support SysML v2 document editing:
 - **Document symbols** provide rapid model overviews, enabling efficient comprehension and navigation.  
   ![Symbols](/docs/images/symbols.gif)
   <br> <br>
-
 
 <!-- markdownlint-restore -->
 

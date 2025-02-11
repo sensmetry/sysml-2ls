@@ -266,6 +266,11 @@ const AstToModel: {
         model.isParallel = node.isParallel;
     },
 
+    [ast.TerminateActionUsage](model, node) {
+        (model["_terminatedOccurrence"] as RelationshipMeta | undefined) =
+            node.terminatedOccurrence?.$meta;
+    },
+
     [ast.TransitionUsage](model, node) {
         (model["_source"] as RelationshipMeta | undefined) = node.source?.$meta;
         (model["_accepter"] as RelationshipMeta | undefined) = node.accepter?.$meta;

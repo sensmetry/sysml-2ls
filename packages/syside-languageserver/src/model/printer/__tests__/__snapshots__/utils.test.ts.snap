@@ -220,6 +220,7 @@ Set {
   "when",
   "send",
   "assign",
+  "terminate",
   "if",
   "else",
   "while",

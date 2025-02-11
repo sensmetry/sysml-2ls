@@ -26,6 +26,7 @@ import {
     MergeNode,
     SendActionUsage,
     StateSubactionMembership,
+    TerminateActionUsage,
     WhileLoopActionUsage,
 } from "../../../generated/ast";
 import { parsedNode } from "../../../testing/utils";
@@ -432,5 +433,33 @@ describe.each(["entry", "exit", "do"])("state %s subactions", (kind) => {
             options: { lineWidth: 15 },
         }).resolves.toEqual(`${kind} assign b :=
     x.y;\n`);
+    });
+});
+
+describe("terminate actions", () => {
+    it("terminate actions are printed", async () => {
+        return expectPrinted(`action c1 { terminate c1; }`, {
+            node: TerminateActionUsage,
+            lang: "sysml",
+        }).resolves.toEqual(`terminate c1;\n`);
+    });
+
+    it("empty terminate actions are printed", async () => {
+        return expectPrinted(`action c1 { terminate; }`, {
+            node: TerminateActionUsage,
+            lang: "sysml",
+        }).resolves.toEqual(`terminate;\n`);
+    });
+
+    it("long actions are broken", async () => {
+        return expectPrinted(
+            `action some_long_terminate_name { action some_long_action_name terminate some_long_terminate_name; }`,
+            {
+                node: TerminateActionUsage,
+                lang: "sysml",
+                options: { lineWidth: 40 },
+            }
+        ).resolves.toEqual(`action some_long_action_name
+    terminate some_long_terminate_name;\n`);
     });
 });

@@ -86,6 +86,11 @@ declare module "langium" {
         commentsAttached: boolean;
 
         parseDuration: number;
+
+        /**
+         * If true this document is part of the standard library
+         */
+        isStandard?: boolean;
     }
 }
 

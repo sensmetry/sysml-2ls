@@ -36,7 +36,7 @@ import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-us
 export interface SuccessionAsUsageOptions extends SuccessionOptions, ConnectorAsUsageOptions {}
 
 @metamodelOf(SuccessionAsUsage, {
-    base: "Links::links",
+    base: "Occurrences::happensBeforeLinks",
     binary: "Occurrences::happensBeforeLinks",
 })
 export class SuccessionAsUsageMeta extends Mixin(SuccessionMeta, ConnectorAsUsageMeta) {

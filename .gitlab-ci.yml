@@ -59,7 +59,6 @@ code_navigation:
     reports:
       lsif: dump.lsif
 
-
 test:
   stage: test
   coverage: /Lines\s*:\s*(\d+.?\d*)%/
@@ -94,7 +93,7 @@ validate:
 .package-template:
   stage: deploy
   script:
-    - *apt_install_package 
+    - *apt_install_package
     - *package_artefacts
   artifacts:
     paths:
@@ -162,7 +161,7 @@ package:release:
         echo "$VERSION tag already exists, bailing out"
         exit 1
       fi
-    - *apt_install_package 
+    - *apt_install_package
     # add GH and GL remotes and check that we can access them
     - git remote add github_origin https://github-ci-token:${GH_ACCESS_TOKEN}@github.com/sensmetry/sysml-2ls.git
     - git ls-remote -q github_origin
@@ -223,15 +222,17 @@ publish:release:
     assets:
       links:
         - name: $EXTENSION_FILENAME
+          filepath: $EXTENSION_FILENAME
           url: $ARTIFACTS_ROOT_URL/$EXTENSION_RELPATH
-        - name: $SERVER_FILENAME
-          url: $ARTIFACTS_ROOT_URL/$SERVER_FILENAME
+        - name: $SERVER_ZIPNAME
+          filepath: $SERVER_ZIPNAME
+          url: $ARTIFACTS_ROOT_URL/$SERVER_ZIPNAME
 
 publish:github:
   extends: .publish-template
   script:
     - echo "Creating and uploading release artifacts to GitHub mirror for version $VERSION"
-    - node ./scripts/gh-release.mjs --pat ${GH_ACCESS_TOKEN} --tag ${VERSION} --notes ./release.description -a ${EXTENSION_FILENAME}=${EXTENSION_PATH} -a ${SERVER_FILENAME}
+    - node ./scripts/gh-release.mjs --pat ${GH_ACCESS_TOKEN} --tag ${VERSION} --notes ./release.description -a ${EXTENSION_FILENAME}=${EXTENSION_PATH} -a ${SERVER_ZIPNAME}
 
 publish:vscode:
   extends: .publish-template
