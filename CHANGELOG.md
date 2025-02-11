@@ -6,6 +6,8 @@
 
 ## main
 
+## 0.8.0
+
 ### Fixed
 
 - Fixed erroneous `validateLibraryPackageNotStandard` validation errors when
