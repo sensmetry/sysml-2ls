@@ -20,7 +20,7 @@ import { ConnectorMeta, ConnectorOptions } from "../KerML/connector";
 import { ElementIDProvider, MetatypeProto, metamodelOf } from "../metamodel";
 import { UsageMeta, UsageOptions } from "./usage";
 import { AstNode, LangiumDocument } from "langium";
-import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta } from "../KerML";
+import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta, ElementParts } from "../KerML";
 import { enumerable } from "../../utils";
 
 export interface ConnectorAsUsageOptions extends UsageOptions, ConnectorOptions {}
@@ -57,6 +57,10 @@ export class ConnectorAsUsageMeta extends Mixin(ConnectorMeta, UsageMeta) {
 
     override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
         return ConnectorMeta.prototype.featureMembers.call(this);
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        ConnectorMeta.prototype["collectDeclaration"].call(this, parts);
     }
 
     static override create<T extends AstNode>(

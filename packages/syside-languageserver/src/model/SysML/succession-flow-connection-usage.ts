@@ -28,8 +28,8 @@ export interface SuccessionFlowConnectionUsageOptions
 }
 
 @metamodelOf(SuccessionFlowConnectionUsage, {
-    base: "Connections::successionFlowConnections",
-    message: "Connections::successionFlowConnections",
+    base: "FlowConnections::successionFlowConnections",
+    message: "FlowConnections::successionFlowConnections",
 })
 export class SuccessionFlowConnectionUsageMeta extends Mixin(
     SuccessionItemFlowMeta,

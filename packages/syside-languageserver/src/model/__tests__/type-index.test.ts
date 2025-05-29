@@ -37,6 +37,7 @@ import {
     MetadataFeature,
     MetadataUsage,
     TextualRepresentation,
+    CrossSubsetting,
 } from "../../generated/ast";
 import { typeIndex } from "../types";
 
@@ -74,7 +75,7 @@ test.concurrent.each([
         ],
     ],
     [Multiplicity, [MultiplicityRange]],
-    [Subsetting, [Redefinition, ReferenceSubsetting]],
+    [Subsetting, [CrossSubsetting, Redefinition, ReferenceSubsetting]],
 ])("%s have subtypes computed", (supertype, subtypes) => {
     expect(subtypes).toEqual(expect.arrayContaining(Array.from(typeIndex.getSubtypes(supertype))));
 });

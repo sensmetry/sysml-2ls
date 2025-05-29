@@ -188,6 +188,11 @@
                 "title": "SysIDE Editor: Get MRO of the current node"
             },
             {
+                "command": "syside.editor.sexp.console",
+                "shortTitle": "Get S-expression of the current node",
+                "title": "SysIDE Editor: Get S-expression of the current node"
+            },
+            {
                 "command": "syside.editor.children.console",
                 "shortTitle": "Get children of the current node",
                 "title": "SysIDE Editor: Get all direct, inherited and imported children of the current node"
@@ -232,6 +237,11 @@
                 },
                 {
                     "command": "syside.editor.mro.console",
+                    "group": "SysML",
+                    "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
+                },
+                {
+                    "command": "syside.editor.sexp.console",
                     "group": "SysML",
                     "when": "editorTextFocus && editorLangId =~ /(ker|sys)ml/"
                 },

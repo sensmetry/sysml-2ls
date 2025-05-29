@@ -14,17 +14,32 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * from "./collect-expression";
-export * from "./feature-chain-expression";
-export * from "./feature-reference-expression";
-export * from "./index-expression";
-export * from "./invocation-expression";
-export * from "./literal-boolean";
-export * from "./literal-expression";
-export * from "./literal-infinity";
-export * from "./literal-number";
-export * from "./literal-string";
-export * from "./metadata-access-expression";
-export * from "./null-expression";
-export * from "./operator-expression";
-export * from "./select-expression";
+import { IndexExpression } from "../../../generated/ast";
+import { metamodelOf } from "../../metamodel";
+import {
+    AnyOperator,
+    IMPLICIT_OPERATORS,
+    OperatorExpressionMeta,
+    OperatorExpressionOptions,
+} from "../_internal";
+
+export interface IndexExpressionOptions extends OperatorExpressionOptions {
+    operator?: never;
+}
+
+@metamodelOf(IndexExpression)
+export class IndexExpressionMeta extends OperatorExpressionMeta {
+    override get operator(): AnyOperator {
+        return IMPLICIT_OPERATORS.INDEX;
+    }
+
+    override ast(): IndexExpression | undefined {
+        return this._ast as IndexExpression;
+    }
+}
+
+declare module "../../../generated/ast" {
+    interface IndexExpression {
+        $meta: IndexExpressionMeta;
+    }
+}

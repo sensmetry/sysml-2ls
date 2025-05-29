@@ -25,7 +25,7 @@ import {
     ServiceRegistry,
     stream,
 } from "langium";
-import { CancellationToken, Connection, Disposable } from "vscode-languageserver";
+import { CancellationToken, Connection, Disposable, Position } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import { UriComponents } from "vscode-uri/lib/umd/uri";
 import {
@@ -41,6 +41,7 @@ import { SysMLSharedServices } from "../services";
 import { FeatureMeta, Metamodel } from "../../model";
 import { RegisterTextEditorCommandsRequest } from "syside-protocol";
 import { makeLinkingScope } from "../../utils/scopes";
+import { toSExp } from "../../model/sexp";
 
 type EditorCommand<T> = (
     editor: RegisterTextEditorCommandsRequest.Parameters,
@@ -336,6 +337,19 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     }
 
     /**
+     * @return string with S-expression describing the abstract syntax of node
+     */
+    @editorCommand("syside.editor.sexp")
+    protected sexp(
+        editor: RegisterTextEditorCommandsRequest.Parameters,
+        _ = CancellationToken.None
+    ): string {
+        const node = this.findCursorNode(editor)?.$meta;
+        if (!node?.is(Element)) return "not an element";
+        return toSExp(node);
+    }
+
+    /**
      * @returns array of qualified children names visible to the linker in the
      * scope of the AST node under active cursor
      */
@@ -461,6 +475,38 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     }
 
     /**
+     * Get active position
+     * @param editor
+     * @returns `Position` if found, undefined otherwise
+     */
+    protected getActivePosition(
+        editor: RegisterTextEditorCommandsRequest.Parameters
+    ): Position | undefined {
+        // Get active position in Eclipse Theia where selection
+        // in TextEditor has the form Position[]
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getPosition = (selection: any): Position | undefined => {
+            if (Array.isArray(selection)) return selection?.[0] as Position | undefined;
+            return undefined;
+        };
+
+        if (!editor?.document?.uri) {
+            console.error(
+                "findCursorNode called with missing editor or document parameters.",
+                editor
+            );
+            return;
+        }
+
+        return (
+            editor.selection?.active ||
+            editor.selections?.[0]?.active ||
+            getPosition(editor.selection) ||
+            getPosition(editor.selections?.[0])
+        );
+    }
+
+    /**
      * Find node under current selection
      * @param editor
      * @returns `AstNode` if found, undefined otherwise
@@ -468,14 +514,22 @@ export class SysMLExecuteCommandHandler extends AbstractExecuteCommandHandler {
     protected findCursorNode(
         editor: RegisterTextEditorCommandsRequest.Parameters
     ): AstNode | undefined {
+        const activePosition = this.getActivePosition(editor);
+        if (!activePosition) {
+            console.error("Could not determine cursor position from editor parameters.", editor);
+            return;
+        }
+
         const uri = URI.parse(editor.document.uri);
         if (!this.documents.hasDocument(uri)) return;
+
         const document = this.documents.getOrCreateDocument(uri);
         const rootNode = document.parseResult.value.$cstNode;
         if (!rootNode) return;
+
         const leaf = findDeclarationNodeAtOffset(
             rootNode,
-            document.textDocument.offsetAt(editor.selection.active)
+            document.textDocument.offsetAt(activePosition)
         );
         return leaf?.element;
     }

@@ -16,6 +16,7 @@
 
 export * from "./annotation";
 export * from "./conjugation";
+export * from "./cross-subsetting";
 export * from "./dependency";
 export * from "./differencing";
 export * from "./disjoining";

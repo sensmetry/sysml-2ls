@@ -102,41 +102,53 @@ export function successionAsUsageKind(
     }
 }
 
+function printMultiplicitySourceEnd(
+    node: SuccessionAsUsageMeta,
+    context: ModelPrinterContext
+): Doc | undefined {
+    const range = node.ends[0].element()?.multiplicity?.element()?.range?.element();
+    if (!range) return undefined;
+    return group(
+        printDescendant(node, context, "empty succession")
+            .descend((node) => node.ends[0])
+            .descend((node) => node.element())
+            .descend((node) => node.multiplicity)
+            .descend((node) => node.element())
+            .descend((node) => node.range)
+            .descend((node) => node.element())
+            .print({
+                printer(range, context) {
+                    return printDeclaredMultiplicityRange(range, context);
+                },
+            })
+    );
+}
+
 function printEmptySuccessionAsUsage(
     node: SuccessionAsUsageMeta,
     context: ModelPrinterContext
 ): Doc {
-    const range = node.ends[0].element()?.multiplicity?.element()?.range?.element();
-    if (!range) return keyword("then");
-    return [
-        keyword("then "),
-        group(
-            printDescendant(node, context, "empty succession")
-                .descend((node) => node.ends[0])
-                .descend((node) => node.element())
-                .descend((node) => node.multiplicity)
-                .descend((node) => node.element())
-                .descend((node) => node.range)
-                .descend((node) => node.element())
-                .print({
-                    printer(range, context) {
-                        return printDeclaredMultiplicityRange(range, context);
-                    },
-                })
-        ),
-    ];
+    const src = printMultiplicitySourceEnd(node, context);
+    if (!src) return keyword("then");
+    return [keyword("then "), src];
 }
 
 function printTargetSuccession(node: SuccessionAsUsageMeta, context: ModelPrinterContext): Doc {
-    return [
-        printEmptySuccessionAsUsage(node, context),
-        literals.space,
-        printConnectorEndMember(node.ends[node.ends.length - 1], context),
+    const parts: Doc[] = [];
+    const src = printMultiplicitySourceEnd(node, context);
+    if (src) {
+        parts.push(src);
+        parts.push(literals.space);
+    }
+    parts.push(keyword("then "));
+    parts.push(printConnectorEndMember(node.ends[node.ends.length - 1], context));
+    parts.push(
         printChildrenBlock(node, node.children, context, {
             insertSpaceBeforeBrackets: true,
             join: actionBodyJoiner(),
-        }),
-    ];
+        })
+    );
+    return parts;
 }
 
 function printRegularSuccession(node: SuccessionAsUsageMeta, context: ModelPrinterContext): Doc {
@@ -350,6 +362,7 @@ function printGuardedSuccession(node: TransitionUsageMeta, context: ModelPrinter
     return printGenericFeature(
         [],
         hasFeatureDeclaration(node) ? "succession" : undefined,
+        undefined,
         node,
         context,
         {
@@ -403,7 +416,7 @@ function printDefaultTransitionUsage(node: TransitionUsageMeta, context: ModelPr
         if (first) source = group(indent([keyword(first), literals.space, indent(source)]));
         else source = indent(source);
 
-        return printGenericFeature([], "transition", node, context, {
+        return printGenericFeature([], "transition", undefined, node, context, {
             appendToDeclaration(decl) {
                 decl.push(indent(line), group([source, indent(line), suffix]));
             },

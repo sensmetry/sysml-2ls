@@ -369,6 +369,274 @@ describe("Subsettings", () => {
     );
 });
 
+describe("CrossSubsettings", () => {
+    test("chain of 2 features does not trigger validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end feature b { feature c; }
+          end feature c => b.c;
+        }`,
+            "validateCrossSubsettingCrossedFeature"
+        ).resolves.toHaveLength(0);
+    });
+
+    test("no chain triggers validation", async () => {
+        return expectValidations(
+            `
+        feature a {
+          end feature b;
+          end feature c => a;
+        }`,
+            "validateCrossSubsettingCrossedFeature"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("chain of 3 features triggers validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end feature b { feature c; }
+          end feature c => a.b.c;
+        }`,
+            "validateCrossSubsettingCrossedFeature"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("chaining through opposite feature does not trigger validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end feature b { feature c; }
+          end feature c => b.c;
+        }`,
+            "validateCrossSubsettingCrossedFeature"
+        ).resolves.toHaveLength(0);
+    });
+
+    test("chaining through non-opposite feature triggers validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end feature b;
+          end feature c => a.b;
+        }`,
+            "validateCrossSubsettingCrossedFeature"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("chaining with more than 2 ends does not trigger validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end feature b { feature c; }
+          end feature c => b.c;
+          end feature d;
+        }`,
+            "validateCrossSubsettingCrossingFeature"
+        ).resolves.toHaveLength(0);
+    });
+
+    test("lone end feature with explicit cross subsetting triggers validation", async () => {
+        return expectValidations(
+            `
+        feature a {
+          end feature b => a.b;
+        }`,
+            "validateCrossSubsettingCrossingFeature"
+        ).resolves.toHaveLength(1);
+    });
+});
+
+describe("Cross features", () => {
+    test("implicit cross subsettings do not trigger validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end [1] feature b;
+          end [1] feature c;
+        }`,
+            "validateFeatureCrossFeatureType"
+        ).resolves.toHaveLength(0);
+    });
+
+    test("explicit cross subsettings to features with the same types do not trigger validation", async () => {
+        return expectValidations(
+            `
+        class A;
+        feature a { 
+          end [1] feature b { feature c : A; }
+          end feature c : A => b.c;
+        }`,
+            "validateFeatureCrossFeatureType"
+        ).resolves.toHaveLength(0);
+    });
+
+    test("explicit cross subsettings to features with different types trigger validation", async () => {
+        return expectValidations(
+            `
+        class A; class B;
+        feature a { 
+          end [1] feature b : A { feature c : A; }
+          end feature c : B => b.c;
+        }`,
+            "validateFeatureCrossFeatureType"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("implicit cross subsettings and redefinitions do not trigger validation", async () => {
+        return expectValidations(
+            `
+        feature A { 
+          end [1] feature b;
+          end [1] feature c;
+        }
+        feature a :> A { 
+          end [1] feature b;
+          end [1] feature c;
+        }`,
+            "validateFeatureCrossFeatureSpecialization"
+        ).resolves.toHaveLength(0);
+    });
+
+    test.each(["", " :>>"])(
+        "explicit cross subsettings trigger validation when the cross feature does not redefine other cross features",
+        (redef) => {
+            return expectValidations(
+                `
+        class C;
+        feature A { 
+          end [1] feature b : C;
+          end [1] feature c : C;
+        }
+        feature a :> A { 
+          end [1] feature b { feature c : C; }
+          end feature${redef} c : C => b.c;
+        }`,
+                "validateFeatureCrossFeatureSpecialization"
+            ).resolves.toHaveLength(1);
+        }
+    );
+
+    test("multiple cross subsettings trigger validation", async () => {
+        return expectValidations(
+            `
+        feature x;
+        feature a => x => x;`,
+            "validateFeatureOwnedCrossSubsetting"
+        ).resolves.toHaveLength(2);
+    });
+
+    test("explicit cross subsetting with an owned cross feature triggers validation", async () => {
+        return expectValidations(
+            `
+        class A;
+        feature a {
+          end [1] feature b :A { feature c : A; }
+          end [1] feature c :A [1] => b.c;
+        }`,
+            "checkFeatureCrossingSpecialization"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("end feature with [1..1] multiplicity does not trigger validation", async () => {
+        return expectValidations(
+            `
+        end feature x [1..1];
+        end feature y [1];`,
+            "validateFeatureEndMultiplicity"
+        ).resolves.toHaveLength(0);
+    });
+
+    test("end feature with not [1..1] multiplicity triggers validation", async () => {
+        return expectValidations(
+            `
+        end feature x [0..1];`,
+            "validateFeatureEndMultiplicity"
+        ).resolves.toHaveLength(1);
+    });
+
+    test("implicit n-ary cross features do not trigger validation", async () => {
+        return expectValidations(
+            `
+        feature a { 
+          end [1] feature b;
+          end [1] feature c;
+          end [1] feature d;
+        }`,
+            [
+                "validateFeatureCrossFeatureSpecialization",
+                "validateFeatureCrossFeatureType",
+                "validateFeatureOwnedCrossSubsetting",
+            ]
+        ).resolves.toHaveLength(0);
+    });
+
+    test("explicit n-ary cross features do not trigger validation", async () => {
+        return expectValidations(
+            `
+        class ShoppingCart;
+        class Product;
+        class Account;
+        
+        assoc ProductSelection3 {
+          end cart: ShoppingCart[1] crosses cart::product_account.inCart {
+            member feature inCart: ShoppingCart[0..1] featured by Product_Account {
+              member feature Product_Account : Account featured by Product;
+            }
+            member feature product_account : inCart::Product_Account featured by ProductSelection3 {
+              public import inCart;
+            }
+          }
+          end feature selectedProduct: Product[1];
+          end feature account : Account[1];
+        }
+        
+        assoc SingleProductSelection3 specializes ProductSelection3 {
+          end cart: ShoppingCart[1] redefines cart crosses cart::product_account1.inCart1 {
+            member feature inCart1: ShoppingCart[0..1] featured by Product_Account1 {
+              member feature Product_Account1 subsets Product_Account : Account featured by Product;
+            }
+            member feature product_account1 : inCart1::Product_Account1 featured by ProductSelection3 {
+              public import inCart1;
+            }
+          }
+          end feature selectedProduct: Product[1];
+          end feature account : Account[1];
+        }`,
+            [
+                "validateFeatureCrossFeatureSpecialization",
+                "validateFeatureCrossFeatureType",
+                "validateFeatureOwnedCrossSubsetting",
+            ]
+        ).resolves.toHaveLength(0);
+    });
+
+    test("cross features with redefinitions of ends without cross features do not trigger validation", async () => {
+        return expectValidations(
+            `
+        class SelectionInfo;
+        class ShoppingCart { feature selectedProducts : Product; }
+        class Product { feature inCart: ShoppingCart;}
+        
+        assoc Assoc {
+          end feature source;
+          end feature target;
+        }
+
+        assoc ProductSelection :> Assoc {
+          end feature cart: ShoppingCart[1] crosses selectedProduct.inCart;
+          end feature selectedProduct: Product[1] crosses cart.selectedProducts;
+        }`,
+            [
+                "validateFeatureCrossFeatureSpecialization",
+                "validateFeatureCrossFeatureType",
+                "validateFeatureOwnedCrossSubsetting",
+            ]
+        ).resolves.toHaveLength(0);
+    });
+});
+
 describe("DataType", () => {
     test.each(["class", "assoc"])("specializing %s triggers validation", (tok) => {
         return expectValidations(

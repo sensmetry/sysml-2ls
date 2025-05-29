@@ -46,8 +46,8 @@ describe("connectors", () => {
 
     it("should print binary connectors", async () => {
         return expectPrinted(
-            "connector a from one ::> a [1] to two references b [2] {}"
-        ).resolves.toEqual("connector a from one ::> a [1] to two references b [2] {}\n");
+            "connector a from [1] one ::> a to [2] two references b {}"
+        ).resolves.toEqual("connector a from [1] one ::> a to [2] two references b {}\n");
     });
 
     it("should print sufficient connectors", () => {
@@ -70,13 +70,13 @@ describe("connectors", () => {
 
     it("should break connectors", async () => {
         return expectPrinted(
-            "connector 'some long name here' from one ::> a [1] to two references b [2] {}",
+            "connector 'some long name here' from [1] one ::> a to [2] two references b {}",
             {
                 options: { lineWidth: 30 },
             }
         ).resolves.toEqual(`connector 'some long name here'
-    from one ::> a [1]
-    to two references b [2] {}\n`);
+    from [1] one ::> a
+    to [2] two references b {}\n`);
     });
 
     it("should long nary connectors", async () => {

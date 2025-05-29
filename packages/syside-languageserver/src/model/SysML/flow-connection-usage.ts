@@ -19,7 +19,7 @@ import { FlowConnectionUsage } from "../../generated/ast";
 import { ItemFlowMeta, ItemFlowOptions } from "../KerML/item-flow";
 import { ElementIDProvider, GeneralType, MetatypeProto, metamodelOf } from "../metamodel";
 import { ActionUsageMeta, ActionUsageOptions } from "./action-usage";
-import { ConnectionUsageMeta, ConnectionUsageOptions } from "./connection-usage";
+import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
 import { AstNode, LangiumDocument } from "langium";
 import {
     Edge,
@@ -33,7 +33,7 @@ import { EventOccurrenceUsageMeta } from "./event-occurrence-usage";
 import { enumerable } from "../../utils";
 
 export interface FlowConnectionUsageOptions
-    extends ConnectionUsageOptions,
+    extends ConnectorAsUsageOptions,
         ActionUsageOptions,
         ItemFlowOptions {
     // can't override ends alone to allow only either ends or messages
@@ -45,18 +45,26 @@ export interface FlowConnectionUsageOptions
 }
 
 @metamodelOf(FlowConnectionUsage, {
-    base: "Connections::flowConnections",
-    message: "Connections::messageConnections",
+    base: "FlowConnections::flowConnections",
+    message: "FlowConnections::messageConnections",
     enclosedPerformance: "Performances::Performance::enclosedPerformances",
     subperformance: "Performances::Performance::subperformances",
     ownedPerformance: "Objects::Object::ownedPerformances",
     subaction: "Actions::Action::subactions",
     ownedAction: "Parts::Part::ownedActions",
+    entry: "States::StateAction::entryAction",
+    do: "States::StateAction::doAction",
+    exit: "States::StateAction::exitAction",
+    trigger: "Actions::TransitionAction::accepter",
+    guard: "Actions::TransitionAction::guard",
+    effect: "Actions::TransitionAction::effect",
+    timeslice: "Occurrences::Occurrence::timeSlices",
+    snapshot: "Occurrences::Occurrence::snapshots",
 })
 export class FlowConnectionUsageMeta extends Mixin(
     ActionUsageMeta,
     ItemFlowMeta,
-    ConnectionUsageMeta
+    ConnectorAsUsageMeta
 ) {
     // this ideally would be mutually exclusive with `ends`
     private _messages: ParameterMembershipMeta<EventOccurrenceUsageMeta>[] = [];
@@ -125,14 +133,14 @@ export class FlowConnectionUsageMeta extends Mixin(
         document: LangiumDocument,
         options?: FlowConnectionUsageOptions
     ): T["$meta"] {
-        const model = ConnectionUsageMeta.create.call(
+        const model = ActionUsageMeta.create.call(
             this,
             provider,
             document,
             options
         ) as FlowConnectionUsageMeta;
         if (options) {
-            ConnectionUsageMeta.applyConnectorOptions(model, options);
+            ConnectorAsUsageMeta.applyConnectorOptions(model, options);
             ItemFlowMeta.applyItemFlowOptions(model, options);
             if (options.messages) model.addMessage(...options.messages);
         }

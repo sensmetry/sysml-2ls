@@ -23,7 +23,7 @@ export function isFeatureRelationship(item: unknown): item is FeatureRelationshi
 
 export type ImportKind = '::*' | '::**' | '::*::**';
 
-export type InlineExpression = CollectExpression | FeatureChainExpression | FeatureReferenceExpression | InvocationExpression | LiteralExpression | MetadataAccessExpression | NullExpression | OperatorExpression | SelectExpression;
+export type InlineExpression = CollectExpression | FeatureChainExpression | FeatureReferenceExpression | IndexExpression | InvocationExpression | LiteralExpression | MetadataAccessExpression | NullExpression | OperatorExpression | SelectExpression;
 
 export const InlineExpression = 'InlineExpression';
 
@@ -83,7 +83,7 @@ export type VisibilityKind = 'private' | 'protected' | 'public';
 
 export interface Element extends AstNode {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'ActorMembership' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AnnotatingElement' | 'Annotation' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'Comment' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConjugatedPortTyping' | 'Conjugation' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'Dependency' | 'Differencing' | 'Disjoining' | 'Documentation' | 'Element' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expose' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureChaining' | 'FeatureInverting' | 'FeatureMembership' | 'FeatureReferenceExpression' | 'FeatureTyping' | 'FeatureValue' | 'Featuring' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'FramedConcernMembership' | 'IfActionUsage' | 'Import' | 'IncludeUseCaseUsage' | 'Inheritance' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Intersecting' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LibraryPackage' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'Membership' | 'MembershipExpose' | 'MembershipImport' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'Namespace' | 'NamespaceExpose' | 'NamespaceImport' | 'NullExpression' | 'ObjectiveMembership' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'OwningMembership' | 'Package' | 'ParameterMembership' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortConjugation' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'Redefinition' | 'ReferenceSubsetting' | 'ReferenceUsage' | 'Relationship' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementConstraintMembership' | 'RequirementDefinition' | 'RequirementUsage' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'Specialization' | 'StakeholderMembership' | 'StateDefinition' | 'StateSubactionMembership' | 'StateUsage' | 'Step' | 'Structure' | 'Subclassification' | 'SubjectMembership' | 'Subsetting' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TerminateActionUsage' | 'TextualAnnotatingElement' | 'TextualRepresentation' | 'TransitionFeatureMembership' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'TypeFeaturing' | 'Unioning' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VariantMembership' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewRenderingMembership' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'ActorMembership' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AnnotatingElement' | 'Annotation' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'Comment' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConjugatedPortTyping' | 'Conjugation' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'CrossSubsetting' | 'DataType' | 'DecisionNode' | 'Definition' | 'Dependency' | 'Differencing' | 'Disjoining' | 'Documentation' | 'Element' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expose' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureChaining' | 'FeatureInverting' | 'FeatureMembership' | 'FeatureReferenceExpression' | 'FeatureTyping' | 'FeatureValue' | 'Featuring' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'FramedConcernMembership' | 'IfActionUsage' | 'Import' | 'IncludeUseCaseUsage' | 'IndexExpression' | 'Inheritance' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Intersecting' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LibraryPackage' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'Membership' | 'MembershipExpose' | 'MembershipImport' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'Namespace' | 'NamespaceExpose' | 'NamespaceImport' | 'NullExpression' | 'ObjectiveMembership' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'OwningMembership' | 'Package' | 'ParameterMembership' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortConjugation' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'Redefinition' | 'ReferenceSubsetting' | 'ReferenceUsage' | 'Relationship' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementConstraintMembership' | 'RequirementDefinition' | 'RequirementUsage' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'Specialization' | 'StakeholderMembership' | 'StateDefinition' | 'StateSubactionMembership' | 'StateUsage' | 'Step' | 'Structure' | 'Subclassification' | 'SubjectMembership' | 'Subsetting' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TerminateActionUsage' | 'TextualAnnotatingElement' | 'TextualRepresentation' | 'TransitionFeatureMembership' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'TypeFeaturing' | 'Unioning' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VariantMembership' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewRenderingMembership' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
     declaredName?: string
     declaredShortName?: string
 }
@@ -120,7 +120,7 @@ export function isAnnotatingElement(item: unknown): item is AnnotatingElement {
 
 export interface Namespace extends Element {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LibraryPackage' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'Namespace' | 'NullExpression' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'Package' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'ReferenceUsage' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementDefinition' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateDefinition' | 'StateUsage' | 'Step' | 'Structure' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'IndexExpression' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LibraryPackage' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'Namespace' | 'NullExpression' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'Package' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'ReferenceUsage' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementDefinition' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateDefinition' | 'StateUsage' | 'Step' | 'Structure' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
     children: Array<Import | Membership>
     prefixes: Array<OwningMembership>
 }
@@ -133,7 +133,7 @@ export function isNamespace(item: unknown): item is Namespace {
 
 export interface Relationship extends Element {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'ActorMembership' | 'AllocationDefinition' | 'AllocationUsage' | 'Annotation' | 'Association' | 'AssociationStructure' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'ConjugatedPortTyping' | 'Conjugation' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'Dependency' | 'Differencing' | 'Disjoining' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'Expose' | 'FeatureChaining' | 'FeatureInverting' | 'FeatureMembership' | 'FeatureTyping' | 'FeatureValue' | 'Featuring' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'FramedConcernMembership' | 'Import' | 'Inheritance' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Intersecting' | 'ItemFlow' | 'Membership' | 'MembershipExpose' | 'MembershipImport' | 'NamespaceExpose' | 'NamespaceImport' | 'ObjectiveMembership' | 'OwningMembership' | 'ParameterMembership' | 'PortConjugation' | 'Redefinition' | 'ReferenceSubsetting' | 'Relationship' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'Specialization' | 'StakeholderMembership' | 'StateSubactionMembership' | 'Subclassification' | 'SubjectMembership' | 'Subsetting' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TransitionFeatureMembership' | 'TypeFeaturing' | 'Unioning' | 'VariantMembership' | 'ViewRenderingMembership';
+    readonly $type: 'ActorMembership' | 'AllocationDefinition' | 'AllocationUsage' | 'Annotation' | 'Association' | 'AssociationStructure' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'ConjugatedPortTyping' | 'Conjugation' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'CrossSubsetting' | 'Dependency' | 'Differencing' | 'Disjoining' | 'ElementFilterMembership' | 'EndFeatureMembership' | 'Expose' | 'FeatureChaining' | 'FeatureInverting' | 'FeatureMembership' | 'FeatureTyping' | 'FeatureValue' | 'Featuring' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'FramedConcernMembership' | 'Import' | 'Inheritance' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Intersecting' | 'ItemFlow' | 'Membership' | 'MembershipExpose' | 'MembershipImport' | 'NamespaceExpose' | 'NamespaceImport' | 'ObjectiveMembership' | 'OwningMembership' | 'ParameterMembership' | 'PortConjugation' | 'Redefinition' | 'ReferenceSubsetting' | 'Relationship' | 'RequirementConstraintMembership' | 'RequirementVerificationMembership' | 'ResultExpressionMembership' | 'ReturnParameterMembership' | 'Specialization' | 'StakeholderMembership' | 'StateSubactionMembership' | 'Subclassification' | 'SubjectMembership' | 'Subsetting' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TransitionFeatureMembership' | 'TypeFeaturing' | 'Unioning' | 'VariantMembership' | 'ViewRenderingMembership';
     elements: Array<Annotation | Feature | Namespace | Relationship>
     source?: Element
     sourceChain?: Feature
@@ -208,7 +208,7 @@ export function isPackage(item: unknown): item is Package {
 
 export interface Type extends Namespace {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'NullExpression' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'ReferenceUsage' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementDefinition' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateDefinition' | 'StateUsage' | 'Step' | 'Structure' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    readonly $type: 'AcceptActionUsage' | 'ActionDefinition' | 'ActionUsage' | 'AllocationDefinition' | 'AllocationUsage' | 'AnalysisCaseDefinition' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'Association' | 'AssociationStructure' | 'AttributeDefinition' | 'AttributeUsage' | 'Behavior' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationDefinition' | 'CalculationUsage' | 'CaseDefinition' | 'CaseUsage' | 'Class' | 'Classifier' | 'CollectExpression' | 'ConcernDefinition' | 'ConcernUsage' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintDefinition' | 'ConstraintUsage' | 'ControlNode' | 'DataType' | 'DecisionNode' | 'Definition' | 'EnumerationDefinition' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionDefinition' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'IndexExpression' | 'Interaction' | 'InterfaceDefinition' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemDefinition' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LifeClass' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'Metaclass' | 'MetadataAccessExpression' | 'MetadataDefinition' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'NullExpression' | 'OccurrenceDefinition' | 'OccurrenceUsage' | 'OperatorExpression' | 'PartDefinition' | 'PartUsage' | 'PerformActionUsage' | 'PortDefinition' | 'PortUsage' | 'Predicate' | 'ReferenceUsage' | 'RenderingDefinition' | 'RenderingUsage' | 'RequirementDefinition' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateDefinition' | 'StateUsage' | 'Step' | 'Structure' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'SysMLFunction' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Type' | 'Usage' | 'UseCaseDefinition' | 'UseCaseUsage' | 'VerificationCaseDefinition' | 'VerificationCaseUsage' | 'ViewDefinition' | 'ViewUsage' | 'ViewpointDefinition' | 'ViewpointUsage' | 'WhileLoopActionUsage';
     heritage: Array<Inheritance>
     isAbstract?: 'abstract'
     isSufficient: boolean
@@ -341,7 +341,7 @@ export function isImport(item: unknown): item is Import {
 
 export interface Inheritance extends Relationship {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'ConjugatedPortTyping' | 'Conjugation' | 'FeatureTyping' | 'Inheritance' | 'PortConjugation' | 'Redefinition' | 'ReferenceSubsetting' | 'Specialization' | 'Subclassification' | 'Subsetting';
+    readonly $type: 'ConjugatedPortTyping' | 'Conjugation' | 'CrossSubsetting' | 'FeatureTyping' | 'Inheritance' | 'PortConjugation' | 'Redefinition' | 'ReferenceSubsetting' | 'Specialization' | 'Subclassification' | 'Subsetting';
 }
 
 export const Inheritance = 'Inheritance';
@@ -455,7 +455,8 @@ export function isClassifier(item: unknown): item is Classifier {
 
 export interface Feature extends Type {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AllocationUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'AttributeUsage' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'MetadataAccessExpression' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'NullExpression' | 'OccurrenceUsage' | 'OperatorExpression' | 'PartUsage' | 'PerformActionUsage' | 'PortUsage' | 'ReferenceUsage' | 'RenderingUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateUsage' | 'Step' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Usage' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AllocationUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'AttributeUsage' | 'BindingConnector' | 'BindingConnectorAsUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConnectionUsage' | 'Connector' | 'ConnectorAsUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'EnumerationUsage' | 'EventOccurrenceUsage' | 'ExhibitStateUsage' | 'Expression' | 'Feature' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'IndexExpression' | 'InterfaceUsage' | 'Invariant' | 'InvocationExpression' | 'ItemFeature' | 'ItemFlow' | 'ItemFlowEnd' | 'ItemUsage' | 'JoinNode' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'MetadataAccessExpression' | 'MetadataFeature' | 'MetadataUsage' | 'Multiplicity' | 'MultiplicityRange' | 'NullExpression' | 'OccurrenceUsage' | 'OperatorExpression' | 'PartUsage' | 'PerformActionUsage' | 'PortUsage' | 'ReferenceUsage' | 'RenderingUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateUsage' | 'Step' | 'Succession' | 'SuccessionAsUsage' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'Usage' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    crossingFeature?: OwningMembership
     direction?: FeatureDirectionKind
     isComposite?: 'composite'
     isDerived?: 'derived'
@@ -476,7 +477,7 @@ export function isFeature(item: unknown): item is Feature {
 
 export interface AssociationStructure extends Association, Structure {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationDefinition' | 'AssociationStructure' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition';
+    readonly $type: 'AllocationDefinition' | 'AssociationStructure' | 'ConnectionDefinition' | 'InterfaceDefinition';
 }
 
 export const AssociationStructure = 'AssociationStructure';
@@ -609,7 +610,7 @@ export function isConjugation(item: unknown): item is Conjugation {
 
 export interface Specialization extends Inheritance {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'ConjugatedPortTyping' | 'FeatureTyping' | 'Redefinition' | 'ReferenceSubsetting' | 'Specialization' | 'Subclassification' | 'Subsetting';
+    readonly $type: 'ConjugatedPortTyping' | 'CrossSubsetting' | 'FeatureTyping' | 'Redefinition' | 'ReferenceSubsetting' | 'Specialization' | 'Subclassification' | 'Subsetting';
 }
 
 export const Specialization = 'Specialization';
@@ -732,7 +733,7 @@ export function isMultiplicity(item: unknown): item is Multiplicity {
 
 export interface Step extends Feature {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'ExhibitStateUsage' | 'Expression' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'Invariant' | 'InvocationExpression' | 'ItemFlow' | 'JoinNode' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'MetadataAccessExpression' | 'NullExpression' | 'OperatorExpression' | 'PerformActionUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateUsage' | 'Step' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
+    readonly $type: 'AcceptActionUsage' | 'ActionUsage' | 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'AssignmentActionUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'ControlNode' | 'DecisionNode' | 'ExhibitStateUsage' | 'Expression' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'FlowConnectionUsage' | 'ForLoopActionUsage' | 'ForkNode' | 'IfActionUsage' | 'IncludeUseCaseUsage' | 'IndexExpression' | 'Invariant' | 'InvocationExpression' | 'ItemFlow' | 'JoinNode' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'LoopActionUsage' | 'MergeNode' | 'MetadataAccessExpression' | 'NullExpression' | 'OperatorExpression' | 'PerformActionUsage' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'SendActionUsage' | 'StateUsage' | 'Step' | 'SuccessionFlowConnectionUsage' | 'SuccessionItemFlow' | 'TerminateActionUsage' | 'TransitionUsage' | 'TriggerInvocationExpression' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewpointUsage' | 'WhileLoopActionUsage';
 }
 
 export const Step = 'Step';
@@ -758,7 +759,7 @@ export function isUsage(item: unknown): item is Usage {
 
 export interface ConnectionDefinition extends AssociationStructure, PartDefinition {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition';
+    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'InterfaceDefinition';
 }
 
 export const ConnectionDefinition = 'ConnectionDefinition';
@@ -767,7 +768,7 @@ export function isConnectionDefinition(item: unknown): item is ConnectionDefinit
     return reflection.isInstance(item, ConnectionDefinition);
 }
 
-export interface FlowConnectionDefinition extends ActionDefinition, ConnectionDefinition, Interaction {
+export interface FlowConnectionDefinition extends ActionDefinition, Interaction {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
     readonly $type: 'FlowConnectionDefinition';
 }
@@ -791,13 +792,25 @@ export function isBindingConnectorAsUsage(item: unknown): item is BindingConnect
 
 export interface ConnectionUsage extends ConnectorAsUsage, PartUsage {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'SuccessionFlowConnectionUsage';
+    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'InterfaceUsage';
 }
 
 export const ConnectionUsage = 'ConnectionUsage';
 
 export function isConnectionUsage(item: unknown): item is ConnectionUsage {
     return reflection.isInstance(item, ConnectionUsage);
+}
+
+export interface FlowConnectionUsage extends ActionUsage, ConnectorAsUsage, ItemFlow {
+    readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
+    readonly $type: 'FlowConnectionUsage' | 'SuccessionFlowConnectionUsage';
+    messages: Array<ParameterMembership>
+}
+
+export const FlowConnectionUsage = 'FlowConnectionUsage';
+
+export function isFlowConnectionUsage(item: unknown): item is FlowConnectionUsage {
+    return reflection.isInstance(item, FlowConnectionUsage);
 }
 
 export interface SuccessionAsUsage extends ConnectorAsUsage, Succession {
@@ -809,18 +822,6 @@ export const SuccessionAsUsage = 'SuccessionAsUsage';
 
 export function isSuccessionAsUsage(item: unknown): item is SuccessionAsUsage {
     return reflection.isInstance(item, SuccessionAsUsage);
-}
-
-export interface FlowConnectionUsage extends ActionUsage, ConnectionUsage, ItemFlow {
-    readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'FlowConnectionUsage' | 'SuccessionFlowConnectionUsage';
-    messages: Array<ParameterMembership>
-}
-
-export const FlowConnectionUsage = 'FlowConnectionUsage';
-
-export function isFlowConnectionUsage(item: unknown): item is FlowConnectionUsage {
-    return reflection.isInstance(item, FlowConnectionUsage);
 }
 
 export interface SuccessionItemFlow extends ItemFlow, Succession {
@@ -982,7 +983,7 @@ export function isSubclassification(item: unknown): item is Subclassification {
 
 export interface Subsetting extends Specialization {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'Redefinition' | 'ReferenceSubsetting' | 'Subsetting';
+    readonly $type: 'CrossSubsetting' | 'Redefinition' | 'ReferenceSubsetting' | 'Subsetting';
 }
 
 export const Subsetting = 'Subsetting';
@@ -1083,7 +1084,7 @@ export function isOccurrenceDefinition(item: unknown): item is OccurrenceDefinit
 
 export interface Structure extends Class {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationDefinition' | 'AssociationStructure' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'Metaclass' | 'MetadataDefinition' | 'PartDefinition' | 'PortDefinition' | 'RenderingDefinition' | 'Structure' | 'ViewDefinition';
+    readonly $type: 'AllocationDefinition' | 'AssociationStructure' | 'ConjugatedPortDefinition' | 'ConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'Metaclass' | 'MetadataDefinition' | 'PartDefinition' | 'PortDefinition' | 'RenderingDefinition' | 'Structure' | 'ViewDefinition';
 }
 
 export const Structure = 'Structure';
@@ -1128,7 +1129,7 @@ export function isActionUsage(item: unknown): item is ActionUsage {
 
 export interface Expression extends Step {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'Expression' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'IncludeUseCaseUsage' | 'Invariant' | 'InvocationExpression' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'MetadataAccessExpression' | 'NullExpression' | 'OperatorExpression' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'TriggerInvocationExpression' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewpointUsage';
+    readonly $type: 'AnalysisCaseUsage' | 'AssertConstraintUsage' | 'BooleanExpression' | 'CalculationUsage' | 'CaseUsage' | 'CollectExpression' | 'ConcernUsage' | 'ConstraintUsage' | 'Expression' | 'FeatureChainExpression' | 'FeatureReferenceExpression' | 'IncludeUseCaseUsage' | 'IndexExpression' | 'Invariant' | 'InvocationExpression' | 'LiteralBoolean' | 'LiteralExpression' | 'LiteralInfinity' | 'LiteralNumber' | 'LiteralString' | 'MetadataAccessExpression' | 'NullExpression' | 'OperatorExpression' | 'RequirementUsage' | 'SatisfyRequirementUsage' | 'SelectExpression' | 'TriggerInvocationExpression' | 'UseCaseUsage' | 'VerificationCaseUsage' | 'ViewpointUsage';
     result?: ResultExpressionMembership
 }
 
@@ -1303,6 +1304,17 @@ export function isConjugatedPortTyping(item: unknown): item is ConjugatedPortTyp
     return reflection.isInstance(item, ConjugatedPortTyping);
 }
 
+export interface CrossSubsetting extends Subsetting {
+    readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
+    readonly $type: 'CrossSubsetting';
+}
+
+export const CrossSubsetting = 'CrossSubsetting';
+
+export function isCrossSubsetting(item: unknown): item is CrossSubsetting {
+    return reflection.isInstance(item, CrossSubsetting);
+}
+
 export interface Redefinition extends Subsetting {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
     readonly $type: 'Redefinition';
@@ -1361,7 +1373,7 @@ export function isConstraintDefinition(item: unknown): item is ConstraintDefinit
 
 export interface ItemDefinition extends OccurrenceDefinition, Structure {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'MetadataDefinition' | 'PartDefinition' | 'RenderingDefinition' | 'ViewDefinition';
+    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'InterfaceDefinition' | 'ItemDefinition' | 'MetadataDefinition' | 'PartDefinition' | 'RenderingDefinition' | 'ViewDefinition';
 }
 
 export const ItemDefinition = 'ItemDefinition';
@@ -1569,7 +1581,7 @@ export function isFeatureReferenceExpression(item: unknown): item is FeatureRefe
 
 export interface InvocationExpression extends Expression {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'CollectExpression' | 'FeatureChainExpression' | 'InvocationExpression' | 'OperatorExpression' | 'SelectExpression' | 'TriggerInvocationExpression';
+    readonly $type: 'CollectExpression' | 'FeatureChainExpression' | 'IndexExpression' | 'InvocationExpression' | 'OperatorExpression' | 'SelectExpression' | 'TriggerInvocationExpression';
     operands: Array<Expression>
 }
 
@@ -1648,7 +1660,7 @@ export function isEventOccurrenceUsage(item: unknown): item is EventOccurrenceUs
 
 export interface ItemUsage extends OccurrenceUsage {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'ItemUsage' | 'MetadataUsage' | 'PartUsage' | 'RenderingUsage' | 'SuccessionFlowConnectionUsage' | 'ViewUsage';
+    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'InterfaceUsage' | 'ItemUsage' | 'MetadataUsage' | 'PartUsage' | 'RenderingUsage' | 'ViewUsage';
 }
 
 export const ItemUsage = 'ItemUsage';
@@ -1726,7 +1738,7 @@ export function isMetadataDefinition(item: unknown): item is MetadataDefinition 
 
 export interface PartDefinition extends ItemDefinition {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'FlowConnectionDefinition' | 'InterfaceDefinition' | 'PartDefinition' | 'RenderingDefinition' | 'ViewDefinition';
+    readonly $type: 'AllocationDefinition' | 'ConnectionDefinition' | 'InterfaceDefinition' | 'PartDefinition' | 'RenderingDefinition' | 'ViewDefinition';
 }
 
 export const PartDefinition = 'PartDefinition';
@@ -1865,7 +1877,7 @@ export function isInvariant(item: unknown): item is Invariant {
 
 export interface OperatorExpression extends InvocationExpression {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'CollectExpression' | 'FeatureChainExpression' | 'OperatorExpression' | 'SelectExpression';
+    readonly $type: 'CollectExpression' | 'FeatureChainExpression' | 'IndexExpression' | 'OperatorExpression' | 'SelectExpression';
     operator?: string
 }
 
@@ -1958,7 +1970,7 @@ export function isRequirementUsage(item: unknown): item is RequirementUsage {
 
 export interface PartUsage extends ItemUsage {
     readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
-    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'FlowConnectionUsage' | 'InterfaceUsage' | 'PartUsage' | 'RenderingUsage' | 'SuccessionFlowConnectionUsage' | 'ViewUsage';
+    readonly $type: 'AllocationUsage' | 'ConnectionUsage' | 'InterfaceUsage' | 'PartUsage' | 'RenderingUsage' | 'ViewUsage';
 }
 
 export const PartUsage = 'PartUsage';
@@ -2075,6 +2087,17 @@ export const FeatureChainExpression = 'FeatureChainExpression';
 
 export function isFeatureChainExpression(item: unknown): item is FeatureChainExpression {
     return reflection.isInstance(item, FeatureChainExpression);
+}
+
+export interface IndexExpression extends OperatorExpression {
+    readonly $container: AcceptActionUsage | AnnotatingElement | AssignmentActionUsage | Connector | Dependency | Expression | Feature | FeatureReferenceExpression | FlowConnectionUsage | ForLoopActionUsage | IfActionUsage | InvocationExpression | ItemFlow | MultiplicityRange | Namespace | Relationship | SatisfyRequirementUsage | SendActionUsage | SysMLFunction | TerminateActionUsage | TransitionUsage | Type | WhileLoopActionUsage;
+    readonly $type: 'IndexExpression';
+}
+
+export const IndexExpression = 'IndexExpression';
+
+export function isIndexExpression(item: unknown): item is IndexExpression {
+    return reflection.isInstance(item, IndexExpression);
 }
 
 export interface SelectExpression extends OperatorExpression {
@@ -2220,6 +2243,7 @@ export type SysMlAstType = {
     ConstraintDefinition: ConstraintDefinition
     ConstraintUsage: ConstraintUsage
     ControlNode: ControlNode
+    CrossSubsetting: CrossSubsetting
     DataType: DataType
     DecisionNode: DecisionNode
     Definition: Definition
@@ -2256,6 +2280,7 @@ export type SysMlAstType = {
     IfActionUsage: IfActionUsage
     Import: Import
     IncludeUseCaseUsage: IncludeUseCaseUsage
+    IndexExpression: IndexExpression
     Inheritance: Inheritance
     InlineExpression: InlineExpression
     Interaction: Interaction
@@ -2370,7 +2395,7 @@ export type SysMlAstType = {
 export class SysMlAstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return ['AcceptActionUsage', 'ActionDefinition', 'ActionUsage', 'ActorMembership', 'AllocationDefinition', 'AllocationUsage', 'AnalysisCaseDefinition', 'AnalysisCaseUsage', 'AnnotatingElement', 'Annotation', 'AssertConstraintUsage', 'AssignmentActionUsage', 'Association', 'AssociationStructure', 'AttributeDefinition', 'AttributeUsage', 'Behavior', 'BindingConnector', 'BindingConnectorAsUsage', 'BooleanExpression', 'CalculationDefinition', 'CalculationUsage', 'CaseDefinition', 'CaseUsage', 'Class', 'Classifier', 'ClassifierReference', 'CollectExpression', 'Comment', 'ConcernDefinition', 'ConcernUsage', 'ConjugatedPortDefinition', 'ConjugatedPortReference', 'ConjugatedPortTyping', 'Conjugation', 'ConnectionDefinition', 'ConnectionUsage', 'Connector', 'ConnectorAsUsage', 'ConstraintDefinition', 'ConstraintUsage', 'ControlNode', 'DataType', 'DecisionNode', 'Definition', 'Dependency', 'Differencing', 'Disjoining', 'Documentation', 'Element', 'ElementFilterMembership', 'ElementReference', 'EndFeatureMembership', 'EnumerationDefinition', 'EnumerationUsage', 'EventOccurrenceUsage', 'ExhibitStateUsage', 'Expose', 'Expression', 'Feature', 'FeatureChainExpression', 'FeatureChaining', 'FeatureInverting', 'FeatureMembership', 'FeatureReference', 'FeatureReferenceExpression', 'FeatureRelationship', 'FeatureTyping', 'FeatureValue', 'Featuring', 'FlowConnectionDefinition', 'FlowConnectionUsage', 'ForLoopActionUsage', 'ForkNode', 'FramedConcernMembership', 'IfActionUsage', 'Import', 'IncludeUseCaseUsage', 'Inheritance', 'InlineExpression', 'Interaction', 'InterfaceDefinition', 'InterfaceUsage', 'Intersecting', 'Invariant', 'InvocationExpression', 'ItemDefinition', 'ItemFeature', 'ItemFlow', 'ItemFlowEnd', 'ItemUsage', 'JoinNode', 'LibraryPackage', 'LifeClass', 'LiteralBoolean', 'LiteralExpression', 'LiteralInfinity', 'LiteralNumber', 'LiteralString', 'LoopActionUsage', 'Membership', 'MembershipExpose', 'MembershipImport', 'MembershipReference', 'MergeNode', 'Metaclass', 'MetaclassReference', 'MetadataAccessExpression', 'MetadataDefinition', 'MetadataFeature', 'MetadataUsage', 'Multiplicity', 'MultiplicityRange', 'Namespace', 'NamespaceExpose', 'NamespaceImport', 'NamespaceReference', 'NonOwnerType', 'NullExpression', 'ObjectiveMembership', 'OccurrenceDefinition', 'OccurrenceUsage', 'OperatorExpression', 'OwningMembership', 'Package', 'ParameterMembership', 'PartDefinition', 'PartUsage', 'PerformActionUsage', 'PortConjugation', 'PortDefinition', 'PortUsage', 'Predicate', 'Redefinition', 'ReferenceSubsetting', 'ReferenceUsage', 'Relationship', 'RenderingDefinition', 'RenderingUsage', 'RequirementConstraintMembership', 'RequirementDefinition', 'RequirementUsage', 'RequirementVerificationMembership', 'ResultExpressionMembership', 'ReturnParameterMembership', 'SatisfyRequirementUsage', 'SelectExpression', 'SendActionUsage', 'Specialization', 'StakeholderMembership', 'StateDefinition', 'StateSubactionMembership', 'StateUsage', 'Step', 'Structure', 'Subclassification', 'SubjectMembership', 'Subsetting', 'Succession', 'SuccessionAsUsage', 'SuccessionFlowConnectionUsage', 'SuccessionItemFlow', 'SysMLFunction', 'TerminateActionUsage', 'TextualAnnotatingElement', 'TextualRepresentation', 'TransitionFeatureMembership', 'TransitionUsage', 'TransparentElement', 'TriggerInvocationExpression', 'Type', 'TypeFeaturing', 'TypeReference', 'TypeRelationship', 'Unioning', 'Usage', 'UseCaseDefinition', 'UseCaseUsage', 'VariantMembership', 'VerificationCaseDefinition', 'VerificationCaseUsage', 'ViewDefinition', 'ViewRenderingMembership', 'ViewUsage', 'ViewpointDefinition', 'ViewpointUsage', 'WhileLoopActionUsage'];
+        return ['AcceptActionUsage', 'ActionDefinition', 'ActionUsage', 'ActorMembership', 'AllocationDefinition', 'AllocationUsage', 'AnalysisCaseDefinition', 'AnalysisCaseUsage', 'AnnotatingElement', 'Annotation', 'AssertConstraintUsage', 'AssignmentActionUsage', 'Association', 'AssociationStructure', 'AttributeDefinition', 'AttributeUsage', 'Behavior', 'BindingConnector', 'BindingConnectorAsUsage', 'BooleanExpression', 'CalculationDefinition', 'CalculationUsage', 'CaseDefinition', 'CaseUsage', 'Class', 'Classifier', 'ClassifierReference', 'CollectExpression', 'Comment', 'ConcernDefinition', 'ConcernUsage', 'ConjugatedPortDefinition', 'ConjugatedPortReference', 'ConjugatedPortTyping', 'Conjugation', 'ConnectionDefinition', 'ConnectionUsage', 'Connector', 'ConnectorAsUsage', 'ConstraintDefinition', 'ConstraintUsage', 'ControlNode', 'CrossSubsetting', 'DataType', 'DecisionNode', 'Definition', 'Dependency', 'Differencing', 'Disjoining', 'Documentation', 'Element', 'ElementFilterMembership', 'ElementReference', 'EndFeatureMembership', 'EnumerationDefinition', 'EnumerationUsage', 'EventOccurrenceUsage', 'ExhibitStateUsage', 'Expose', 'Expression', 'Feature', 'FeatureChainExpression', 'FeatureChaining', 'FeatureInverting', 'FeatureMembership', 'FeatureReference', 'FeatureReferenceExpression', 'FeatureRelationship', 'FeatureTyping', 'FeatureValue', 'Featuring', 'FlowConnectionDefinition', 'FlowConnectionUsage', 'ForLoopActionUsage', 'ForkNode', 'FramedConcernMembership', 'IfActionUsage', 'Import', 'IncludeUseCaseUsage', 'IndexExpression', 'Inheritance', 'InlineExpression', 'Interaction', 'InterfaceDefinition', 'InterfaceUsage', 'Intersecting', 'Invariant', 'InvocationExpression', 'ItemDefinition', 'ItemFeature', 'ItemFlow', 'ItemFlowEnd', 'ItemUsage', 'JoinNode', 'LibraryPackage', 'LifeClass', 'LiteralBoolean', 'LiteralExpression', 'LiteralInfinity', 'LiteralNumber', 'LiteralString', 'LoopActionUsage', 'Membership', 'MembershipExpose', 'MembershipImport', 'MembershipReference', 'MergeNode', 'Metaclass', 'MetaclassReference', 'MetadataAccessExpression', 'MetadataDefinition', 'MetadataFeature', 'MetadataUsage', 'Multiplicity', 'MultiplicityRange', 'Namespace', 'NamespaceExpose', 'NamespaceImport', 'NamespaceReference', 'NonOwnerType', 'NullExpression', 'ObjectiveMembership', 'OccurrenceDefinition', 'OccurrenceUsage', 'OperatorExpression', 'OwningMembership', 'Package', 'ParameterMembership', 'PartDefinition', 'PartUsage', 'PerformActionUsage', 'PortConjugation', 'PortDefinition', 'PortUsage', 'Predicate', 'Redefinition', 'ReferenceSubsetting', 'ReferenceUsage', 'Relationship', 'RenderingDefinition', 'RenderingUsage', 'RequirementConstraintMembership', 'RequirementDefinition', 'RequirementUsage', 'RequirementVerificationMembership', 'ResultExpressionMembership', 'ReturnParameterMembership', 'SatisfyRequirementUsage', 'SelectExpression', 'SendActionUsage', 'Specialization', 'StakeholderMembership', 'StateDefinition', 'StateSubactionMembership', 'StateUsage', 'Step', 'Structure', 'Subclassification', 'SubjectMembership', 'Subsetting', 'Succession', 'SuccessionAsUsage', 'SuccessionFlowConnectionUsage', 'SuccessionItemFlow', 'SysMLFunction', 'TerminateActionUsage', 'TextualAnnotatingElement', 'TextualRepresentation', 'TransitionFeatureMembership', 'TransitionUsage', 'TransparentElement', 'TriggerInvocationExpression', 'Type', 'TypeFeaturing', 'TypeReference', 'TypeRelationship', 'Unioning', 'Usage', 'UseCaseDefinition', 'UseCaseUsage', 'VariantMembership', 'VerificationCaseDefinition', 'VerificationCaseUsage', 'ViewDefinition', 'ViewRenderingMembership', 'ViewUsage', 'ViewpointDefinition', 'ViewpointUsage', 'WhileLoopActionUsage'];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -2483,6 +2508,7 @@ export class SysMlAstReflection extends AbstractAstReflection {
             }
             case CollectExpression:
             case FeatureChainExpression:
+            case IndexExpression:
             case SelectExpression: {
                 return this.isSubtype(InlineExpression, supertype) || this.isSubtype(OperatorExpression, supertype);
             }
@@ -2529,6 +2555,11 @@ export class SysMlAstReflection extends AbstractAstReflection {
             }
             case ConstraintUsage: {
                 return this.isSubtype(BooleanExpression, supertype) || this.isSubtype(OccurrenceUsage, supertype);
+            }
+            case CrossSubsetting:
+            case Redefinition:
+            case ReferenceSubsetting: {
+                return this.isSubtype(Subsetting, supertype);
             }
             case DecisionNode:
             case ForkNode:
@@ -2608,10 +2639,10 @@ export class SysMlAstReflection extends AbstractAstReflection {
                 return this.isSubtype(Specialization, supertype);
             }
             case FlowConnectionDefinition: {
-                return this.isSubtype(ActionDefinition, supertype) || this.isSubtype(ConnectionDefinition, supertype) || this.isSubtype(Interaction, supertype);
+                return this.isSubtype(ActionDefinition, supertype) || this.isSubtype(Interaction, supertype);
             }
             case FlowConnectionUsage: {
-                return this.isSubtype(ActionUsage, supertype) || this.isSubtype(ConnectionUsage, supertype) || this.isSubtype(ItemFlow, supertype);
+                return this.isSubtype(ActionUsage, supertype) || this.isSubtype(ConnectorAsUsage, supertype) || this.isSubtype(ItemFlow, supertype);
             }
             case ForLoopActionUsage:
             case WhileLoopActionUsage: {
@@ -2711,10 +2742,6 @@ export class SysMlAstReflection extends AbstractAstReflection {
             }
             case Predicate: {
                 return this.isSubtype(SysMLFunction, supertype);
-            }
-            case Redefinition:
-            case ReferenceSubsetting: {
-                return this.isSubtype(Subsetting, supertype);
             }
             case RenderingDefinition:
             case ViewDefinition: {

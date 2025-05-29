@@ -217,6 +217,11 @@ export interface FormatOptions {
     declaration_conjugated_port_typing: DeclaredRelationshipFormat;
 
     /**
+     * Controls cross subsetting formatting in feature declarations.
+     */
+    declaration_cross_subsetting: DeclaredRelationshipFormat;
+
+    /**
      * Controls feature value equals token formatting whenever it can be
      * omitted:
      * * `as_needed`: `=` will only be printed if it is required by the grammar
@@ -556,6 +561,13 @@ export interface FormatOptions {
     interface_usage_connect_keyword: PreservableFormatting<"always" | "as_needed">;
 
     /**
+     * Controls `port` keyword formatting inside interface definitions:
+     * * `always`: `port` is always printed
+     * * `never`: `port` is never printed
+     */
+    interface_port_keyword: PreservableFormatting<"always" | "never">;
+
+    /**
      * Controls `action` formatting in action nodes:
      * * `always`: `action` is always printed
      * * `as_needed`: `action` is printed only if required by the grammar
@@ -715,6 +727,7 @@ export const DefaultFormatOptions: FormatOptions = {
     declaration_reference_subsetting: { default: "preserve", fallback: "token" },
     declaration_feature_typing: { default: "preserve", fallback: "token" },
     declaration_conjugated_port_typing: { default: "preserve", fallback: "token" },
+    declaration_cross_subsetting: { default: "preserve", fallback: "token" },
     feature_value_equals: { default: "preserve", fallback: "as_needed" },
     feature_keyword: { default: "preserve", fallback: "as_needed" },
     public_keyword: { default: "preserve", fallback: "never" },
@@ -761,6 +774,7 @@ export const DefaultFormatOptions: FormatOptions = {
     binary_connection_usages: { default: "preserve", fallback: "always" },
     binary_interface_usages: { default: "preserve", fallback: "always" },
     interface_usage_connect_keyword: { default: "preserve", fallback: "always" },
+    interface_port_keyword: { default: "preserve", fallback: "always" },
     action_node_keyword: { default: "preserve", fallback: "as_needed" },
     while_loop_parenthesize_condition: "on_break",
     while_loop_parenthesize_until: "on_break",

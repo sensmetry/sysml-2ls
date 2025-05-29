@@ -278,7 +278,7 @@ fragment MultiplicityPart:
 ;
 
 fragment FeatureSpecialization:
-    Typings | Subsettings | References | Redefinitions
+    Typings | Subsettings | References | Crosses | Redefinitions
 ;
 
 fragment Typings:
@@ -299,6 +299,10 @@ fragment Subsets:
 
 fragment References:
     ReferencesToken heritage+=OwnedReferenceSubsetting
+;
+
+fragment Crosses:
+    CrossesToken heritage+=OwnedCrossSubsetting
 ;
 
 fragment Redefinitions:
@@ -322,6 +326,10 @@ OwnedSubsetting returns Subsetting:
 ;
 
 OwnedReferenceSubsetting returns ReferenceSubsetting:
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
+;
+
+OwnedCrossSubsetting returns CrossSubsetting:
     targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
@@ -386,8 +394,8 @@ fragment DefinitionBodyItem:
     | children+=DefinitionMember
     | children+=VariantUsageMember
     | children+=NonOccurrenceUsageMember
-    | children+=EmptySuccessionMember // TODO: must precede OccurrenceUsageMember
-    | children+=OccurrenceUsageMember
+    | ( children+=EmptySuccessionMember )?
+    children+=OccurrenceUsageMember
 ;
 
 DefinitionMember returns OwningMembership:
@@ -423,7 +431,7 @@ BehaviorUsageMember returns FeatureMembership:
 
 fragment RefPrefix:
     ( direction=FeatureDirectionKind )?
-    BasicDefinitionPrefix? Readonly? Derived? End?
+    BasicDefinitionPrefix? Readonly? Derived?
 ;
 
 fragment Reference:
@@ -434,12 +442,28 @@ fragment BasicUsagePrefix:
     RefPrefix Reference?
 ;
 
+fragment EndUsagePrefix:
+    End ( crossingFeature=OwnedCrossingFeatureMember )?
+;
+
 fragment UsageExtensionKeyword:
     prefixes+=PrefixMetadataMember
 ;
 
+fragment UnextendedUsagePrefix:
+    EndUsagePrefix | BasicUsagePrefix
+;
+
+OwnedCrossingFeatureMember returns OwningMembership:
+    target=OwnedCrossingFeature
+;
+
+OwnedCrossingFeature returns ReferenceUsage:
+    BasicUsagePrefix? UsageDeclaration
+;
+
 fragment UsagePrefix:
-    BasicUsagePrefix UsageExtensionKeyword*
+    UnextendedUsagePrefix UsageExtensionKeyword*
 ;
 
 fragment UsageSuffix:
@@ -473,11 +497,11 @@ FeatureValue returns FeatureValue:
 // Reference Usages
 
 DefaultReferenceUsage returns ReferenceUsage:
-    RefPrefix UsageDeclaration ValuePart? UsageBody
+    End? RefPrefix UsageSuffix
 ;
 
 ReferenceUsage returns ReferenceUsage:
-    RefPrefix 'ref' UsageSuffix
+    (EndUsagePrefix | RefPrefix) 'ref' UsageSuffix
 ;
 
 VariantReference returns ReferenceUsage:
@@ -569,7 +593,7 @@ ExtendedDefinition returns Definition:
 ;
 
 ExtendedUsage returns Usage:
-    BasicUsagePrefix UsageExtensionKeyword+ UsageSuffix
+    UnextendedUsagePrefix UsageExtensionKeyword+ UsageSuffix
 ;
 
 // Attributes
@@ -645,8 +669,12 @@ IndividualDefinition returns OccurrenceDefinition:
 
 // Occurrence Usages
 
+fragment BasicOccurrenceUsagePrefix:
+    BasicUsagePrefix Individual? Portion?
+;
+
 fragment OccurrenceUsagePrefix:
-    BasicUsagePrefix Individual? Portion? UsageExtensionKeyword*
+    ( EndUsagePrefix | BasicOccurrenceUsagePrefix ) UsageExtensionKeyword*
 ;
 
 OccurrenceUsage returns OccurrenceUsage:
@@ -768,7 +796,8 @@ ConnectorEndMember returns EndFeatureMembership:
 ;
 
 ConnectorEnd returns ReferenceUsage:
-    ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
+    ( crossingFeature=OwnedCrossMultiplicityMember )?
+    ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting
 ;
 
 // Binding Connectors
@@ -965,7 +994,7 @@ InterfaceOccurrenceUsageElement returns Usage:
 ;
 
 DefaultInterfaceEnd returns PortUsage:
-    ( direction=FeatureDirectionKind )? BasicDefinitionPrefix? End UsageSuffix
+    End UsageSuffix
 ;
 
 // Interface Usages
@@ -995,7 +1024,16 @@ InterfaceEndMember returns EndFeatureMembership:
 ;
 
 InterfaceEnd returns PortUsage:
-    ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting (multiplicity=OwnedMultiplicity)?
+    ( crossingFeature=OwnedCrossMultiplicityMember )?
+    ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting
+;
+
+OwnedCrossMultiplicityMember returns OwningMembership:
+    target=OwnedCrossMultiplicity
+;
+
+OwnedCrossMultiplicity returns Feature:
+    multiplicity=OwnedMultiplicity
 ;
 
 
@@ -1338,7 +1376,8 @@ ActionTargetSuccession returns Usage:
 ;
 
 TargetSuccession returns SuccessionAsUsage:
-    'then' ( ends+=MultiplicitySourceEndMember )?
+    ( ends+=MultiplicitySourceEndMember )?
+    'then'
     ends+=ConnectorEndMember
 ;
 
@@ -2047,7 +2086,7 @@ ExtentExpression returns Expression:
 PrimaryExpression returns Expression:
     BaseExpression
     ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
-    (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
+    (   ( {IndexExpression.operands+=current} '#' '(' operands+=SequenceExpression ')' // indexing
         | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
         | {InvocationExpression.operands+=current} '->' heritage+=ReferenceTyping 
             ( children+=ExpressionBodyMember

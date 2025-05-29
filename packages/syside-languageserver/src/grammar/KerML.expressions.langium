@@ -75,6 +75,9 @@ fragment SubsetsToken returns string:
 fragment ReferencesToken returns string:
     '::>' | 'references'
 ;
+fragment CrossesToken returns string:
+    '=>' | 'crosses'
+;
 fragment RedefinesToken returns string:
     ':>>' | 'redefines'
 ;

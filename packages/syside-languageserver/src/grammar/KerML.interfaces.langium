@@ -12,6 +12,7 @@ type RelationalOperator = '<' | '<=' | '>' | '>=';
 
 type InlineExpression =
     FeatureChainExpression
+    | IndexExpression
     | InvocationExpression
     | LiteralExpression
     | MetadataAccessExpression
@@ -20,11 +21,11 @@ type InlineExpression =
     | CollectExpression
     | SelectExpression
     | FeatureReferenceExpression;
-    type NonOwnerType =
+type NonOwnerType =
     Membership
     | Annotation;
 
-    // Annotations
+// Annotations
 
 interface Annotation extends Relationship {
 }
@@ -64,12 +65,12 @@ type TypeRelationship =
     | Differencing
     | Disjoining
     | Intersecting;
-    type FeatureRelationship =
+type FeatureRelationship =
     TypeRelationship
     | FeatureChaining
     | FeatureInverting
     | TypeFeaturing;
-    interface Type extends Namespace {
+interface Type extends Namespace {
     isSufficient: boolean;
     isAbstract?: 'abstract';
     heritage: Inheritance[];
@@ -114,6 +115,7 @@ interface Feature extends Type {
     isReadOnly?: 'readonly';
     value?: FeatureValue;
     write?: Membership;
+    crossingFeature?: OwningMembership;
 }
 
 interface MetadataFeature extends Feature, AnnotatingElement {
@@ -215,6 +217,8 @@ interface Redefinition extends Subsetting {
 }
 interface ReferenceSubsetting extends Subsetting {
 }
+interface CrossSubsetting extends Subsetting {
+}
 
 interface Dependency extends Relationship {
     prefixes: Annotation[];
@@ -292,6 +296,8 @@ interface LiteralNumber extends LiteralExpression {
 interface LiteralInfinity extends LiteralExpression {
 }
 interface NullExpression extends Expression {
+}
+interface IndexExpression extends OperatorExpression {
 }
 interface InvocationExpression extends Expression {
     operands?: Expression[];

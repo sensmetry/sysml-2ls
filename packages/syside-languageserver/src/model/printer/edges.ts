@@ -792,7 +792,7 @@ function printRequirementParticipant(
     return printGenericMembership(options.keyword, node, context, {
         previousSibling: options.previousSibling,
         printer(node, context) {
-            return printGenericFeature([], undefined, node, context);
+            return printGenericFeature([], undefined, undefined, node, context);
         },
     });
 }
@@ -902,7 +902,7 @@ export function printObjectiveMembership(
     return printGenericMembership("objective", node, context, {
         previousSibling,
         printer(node, context) {
-            return printGenericFeature([], undefined, node, context, {
+            return printGenericFeature([], undefined, undefined, node, context, {
                 appendToDeclaration: featureValueAppender(node, context),
             });
         },

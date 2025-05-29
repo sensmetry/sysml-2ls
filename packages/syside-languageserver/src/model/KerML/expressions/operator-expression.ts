@@ -54,13 +54,13 @@ export const OPERATORS = {
     BITWISE_NOT: "'~'",
     NOT: "'not'",
     ALL: "'all'",
-    INDEX: "'#'",
     QUANTITY: "'['",
     COMMA: "','",
     NONE: "",
 } as const;
 
 export const IMPLICIT_OPERATORS = {
+    INDEX: "'#'",
     DOT: "'.'",
     COLLECT: "collect",
     SELECT: "'.?'",
@@ -100,7 +100,7 @@ export class OperatorExpressionMeta extends InvocationExpressionMeta {
             // cast operators should be treated as its type arguments
             return typeArgument(this);
         }
-        if (this.operator === OPERATORS.INDEX) {
+        if (this.operator === IMPLICIT_OPERATORS.INDEX) {
             return typeOf(this.args[0]);
         }
         if (this.operator === OPERATORS.QUANTITY) {
