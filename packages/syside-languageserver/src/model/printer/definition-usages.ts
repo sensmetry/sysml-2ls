@@ -17,7 +17,7 @@
 import { findNodeForKeyword } from "langium";
 import * as ast from "../../generated/ast";
 import { Doc, group, indent, keyword, line, literals } from "../../utils";
-import { ResultExpressionMembershipMeta } from "../KerML";
+import { FeatureMeta, ResultExpressionMembershipMeta } from "../KerML";
 import {
     AssertConstraintUsageMeta,
     AttributeUsageMeta,
@@ -41,6 +41,7 @@ import {
     featureValueAppender,
     printChildrenBlock,
     printGenericFeature,
+    printOwnedCrossFeaturePart,
     printSpecializationPart,
     printType,
 } from "./namespaces";
@@ -50,10 +51,7 @@ import { printTarget } from "./edges";
 import { actionBodyJoiner } from "./actions";
 import { SubtypeKeys } from "../../services";
 
-/**
- * Returns an array of usage modifiers to be used with `prinUsage`.
- */
-export function sysmlUsageModifiers(node: UsageMeta, ignoreRef = false): Doc[] {
+function usageBasicModifiers(node: UsageMeta, ignoreRef = false): Doc[] {
     const modifiers: Doc[] = [];
 
     if (node.explicitDirection !== "none") modifiers.push(keyword(node.explicitDirection));
@@ -72,16 +70,31 @@ export function sysmlUsageModifiers(node: UsageMeta, ignoreRef = false): Doc[] {
     return modifiers;
 }
 
+/**
+ * Returns an array of usage modifiers to be used with `printUsage`.
+ */
+export function sysmlUsageModifiers(node: UsageMeta, ignoreRef = false): Doc[] {
+    if (node.isEndExplicitly) {
+        return [keyword("end")];
+    }
+    return usageBasicModifiers(node, ignoreRef);
+}
+
 export function definitionModifiers(node: DefinitionMeta | UsageMeta): Doc[] {
     return node.isVariation ? [keyword("variation")] : node.isAbstract ? [keyword("abstract")] : [];
 }
 
-export function occurrenceUsageModifiers(node: OccurrenceUsageMeta, ignoreRef = false): Doc[] {
+export function basicOccurrenceUsageModifiers(node: OccurrenceUsageMeta, ignoreRef = false): Doc[] {
     const modifiers = sysmlUsageModifiers(node, ignoreRef);
 
     if (node.isIndividual) modifiers.push(keyword("individual"));
     if (node.portionKind) modifiers.push(keyword(node.portionKind));
     return modifiers;
+}
+
+export function occurrenceUsageModifiers(node: OccurrenceUsageMeta, ignoreRef = false): Doc[] {
+    if (node.isEndExplicitly) return sysmlUsageModifiers(node, ignoreRef);
+    return basicOccurrenceUsageModifiers(node, ignoreRef);
 }
 
 export function occurrenceDefinitionModifiers(node: OccurrenceDefinitionMeta): Doc[] {
@@ -109,6 +122,7 @@ export function printGenericUsage<T extends UsageMeta>(
     return printGenericFeature(
         modifiers === "auto" ? sysmlUsageModifiers(node, options?.ignoreRef) : modifiers,
         kw,
+        printSysmlOwnedCrossFeature(node, context),
         node,
         context,
         { ...options, join: actionBodyJoiner() }
@@ -129,6 +143,7 @@ export function printGenericOccurrenceUsage<T extends OccurrenceUsageMeta>(
     return printGenericFeature(
         modifiers === "auto" ? occurrenceUsageModifiers(node, options?.ignoreRef) : modifiers,
         kw,
+        printSysmlOwnedCrossFeature(node, context),
         node,
         context,
         { ...options, join: actionBodyJoiner() }
@@ -431,13 +446,18 @@ export function printPortUsage(node: PortUsageMeta, context: ModelPrinterContext
     if (
         node.isEndExplicitly &&
         node.parent()?.is(ast.FeatureMembership) &&
-        node.owner()?.isAny(ast.InterfaceDefinition, ast.InterfaceUsage)
+        node.owner()?.isAny(ast.InterfaceDefinition, ast.InterfaceUsage) &&
+        formatPreserved(node, context.format.interface_port_keyword, "always", {
+            find: (node) => findNodeForKeyword(node, "port"),
+            choose: {
+                always: () => keyword("port"),
+                never: () => literals.emptytext,
+                preserve: (found) => (found ? "always" : "never"),
+            },
+        }) === literals.emptytext
     ) {
         // this should be DefaultInterfaceEnd
-        const modifiers: Doc[] = [];
-        if (node.explicitDirection !== "none") modifiers.push(keyword(node.direction));
-        modifiers.push(...definitionModifiers(node), keyword("end"));
-        return printGenericFeature(modifiers, undefined, node, context);
+        return printGenericFeature([keyword("end")], undefined, undefined, node, context);
     }
     return printGenericOccurrenceUsage("auto", "port", node, context, {
         appendToDeclaration: featureValueAppender(node, context),
@@ -528,4 +548,15 @@ export function printAttributeUsage(node: AttributeUsageMeta, context: ModelPrin
         appendToDeclaration: featureValueAppender(node, context),
         ignoreRef: shouldIgnoreRef(node, context.format.attribute_usage_reference_keyword),
     });
+}
+
+export function printSysmlOwnedCrossFeature(
+    node: UsageMeta,
+    context: ModelPrinterContext
+): Doc | undefined {
+    return printOwnedCrossFeaturePart(
+        node,
+        (node: FeatureMeta) => usageBasicModifiers(node as UsageMeta, true),
+        context
+    );
 }

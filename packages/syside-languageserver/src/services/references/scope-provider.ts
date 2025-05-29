@@ -23,6 +23,7 @@ import {
 } from "langium";
 import {
     Conjugation,
+    CrossSubsetting,
     Element,
     ElementReference,
     EndFeatureMembership,
@@ -165,7 +166,11 @@ export class SysMLScopeProvider extends DefaultScopeProvider {
             // allowed to reference the declaring element but this fixes a
             // linking error in
             // SysML-v2-Release/sysml/src/examples/Individuals%20Examples/JohnIndividualExample.sysml
-            if (owner.nodeType() !== Subsetting && owner.nodeType() !== FeatureInverting) {
+            if (
+                owner.nodeType() !== Subsetting &&
+                owner.nodeType() !== CrossSubsetting &&
+                owner.nodeType() !== FeatureInverting
+            ) {
                 options.skip = owner.source();
             }
 

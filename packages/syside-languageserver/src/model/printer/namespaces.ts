@@ -19,6 +19,7 @@ import * as ast from "../../generated/ast";
 import {
     Doc,
     Text,
+    appendFill,
     brackets,
     breakParent,
     fill,
@@ -62,7 +63,7 @@ import {
     printModelElement,
     printModelElements,
 } from "./print";
-import { formatPreserved, printIdentifiers, throwError } from "./utils";
+import { formatPreserved, printDescendant, printIdentifiers, throwError } from "./utils";
 import { printArgument } from "./expressions";
 
 /**
@@ -157,6 +158,14 @@ function getDeclaredRelationshipFormatInfo(
                 merge: false,
             };
         }
+        case "CrossSubsetting":
+            return {
+                keyword: keyword("crosses"),
+                token: text("=>"),
+                format: context.format.declaration_cross_subsetting,
+                groupable: false,
+                merge: false,
+            };
         case "FeatureTyping": {
             return {
                 keyword: keyword(context.mode === "sysml" ? "defined by" : "typed by"),
@@ -502,18 +511,29 @@ export function printChildrenBlock(
 function printNamespaceLeadingParts(
     node: NamespaceMeta,
     context: ModelPrinterContext,
-    parts: { modifiers: Doc[]; keyword: string | undefined }
+    parts: {
+        modifiers: Doc[];
+        crossFeature?: Doc;
+        keyword?: string;
+        printPrefixes: boolean;
+    }
 ): Doc[] {
     const groups: Doc[] = [];
 
     // group modifiers and prefixes into a single fill
     const prefix: Doc[] = [];
     if (parts.modifiers.length > 0) {
-        prefix.push(...parts.modifiers);
+        let lead = fill(join(line, parts.modifiers));
+        if (parts.crossFeature) lead = appendFill(lead, literals.space, parts.crossFeature);
+        prefix.push(lead);
+    } else if (parts.crossFeature) {
+        prefix.push(parts.crossFeature);
     }
-    const prefixes = printPrefixes(node.prefixes, context);
-    if (prefixes.length > 0) {
-        prefix.push(...prefixes);
+    if (parts.printPrefixes) {
+        const prefixes = printPrefixes(node.prefixes, context);
+        if (prefixes.length > 0) {
+            prefix.push(...prefixes);
+        }
     }
     if (prefix.length > 0) {
         groups.push(indent(fill(join(line, prefix))));
@@ -607,6 +627,53 @@ export function printMultiplicityPart(
     }
 
     return group(parts);
+}
+
+export function printOwnedCrossMultiplicityPart(
+    node: FeatureMeta,
+    context: ModelPrinterContext
+): Doc | undefined {
+    if (!node.ownedCrossFeature?.multiplicity) {
+        return undefined;
+    }
+    return group(
+        printDescendant(node, context, "owned cross multiplicity")
+            .descend((node) => node.ownedCrossFeatureMember)
+            .descend((node) => node.element() as FeatureMeta)
+            .descend((node) => node.multiplicity)
+            .descend((node) => node.element() as MultiplicityRangeMeta)
+            .descend((node) => node.range)
+            .descend((node) => node.element() as ExpressionMeta)
+            .print({
+                printer(range, context) {
+                    return printDeclaredMultiplicityRange(range, context);
+                },
+            })
+    );
+}
+
+export function printOwnedCrossFeaturePart(
+    node: FeatureMeta,
+    modifiers: (node: FeatureMeta) => Doc[],
+    context: ModelPrinterContext
+): Doc | undefined {
+    if (!node.ownedCrossFeatureMember || !node.isEnd) {
+        return undefined;
+    }
+    const result: Doc = group(
+        printDescendant(node, context, "owned cross feature")
+            .descend((node) => node.ownedCrossFeatureMember)
+            .descend((node) => node.element() as FeatureMeta)
+            .print({
+                printer(cross, context) {
+                    return printNamespaceDecl(cross, context, {
+                        modifiers: modifiers(cross),
+                        keyword: undefined,
+                    });
+                },
+            })
+    );
+    return result;
 }
 
 /**
@@ -745,6 +812,11 @@ export interface NamespacePrinterParts {
      * If true, children block will always break
      */
     forceBreakChildren?: boolean;
+
+    /**
+     * Optional printed cross feature
+     */
+    crossFeature?: Doc;
 }
 
 export interface TypePrinterOptions<T extends TypeMeta = TypeMeta>
@@ -759,16 +831,17 @@ export interface TypePrinterOptions<T extends TypeMeta = TypeMeta>
 export type NamespacePrinterOptions<T extends NamespaceMeta = NamespaceMeta> =
     NamespacePrinterParts & (T extends TypeMeta ? TypePrinterOptions<T> : object);
 
-/**
- * Default printer for namespaces. Should be configurable enough for any
- * namespace element.
- */
-export function printGenericNamespace<T extends NamespaceMeta>(
+export function printNamespaceDecl<T extends NamespaceMeta>(
     node: T,
     context: ModelPrinterContext,
     parts: NamespacePrinterOptions<T>
-): Doc {
-    let declaration = printNamespaceLeadingParts(node, context, parts);
+): Doc[] {
+    let declaration = printNamespaceLeadingParts(node, context, {
+        modifiers: parts.modifiers,
+        crossFeature: parts?.crossFeature,
+        keyword: parts.keyword,
+        printPrefixes: true,
+    });
 
     const pushGroup = (doc: Doc, linebreak: Doc = indent(line)): void => {
         if (declaration.length > 0) declaration.push(linebreak);
@@ -799,6 +872,21 @@ export function printGenericNamespace<T extends NamespaceMeta>(
         if (declaration.length > 0) declaration = [group(declaration)];
         parts.appendToDeclaration(declaration);
     }
+
+    return declaration;
+}
+
+/**
+ * Default printer for namespaces. Should be configurable enough for any
+ * namespace element.
+ */
+export function printGenericNamespace<T extends NamespaceMeta>(
+    node: T,
+    context: ModelPrinterContext,
+    parts: NamespacePrinterOptions<T>
+): Doc {
+    const declaration = printNamespaceDecl(node, context, parts);
+
     if (parts.skipChildren === true) return group(declaration);
 
     const children = printChildrenBlock(node, node.children, context, {
@@ -850,7 +938,7 @@ export function printType<T extends TypeMeta>(
  * Returns an array of feature modifiers for KerML syntax. Can be used with
  * {@link printGenericFeature} and {@link printNonTypeNamespace}.
  */
-export function kermlFeatureModifiers(node: FeatureMeta): Doc[] {
+export function kermlBasicFeatureModifiers(node: FeatureMeta): Doc[] {
     const modifiers: Doc[] = [];
 
     if (node.explicitDirection !== "none") modifiers.push(keyword(node.explicitDirection));
@@ -861,9 +949,15 @@ export function kermlFeatureModifiers(node: FeatureMeta): Doc[] {
     else if (node.isComposite) modifiers.push(keyword("composite"));
     if (node.isReadonly) modifiers.push(keyword("readonly"));
     if (node.isDerived) modifiers.push(keyword("derived"));
-    if (node.isEnd) modifiers.push(keyword("end"));
 
     return modifiers;
+}
+
+export function kermlFeatureModifiers(node: FeatureMeta): Doc[] {
+    if (node.isEnd) {
+        return [keyword("end")];
+    }
+    return kermlBasicFeatureModifiers(node);
 }
 
 export interface FeaturePrinterOptions<T extends FeatureMeta = FeatureMeta>
@@ -896,6 +990,7 @@ export function featureValueAppender(
 export function printGenericFeature<T extends FeatureMeta>(
     modifiers: Doc[],
     kw: string | undefined,
+    crossFeature: Doc | undefined,
     node: T & { result?: ResultExpressionMembershipMeta },
     context: ModelPrinterContext,
     options: TypePrinterOptions<T> = { appendToDeclaration: featureValueAppender(node, context) }
@@ -903,6 +998,7 @@ export function printGenericFeature<T extends FeatureMeta>(
     return printGenericNamespace<FeatureMeta>(node, context, <NamespacePrinterOptions<FeatureMeta>>{
         modifiers,
         keyword: kw,
+        crossFeature,
         result: node.result,
         ...options,
     });
@@ -922,6 +1018,7 @@ export function printKerMLFeature<T extends FeatureMeta>(
     return printGenericFeature(
         kermlFeatureModifiers(node),
         node.isSufficient ? (kw ? `${kw} all` : "all") : kw,
+        node.isEnd ? printOwnedCrossFeaturePart(node, kermlFeatureModifiers, context) : undefined,
         node,
         context,
         options
@@ -1040,4 +1137,11 @@ export function printNamespace(node: NamespaceMeta, context: ModelPrinterContext
 
     assertKerML(context, node.nodeType());
     return printNonTypeNamespace(undefined, "namespace", node, context);
+}
+
+export function printKerMLOwnedCrossFeature(
+    node: FeatureMeta,
+    context: ModelPrinterContext
+): Doc | undefined {
+    return printOwnedCrossFeaturePart(node, kermlBasicFeatureModifiers, context);
 }

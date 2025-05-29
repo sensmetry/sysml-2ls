@@ -114,7 +114,10 @@ export class SysMLDocumentValidator extends DefaultDocumentValidator {
         // don't want to completely rewrite `validateDocument` so mutating
         // document here instead
         diagnostics.forEach((d) => document.modelDiagnostics.add(d.element, d));
-        return diagnostics.map((d) => this.fromModelDiagnostic(d));
+        return document.modelDiagnostics
+            .values()
+            .map((d) => this.fromModelDiagnostic(d))
+            .toArray();
     }
 
     protected fromModelDiagnostic(diagnostic: ModelDiagnostic): Diagnostic {

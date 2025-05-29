@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 export const STDLIB = {
-    version: "2024-11",
-    tree: "https://github.com/Systems-Modeling/SysML-v2-Release/blob/2024-11/sysml.library/",
-    raw: "https://raw.githubusercontent.com/Systems-Modeling/SysML-v2-Release/2024-11/sysml.library/",
+    version: "2024-12",
+    tree: "https://github.com/daumantas-kavolis-sensmetry/SysML-v2-Release/blob/fixes/sysml.library/",
+    raw: "https://raw.githubusercontent.com/daumantas-kavolis-sensmetry/SysML-v2-Release/fixes/sysml.library/",
     files: [
         "Systems Library/Actions.sysml",
         "Systems Library/Allocations.sysml",
@@ -27,6 +27,7 @@ export const STDLIB = {
         "Systems Library/Cases.sysml",
         "Systems Library/Connections.sysml",
         "Systems Library/Constraints.sysml",
+        "Systems Library/FlowConnections.sysml",
         "Systems Library/Interfaces.sysml",
         "Systems Library/Items.sysml",
         "Systems Library/Metadata.sysml",

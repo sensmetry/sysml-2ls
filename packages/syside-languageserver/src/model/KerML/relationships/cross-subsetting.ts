@@ -14,17 +14,19 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-export * from "./collect-expression";
-export * from "./feature-chain-expression";
-export * from "./feature-reference-expression";
-export * from "./index-expression";
-export * from "./invocation-expression";
-export * from "./literal-boolean";
-export * from "./literal-expression";
-export * from "./literal-infinity";
-export * from "./literal-number";
-export * from "./literal-string";
-export * from "./metadata-access-expression";
-export * from "./null-expression";
-export * from "./operator-expression";
-export * from "./select-expression";
+import { CrossSubsetting } from "../../../generated/ast";
+import { metamodelOf } from "../../metamodel";
+import { FeatureMeta, SubsettingMeta } from "../_internal";
+
+@metamodelOf(CrossSubsetting)
+export class CrossSubsettingMeta<T extends FeatureMeta = FeatureMeta> extends SubsettingMeta<T> {
+    override ast(): CrossSubsetting | undefined {
+        return this._ast as CrossSubsetting;
+    }
+}
+
+declare module "../../../generated/ast" {
+    interface CrossSubsetting {
+        $meta: CrossSubsettingMeta;
+    }
+}

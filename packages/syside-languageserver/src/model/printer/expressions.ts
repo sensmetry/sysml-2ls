@@ -180,6 +180,8 @@ export function getOperator(expr: ElementMeta | undefined): AnyOperator {
             return IMPLICIT_OPERATORS.DOT;
         case ast.CollectExpression:
             return IMPLICIT_OPERATORS.COLLECT;
+        case ast.IndexExpression:
+            return IMPLICIT_OPERATORS.INDEX;
         case ast.OperatorExpression: {
             return (expr as OperatorExpressionMeta).operator;
         }

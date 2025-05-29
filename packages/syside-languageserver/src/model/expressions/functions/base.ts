@@ -16,7 +16,14 @@
 
 import { Type } from "langium/lib/grammar/generated/ast";
 import { Feature } from "../../../generated/ast";
-import { ElementMeta, FeatureMeta, OPERATORS, OperatorExpressionMeta, TypeMeta } from "../../KerML";
+import {
+    ElementMeta,
+    FeatureMeta,
+    IMPLICIT_OPERATORS,
+    OPERATORS,
+    OperatorExpressionMeta,
+    TypeMeta,
+} from "../../KerML";
 import { RangeGenerator } from "../range";
 import {
     BuiltinFunction,
@@ -96,7 +103,7 @@ export class HasTypeFunction extends BuiltinFunction {
     }
 }
 
-@functionFor(PACKAGE, OPERATORS.INDEX)
+@functionFor(PACKAGE, IMPLICIT_OPERATORS.INDEX)
 export class IndexFunction extends BuiltinFunction {
     protected isCollection(values: ExpressionResult, name: string): boolean {
         return (

@@ -415,19 +415,44 @@ ClassifierConjugation returns Conjugation:
 
 /* Features */
 
-fragment FeaturePrefix:
+fragment BasicFeaturePrefix:
     ( direction=FeatureDirectionKind )?
     Abstract? ( isComposite='composite' | isPortion='portion' )? 
-    Readonly? Derived? End? PrefixMetadata?
+    Readonly? Derived?
+;
+
+fragment FeaturePrefix:
+    ( End (crossingFeature=OwnedCrossingFeatureMember)? | BasicFeaturePrefix )
+    PrefixMetadata?
 ;
 
 Feature returns Feature:
-    FeaturePrefix
-    ( 'feature'? FeatureDeclaration
-    | prefixes+=PrefixMetadataMember
-    | 'feature'
-    ) 
+    ( End EndFeatureDeclarationPart
+    | BasicFeaturePrefix FeatureDeclarationPart
+    )
     ValuePart? TypeBody
+;
+
+// Trick to get parser to deal with ambiguous grammar
+fragment EndFeatureDeclarationPart:
+    ( FeatureDeclarationPart
+    | (crossingFeature=OwnedCrossingFeatureMember) FeatureDeclarationPart
+    )
+;
+
+fragment FeatureDeclarationPart:
+    ( PrefixMetadata? 'feature'? FeatureDeclaration
+    | PrefixMetadata? 'feature'
+    | PrefixMetadata
+    )
+;
+
+OwnedCrossingFeatureMember returns OwningMembership:
+    target=OwnedCrossingFeature
+;
+
+OwnedCrossingFeature returns Feature:
+    BasicFeaturePrefix FeatureDeclaration
 ;
 
 fragment FeatureDeclaration:
@@ -468,7 +493,7 @@ fragment MultiplicityPart:
 ;
 
 fragment FeatureSpecialization:
-    Typings | Subsettings | References | Redefinitions
+    Typings | Subsettings | References | Crosses | Redefinitions
 ;
 
 fragment Typings:
@@ -489,6 +514,10 @@ fragment Subsets:
 
 fragment References:
     ReferencesToken heritage+=OwnedReferenceSubsetting
+;
+
+fragment Crosses:
+    CrossesToken heritage+=OwnedCrossSubsetting
 ;
 
 fragment Redefinitions:
@@ -548,6 +577,10 @@ OwnedSubsetting returns Subsetting:
 ;
 
 OwnedReferenceSubsetting returns ReferenceSubsetting:
+    targetRef=FeatureReference | targetChain=OwnedFeatureChain
+;
+
+OwnedCrossSubsetting returns CrossSubsetting:
     targetRef=FeatureReference | targetChain=OwnedFeatureChain
 ;
 
@@ -681,8 +714,16 @@ ConnectorEndMember returns EndFeatureMembership:
 ;
 
 ConnectorEnd returns Feature:
+    ( crossingFeature=OwnedCrossMultiplicityMember )?
     ( RegularName ReferencesToken )? heritage+=OwnedReferenceSubsetting
-    ( multiplicity=OwnedMultiplicity )?
+;
+
+OwnedCrossMultiplicityMember returns OwningMembership:
+    target=OwnedCrossMultiplicity
+;
+
+OwnedCrossMultiplicity returns Feature:
+    multiplicity=OwnedMultiplicity
 ;
 
 /* Binding Connectors */
@@ -1068,7 +1109,7 @@ ExtentExpression returns Expression:
 PrimaryExpression returns Expression:
     BaseExpression
     ( {FeatureChainExpression.operands+=current} '.' children+=FeatureChainMember)?
-    (   ( {OperatorExpression.operands+=current} operator='#' '(' operands+=SequenceExpression ')' // indexing
+    (   ( {IndexExpression.operands+=current} '#' '(' operands+=SequenceExpression ')' // indexing
         | {OperatorExpression.operands+=current} operator='[' operands+=SequenceExpression ']' // indexing
         | {InvocationExpression.operands+=current} '->' heritage+=ReferenceTyping 
             ( children+=ExpressionBodyMember

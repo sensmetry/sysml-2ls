@@ -27,7 +27,6 @@ import {
     ElementReference,
     Feature,
     Type,
-    Association,
     Connector,
     Namespace,
     Element,
@@ -75,6 +74,7 @@ import {
     TypeFeaturing,
     ItemFlow,
     FlowConnectionUsage,
+    CrossSubsetting,
 } from "../../../generated/ast";
 import {
     BasicMetamodel,
@@ -102,7 +102,6 @@ import {
     ClassifierMeta,
     MetaclassMeta,
     ConnectorMeta,
-    AssociationMeta,
     DefinitionMeta,
     ActionDefinitionMeta,
     ActionUsageMeta,
@@ -125,6 +124,9 @@ import {
     ItemFlowMeta,
     EndFeatureMembershipMeta,
     FlowConnectionUsageMeta,
+    CrossSubsettingMeta,
+    FeatureChainingMeta,
+    FeatureMembershipMeta,
 } from "../../../model";
 import { SysMLDefaultServices, SysMLSharedServices } from "../../services";
 import { SysMLIndexManager } from "./index-manager";
@@ -132,7 +134,7 @@ import { TypeMap, typeIndex } from "../../../model/types";
 import { implicitIndex } from "../../../model/implicits";
 import { FeatureDirectionKind, TransitionFeatureKind } from "../../../model/enums";
 import { NonNullReference, SysMLLinker } from "../../references/linker";
-import { Statistics } from "../../../utils/common";
+import { NonNullable, Statistics } from "../../../utils/common";
 import {
     SubtypeKeys,
     SysMLAstReflection,
@@ -564,8 +566,6 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
 
     @builder(Namespace, 10000)
     protected linkNamespaceFeatures(node: NamespaceMeta, document: LangiumDocument): void {
-        // feature elements need to be linked early to resolve implicit naming
-        // that may be used to reference them later on
         node.featureMembers().forEach((member) => {
             const element = member.element();
             if (
@@ -676,8 +676,9 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
      */
     @builder(Type)
     protected linkTypeRelationships(node: TypeMeta, document: LangiumDocument): void {
-        // explicit
-        node.heritage.forEach((r) => this.preLinkModel(r, document));
+        node.heritage
+            .filter((s) => !s.is(CrossSubsetting))
+            .forEach((r) => this.preLinkModel(r, document));
         node.typeRelationships.forEach((r) => this.preLinkModel(r, document));
     }
 
@@ -701,33 +702,233 @@ export class SysMLMetamodelBuilder implements MetamodelBuilder {
     }
 
     /**
-     * Setup implicit Association and Connector end feature redefinitions
+     * Setup implicit end feature redefinitions
      * @param node
      */
-    @builder([Association, Connector], 1000)
-    protected redefineEnds(node: AssociationMeta | ConnectorMeta, document: LangiumDocument): void {
-        const baseEndIterator = node
-            .basePositionalFeatures(
-                (f) => f.is(EndFeatureMembership) || !!f.element()?.isEnd,
-                (t) => t.is(Association)
-            )
-            .iterator();
+    @builder(Type, 1000)
+    protected redefineEnds(node: TypeMeta, document: LangiumDocument): void {
+        const endFeatureMembers: (f: MembershipMeta<FeatureMeta>) => boolean = (f) =>
+            Boolean(f.is(EndFeatureMembership) || f.element()?.isEnd);
 
-        stream(node.ownedEnds()).forEach((end) => {
-            const base = baseEndIterator.next();
-            if (base.done) return;
-            if (end.specializations(Redefinition).length > 0) return; // no implicit end redefinition
-            const target = base.value.element();
-            if (!target) return;
+        const baseEndIterator = node.basePositionalFeatures(endFeatureMembers).iterator();
 
-            // not prelinking the child elements to hide implicit
-            // redefinitions
-            const specialization = RedefinitionMeta.create(this.util.idProvider, document, {
+        stream(node.featureMembers())
+            .filter(endFeatureMembers)
+            .map((m) => m.element())
+            .nonNullable()
+            .forEach((end) => {
+                const base = baseEndIterator.next();
+                if (base.done) return;
+                if (end.specializations(Redefinition).length > 0) return; // no implicit end redefinition
+                const target = base.value.element();
+                if (!target) return;
+
+                // not prelinking the child elements to hide implicit
+                // redefinitions
+                const specialization = RedefinitionMeta.create(this.util.idProvider, document, {
+                    isImplied: true,
+                });
+                end.addHeritage([specialization, target]);
+                return;
+            });
+    }
+
+    private resolveCrossCartesianFeature(
+        self: FeatureMeta,
+        cross: FeatureMeta,
+        document: LangiumDocument
+    ): FeatureMeta | undefined {
+        const makeCrossSubsetting = self.specializations(CrossSubsetting).length === 0;
+        const needsTypeFeaturings = cross.typeFeaturings.length === 0;
+        if (!makeCrossSubsetting && !needsTypeFeaturings) return;
+
+        const owner = self.owningType;
+        if (!owner) return;
+
+        let cartesianFeature: FeatureMeta | undefined;
+        let cache: MembershipMeta | undefined;
+
+        let first: FeatureMeta | undefined;
+        let i = 0;
+        const nameOrShortName = (t: TypeMeta): string =>
+            t.name ?? (t.shortName ? `<${t.shortName}>` : "");
+
+        stream(owner.featureMembers())
+            .filter((m) => m.is(EndFeatureMembership) || m.element()?.isEnd)
+            .forEach((end) => {
+                const endFeature = end.element();
+                if (!endFeature || endFeature === self) return;
+
+                ++i;
+                if (!first) {
+                    first = endFeature;
+                    return;
+                }
+                if (i == 2) {
+                    if (needsTypeFeaturings) {
+                        cache = MembershipMeta.create(this.util.idProvider, document, {
+                            isImplied: true,
+                        });
+                        self.addChild([cache, self]);
+                        cartesianFeature = FeatureMeta.create(this.util.idProvider, document, {
+                            declaredName: `${nameOrShortName(first)}_${nameOrShortName(endFeature)}`,
+                        });
+                        cache.addChild(cartesianFeature);
+                        cartesianFeature.addFeatureRelationship([
+                            TypeFeaturingMeta.create(this.util.idProvider, document, {
+                                isImplied: true,
+                            }),
+                            first,
+                        ]);
+                    }
+                    if (makeCrossSubsetting) {
+                        first = FeatureMeta.create(this.util.idProvider, document);
+                        first.addFeatureRelationship([
+                            TypeFeaturingMeta.create(this.util.idProvider, document, {
+                                isImplied: true,
+                            }),
+                            owner,
+                        ]);
+                        self.addChild([
+                            FeatureMembershipMeta.create(this.util.idProvider, document, {
+                                isImplied: true,
+                            }),
+                            first,
+                        ]);
+                    }
+                }
+
+                if (!needsTypeFeaturings) return;
+
+                if (i >= 3 && cartesianFeature && cache) {
+                    const nexCart = FeatureMeta.create(this.util.idProvider, document, {
+                        declaredName: `${nameOrShortName(cartesianFeature)}_${nameOrShortName(endFeature)}`,
+                    });
+                    cache.addChild(nexCart);
+                    nexCart.addFeatureRelationship([
+                        TypeFeaturingMeta.create(this.util.idProvider, document, {
+                            isImplied: true,
+                        }),
+                        cartesianFeature,
+                    ]);
+                    cartesianFeature = nexCart;
+                }
+
+                cartesianFeature?.addHeritage([
+                    FeatureTypingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                    endFeature,
+                ]);
+            });
+
+        if (!first) {
+            document.modelDiagnostics.add(self, {
+                element: self,
+                message:
+                    "End feature with owned cross feature must be one of two or more end features.",
+                severity: "error",
+                info: {
+                    code: "checkFeatureCrossingSpecialization",
+                },
+            });
+            return;
+        }
+
+        if (makeCrossSubsetting) {
+            if (cartesianFeature) {
+                first.declaredName = `${nameOrShortName(owner)}_${nameOrShortName(cartesianFeature)}`;
+                first.addHeritage([
+                    FeatureTypingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                    cartesianFeature,
+                ]);
+            }
+            const crosses = CrossSubsettingMeta.create(this.util.idProvider, document, {
                 isImplied: true,
             });
-            end.addHeritage([specialization, target]);
-            return;
-        });
+            const chain = FeatureMeta.create(this.util.idProvider, document, {
+                declaredName: `${first.name}.${cross.name}`,
+                parent: crosses,
+            });
+            chain.addFeatureRelationship([
+                FeatureChainingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                first,
+            ]);
+            chain.addFeatureRelationship([
+                FeatureChainingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                cross,
+            ]);
+            self.addHeritage([crosses, chain]);
+        }
+
+        if (cartesianFeature) {
+            cross.allFeaturingTypes().forEach((type) => {
+                first?.addHeritage([
+                    FeatureTypingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                    type,
+                ]);
+            });
+            cross.addFeatureRelationship([
+                TypeFeaturingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                cartesianFeature,
+            ]);
+        } else {
+            stream(first.allTypes()).forEach((type) => {
+                cross.addFeatureRelationship([
+                    TypeFeaturingMeta.create(this.util.idProvider, document, {
+                        isImplied: true,
+                    }),
+                    type,
+                ]);
+            });
+        }
+
+        return cartesianFeature;
+    }
+
+    /**
+     * Setup implicit cross feature specializations
+     * @param node
+     */
+    @builder(Feature, 2000)
+    protected addCrossFeatureImplicits(node: FeatureMeta, document: LangiumDocument): void {
+        if (node.isEnd && node.owningType) {
+            const cross = node.findOwnedCrossFeature();
+            if (!cross) return;
+
+            node.allTypings().forEach((type) => {
+                cross.addHeritage([
+                    FeatureTypingMeta.create(this.util.idProvider, document, {
+                        isImplied: true,
+                    }),
+                    type,
+                ]);
+            });
+
+            const cartesianFeature = this.resolveCrossCartesianFeature(node, cross, document);
+
+            // checkFeatureOwnedCrossFeatureRedefinitionSpecialization
+            node.specializations(Redefinition).forEach((redef) => {
+                const target = redef.element() as FeatureMeta;
+                if (!target?.isEnd) return;
+                const feat = target.findOwnedCrossFeature();
+                if (feat) {
+                    cross.addHeritage([
+                        SubsettingMeta.create(this.util.idProvider, document, { isImplied: true }),
+                        feat,
+                    ]);
+                    if (!cartesianFeature) return;
+                    feat.allFeaturingTypes().forEach((maybeFeature) => {
+                        if (maybeFeature.is(Feature)) {
+                            cartesianFeature.addHeritage([
+                                SubsettingMeta.create(this.util.idProvider, document, {
+                                    isImplied: true,
+                                }),
+                                maybeFeature,
+                            ]);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     /**

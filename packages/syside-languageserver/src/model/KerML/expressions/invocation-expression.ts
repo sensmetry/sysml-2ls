@@ -66,6 +66,13 @@ export class InvocationExpressionMeta extends ExpressionMeta {
         ];
     }
 
+    override isModelLevelEvaluable(): boolean {
+        if (this.invokes()?.isAny(Expression, SysMLFunction))
+            return super.isModelLevelEvaluable() && this.args.every((p) => p.isModelLevelEvaluable);
+        // Treat as constructor expression
+        return this.args.every((p) => p.isModelLevelEvaluable);
+    }
+
     override ast(): InvocationExpression | undefined {
         return this._ast as InvocationExpression;
     }

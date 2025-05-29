@@ -176,6 +176,9 @@ const ModelPrinter: Omit<
     [ast.FeatureReferenceExpression](node, context) {
         return expr.printFeatureReferenceExpression(node, context);
     },
+    [ast.IndexExpression](node, context) {
+        return expr.printOperatorExpression(node, context);
+    },
     [ast.InvocationExpression](node, context) {
         return expr.printInvocationExpr(node, context);
     },
@@ -690,6 +693,7 @@ const ModelPrinter: Omit<
     // these elements can't appear on their own in textual syntax
     [ast.ConjugatedPortDefinition]: directPrint,
     [ast.ConjugatedPortTyping]: directPrint,
+    [ast.CrossSubsetting]: directPrint,
     [ast.Differencing]: directPrint,
     [ast.EndFeatureMembership]: directPrint,
     [ast.FeatureChaining]: directPrint,

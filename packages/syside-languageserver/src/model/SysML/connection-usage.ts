@@ -19,7 +19,7 @@ import { ConnectionUsage } from "../../generated/ast";
 import { metamodelOf } from "../metamodel";
 import { ConnectorAsUsageMeta, ConnectorAsUsageOptions } from "./connector-as-usage";
 import { PartUsageMeta, PartUsageOptions } from "./part-usage";
-import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta } from "../KerML";
+import { FeatureMeta, InheritanceMeta, MembershipMeta, TypeMeta, ElementParts } from "../KerML";
 import { enumerable } from "../../utils";
 
 export interface ConnectionUsageOptions extends PartUsageOptions, ConnectorAsUsageOptions {}
@@ -58,6 +58,10 @@ export class ConnectionUsageMeta extends Mixin(ConnectorAsUsageMeta, PartUsageMe
 
     override featureMembers(): readonly MembershipMeta<FeatureMeta>[] {
         return ConnectorAsUsageMeta.prototype.featureMembers.call(this);
+    }
+
+    protected override collectDeclaration(parts: ElementParts): void {
+        ConnectorAsUsageMeta.prototype["collectDeclaration"].call(this, parts);
     }
 }
 

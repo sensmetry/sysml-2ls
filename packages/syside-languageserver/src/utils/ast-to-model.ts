@@ -140,6 +140,8 @@ const AstToModel: {
 
         model.isOrdered = node.isOrdered;
         model.isNonUnique = node.isNonunique;
+        model["_crossingFeature"] = node.crossingFeature
+            ?.$meta as OwningMembershipMeta<FeatureMeta>;
     },
 
     [ast.Invariant](model, node) {

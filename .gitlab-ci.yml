@@ -222,10 +222,10 @@ publish:release:
     assets:
       links:
         - name: $EXTENSION_FILENAME
-          filepath: $EXTENSION_FILENAME
+          filepath: /$EXTENSION_FILENAME
           url: $ARTIFACTS_ROOT_URL/$EXTENSION_RELPATH
         - name: $SERVER_ZIPNAME
-          filepath: $SERVER_ZIPNAME
+          filepath: /$SERVER_ZIPNAME
           url: $ARTIFACTS_ROOT_URL/$SERVER_ZIPNAME
 
 publish:github:

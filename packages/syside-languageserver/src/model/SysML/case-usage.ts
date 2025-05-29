@@ -22,7 +22,7 @@ export type CaseUsageOptions = CalculationUsageOptions;
 
 @metamodelOf(CaseUsage, {
     base: "Cases::cases",
-    subcase: "Cases:subcases",
+    subcase: "Cases::Case::subcases",
 })
 export class CaseUsageMeta extends CalculationUsageMeta {
     override ast(): CaseUsage | undefined {

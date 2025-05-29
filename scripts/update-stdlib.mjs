@@ -25,7 +25,7 @@ import { fileURLToPath } from "url";
  * in chronological order. Last tag is the one we currently support. Update this
  * by appending a new tag to the array.
  */
-const SUPPORTED_TAGS = ["2022-12", "2023-02", "2023-07.1", "2023-08", "2024-02", "2024-07", "2024-09", "2024-11"];
+const SUPPORTED_TAGS = ["2022-12", "2023-02", "2023-07.1", "2023-08", "2024-02", "2024-07", "2024-09", "2024-11", "2024-12"];
 
 const CURRENT_TAG = SUPPORTED_TAGS.at(-1);
 const PREVIOUS_TAG = SUPPORTED_TAGS.at(-2);
@@ -98,8 +98,8 @@ async function generateStdlibUrls() {
 
 export const STDLIB = {
     version: "${CURRENT_TAG}",
-    tree: "https://github.com/Systems-Modeling/SysML-v2-Release/blob/${CURRENT_TAG}/sysml.library/",
-    raw: "https://raw.githubusercontent.com/Systems-Modeling/SysML-v2-Release/${CURRENT_TAG}/sysml.library/",
+    tree: "https://github.com/daumantas-kavolis-sensmetry/SysML-v2-Release/blob/fixes/sysml.library/",
+    raw: "https://raw.githubusercontent.com/daumantas-kavolis-sensmetry/SysML-v2-Release/fixes/sysml.library/",
     files: [
         ${urls.map((name) => `"${name}",`).join("\n" + " ".repeat(8))}
     ],

@@ -75,6 +75,13 @@ describe("successions", () => {
         }).resolves.toEqual("then [1] b;\n");
     });
 
+    it("should print target successions with source ends", async () => {
+        return expectPrinted("action { first start; [2] then [1] b; }", {
+            lang: "sysml",
+            node: SuccessionAsUsage,
+        }).resolves.toEqual("[2] then [1] b;\n");
+    });
+
     it("should print transition successions", async () => {
         // this should parse the second child using EntryTransitionMember rule but we
         // had to flatten the body fragment due to a bug in Langium, the second

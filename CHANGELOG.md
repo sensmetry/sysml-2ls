@@ -6,6 +6,27 @@
 
 ## main
 
+### Changes
+
+- Updated to [2024-12 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-12).
+  - Support for _Cross subsetting_ (`crosses` and `=>` keywords).
+- Switch to [Sensmetry fork](https://github.com/daumantas-kavolis-sensmetry/SysML-v2-Release/tree/fixes)
+  of the SysML v2 standard library that fixes some issues
+  - Users can still opt to using the official library by downloading it manually
+    and using the `syside.editor.standardLibraryPath` setting, but then validation
+    issues might arise.
+- Added `syside.editor.sexp.console` command to print out the [S-expressions](https://en.wikipedia.org/wiki/S-expression)
+  of the selected model node.
+  - Can be triggered either by right clicking on the node and choosing
+    _SysIDE Editor_: Get S-expression of the current node_ from the _SysML_
+    category or from the Command Palette
+  - The output is printed to the _Output_ pane of VSCode, under _SysIDE_ category
+
+### Fixed
+
+- Fix [#22](https://gitlab.com/sensmetry/public/sysml-2ls/-/issues/22) -
+  Context Menu Commands Fail in Eclipse Theia
+
 ## 0.8.0
 
 ### Fixed

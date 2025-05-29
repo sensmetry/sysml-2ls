@@ -56,16 +56,21 @@ import * as ast from "../../generated/ast";
 import { findNodeForKeyword } from "langium";
 import { printTarget } from "./edges";
 import {
-    printMultiplicityPart,
     printSpecializationPart,
     defaultSpecializationGrouper,
     printGenericFeature,
     kermlFeatureModifiers,
     TypePrinterOptions,
     featureValueAppender,
+    printKerMLOwnedCrossFeature,
+    printOwnedCrossMultiplicityPart,
 } from "./namespaces";
 import { BasicMetamodel } from "../metamodel";
-import { occurrenceUsageModifiers, sysmlUsageModifiers } from "./definition-usages";
+import {
+    occurrenceUsageModifiers,
+    sysmlUsageModifiers,
+    printSysmlOwnedCrossFeature,
+} from "./definition-usages";
 import {
     AllocationUsageMeta,
     BindingConnectorAsUsageMeta,
@@ -106,6 +111,13 @@ export function printConnectorEndMember(node: EndMember, context: ModelPrinterCo
 
     const parts: Doc[] = [];
     const heritage: Doc[] = [];
+
+    const cross = printOwnedCrossMultiplicityPart(target, context);
+    if (cross) {
+        parts.push(cross);
+        parts.push(literals.space);
+    }
+
     if (target.declaredName) {
         parts.push(
             printIdentifier(target.declaredName, {
@@ -129,8 +141,7 @@ export function printConnectorEndMember(node: EndMember, context: ModelPrinterCo
 
     heritage.push(doc);
 
-    const multi = printMultiplicityPart(target, context);
-    return [...parts, indent(group(heritage)), multi ? indent([literals.space, multi]) : []];
+    return [...parts, indent(group(heritage))];
 }
 
 export type EndMemberPrinter = typeof printConnectorEndMember;
@@ -299,6 +310,7 @@ export interface ConnectorPrinterOptions
 export function printGenericConnector(
     modifiers: Doc[],
     kw: string | undefined,
+    crossFeature: Doc | undefined,
     node: ConnectorMeta,
     context: ModelPrinterContext,
     options: ConnectorPrinterOptions
@@ -313,7 +325,7 @@ export function printGenericConnector(
     };
 
     if (ends.length === 0) {
-        return printGenericFeature(modifiers, kw, node, context, {
+        return printGenericFeature(modifiers, kw, crossFeature, node, context, {
             appendToDeclaration: push_suffix,
         });
     }
@@ -323,7 +335,7 @@ export function printGenericConnector(
         throwError(node, `Invalid ${node.nodeType()} - must have at least 2 ends`);
 
     const printNary = (): Doc => {
-        return printGenericFeature(modifiers, kw, node, context, {
+        return printGenericFeature(modifiers, kw, crossFeature, node, context, {
             appendToDeclaration(decl) {
                 push_suffix(decl);
 
@@ -342,7 +354,7 @@ export function printGenericConnector(
     };
 
     const printBinary = (): Doc => {
-        return printGenericFeature(modifiers, kw, node, context, {
+        return printGenericFeature(modifiers, kw, crossFeature, node, context, {
             appendToDeclaration(decl) {
                 push_suffix(decl);
                 if (decl.length > 0) decl.push(indent(line));
@@ -376,6 +388,7 @@ export function printKerMLConnector(
     return printGenericConnector(
         kermlFeatureModifiers(node),
         node.isSufficient ? `${kw} all` : kw,
+        printKerMLOwnedCrossFeature(node, context),
         node,
         context,
         options
@@ -420,6 +433,7 @@ export function printItemFeature(node: ItemFeatureMeta, context: ModelPrinterCon
 export function printGenericItemFlow(
     modifiers: Doc[],
     kw: string,
+    crossFeature: Doc | undefined,
     node: ItemFlowMeta,
     context: ModelPrinterContext,
     options: Pick<TypePrinterOptions, "join"> & {
@@ -435,7 +449,7 @@ export function printGenericItemFlow(
         suffix.push(indent([line, keyword("of "), printModelElement(node.item, context)]));
     }
 
-    return printGenericConnector(modifiers, kw, node, context, {
+    return printGenericConnector(modifiers, kw, crossFeature, node, context, {
         format: "binary",
         binding: keyword("to"),
         printer,
@@ -459,7 +473,14 @@ export function printItemFlow(
         ends?: EndMemberArray;
     }
 ): Doc {
-    return printGenericItemFlow(kermlFeatureModifiers(node), kw, node, context, options);
+    return printGenericItemFlow(
+        kermlFeatureModifiers(node),
+        kw,
+        printKerMLOwnedCrossFeature(node, context),
+        node,
+        context,
+        options
+    );
 }
 
 export function printGenericFlowConnectionUsage(
@@ -478,6 +499,7 @@ export function printGenericFlowConnectionUsage(
             shouldIgnoreRef(node, context.format.connection_usage_reference_keyword)
         ),
         kw,
+        printSysmlOwnedCrossFeature(node, context),
         node,
         context,
         {
@@ -523,6 +545,7 @@ export function printConnectorAsUsage(
             shouldIgnoreRef(node, context.format.connector_as_usage_reference_keyword)
         ),
         kw,
+        printSysmlOwnedCrossFeature(node, context),
         node,
         context,
         {

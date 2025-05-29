@@ -20,12 +20,16 @@ import {
     Class,
     Conjugation,
     Connector,
+    CrossSubsetting,
     EndFeatureMembership,
     Feature,
     FeatureChaining,
     FeatureMembership,
     FeatureTyping,
     Inheritance,
+    MetadataFeature,
+    Multiplicity,
+    OwningMembership,
     ParameterMembership,
     Redefinition,
     ReferenceSubsetting,
@@ -67,6 +71,7 @@ import {
 import { SubtypeKeys, SysMLType } from "../../services/sysml-ast-reflection";
 import { AstNode, EMPTY_STREAM, LangiumDocument, stream, Stream, TreeStreamImpl } from "langium";
 import { NonNullable, enumerable } from "../../utils";
+import { CrossSubsettingMeta } from "./relationships";
 
 export const ImplicitFeatures = {
     base: "Base::things",
@@ -332,6 +337,35 @@ export class FeatureMeta extends TypeMeta {
         );
     }
 
+    get ownedCrossSubsetting(): CrossSubsettingMeta | undefined {
+        return this.specializations(CrossSubsetting).at(0) as CrossSubsettingMeta | undefined;
+    }
+
+    get crossFeature(): FeatureMeta | undefined {
+        const target = this.ownedCrossSubsetting?.element() as FeatureMeta | undefined;
+        return target?.chainings.at(1)?.element();
+    }
+
+    protected _crossingFeature: OwningMembershipMeta<FeatureMeta> | undefined;
+
+    get ownedCrossFeatureMember(): OwningMembershipMeta | undefined {
+        return this._crossingFeature;
+    }
+
+    get ownedCrossFeature(): FeatureMeta | undefined {
+        return this._crossingFeature?.element();
+    }
+
+    findOwnedCrossFeature(): FeatureMeta | undefined {
+        if (this.ownedCrossFeature) return this.ownedCrossFeature;
+        for (const child of this.children) {
+            if (child.nodeType() !== OwningMembership) continue;
+            const f = child.element();
+            if (f && f.is(Feature) && !f.is(MetadataFeature) && !f.is(Multiplicity)) return f;
+        }
+        return undefined;
+    }
+
     override ast(): Feature | undefined {
         return this._ast as Feature;
     }
@@ -590,7 +624,9 @@ export class FeatureMeta extends TypeMeta {
     }
 
     private collectDirectTypes(visited: Set<FeatureMeta>): Stream<TypeMeta> {
-        const types = this.types(FeatureTyping);
+        const types = stream(this.specializations(FeatureTyping))
+            .map((s) => s.finalElement())
+            .nonNullable();
 
         const lastChaining = this.chainingFeatures.at(-1);
         if (lastChaining) {
@@ -640,6 +676,9 @@ export class FeatureMeta extends TypeMeta {
     }
 
     protected override collectDeclaration(parts: ElementParts): void {
+        if (this.ownedCrossFeatureMember) {
+            parts.push(["ownedCrossFeatureMember", [this.ownedCrossFeatureMember]]);
+        }
         if (this.parent()?.is(EndFeatureMembership)) {
             parts.push(["heritage", this.heritage]);
             if (this._multiplicity) {

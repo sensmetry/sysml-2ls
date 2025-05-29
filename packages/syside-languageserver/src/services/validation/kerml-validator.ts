@@ -21,9 +21,11 @@ import {
     AssociationMeta,
     AssociationStructMeta,
     BasicMetamodel,
+    BehaviorMeta,
     BindingConnectorMeta,
     ClassMeta,
     ConnectorMeta,
+    CrossSubsettingMeta,
     DataTypeMeta,
     ElementFilterMembershipMeta,
     ElementMeta,
@@ -53,6 +55,7 @@ import {
     ResultExpressionMembershipMeta,
     ReturnParameterMembershipMeta,
     SpecializationMeta,
+    StructureMeta,
     SubsettingMeta,
     typeArgument,
     TypeMeta,
@@ -354,6 +357,155 @@ export class KerMLValidator {
         }
     }
 
+    @validateKerML(ast.CrossSubsetting)
+    validateCrossSubsettingCrossedFeature(
+        node: CrossSubsettingMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        const crossingFeature = node.source();
+        if (
+            !crossingFeature?.is(ast.Feature) ||
+            !crossingFeature.isEnd ||
+            !crossingFeature.owningType
+        )
+            return;
+
+        const target = node.element();
+
+        if (!target?.is(ast.Feature) || target.chainings.length !== 2) {
+            accept("error", "Cross subsetting must chain exactly 2 features.", {
+                element: node,
+                code: "validateCrossSubsettingCrossedFeature",
+            });
+        } else {
+            let count = 0;
+            let opposite = undefined;
+
+            for (const member of crossingFeature.owningType.featureMembers()) {
+                const f = member.element();
+                if (!member.is(ast.EndFeatureMembership) && !f?.isEnd) continue;
+                if (++count > 2) break;
+                if (!opposite && crossingFeature !== f) opposite = f;
+            }
+
+            if (count == 2 && target.chainings.at(0)?.element() !== opposite) {
+                accept("error", "Cross subsetting must chain through an opposite end feature.", {
+                    element: target,
+                    code: "validateCrossSubsettingCrossedFeature",
+                });
+            }
+        }
+    }
+
+    // Only doing validateCrossSubsettingCrossingFeature for explicit CrossSubsettings as otherwise
+    // Occurrences::Occurrence::surroundedByOccurrences::surroundingSpace in the standard library
+    // fails validation
+    @validateKerML(ast.CrossSubsetting)
+    validateCrossSubsettingCrossingFeature(
+        node: CrossSubsettingMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        const crossingFeature = node.source();
+        if (node.isImplied || !crossingFeature?.is(ast.Feature)) return;
+
+        const numEndFeatures = crossingFeature.owningType
+            ?.basePositionalFeatures(
+                (f) => f.is(ast.EndFeatureMembership) || !!f.element()?.isEnd,
+                undefined,
+                true
+            )
+            .toArray().length;
+        if (!crossingFeature.isEnd || !numEndFeatures || numEndFeatures < 2) {
+            accept("error", "Cross subsetting must be owned by one of two or more end features.", {
+                element: node,
+                code: "validateCrossSubsettingCrossingFeature",
+            });
+        }
+    }
+
+    @validateKerML(ast.Feature)
+    validateFeatureCrossFeatureSpecialization(
+        node: FeatureMeta,
+        accept: ModelValidationAcceptor
+    ): void {
+        const cross = node.crossFeature;
+        if (!cross || cross === node.findOwnedCrossFeature()) return;
+
+        const redefinitions = stream(node.specializations(ast.Redefinition))
+            .map((redefinition) => (redefinition as RedefinitionMeta).element()?.crossFeature)
+            .nonNullable()
+            .filter((redefinitionCross) => !cross.conforms(redefinitionCross))
+            .toArray();
+
+        if (redefinitions.length > 0) {
+            accept("error", "Cross feature must specialize redefined end cross features.", {
+                element: node.findOwnedCrossFeature() ?? node.ownedCrossSubsetting ?? node,
+                code: "validateFeatureCrossFeatureSpecialization",
+            });
+        }
+    }
+
+    @validateKerML(ast.Feature)
+    validateFeatureCrossFeatureType(node: FeatureMeta, accept: ModelValidationAcceptor): void {
+        const cross = node.crossFeature;
+        if (!cross) return;
+        if (
+            cross === node.findOwnedCrossFeature() &&
+            node.specializations().every((s) => s.isImplied)
+        )
+            return;
+        const nodeTypings = node.allTypings();
+        const crossTypings = cross.allTypings();
+        if (
+            nodeTypings.length === crossTypings.length &&
+            nodeTypings.every((t) => crossTypings.includes(t))
+        )
+            return;
+        accept("error", "Cross feature must have same types as its feature.", {
+            element: node.findOwnedCrossFeature() ?? node.ownedCrossSubsetting ?? node,
+            code: "validateFeatureCrossFeatureType",
+        });
+    }
+
+    @validateKerML(ast.Feature)
+    checkFeatureCrossingSpecialization(node: FeatureMeta, accept: ModelValidationAcceptor): void {
+        if (!node.isEnd) return;
+        const cross = node.findOwnedCrossFeature();
+        if (cross && node.crossFeature && cross !== node.crossFeature) {
+            accept("error", "Must cross the owned cross feature.", {
+                element: node.ownedCrossSubsetting as CrossSubsettingMeta,
+                code: "checkFeatureCrossingSpecialization",
+            });
+        }
+    }
+
+    @validateKerML(ast.Feature)
+    validateFeatureEndMultiplicity(node: FeatureMeta, accept: ModelValidationAcceptor): void {
+        if (node.isEnd && node.multiplicity) {
+            const bounds = node.multiplicity.element()?.bounds;
+            if (bounds && (bounds.lower !== 1 || bounds.upper !== 1)) {
+                accept("warning", "End feature must have a multiplicity 1..1.", {
+                    element: node.multiplicity,
+                    code: "validateFeatureEndMultiplicity",
+                });
+            }
+        }
+    }
+
+    @validateKerML(ast.Feature)
+    validateFeatureOwnedCrossSubsetting(node: FeatureMeta, accept: ModelValidationAcceptor): void {
+        const cross = node.specializations(ast.CrossSubsetting);
+        if (cross.length > 1) {
+            this.apply(
+                "error",
+                cross,
+                "A Feature must have at most one ownedSubsetting that is a CrossSubsetting.",
+                accept,
+                { code: "validateFeatureOwnedCrossSubsetting" }
+            );
+        }
+    }
+
     @validateKerML(ast.Feature)
     validateFeatureOwnedReferenceSubsetting(
         node: FeatureMeta,
@@ -598,6 +750,17 @@ export class KerMLValidator {
         );
     }
 
+    @validateKerML(ast.Structure, { sysml: false })
+    validateStructSpecialization(node: StructureMeta, accept: ModelValidationAcceptor): void {
+        this.apply(
+            "error",
+            node.specializations(ast.Specialization).filter((s) => s.element()?.is(ast.Behavior)),
+            "A Structure must not specialize a Behavior.",
+            accept,
+            { code: "validateStructSpecialization", property: "targetRef" }
+        );
+    }
+
     @validateKerML(ast.AssociationStructure, { sysml: false })
     @validateKerML(ast.Interaction, { sysml: false })
     validateAssocStructSpecialization(
@@ -752,6 +915,17 @@ export class KerMLValidator {
         });
     }
 
+    @validateKerML(ast.Behavior)
+    validateBehaviorSpecialization(node: BehaviorMeta, accept: ModelValidationAcceptor): void {
+        this.apply(
+            "error",
+            node.specializations(ast.Specialization).filter((s) => s.element()?.is(ast.Structure)),
+            "A Behavior must not specialize a Structure.",
+            accept,
+            { code: "validateBehaviorSpecialization", property: "targetRef" }
+        );
+    }
+
     // this is implicitly ensured by the grammar but not the type system
     @validateKerML(ast.ParameterMembership)
     validateParameterMembershipOwningType(
@@ -819,6 +993,8 @@ export class KerMLValidator {
     // ensured by the model
 
     // validateCollectExpressionOperator - implicitly ensured by the model
+
+    // validateIndexExpressionOperator - implicitly ensured by the model
 
     @validateKerML(ast.FeatureChainExpression)
     validateFeatureChainExpressionFeatureConformance(

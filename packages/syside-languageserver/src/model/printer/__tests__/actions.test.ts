@@ -161,12 +161,12 @@ describe.each([
 ] as const)("%s control nodes", (kw, type) => {
     it("should print fitting nodes on one line", async () => {
         return expectPrinted(
-            `action { in abstract readonly derived end individual snapshot ${kw} node; }`,
+            `action { in abstract readonly derived individual snapshot ${kw} node; }`,
             {
                 node: type,
                 lang: "sysml",
             }
-        ).resolves.toEqual(`in abstract readonly derived end individual snapshot ${kw} node;\n`);
+        ).resolves.toEqual(`in abstract readonly derived individual snapshot ${kw} node;\n`);
     });
 });
 

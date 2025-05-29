@@ -33,10 +33,24 @@ describe("definition-usage", () => {
     });
 
     it("should print extended usages", async () => {
-        return expectPrinted("inout abstract readonly derived end #prefix a :> b {}", {
+        return expectPrinted("inout abstract readonly derived #prefix a :> b {}", {
             lang: "sysml",
             node: ast.Usage,
-        }).resolves.toEqual("inout abstract readonly derived end #prefix a :> b {}\n");
+        }).resolves.toEqual("inout abstract readonly derived #prefix a :> b {}\n");
+    });
+
+    it("should print end usages", async () => {
+        return expectPrinted("end #prefix a :> b;", {
+            lang: "sysml",
+            node: ast.Usage,
+        }).resolves.toEqual("end #prefix a :> b;\n");
+    });
+
+    it("should print end usages with cross features", async () => {
+        return expectPrinted("end cross [10] #prefix a :> b;", {
+            lang: "sysml",
+            node: ast.Usage,
+        }).resolves.toEqual("end cross [10] #prefix a :> b;\n");
     });
 
     it("should print extended variation usages", async () => {
@@ -324,9 +338,16 @@ describe("exhibit state", () => {
 
 describe("interfaces", () => {
     it("should print default interface ends", async () => {
-        return expectPrinted("interface def I { in abstract end End; }", {
+        return expectPrinted("interface def I { end End; }", {
             lang: "sysml",
             node: ast.PortUsage,
-        }).resolves.toEqual("in abstract end End;\n");
+        }).resolves.toEqual("end End;\n");
+    });
+
+    it("should print explicit port usage ends", async () => {
+        return expectPrinted("interface def I { end [1] port End; }", {
+            lang: "sysml",
+            node: ast.PortUsage,
+        }).resolves.toEqual("end [1] port End;\n");
     });
 });

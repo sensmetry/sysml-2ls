@@ -26,6 +26,7 @@ export interface ActionUsageOptions extends StepOptions, OccurrenceUsageOptions 
     base: "Actions::actions",
     subaction: "Actions::Action::subactions",
     ownedAction: "Parts::Part::ownedActions",
+    subPerformance: "Performances::Performance::subPerformances",
     enclosedPerformance: "Performances::Performance::enclosedPerformances",
     entry: "States::StateAction::entryAction",
     do: "States::StateAction::doAction",

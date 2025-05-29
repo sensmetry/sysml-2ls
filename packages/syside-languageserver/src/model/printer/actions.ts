@@ -72,7 +72,7 @@ import {
     WhileLoopActionUsageMeta,
 } from "../SysML";
 import {
-    occurrenceUsageModifiers,
+    basicOccurrenceUsageModifiers,
     printGenericOccurrenceDefinition,
     printGenericOccurrenceUsage,
     printPerformAction,
@@ -265,9 +265,9 @@ export function printControlNode(
     context: ModelPrinterContext
 ): Doc {
     assertSysML(context, node.nodeType());
-    const modifiers = occurrenceUsageModifiers(node);
+    const modifiers = basicOccurrenceUsageModifiers(node);
 
-    return printGenericFeature(modifiers, kw, node, context, {
+    return printGenericFeature(modifiers, kw, undefined, node, context, {
         join: actionBodyJoiner(),
         appendToDeclaration: featureValueAppender(node, context),
     });
@@ -318,7 +318,7 @@ function printActionBodyParameter<
                     context.format.action_node_keyword
                 );
 
-                let body = printGenericFeature([], kw, param, context, {
+                let body = printGenericFeature([], kw, undefined, param, context, {
                     forceBrackets: true,
                     appendToDeclaration() {
                         /* empty */
@@ -432,7 +432,7 @@ export function printForLoop(node: ForLoopActionUsageMeta, context: ModelPrinter
                 const suffix: Doc[] = [];
 
                 suffix.push(
-                    printGenericFeature([], undefined, variable, context, {
+                    printGenericFeature([], undefined, undefined, variable, context, {
                         appendToDeclaration() {
                             /* empty */
                         },

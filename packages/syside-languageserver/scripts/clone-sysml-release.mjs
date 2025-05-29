@@ -28,17 +28,24 @@ const __dirname = path.dirname(__filename);
 const root = path.join(__dirname, "..", "..", "..");
 const dir = path.join(root, "SysML-v2-Release");
 
-const tag = "2024-11";
+const branch = "fixes";
+const commit = "c37f87f048806d9f66c8457d75aedf76af187b17";
+// const tag = "2024-12";
 
 if (existsSync(dir)) {
-    await exec(`git config remote.origin.fetch "+refs/tags/${tag}:refs/tags/${tag}"`, { cwd: dir })
-        .then(() => exec(`git fetch --depth=1`, { cwd: dir }))
-        .then(() => exec(`git checkout tags/${tag}`, { cwd: dir }));
+    await exec(`git config remote.origin.fetch "+${branch}:${commit}"`, { cwd: dir })
+    .then(() => exec(`git fetch --depth=1 --update-head-ok`, { cwd: dir }))
+    .then(() => exec(`git checkout ${commit}`, { cwd: dir }));
+    // await exec(`git config remote.origin.fetch "+refs/tags/${tag}:refs/tags/${tag}"`, { cwd: dir })
+        // .then(() => exec(`git fetch --depth=1`, { cwd: dir }))
+        // .then(() => exec(`git checkout tags/${tag}`, { cwd: dir }));
 } else {
     await exec(
-        `git clone --depth 1 --branch ${tag} https://github.com/Systems-Modeling/SysML-v2-Release.git`,
+        `git clone --depth 1 --branch ${branch} https://github.com/daumantas-kavolis-sensmetry/SysML-v2-Release.git`,
+        // `git clone --depth 1 --branch ${tag} https://github.com/Systems-Modeling/SysML-v2-Release.git`,
         { cwd: root }
-    );
+    )
+    .then(() => exec(`git checkout ${commit}`, { cwd: dir }));
 }
 
 export const SYSMLRELEASE = dir

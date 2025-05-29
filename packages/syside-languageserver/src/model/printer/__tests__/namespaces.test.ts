@@ -234,9 +234,31 @@ type a
 
 describe("kerml feature formatting", () => {
     it("should print feature modifiers", async () => {
-        return expectPrinted("out abstract composite readonly derived end feature c;", {
+        return expectPrinted("out abstract composite readonly derived feature c;", {
             node: Feature,
-        }).resolves.toEqual("out abstract composite readonly derived end feature c;\n");
+        }).resolves.toEqual("out abstract composite readonly derived feature c;\n");
+    });
+
+    it("should print end features", async () => {
+        return expectPrinted("end feature c;", {
+            node: Feature,
+        }).resolves.toEqual("end feature c;\n");
+    });
+
+    it("should print end features with owned cross features", async () => {
+        return expectPrinted("end [1] feature c;", {
+            node: Feature,
+        }).resolves.toEqual("end [1] feature c;\n");
+    });
+
+    it("should break long owned cross features multiplicities", async () => {
+        return expectPrinted("end ['some very long reference identifier'] feature c;", {
+            node: Feature,
+            options: { lineWidth: 30 },
+        }).resolves.toEqual(`end [
+            'some very long reference identifier'
+        ]
+feature c;\n`);
     });
 
     it("should print expr nodes", async () => {

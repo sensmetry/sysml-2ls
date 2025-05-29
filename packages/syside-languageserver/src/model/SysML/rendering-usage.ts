@@ -30,7 +30,7 @@ export type RenderingUsageOptions = PartUsageOptions;
 @metamodelOf(RenderingUsage, {
     base: "Views::renderings",
     subrendering: "Views::Rendering::subrenderings",
-    viewRendering: "Views::Rendering::viewRendering",
+    viewRendering: "Views::View::viewRendering",
 })
 export class RenderingUsageMeta extends PartUsageMeta {
     override defaultSupertype(): string {
