@@ -6,6 +6,8 @@
 
 ## main
 
+## 0.9.0
+
 ### Changes
 
 - Updated to [2024-12 spec](https://github.com/Systems-Modeling/SysML-v2-Release/tree/2024-12).

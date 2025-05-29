@@ -7,7 +7,7 @@
         "url": "https://sensmetry.com/",
         "email": "opensource@sensmetry.com"
     },
-    "version": "0.8.0",
+    "version": "0.9.0",
     "repository": {
         "url": "https://gitlab.com/sensmetry/public/sysml-2ls",
         "type": "git"
