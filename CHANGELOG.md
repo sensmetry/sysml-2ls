@@ -6,6 +6,10 @@
 
 ## main
 
+- Renamed from "SysIDE Editor" to "SysIDE Editor Legacy"
+- Updated README.md with deprecation status
+- Added notification on launch announcing deprecation
+
 ## 0.9.0
 
 ### Changes

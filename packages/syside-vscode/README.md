@@ -1,3 +1,3 @@
-# _SysIDE_ VS Code Extension
+# _SysIDE Editor Legacy_ VS Code Extension
 
-This package contains the _SysIDE_ VS Code extension.
+This package contains the _SysIDE Editor Legacy_ VS Code extension.

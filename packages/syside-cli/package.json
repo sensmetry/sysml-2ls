@@ -1,6 +1,6 @@
 {
     "name": "syside-cli",
-    "displayName": "SysIDE-CLI",
+    "displayName": "SysIDE-CLI Legacy",
     "description": "CLI for SysIDE.",
     "publisher": "Sensmetry",
     "author": {

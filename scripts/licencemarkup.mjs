@@ -67,7 +67,7 @@ async function getLicenseText(dependencies) {
 
     const parts = [
         text,
-        `## Licenses of bundled dependencies\n\nThe published SysIDE Editor artifact additionally contains code with the following licenses:\n${licenses.join(", ")}`,
+        `## Licenses of bundled dependencies\n\nThe published SysIDE Editor Legacy artifact additionally contains code with the following licenses:\n${licenses.join(", ")}`,
     ];
 
     const content = dependencies
