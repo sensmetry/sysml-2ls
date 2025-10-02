@@ -51,6 +51,9 @@
         ],
         "files.insertFinalNewline": true
     },
+    "[markdown]": {
+        "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+    },
     "debug.onTaskErrors": "debugAnyway",
     "jest.monitorLongRun": 30000,
     "jest.jestCommandLine": "pnpm run test --verbose=false",

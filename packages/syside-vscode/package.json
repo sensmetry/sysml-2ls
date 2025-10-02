@@ -1,6 +1,6 @@
 {
     "name": "sysml-2ls",
-    "displayName": "SysIDE Editor",
+    "displayName": "[DEPRECATED] SysIDE Editor Legacy",
     "description": "SysML v2 language support in VS Code.",
     "publisher": "Sensmetry",
     "author": {
@@ -170,47 +170,47 @@
             {
                 "command": "syside.editor.dumpAst.console",
                 "shortTitle": "Dump AST of the current selection",
-                "title": "SysIDE Editor: Dump AST of the current selection in the active text editor"
+                "title": "SysIDE Editor Legacy: Dump AST of the current selection in the active text editor"
             },
             {
                 "command": "syside.editor.dumpMeta.console",
                 "shortTitle": "Dump Meta of the current selection",
-                "title": "SysIDE Editor: Dump Meta of the current selection in the active text editor"
+                "title": "SysIDE Editor Legacy: Dump Meta of the current selection in the active text editor"
             },
             {
                 "command": "syside.editor.updateDocument",
                 "shortTitle": "Update current document",
-                "title": "SysIDE Editor: Update current document"
+                "title": "SysIDE Editor Legacy: Update current document"
             },
             {
                 "command": "syside.editor.mro.console",
                 "shortTitle": "Get MRO of the current node",
-                "title": "SysIDE Editor: Get MRO of the current node"
+                "title": "SysIDE Editor Legacy: Get MRO of the current node"
             },
             {
                 "command": "syside.editor.sexp.console",
                 "shortTitle": "Get S-expression of the current node",
-                "title": "SysIDE Editor: Get S-expression of the current node"
+                "title": "SysIDE Editor Legacy: Get S-expression of the current node"
             },
             {
                 "command": "syside.editor.children.console",
                 "shortTitle": "Get children of the current node",
-                "title": "SysIDE Editor: Get all direct, inherited and imported children of the current node"
+                "title": "SysIDE Editor Legacy: Get all direct, inherited and imported children of the current node"
             },
             {
                 "command": "syside.editor.scope.console",
                 "shortTitle": "Get elements in scope of the current node",
-                "title": "SysIDE Editor: Get all elements in scope of the current node"
+                "title": "SysIDE Editor Legacy: Get all elements in scope of the current node"
             },
             {
                 "command": "syside.editor.evaluate.console",
                 "shortTitle": "Evaluate the selected expression",
-                "title": "SysIDE Editor: Evaluate the selected expression or feature value"
+                "title": "SysIDE Editor Legacy: Evaluate the selected expression or feature value"
             },
             {
                 "command": "syside.editor.allCommands.console",
                 "shortTitle": "Get all available language server commands",
-                "title": "SysIDE Editor: Get all available language server commands"
+                "title": "SysIDE Editor Legacy: Get all available language server commands"
             }
         ],
         "menus": {

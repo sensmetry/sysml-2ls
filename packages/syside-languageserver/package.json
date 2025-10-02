@@ -1,6 +1,6 @@
 {
     "name": "syside-languageserver",
-    "displayName": "SysIDE",
+    "displayName": "SysIDE Legacy",
     "description": "SysML v2 language server.",
     "publisher": "Sensmetry",
     "author": {

@@ -1,6 +1,6 @@
 {
     "name": "syside-languageclient",
-    "displayName": "SysIDE Language Client Extensions",
+    "displayName": "SysIDE Language Client Extensions Legacy",
     "description": "Language client extensions for SysIDE.",
     "publisher": "Sensmetry",
     "author": {

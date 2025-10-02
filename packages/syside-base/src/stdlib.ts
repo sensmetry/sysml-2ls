@@ -16,8 +16,8 @@
 
 export const STDLIB = {
     version: "2024-12",
-    tree: "https://github.com/daumantas-kavolis-sensmetry/SysML-v2-Release/blob/fixes/sysml.library/",
-    raw: "https://raw.githubusercontent.com/daumantas-kavolis-sensmetry/SysML-v2-Release/fixes/sysml.library/",
+    tree: "https://github.com/daumantas-kavolis-sensmetry/SysML-v2-Release/blob/release/2024-12/sysml.library/",
+    raw: "https://raw.githubusercontent.com/daumantas-kavolis-sensmetry/SysML-v2-Release/release/2024-12/sysml.library/",
     files: [
         "Systems Library/Actions.sysml",
         "Systems Library/Allocations.sysml",
